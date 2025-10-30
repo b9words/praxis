@@ -1,0 +1,156 @@
+{
+  "caseId": "cs_02_disney_streaming_pivot_2017",
+  "version": "1.2",
+  "title": "Disney's Streaming Dilemma: Cannibalize or Defend? (2017)",
+  "description": "You are Disney CEO Bob Iger in 2017. Your cable networks are immensely profitable, as is your content licensing deal with Netflix. But subscriber trends are alarming. You must decide whether to go all-in on a direct-to-consumer streaming service, directly attacking your own profit centers.",
+  "competencies": ["Corporate Strategy", "Capital Allocation", "Risk Management", "Investor Narrative"],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+
+  "caseFiles": [
+    {
+      "fileId": "doc_a",
+      "fileName": "Financial Summary: Media Networks & Studio Entertainment (2015-2017).csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Year,Media Networks Revenue (B),Media Networks Operating Income (B),Studio Revenue (B),Studio Operating Income (B),Netflix Licensing Revenue (M)\n2015,23.3,7.8,7.4,1.9,300\n2016,23.7,7.8,9.4,2.7,350\n2017,23.5,7.2,8.4,2.4,350"
+      }
+    },
+    {
+      "fileId": "doc_b",
+      "fileName": "CONFIDENTIAL MEMO: The Netflix Licensing Deal.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "To: CEO\nFrom: CFO\nSubject: Projecting the Netflix Deal Value\n\nOur current licensing deal for our 'Pay 1' movie window with Netflix is worth approximately $350M/year in pure, high-margin profit. This deal is up for renewal in 2019. Netflix has indicated a willingness to increase this substantially, potentially to over $500M/year. Forfeiting this revenue stream to launch our own service represents a significant, guaranteed hit to operating income for the foreseeable future.\n\nKey Financial Implications:\n- Current Netflix deal: $350M/year (95% margin)\n- Potential renewal: $500M+/year\n- DTC service costs: $4B+ investment over 3 years\n- Break-even timeline: 5-7 years (optimistic scenario)\n\nRecommendation: Carefully weigh the guaranteed high-margin revenue against the uncertain returns of a DTC strategy."
+      }
+    },
+    {
+      "fileId": "doc_c",
+      "fileName": "Market Research: The Cord-Cutting Threat & SVOD Growth.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "Internal research confirms an accelerating decline in multichannel video subscribers (cable/satellite), impacting ESPN's long-term growth. Conversely, Netflix's subscriber base is projected to double in the next 4 years, and their content spend is set to exceed $10 billion annually. They are increasingly using our content to build their platform, which they will then leverage to outbid us for new creative talent.\n\nKey Market Trends:\n- Cable/Satellite subscribers declining 3-5% annually\n- Netflix subscribers growing 25%+ annually\n- SVOD market projected to reach 200M+ US subscribers by 2025\n- Content costs inflating 15-20% annually\n- Netflix content budget: $6B (2017) → $15B+ (projected 2020)\n\nStrategic Risk: Netflix is using our content to fund their war chest against us."
+      }
+    },
+    {
+      "fileId": "doc_d",
+      "fileName": "INTERNAL DRAFT: 'Project D+' Strategic Options Analysis.pdf",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": "# Disney+ Strategic Options Analysis\n\n## Option A: All-In Direct-to-Consumer\n- Launch mass-market Disney+ service\n- Forfeit Netflix licensing revenue ($350M+/year)\n- Invest $4B+ over 3 years in content and technology\n- Target 60-90M subscribers by 2024\n- High risk, high reward strategy\n\n## Option B: Defend & License (Arms Dealer)\n- Renew and expand Netflix licensing deal\n- Focus on premium content creation\n- Maintain high-margin revenue streams\n- Lower risk, but potential future obsolescence\n\n## Option C: Niche & Premium DTC\n- Launch limited Disney Vault service for superfans\n- Keep blockbusters licensed to Netflix\n- Hedged approach with limited upside\n- Moderate risk, moderate reward\n\n## Financial Projections\n- Option A: -$2B years 1-3, +$5B+ year 7\n- Option B: +$500M/year steady state\n- Option C: +$200M/year incremental"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "stage_1_triage",
+      "stageTitle": "Choose Your Strategic Path",
+      "challengeType": "STRATEGIC_OPTIONS_TRIAGE",
+      "challengeData": {
+        "prompt": "You are presented with three viable strategic paths for Disney's digital future. Each has significant risks and rewards. You must choose ONE path to recommend to the board. This choice will lock in your strategy for the rest of the simulation.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "All-In Direct-to-Consumer (DTC)",
+            "description": "Forfeit the Netflix licensing revenue. Launch a mass-market Disney-branded streaming service. Invest $4B/year in new content and technology. This is a high-risk, high-reward bet to own your own destiny.",
+            "pros": [
+              "Complete control over customer relationship",
+              "Unlimited upside potential with scale",
+              "Future-proofs Disney for streaming era",
+              "Captures full value chain economics"
+            ],
+            "cons": [
+              "Immediate $350M+ annual revenue loss",
+              "Requires $4B+ investment over 3 years",
+              "Unproven market demand for Disney content alone",
+              "Risk of cannibalizing profitable cable networks"
+            ],
+            "riskLevel": "high"
+          },
+          {
+            "id": "option_b",
+            "title": "Defend & License (The 'Arms Dealer' Strategy)",
+            "description": "Do not launch a broad streaming service. Instead, renew and expand the licensing deal with Netflix. Use that high-margin cash to create even more premium content, making Disney the indispensable 'arms dealer' to all streaming platforms.",
+            "pros": [
+              "Guaranteed $500M+/year high-margin revenue",
+              "No massive capital investment required",
+              "Maintains profitable cable network model",
+              "Reduces execution risk"
+            ],
+            "cons": [
+              "Cedes customer relationship to Netflix",
+              "Limited upside as Netflix grows stronger",
+              "Eventual obsolescence as streaming dominates",
+              "Strengthens competitor with Disney content"
+            ],
+            "riskLevel": "low"
+          },
+          {
+            "id": "option_c",
+            "title": "Niche & Premium DTC",
+            "description": "Launch a smaller, high-priced streaming service for die-hard fans only (e.g., 'Disney Vault Club'). Keep the main blockbusters licensed to Netflix to minimize revenue loss. A hedged approach that avoids direct conflict.",
+            "pros": [
+              "Tests DTC waters with limited risk",
+              "Maintains most Netflix licensing revenue",
+              "Builds streaming capabilities gradually",
+              "Appeals to Disney superfans willing to pay premium"
+            ],
+            "cons": [
+              "Limited market size and growth potential",
+              "Doesn't solve long-term strategic challenge",
+              "May confuse brand positioning",
+              "Insufficient scale to compete with Netflix"
+            ],
+            "riskLevel": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_persuade",
+      "stageTitle": "Justify Your Strategy to the Board",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Your team has prepared a draft board presentation (doc_d) arguing for your chosen path, but the narrative is weak and the data isn't presented effectively. Your task is to leave at least 8 specific, actionable comments on the slides. Your critique must sharpen the argument, preemptively address the board's likely objections to your chosen path, and make the presentation compelling and defensible.",
+        "documentToCritique": "doc_d",
+        "timer": {
+          "durationSeconds": 2700
+        }
+      }
+    },
+    {
+      "stageId": "stage_3_communicate",
+      "stageTitle": "Defend Your Decision to Wall Street",
+      "challengeType": "EARNINGS_CALL_QA",
+      "challengeData": {
+        "prompt": "You have just announced your strategic decision on the quarterly earnings call. Now, you must face the consequences. Respond to the following questions from Wall Street analysts. Your answers must be consistent with the path you chose and address investor concerns directly.",
+        "analystQuestions": [
+          {
+            "persona": "Morgan Stanley (Bullish but Cautious)",
+            "question": "Bob, this is a bold move. Can you walk us through the expected impact on operating margins for the next 24 months and give us a sense of when you expect this new strategy to become profitable?"
+          },
+          {
+            "persona": "Bernstein Research (Skeptical Bear)",
+            "question": "It seems you're either destroying billions in guaranteed profit (if you chose DTC) or ceding the future to Netflix (if you chose to license). Can you explain why you believe this path won't permanently impair shareholder value?"
+          },
+          {
+            "persona": "The Hollywood Reporter (Industry Focused)",
+            "question": "How does this decision impact your relationship with key distribution partners, from cable companies to movie theaters? Are you prepared for the potential backlash?"
+          },
+          {
+            "persona": "Barclays (Institutional Investor)",
+            "question": "Given the massive content investments required in streaming, how do you plan to maintain Disney's historically strong return on invested capital? What's your framework for capital allocation going forward?"
+          }
+        ],
+        "timer": {
+          "durationSeconds": 3600
+        }
+      }
+    }
+  ]
+}

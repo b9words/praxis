@@ -1,0 +1,185 @@
+{
+  "caseId": "product-market-fit-validation",
+  "title": "Product-Market Fit Crisis at HealthTrack",
+  "description": "An early-stage health-tech startup with promising initial traction faces conflicting signals about product-market fit. As Head of Product, you must determine whether to pivot, persevere, or iterate.",
+  "difficulty": "intermediate",
+  "duration": 40,
+  "competencies": ["strategic-thinking", "market-awareness"],
+  "persona": {
+    "name": "Marcus Johnson",
+    "role": "Co-founder & CEO",
+    "background": "Former physician turned entrepreneur, deeply passionate about the mission",
+    "personality": "Visionary but can be defensive about the original vision. Needs data-driven arguments to change course."
+  },
+  "briefing": {
+    "situation": "HealthTrack is a 18-month-old startup building a platform to help primary care physicians coordinate care for patients with chronic conditions. The founding team includes 2 physicians and 2 engineers. You're the Head of Product, brought in 6 months ago to scale the product.\n\nThe company raised a $3M seed round 12 months ago. Current situation:\n- 45 physician practices signed up (target was 200)\n- Only 18 practices are 'active' (used in past 30 days)\n- Among active practices, usage is mixed: some love it, some barely touch it\n- Burn rate: $250K/month (12 months runway remaining)\n- The CEO believes the problem is sales/marketing execution, not the product\n- Your product instincts say something deeper is wrong\n\n**Recent Developments:**\n- A large hospital system expressed interest but wants completely different features\n- Your most engaged users are using the product in ways you didn't intend\n- Churn is 25% in the first 3 months\n- NPS is 35 (mixed signals: promoters love it, detractors hate it)\n- The original value proposition (\"coordinate care seamlessly\") isn't resonating in sales calls\n\nThe CEO has asked you to present at next week's board meeting: \"Are we on track or do we need to pivot?\"",
+    "objectives": [
+      "Assess the current state of product-market fit using available signals",
+      "Identify the core disconnect between product vision and market reality",
+      "Recommend a specific path forward with supporting evidence"
+    ],
+    "datasets": {
+      "user_segmentation": {
+        "description": "User behavior analysis across practice types",
+        "data": [
+          {
+            "segment": "Solo Practitioners (8 practices)",
+            "adoption": "low",
+            "primary_use_case": "Patient messaging only",
+            "retention": "40%",
+            "nps": 15
+          },
+          {
+            "segment": "Small Groups 2-5 docs (22 practices)",
+            "adoption": "medium",
+            "primary_use_case": "Care plan templates",
+            "retention": "65%",
+            "nps": 45
+          },
+          {
+            "segment": "Large Groups 6+ docs (15 practices)",
+            "adoption": "low",
+            "primary_use_case": "Trying to use for referral tracking (not designed for this)",
+            "retention": "30%",
+            "nps": 20
+          }
+        ]
+      },
+      "feature_usage": {
+        "description": "Weekly active usage by feature (among active users)",
+        "data": [
+          {
+            "feature": "Care Plan Templates",
+            "usage": "85% of users",
+            "satisfaction": 4.2
+          },
+          {
+            "feature": "Patient Messaging",
+            "usage": "70% of users",
+            "satisfaction": 3.8
+          },
+          {
+            "feature": "Team Coordination",
+            "usage": "25% of users",
+            "satisfaction": 2.9
+          },
+          {
+            "feature": "Analytics Dashboard",
+            "usage": "15% of users",
+            "satisfaction": 2.5
+          },
+          {
+            "feature": "Referral Tracking (beta)",
+            "usage": "45% of users",
+            "satisfaction": 4.5
+          }
+        ]
+      },
+      "customer_interviews": {
+        "description": "Recent feedback from user interviews (summary)",
+        "insights": [
+          "Solo practitioners: 'Too complex for my needs. I just want better patient communication.'",
+          "Small group advocate: 'The care plan templates save us hours. We built our diabetes program around them.'",
+          "Large group critic: 'We need this to integrate with our existing EMR. Also, we really need better referral management.'",
+          "Churned user: 'Seemed promising but the team coordination features never worked for our workflow.'",
+          "Power user: 'We've basically built a chronic care management program using your templates. Wish you had more disease-specific templates and better reporting for billing.'"
+        ]
+      },
+      "market_landscape": {
+        "description": "Competitive/adjacent solutions",
+        "data": {
+          "emr_vendors": "Dominican players like Epic/Cerner adding chronic care modules",
+          "care_coordination_platforms": "3-4 well-funded competitors focusing on hospital systems",
+          "chronic_care_management": "Fragmented market with disease-specific solutions, lots of white space",
+          "patient_communication": "Crowded market with low-cost alternatives"
+        }
+      }
+    }
+  },
+  "challenges": [
+    {
+      "id": "pmf-assessment",
+      "order": 1,
+      "title": "Product-Market Fit Assessment",
+      "description": "Based on the data provided, assess whether HealthTrack has achieved product-market fit. Support your conclusion with specific evidence. If fit is partial or unclear, identify which segments/use cases show strongest signals.",
+      "type": "text",
+      "config": {
+        "minWords": 150,
+        "maxWords": 400,
+        "placeholder": "Analyze the usage data, customer feedback, and market signals to assess PMF status..."
+      },
+      "rubricMapping": ["strategic-thinking", "market-awareness"]
+    },
+    {
+      "id": "strategic-hypothesis",
+      "order": 2,
+      "title": "Strategic Hypothesis",
+      "description": "Develop a hypothesis about what's really going on. What is the true product-market fit opportunity that the data reveals? This may be different from the original vision. Explain your reasoning.",
+      "type": "text",
+      "config": {
+        "minWords": 150,
+        "maxWords": 350,
+        "placeholder": "Based on the evidence, I believe the real opportunity is...\n\nSupporting evidence:\n1. ...\n2. ...\n\nThis suggests we should..."
+      },
+      "rubricMapping": ["strategic-thinking", "market-awareness"]
+    },
+    {
+      "id": "recommendation",
+      "order": 3,
+      "title": "Board Recommendation",
+      "description": "Present your recommendation: Pivot, Persevere, or Iterate? Outline your specific plan including: (1) Target customer segment, (2) Core value proposition, (3) Key product changes needed, (4) Go-to-market adjustments, (5) Success metrics for next 6 months.",
+      "type": "text",
+      "config": {
+        "minWords": 300,
+        "maxWords": 600,
+        "placeholder": "Recommendation: [Pivot/Persevere/Iterate]\n\nTarget Customer: ...\n\nValue Proposition: ...\n\nProduct Changes:\n1. ...\n\nGTM Adjustments: ...\n\nSuccess Metrics:\n- ...\n\nRisks: ..."
+      },
+      "rubricMapping": ["strategic-thinking", "market-awareness", "leadership-judgment"]
+    }
+  ],
+  "rubric": {
+    "criteria": {
+      "strategic-thinking": {
+        "weight": 0.4,
+        "description": "Demonstrates ability to synthesize complex signals, form coherent hypotheses, and develop strategic frameworks",
+        "scoring": {
+          "5": "Exceptional strategic synthesis. Correctly identifies the core PMF signal (care plan templates for chronic care management). Develops clear hypothesis connecting user behavior to market opportunity. Strategic recommendation is well-reasoned and addresses root issues.",
+          "4": "Strong strategic thinking. Identifies key patterns in the data and develops reasonable hypothesis. Recommendation addresses core issues though may miss some nuances.",
+          "3": "Adequate analysis. Recognizes some key signals but synthesis may be incomplete. Hypothesis is reasonable but not deeply insightful. Recommendation is logical but generic.",
+          "2": "Limited strategic thinking. Fails to synthesize data effectively. Hypothesis is weak or unsupported. Recommendation doesn't address core issues.",
+          "1": "Poor strategic analysis. Misinterprets signals or fails to form coherent view. Recommendation is disconnected from evidence."
+        }
+      },
+      "market-awareness": {
+        "weight": 0.35,
+        "description": "Shows understanding of market dynamics, customer needs, competitive landscape, and go-to-market considerations",
+        "scoring": {
+          "5": "Excellent market awareness. Correctly identifies underserved segment (small group chronic care management). Understands competitive dynamics and white space. GTM recommendations are specific and realistic.",
+          "4": "Good market understanding. Identifies viable segment and understands competitive context. GTM approach is reasonable with some specifics.",
+          "3": "Adequate market awareness. General understanding of market but lacks specific insights. GTM approach is generic or partially developed.",
+          "2": "Limited market awareness. Superficial understanding of customer needs or competitive dynamics. GTM approach is vague or unrealistic.",
+          "1": "Poor market understanding. Fails to analyze market meaningfully or makes incorrect assumptions."
+        }
+      },
+      "leadership-judgment": {
+        "weight": 0.25,
+        "description": "Shows sound judgment in making difficult strategic decisions, managing organizational change, and setting realistic goals",
+        "scoring": {
+          "5": "Excellent judgment. Makes clear recommendation while acknowledging trade-offs. Realistic about organizational challenges of pivot/change. Success metrics are specific and appropriate. Addresses CEO's likely concerns thoughtfully.",
+          "4": "Good judgment. Clear recommendation with reasonable supporting logic. Some consideration of organizational factors. Success metrics are relevant.",
+          "3": "Adequate judgment. Makes a recommendation but may not fully address complexity. Limited consideration of organizational factors or change management.",
+          "2": "Limited judgment. Recommendation may be too cautious or too bold without proper justification. Weak consideration of organizational reality.",
+          "1": "Poor judgment. Unrealistic recommendation or fails to make a clear choice. No consideration of organizational factors."
+        }
+      }
+    }
+  },
+  "status": "published",
+  "metadata": {
+    "author": "Praxis Team",
+    "version": "1.0",
+    "created_at": "2025-10-29",
+    "target_audience": "Operator's Residency - Year 1"
+  }
+}
+

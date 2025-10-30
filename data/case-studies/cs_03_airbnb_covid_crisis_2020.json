@@ -1,0 +1,112 @@
+{
+  "caseId": "cs_03_airbnb_covid_crisis_2020",
+  "version": "1.0",
+  "title": "Airbnb's COVID-19 Crisis: Survival and Reinvention (2020)",
+  "description": "You are Brian Chesky, CEO of Airbnb, in March 2020. The COVID-19 pandemic has decimated travel demand overnight. Bookings have plummeted 80%, you must lay off 25% of your workforce, and your IPO plans are in jeopardy. How do you navigate the greatest crisis in travel industry history?",
+  "competencies": ["Crisis Management", "Strategic Pivoting", "Stakeholder Management", "Digital Transformation"],
+  "estimatedDuration": 75,
+  "difficulty": "intermediate",
+
+  "caseFiles": [
+    {
+      "fileId": "covid_impact_data",
+      "fileName": "Airbnb COVID-19 Impact Analysis Q1-Q2 2020.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Jan 2020,Feb 2020,Mar 2020,Apr 2020,May 2020,Jun 2020\nGross Booking Value (M),1200,1150,650,180,220,380\nNew Bookings,2.1M,2.0M,1.1M,0.3M,0.4M,0.7M\nCancellation Rate (%),8,12,45,67,52,38\nActive Listings (M),7.2,7.3,7.1,6.8,6.5,6.3\nNew Host Signups,45000,42000,28000,15000,18000,25000\nAverage Daily Rate ($),127,132,118,89,95,108\nOccupancy Rate (%),68,71,42,18,24,35\nRevenue (M),842,805,434,115,142,251\nEmployee Count,14800,14800,14800,11100,11100,11100\nCash Burn (M/month),150,160,280,420,380,320\nCash on Hand (B),3.0,2.9,2.6,2.2,1.8,1.5"
+      }
+    },
+    {
+      "fileId": "crisis_strategy_memo",
+      "fileName": "COVID-19 Response Strategy - Internal Planning Document.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# Airbnb COVID-19 Crisis Response Strategy\n\n**CONFIDENTIAL - Executive Leadership Team Only**  \n**Date:** March 25, 2020  \n**Prepared by:** Strategy & Operations Team\n\n## Crisis Overview\n\nThe COVID-19 pandemic represents an existential threat to Airbnb's business model. Travel restrictions, lockdown orders, and consumer fear have created the worst travel crisis since 9/11, but with global scope and uncertain duration.\n\n### Immediate Impact (March 2020):\n- Bookings down 80% week-over-week\n- Cancellations spiking to 45% (normal: 8%)\n- Host income declining precipitously\n- Guest confidence at all-time lows\n\n### Financial Projections:\n- Q2 2020 revenue projected at $200-300M (vs $1.2B in Q2 2019)\n- Cash runway: 18-24 months at current burn rate\n- IPO timeline: Delayed indefinitely\n\n## Strategic Response Framework\n\n### Phase 1: Stabilize (Immediate - 90 days)\n**Objective:** Preserve cash, maintain stakeholder trust, adapt to new reality\n\n**Key Actions:**\n1. **Cost Reduction**\n   - Workforce reduction: 25% (1,900 employees)\n   - Marketing spend cut: 90% reduction\n   - Discretionary spending freeze\n   - Executive compensation cuts: 50%\n\n2. **Stakeholder Support**\n   - $250M fund for host support\n   - Enhanced cleaning protocols (\"Enhanced Clean\")\n   - Flexible cancellation policies\n   - Guest safety communications\n\n3. **Product Adaptation**\n   - Promote local/domestic travel\n   - Extended stay options for remote workers\n   - Virtual experiences platform launch\n\n### Phase 2: Adapt (3-12 months)\n**Objective:** Build resilience, capture emerging opportunities\n\n**Strategic Pivots:**\n1. **Domestic Focus**\n   - Shift marketing from international to domestic travel\n   - Partner with local tourism boards\n   - Promote \"nearby\" destinations\n\n2. **Extended Stays**\n   - Target remote workers and \"digital nomads\"\n   - Monthly stay discounts\n   - Work-friendly amenity filters\n\n3. **Health & Safety Leadership**\n   - Industry-leading cleaning standards\n   - Health screening protocols\n   - Insurance coverage enhancements\n\n4. **Virtual Experiences**\n   - Online experiences marketplace\n   - Support hosts with alternative income\n   - Build community during isolation\n\n### Phase 3: Emerge Stronger (12+ months)\n**Objective:** Capture pent-up demand, expand market share\n\n**Growth Strategies:**\n1. **Market Share Gains**\n   - Acquire distressed competitors\n   - Expand in underserved markets\n   - Strengthen host acquisition\n\n2. **Product Innovation**\n   - Enhanced search and discovery\n   - Integrated health/safety features\n   - Expanded service offerings\n\n3. **IPO Preparation**\n   - Demonstrate resilience and adaptability\n   - Strong financial recovery metrics\n   - Clear path to profitability\n\n## Risk Assessment\n\n### High-Risk Scenarios:\n- Prolonged travel restrictions (18+ months)\n- Permanent shift in travel behavior\n- Host attrition accelerating\n- Competitive pressure from hotels\n\n### Mitigation Strategies:\n- Diversify revenue streams (experiences, long-term stays)\n- Strengthen host loyalty programs\n- Build strategic partnerships\n- Maintain financial flexibility\n\n## Success Metrics\n\n**Short-term (Q2-Q3 2020):**\n- Cash preservation: <$300M quarterly burn\n- Host retention: >85% of active hosts\n- Guest safety perception: >70% confidence\n\n**Medium-term (Q4 2020-Q2 2021):**\n- Booking recovery: 60% of 2019 levels\n- Market share gains: +5% vs. 2019\n- Profitability path: Clear timeline to positive EBITDA\n\n**Long-term (2021+):**\n- IPO readiness: Strong growth and profitability\n- Market leadership: #1 in alternative accommodations\n- Platform expansion: Beyond core travel business\n\n## Conclusion\n\nThis crisis, while severe, presents an opportunity to strengthen Airbnb's competitive position and emerge as the dominant platform in a transformed travel industry. Success requires decisive action, stakeholder empathy, and strategic vision.\n\n**Immediate Decisions Required:**\n1. Workforce reduction timeline and communication\n2. Host support fund allocation\n3. Product roadmap prioritization\n4. Marketing strategy pivot\n\n*\"Never waste a good crisis.\" - Winston Churchill*"
+      }
+    },
+    {
+      "fileId": "market_research",
+      "fileName": "Travel Industry COVID-19 Recovery Scenarios.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Travel Industry COVID-19 Recovery Analysis\n\n**McKinsey & Company - Travel, Logistics & Infrastructure Practice**  \n**Date:** April 2020  \n**Client:** Confidential\n\n## Executive Summary\n\nThe COVID-19 pandemic has created the most severe disruption to the travel industry in modern history. Recovery will be gradual, uneven, and fundamentally different from pre-pandemic patterns. Companies that adapt quickly to new consumer behaviors and safety expectations will capture disproportionate value.\n\n## Recovery Scenarios\n\n### Scenario A: Quick Recovery (25% probability)\n- **Timeline:** 12-18 months to 2019 levels\n- **Drivers:** Effective vaccine deployment, coordinated global response\n- **Travel Pattern:** Rapid return to international travel\n- **Winner:** Traditional travel players with strong brands\n\n### Scenario B: Gradual Recovery (50% probability)\n- **Timeline:** 24-36 months to 2019 levels\n- **Drivers:** Vaccine rollout challenges, regional variations\n- **Travel Pattern:** Domestic first, then regional, finally international\n- **Winner:** Flexible platforms with strong domestic presence\n\n### Scenario C: Prolonged Impact (25% probability)\n- **Timeline:** 36+ months to 2019 levels\n- **Drivers:** Vaccine ineffectiveness, permanent behavior change\n- **Travel Pattern:** Permanent reduction in business travel, cautious leisure\n- **Winner:** Low-cost, safety-focused alternatives\n\n## Consumer Behavior Shifts\n\n### Permanent Changes:\n1. **Health & Safety Priority**\n   - Contactless experiences preferred\n   - Enhanced cleaning expectations\n   - Health screening acceptance\n\n2. **Domestic Travel Preference**\n   - \"Staycation\" trend acceleration\n   - Road trip renaissance\n   - Local destination discovery\n\n3. **Extended Stay Demand**\n   - Remote work normalization\n   - \"Workation\" trend emergence\n   - Monthly rental growth\n\n4. **Experience Over Accommodation**\n   - Unique, authentic experiences valued\n   - Virtual experience adoption\n   - Community connection desire\n\n### Temporary Changes:\n- Price sensitivity increase\n- Booking window shortening\n- Cancellation flexibility demand\n- Group travel reduction\n\n## Competitive Landscape Evolution\n\n### Alternative Accommodations (Airbnb, VRBO)\n**Advantages:**\n- Perceived safety (private spaces)\n- Kitchen facilities (avoid restaurants)\n- Extended stay suitability\n- Domestic inventory strength\n\n**Challenges:**\n- Host income pressure\n- Cleaning standard enforcement\n- Insurance/liability concerns\n\n### Hotels\n**Advantages:**\n- Professional cleaning standards\n- Brand trust and consistency\n- Loyalty program strength\n- Corporate travel relationships\n\n**Challenges:**\n- High fixed costs\n- Shared space concerns\n- Business travel decline\n- Occupancy rate pressure\n\n### Online Travel Agencies\n**Advantages:**\n- Booking flexibility and choice\n- Price comparison capability\n- Customer service infrastructure\n\n**Challenges:**\n- Commission pressure from suppliers\n- Reduced travel volume\n- Customer acquisition costs\n\n## Strategic Implications\n\n### For Alternative Accommodation Platforms:\n1. **Double down on safety:** Industry-leading health protocols\n2. **Expand domestic focus:** Local market penetration\n3. **Enable extended stays:** Product features for longer bookings\n4. **Support host community:** Financial assistance and training\n5. **Diversify offerings:** Virtual experiences, services beyond accommodation\n\n### Success Factors:\n- **Agility:** Rapid adaptation to changing conditions\n- **Empathy:** Understanding stakeholder needs (hosts, guests)\n- **Innovation:** New products for new behaviors\n- **Financial resilience:** Cash management and cost flexibility\n- **Brand trust:** Transparent communication and safety leadership\n\n## Investment Thesis\n\nCompanies that successfully navigate this crisis will emerge with stronger competitive positions. The travel industry will consolidate, with winners gaining market share from distressed competitors.\n\n**Key Investment Criteria:**\n- Strong balance sheet and cash position\n- Adaptable business model\n- Differentiated value proposition\n- Proven crisis management capability\n- Clear path to profitability\n\n**Recommendation:** Focus on platforms with domestic strength, safety leadership, and product innovation capability. Avoid companies dependent on international business travel or high-fixed-cost models.\n\n---\n*This report contains confidential and proprietary information. Distribution is restricted to authorized recipients only.*"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "crisis_response",
+      "title": "Immediate Crisis Response",
+      "description": "Define your immediate response to the COVID-19 crisis",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "It's March 2020, and Airbnb is facing an existential crisis. Bookings have collapsed 80%, hosts are panicking, and guests are canceling en masse. You have 72 hours to announce your crisis response strategy. What's your approach?",
+        "options": [
+          {
+            "id": "aggressive_cuts",
+            "title": "Aggressive Cost Cutting",
+            "description": "Deep workforce reductions (40%), marketing spend elimination, and cash preservation focus. Prioritize survival over growth, maintain minimal operations until recovery."
+          },
+          {
+            "id": "stakeholder_support",
+            "title": "Stakeholder-First Approach",
+            "description": "Moderate cuts (25%) while investing heavily in host and guest support. $250M host relief fund, enhanced safety protocols, flexible policies. Balance survival with community trust."
+          },
+          {
+            "id": "pivot_innovation",
+            "title": "Strategic Pivot & Innovation",
+            "description": "Moderate cuts with aggressive investment in new products: virtual experiences, extended stays, local travel. Transform crisis into opportunity for market expansion."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stakeholder_communication",
+      "title": "Stakeholder Communication",
+      "description": "Craft your message to employees, hosts, and investors",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You must communicate your crisis response to three critical stakeholder groups: employees (including those being laid off), hosts (whose livelihoods depend on Airbnb), and investors (who are concerned about their investment). Write a comprehensive communication strategy that addresses each group's specific concerns while maintaining a consistent overall message.",
+        "wordLimit": 1000,
+        "keyPoints": [
+          "Address each stakeholder group's primary concerns",
+          "Maintain consistent messaging across all communications",
+          "Balance transparency with confidence",
+          "Provide specific support measures and timelines",
+          "Articulate long-term vision despite short-term challenges"
+        ]
+      }
+    },
+    {
+      "stageId": "product_strategy",
+      "title": "Product Strategy Evolution",
+      "description": "Design new products and features for the post-COVID world",
+      "challengeType": "EARNINGS_CALL_QA",
+      "challengeData": {
+        "prompt": "Six months into the pandemic, you're hosting an investor call to discuss Airbnb's product evolution and recovery strategy. Analysts are asking tough questions about your pivot to virtual experiences, extended stays, and enhanced safety protocols.",
+        "analystQuestions": [
+          {
+            "persona": "Morgan Stanley - Travel & Leisure Analyst",
+            "question": "Brian, virtual experiences generated only $2M in revenue last quarter versus $1.2B in traditional bookings pre-COVID. How do you justify the investment in this product line, and what's the realistic revenue potential?"
+          },
+          {
+            "persona": "Goldman Sachs - Internet Analyst",
+            "question": "Your enhanced cleaning protocol adds costs for hosts and complexity for guests. How do you balance safety requirements with the cost-effectiveness that made Airbnb attractive in the first place?"
+          },
+          {
+            "persona": "JPMorgan - Hospitality Analyst",
+            "question": "Extended stays for remote workers seem promising, but hotels are targeting the same segment with corporate rates and loyalty programs. What's your sustainable competitive advantage in this market?"
+          },
+          {
+            "persona": "Barclays - Technology Analyst",
+            "question": "You've talked about emerging stronger from this crisis, but you've lost 25% of your workforce and many experienced hosts have left the platform. How do you rebuild operational capacity when travel recovers?"
+          }
+        ]
+      }
+    }
+  ]
+}

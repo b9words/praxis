@@ -1,0 +1,108 @@
+{
+  "caseId": "cs_skill_01_asymmetric_warfare",
+  "version": "1.0",
+  "title": "Asymmetric Warfare: Turning Strength Into Weakness",
+  "description": "You are the CEO of FlowSpace, a fast-moving productivity startup. Your team wants to compete head-to-head with Microsoft Office's enterprise features. Your task: write a Red Team analysis explaining why this approach will fail and propose an asymmetric strategy that turns Microsoft's enterprise dominance into a liability.",
+  "competencies": ["Strategic Thinking", "Competitive Analysis", "Market Positioning", "Contrarian Thinking"],
+  "estimatedDuration": 60,
+  "difficulty": "advanced",
+
+  "caseFiles": [
+    {
+      "fileId": "competitor_analysis",
+      "fileName": "Microsoft Office Enterprise Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Microsoft Office,FlowSpace,Industry Average\nMarket Share (%),85,2,N/A\nEnterprise Customers,500000,1200,N/A\nAnnual Revenue (M),28000,12,N/A\nR&D Spend (M),8400,2,N/A\nSales Team Size,15000,25,N/A\nAverage Deal Size ($),125000,2400,N/A\nSales Cycle (months),18,3,N/A\nCustomer Acquisition Cost ($),45000,800,N/A\nFeature Count,2847,156,N/A\nCompliance Certifications,47,3,N/A\nIntegration Partners,850,12,N/A\nSupport Response Time (hours),4,0.5,N/A\nUser Satisfaction Score,6.2,8.9,N/A\nTime to Value (days),180,1,N/A\nEmployee NPS,42,87,N/A"
+      }
+    },
+    {
+      "fileId": "internal_strategy_memo",
+      "fileName": "INTERNAL: Enterprise Feature Parity Strategy.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# FlowSpace Enterprise Strategy Proposal\n\n**From:** VP of Product  \n**To:** CEO  \n**Date:** Current  \n**Subject:** Enterprise Feature Parity Roadmap\n\n## Executive Summary\n\nTo compete effectively with Microsoft Office in the enterprise market, we must achieve feature parity in key areas. This memo outlines our 18-month roadmap to build enterprise-grade capabilities.\n\n## The Opportunity\n\n- Enterprise productivity market: $47B annually\n- Microsoft's dominance creates complacency\n- Our superior user experience can win enterprise deals\n- 73% of enterprise users report frustration with Office complexity\n\n## Proposed Enterprise Features\n\n### Phase 1 (Months 1-6): Foundation\n- Advanced permissions and access controls\n- Single Sign-On (SSO) integration\n- GDPR and SOC2 compliance\n- Enterprise-grade security audit logs\n- Advanced analytics and reporting\n\n### Phase 2 (Months 7-12): Integration\n- Salesforce integration\n- Microsoft Exchange calendar sync\n- SharePoint document connector\n- Slack and Teams integration\n- Advanced workflow automation\n\n### Phase 3 (Months 13-18): Advanced\n- Custom enterprise branding\n- Advanced admin controls\n- Multi-tenant architecture\n- Enterprise API suite\n- White-label solutions\n\n## Resource Requirements\n\n- **Engineering:** 45 additional engineers ($9M annually)\n- **Sales:** Enterprise sales team of 20 ($4M annually)\n- **Compliance:** Security and legal team expansion ($2M annually)\n- **Infrastructure:** Enterprise-grade hosting ($3M annually)\n- **Total Investment:** $18M over 18 months\n\n## Competitive Positioning\n\n\"FlowSpace Enterprise: All the power of Office, none of the complexity.\"\n\n- Position as the \"modern alternative\" to legacy Office\n- Emphasize speed and simplicity in enterprise context\n- Target mid-market companies (1,000-10,000 employees)\n- Competitive pricing: 40% less than Microsoft\n\n## Success Metrics\n\n- 500 enterprise customers by end of Year 2\n- $50M ARR from enterprise segment\n- Average deal size increase to $75,000\n- 25% market share in mid-market segment\n\n## Risk Mitigation\n\n- Phased rollout reduces execution risk\n- Existing customer base provides feedback loop\n- Strong engineering team can deliver on timeline\n- Market demand validated through customer interviews\n\n## Recommendation\n\nApprove the $18M investment to build enterprise feature parity. This represents our best opportunity to break into the lucrative enterprise market and challenge Microsoft's dominance.\n\nThe window for this opportunity is closing as other competitors (Notion, Airtable) are also targeting enterprise. We must move aggressively to secure our position.\n\n---\n\n*This document contains confidential FlowSpace strategic information.*"
+      }
+    },
+    {
+      "fileId": "customer_interviews",
+      "fileName": "Enterprise Customer Interview Transcripts.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Enterprise Customer Interview Summary\n\n**Research Period:** Last 30 days  \n**Interviews Conducted:** 47 enterprise decision-makers  \n**Company Sizes:** 1,000-50,000 employees\n\n## Key Findings\n\n### Why Companies Choose Microsoft Office\n\n**\"It's not about the features, it's about the ecosystem.\"** - CTO, 15,000-employee manufacturing company\n\n- **Integration Lock-in:** \"We have 847 different systems that integrate with Office. Switching would break everything.\" - IT Director, Financial Services\n- **Procurement Simplicity:** \"Microsoft gives us everything in one contract. Legal loves that.\" - CPO, Healthcare\n- **Risk Aversion:** \"Nobody gets fired for buying Microsoft.\" - CIO, Government Contractor\n- **Training Costs:** \"Our 25,000 employees already know Office. Retraining would cost millions.\" - CHRO, Retail Chain\n\n### Pain Points with Microsoft Office\n\n- **Complexity:** 89% report using <20% of available features\n- **Performance:** \"It's slow and crashes constantly\" - 67% of respondents\n- **Cost:** \"We pay for features we'll never use\" - 78% of respondents\n- **Innovation:** \"It feels like 1990s software with a modern skin\" - 45% of respondents\n\n### What Would Make Them Switch\n\n**Surprising Finding:** Only 23% mentioned needing feature parity\n\n**Top Switching Factors:**\n1. **Seamless Migration:** \"If you can move our data without disruption\" - 89%\n2. **Cost Savings:** \"50%+ savings would get board attention\" - 76%\n3. **Productivity Gains:** \"Measurable time savings for employees\" - 71%\n4. **Integration Guarantees:** \"Promise our existing tools will work\" - 68%\n5. **Executive Sponsorship:** \"If the CEO mandates it\" - 54%\n\n### Startup Perception Challenges\n\n**\"We can't bet our company on a startup.\"** - CFO, 8,000-employee logistics company\n\n- **Longevity Concerns:** \"What if you get acquired or shut down?\" - 83%\n- **Support Worries:** \"Can you handle 10,000 support tickets?\" - 71%\n- **Security Questions:** \"Do you have the same security as Microsoft?\" - 89%\n- **Compliance Gaps:** \"We need 47 different certifications\" - 62%\n\n## Behavioral Insights\n\n### The \"Switching Cost Trap\"\n\nEnterprise customers are trapped not by Microsoft's features, but by switching costs:\n\n- **Technical Debt:** Years of customizations and integrations\n- **Training Investment:** Millions spent on Office training programs\n- **Process Dependencies:** Workflows built around Office limitations\n- **Political Capital:** Previous executives staked reputations on Office\n\n### The \"Innovation Paradox\"\n\nEnterprises want innovation but fear change:\n\n- They complain about Office being outdated\n- But they resist new approaches that require learning\n- They want \"Office, but better\" not \"something completely different\"\n- Innovation must be invisible to end users\n\n### The \"Procurement Reality\"\n\nDecision-making is not about the best product:\n\n- **Risk Minimization** trumps **Value Maximization**\n- **Vendor Consolidation** preferred over **Best-of-Breed**\n- **Compliance Checkboxes** matter more than **User Experience**\n- **Budget Predictability** beats **Cost Optimization**\n\n## Strategic Implications\n\n### Why Feature Parity Won't Work\n\n1. **Resource Mismatch:** Microsoft spends $8.4B on R&D vs our $2M\n2. **Integration Complexity:** 850 partner integrations vs our 12\n3. **Compliance Burden:** 47 certifications take years and millions to achieve\n4. **Sales Cycle Reality:** 18-month enterprise sales cycles favor incumbents\n\n### Alternative Approach Needed\n\nCompeting on Microsoft's terms (features, integrations, compliance) plays to their strengths. We need an asymmetric strategy that:\n\n- Leverages our speed and agility\n- Exploits Microsoft's weaknesses (complexity, cost, innovation speed)\n- Targets segments where switching costs are lower\n- Creates new value categories where we can lead\n\n---\n\n*Research conducted by FlowSpace Strategy Team in partnership with Enterprise Research Group.*"
+      }
+    },
+    {
+      "fileId": "financial_projections",
+      "fileName": "Enterprise Strategy Financial Model.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Scenario,Year 1,Year 2,Year 3,Year 4,Year 5\nEnterprise Investment (M),6,8,4,2,2\nEnterprise Revenue (M),2,12,28,45,62\nEnterprise Customers,25,150,400,650,850\nAverage Deal Size ($),80000,80000,70000,69000,73000\nSales Team Size,8,20,35,45,50\nCAC ($),240000,160000,120000,90000,75000\nLTV ($),400000,480000,420000,414000,438000\nLTV/CAC Ratio,1.7,3.0,3.5,4.6,5.8\nGross Margin (%),65,72,75,78,80\nBurn Rate (M/month),2.1,2.8,2.2,1.8,1.5\nCash Runway (months),14,18,27,42,60\nMarket Share (%),0.1,0.4,0.9,1.4,1.8\nEmployee Count,85,145,220,280,320\nR&D as % Revenue,167,67,36,27,23"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "red_team_analysis",
+      "stageTitle": "Red Team Analysis: Why Feature Parity Will Fail",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "blocks": [
+          {
+            "blockId": "challenge_prompt",
+            "blockType": "PROMPT_BOX",
+            "props": {
+              "title": "The Red Team Challenge",
+              "content": "Your product team has proposed an 18-month, $18M plan to achieve enterprise feature parity with Microsoft Office. As CEO, you must write a Red Team analysis that argues AGAINST this strategy.\n\nYour task is to write a memo to your board explaining why competing head-to-head with Microsoft on their terms will fail, and why this approach will actually make FlowSpace weaker, not stronger.\n\nThis is not about being negative—it's about strategic thinking. The best CEOs can argue against their own team's proposals to find better paths forward.",
+              "type": "challenge",
+              "metadata": {
+                "timeLimit": 45,
+                "wordLimit": 1500,
+                "difficulty": "advanced"
+              }
+            }
+          },
+          {
+            "blockId": "case_materials",
+            "blockType": "DOCUMENT_VIEWER",
+            "props": {
+              "title": "Case Materials",
+              "fileIds": ["competitor_analysis", "internal_strategy_memo", "customer_interviews", "financial_projections"],
+              "showTabs": true
+            }
+          },
+          {
+            "blockId": "red_team_memo",
+            "blockType": "RICH_TEXT_EDITOR",
+            "props": {
+              "title": "Red Team Analysis Memo",
+              "maxLength": 9000,
+              "minLength": 1000,
+              "placeholder": "TO: Board of Directors\nFROM: CEO\nSUBJECT: Red Team Analysis - Why Enterprise Feature Parity Will Fail\n\nBoard Members,\n\nOur product team has presented a compelling case for enterprise feature parity with Microsoft Office. However, as your CEO, I must present the counter-argument. Here's why this strategy will fail and actually weaken our competitive position:\n\n1. THE RESOURCE MISMATCH TRAP\n[Explain why we can't win a resource war against Microsoft...]\n\n2. THE SWITCHING COST REALITY\n[Analyze why feature parity doesn't address the real barriers...]\n\n3. THE STRATEGIC POSITIONING ERROR\n[Explain how this plays to Microsoft's strengths, not ours...]\n\n[Continue your analysis...]",
+              "showWordCount": true,
+              "autoSave": true
+            }
+          },
+          {
+            "blockId": "submit_analysis",
+            "blockType": "SUBMIT_BUTTON",
+            "props": {
+              "label": "Submit Red Team Analysis",
+              "confirmationMessage": "Are you ready to submit your Red Team analysis? Ensure you've made a compelling case against the feature parity strategy using specific data from the case materials.",
+              "requiresValidation": true,
+              "validationRules": {
+                "requiredBlocks": ["red_team_memo"],
+                "minWordCount": 1000
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

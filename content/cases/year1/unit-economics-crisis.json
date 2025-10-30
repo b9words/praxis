@@ -1,0 +1,182 @@
+{
+  "caseId": "unit-economics-crisis",
+  "title": "Unit Economics Crisis at CloudScale SaaS",
+  "description": "A fast-growing B2B SaaS company discovers alarming unit economics that threaten its path to profitability. As the newly appointed COO, you must diagnose the problem and recommend a path forward.",
+  "difficulty": "intermediate",
+  "duration": 45,
+  "competencies": ["financial-acumen", "strategic-thinking"],
+  "persona": {
+    "name": "Sarah Chen",
+    "role": "CEO",
+    "background": "Former VP of Product at a unicorn startup, first-time CEO",
+    "personality": "Data-driven, moves fast, open to bold moves but needs solid reasoning"
+  },
+  "briefing": {
+    "situation": "CloudScale is a B2B SaaS platform helping mid-market companies manage their cloud infrastructure. You joined as COO 3 months ago. The company just closed a Series B ($30M) and is growing revenue 15% month-over-month. However, the CFO just flagged concerning unit economics in the latest board materials.\n\nThe CEO (Sarah Chen) has called an urgent meeting. She's asking you to lead the analysis and present recommendations at next week's board meeting.\n\n**Key Context:**\n- Founded 3 years ago\n- Current ARR: $12M (growing from $5M last year)\n- 450 customers (up from 200 last year)\n- Team size: 85 people (was 45 last year)\n- Burn rate: $2.5M/month (runway: 18 months post-Series B)\n- Average contract value: $26,700 annual\n- Customer acquisition cost (CAC): $32,000\n- Lifetime value (LTV): $78,000\n\n**The Problem:**\nWhile top-line growth looks impressive, the CFO's analysis shows:\n- LTV:CAC ratio has dropped from 3.5:1 to 2.4:1 in 6 months\n- CAC payback period increased from 14 months to 22 months\n- Gross margin declined from 78% to 71%\n- Net dollar retention slipped from 118% to 105%",
+    "objectives": [
+      "Diagnose the root causes of deteriorating unit economics",
+      "Evaluate strategic options to improve the situation",
+      "Recommend a specific action plan with timeline and success metrics"
+    ],
+    "datasets": {
+      "customer_cohorts": {
+        "description": "Cohort analysis by acquisition quarter",
+        "data": [
+          {
+            "cohort": "Q1 2024",
+            "customers": 120,
+            "avg_acv": "$28,500",
+            "churn_6m": "8%",
+            "expansion_6m": "12%"
+          },
+          {
+            "cohort": "Q2 2024",
+            "customers": 105,
+            "avg_acv": "$26,800",
+            "churn_6m": "11%",
+            "expansion_6m": "9%"
+          },
+          {
+            "cohort": "Q3 2024",
+            "customers": 115,
+            "avg_acv": "$24,200",
+            "churn_6m": "14%",
+            "expansion_6m": "6%"
+          },
+          {
+            "cohort": "Q4 2024",
+            "customers": 110,
+            "avg_acv": "$22,500",
+            "churn_6m": "17%",
+            "expansion_6m": "4%"
+          }
+        ]
+      },
+      "sales_efficiency": {
+        "description": "Sales & Marketing metrics by channel",
+        "data": [
+          {
+            "channel": "Inbound (Content/SEO)",
+            "customers_q4": 25,
+            "cac": "$18,000",
+            "close_rate": "22%"
+          },
+          {
+            "channel": "Outbound (SDR Team)",
+            "customers_q4": 45,
+            "cac": "$35,000",
+            "close_rate": "8%"
+          },
+          {
+            "channel": "Partner Referrals",
+            "customers_q4": 20,
+            "cac": "$12,000",
+            "close_rate": "35%"
+          },
+          {
+            "channel": "Paid Ads",
+            "customers_q4": 20,
+            "cac": "$52,000",
+            "close_rate": "5%"
+          }
+        ]
+      },
+      "cost_structure": {
+        "description": "Monthly operating costs breakdown",
+        "data": {
+          "sales_marketing": "$1,100,000",
+          "product_engineering": "$850,000",
+          "customer_success": "$320,000",
+          "infrastructure_cogs": "$180,000",
+          "ga": "$250,000"
+        }
+      }
+    }
+  },
+  "challenges": [
+    {
+      "id": "diagnosis",
+      "order": 1,
+      "title": "Root Cause Analysis",
+      "description": "Based on the data provided, identify the 2-3 primary factors driving the deterioration in unit economics. Support your analysis with specific data points.",
+      "type": "text",
+      "config": {
+        "minWords": 150,
+        "maxWords": 400,
+        "placeholder": "Analyze the cohort data, channel efficiency, and cost structure to identify the root causes..."
+      },
+      "rubricMapping": ["financial-acumen", "strategic-thinking"]
+    },
+    {
+      "id": "strategic-options",
+      "order": 2,
+      "title": "Strategic Options",
+      "description": "Evaluate at least 3 distinct strategic approaches to improve unit economics. For each option, briefly outline the approach, pros/cons, and expected impact on key metrics.",
+      "type": "text",
+      "config": {
+        "minWords": 200,
+        "maxWords": 500,
+        "placeholder": "Option 1: [Approach name]\nApproach: ...\nPros: ...\nCons: ...\nExpected impact: ..."
+      },
+      "rubricMapping": ["strategic-thinking", "financial-acumen"]
+    },
+    {
+      "id": "recommendation",
+      "order": 3,
+      "title": "Final Recommendation",
+      "description": "Present your recommended action plan. Include: (1) Which option you recommend and why, (2) Specific actions to take in next 90 days, (3) Success metrics to track, (4) Risks and mitigation strategies.",
+      "type": "text",
+      "config": {
+        "minWords": 250,
+        "maxWords": 600,
+        "placeholder": "Recommendation: [Option name]\n\nRationale: ...\n\n90-Day Action Plan:\n1. ...\n\nSuccess Metrics:\n- ...\n\nRisks & Mitigation:\n- ..."
+      },
+      "rubricMapping": ["strategic-thinking", "financial-acumen", "leadership-judgment"]
+    }
+  ],
+  "rubric": {
+    "criteria": {
+      "financial-acumen": {
+        "weight": 0.4,
+        "description": "Demonstrates strong understanding of SaaS unit economics, correctly interprets financial data, identifies key metrics and their relationships",
+        "scoring": {
+          "5": "Exceptional analysis of LTV:CAC dynamics, CAC payback, and cohort trends. Correctly identifies all major drivers (deteriorating cohort performance, channel mix shift, rising CAC). Quantifies impact precisely.",
+          "4": "Strong financial analysis identifying 2-3 key drivers with supporting data. Good understanding of SaaS metrics and their interrelationships. Minor gaps in quantification.",
+          "3": "Adequate analysis of financial data. Identifies some key issues but may miss important factors or misinterpret some metrics. Basic quantification.",
+          "2": "Limited financial analysis. Identifies obvious issues but lacks depth. Weak connection between data and conclusions. Minimal quantification.",
+          "1": "Poor understanding of financial metrics. Fails to analyze data meaningfully or draws incorrect conclusions."
+        }
+      },
+      "strategic-thinking": {
+        "weight": 0.35,
+        "description": "Evaluates strategic options comprehensively, considers trade-offs, demonstrates systems thinking about cause and effect",
+        "scoring": {
+          "5": "Exceptional strategic thinking. Proposes 3+ viable options with clear pros/cons and impact analysis. Considers second-order effects and interdependencies. Recommendation is well-reasoned with clear prioritization logic.",
+          "4": "Strong strategic analysis. Multiple options considered with good trade-off analysis. Recommendation is logical and well-supported, though may miss some nuances.",
+          "3": "Adequate strategic thinking. Considers multiple options but analysis may be superficial. Recommendation is reasonable but lacks depth in trade-off analysis.",
+          "2": "Limited strategic thinking. Options are generic or poorly developed. Weak analysis of trade-offs. Recommendation lacks clear reasoning.",
+          "1": "Poor strategic thinking. Fails to consider alternatives or analyze trade-offs meaningfully."
+        }
+      },
+      "leadership-judgment": {
+        "weight": 0.25,
+        "description": "Shows sound judgment in balancing competing priorities, risk assessment, and practical implementation considerations",
+        "scoring": {
+          "5": "Excellent judgment. Balances short-term stability with long-term strategic goals. Thoughtfully addresses implementation risks and organizational readiness. Realistic timeline and clear success metrics.",
+          "4": "Good judgment. Reasonable balance of priorities. Identifies key risks and some mitigation strategies. Practical implementation plan.",
+          "3": "Adequate judgment. Some consideration of trade-offs and risks but may be unbalanced or miss key factors. Implementation plan is generic.",
+          "2": "Limited judgment. Poor balance of competing priorities. Minimal risk consideration. Unrealistic or vague implementation plan.",
+          "1": "Poor judgment. Fails to consider practical constraints, risks, or feasibility."
+        }
+      }
+    }
+  },
+  "status": "published",
+  "metadata": {
+    "author": "Praxis Team",
+    "version": "1.0",
+    "created_at": "2025-10-29",
+    "target_audience": "Operator's Residency - Year 1"
+  }
+}
+

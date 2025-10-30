@@ -1,0 +1,152 @@
+{
+  "caseId": "cs_skill_03_cannibalization",
+  "version": "1.0",
+  "title": "Cannibalization Strategy: Managing Your Own Disruption",
+  "description": "You are the GM of Apple's iPod division in 2007. The iPhone is about to launch and will make your entire $8B business obsolete. Your task: create a 24-month managed decline plan that maximizes cash flow from iPod while shifting resources to iPhone, all without demoralizing your 2,000-person team.",
+  "competencies": ["Strategic Planning", "Change Management", "Resource Allocation", "Team Leadership"],
+  "estimatedDuration": 90,
+  "difficulty": "advanced",
+
+  "caseFiles": [
+    {
+      "fileId": "division_financials",
+      "fileName": "iPod Division P&L 2005-2007.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,2005,2006,2007E,2008E,2009E\nRevenue (B),4.5,7.7,8.2,6.1,3.8\nGross Margin (%),32,35,38,35,28\nOperating Income (B),1.44,2.70,3.12,2.14,1.06\nUnit Sales (M),22.5,39.4,51.6,38.2,23.8\nASP ($),200,195,159,160,160\nR&D Spend (M),180,240,320,180,90\nMarketing Spend (M),300,450,520,280,140\nEmployee Count,1200,1800,2000,1400,800\nMarket Share (%),78,76,71,58,42\nInventory (M),340,580,720,450,280\nCapEx (M),120,180,200,80,40\nFree Cash Flow (B),1.2,2.3,2.7,1.9,0.9"
+      }
+    },
+    {
+      "fileId": "iphone_projections",
+      "fileName": "iPhone Business Plan - CONFIDENTIAL.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,2007,2008,2009,2010,2011\niPhone Revenue (B),0.6,6.7,13.0,25.2,47.1\niPhone Units (M),1.4,11.6,20.7,39.9,72.3\niPhone ASP ($),499,574,627,632,652\niPhone Gross Margin (%),28,32,38,42,45\nRequired Engineers,200,800,1200,1800,2400\nRequired Marketing (M),100,400,600,800,1000\nRequired CapEx (M),50,200,400,600,800\nCannibalization of iPod (%),5,25,45,65,80\nNet Revenue Impact (B),0.1,0.5,2.8,8.9,22.3\nEmployee Transfers Needed,150,600,900,1200,1500\nTime to Profitability (months),18,12,8,6,4"
+      }
+    },
+    {
+      "fileId": "team_morale_survey",
+      "fileName": "iPod Team Morale & Retention Survey.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# iPod Division Team Survey Results\n\n**Survey Period:** Q4 2006  \n**Response Rate:** 87% (1,566 of 1,800 employees)  \n**Conducted by:** Apple HR & External Consultant\n\n## Executive Summary\n\nThe iPod team shows high engagement and pride but growing anxiety about the division's future. iPhone rumors are creating uncertainty and talent flight risk.\n\n## Key Findings\n\n### Job Satisfaction & Pride\n- **Overall Satisfaction:** 8.4/10 (company average: 7.9)\n- **Pride in Product:** 9.2/10 (highest in company)\n- **Team Cohesion:** 8.7/10\n- **Work-Life Balance:** 6.8/10 (below company average)\n\n### Future Concerns\n- **Job Security Confidence:** 6.1/10 (down from 8.3 in 2005)\n- **Career Growth Optimism:** 5.9/10 (down from 8.1)\n- **Division Future Confidence:** 5.4/10 (concerning decline)\n\n### iPhone Impact Awareness\n\n**\"How will iPhone affect iPod?\"**\n- \"Significant negative impact\": 47%\n- \"Some cannibalization\": 31%\n- \"Complementary products\": 15%\n- \"Don't know\": 7%\n\n**\"Are you concerned about your job?\"**\n- \"Very concerned\": 23%\n- \"Somewhat concerned\": 41%\n- \"Not concerned\": 36%\n\n### Talent Flight Risk\n\n**\"Considering leaving Apple?\"**\n- \"Actively looking\": 12%\n- \"Open to opportunities\": 34%\n- \"Not considering\": 54%\n\n**Top Reasons for Potential Departure:**\n1. \"Uncertain future of iPod division\" (67%)\n2. \"Better opportunities elsewhere\" (45%)\n3. \"Want to work on growing products\" (38%)\n4. \"Compensation concerns\" (23%)\n\n### Skills & Transition Readiness\n\n**\"Interest in iPhone project?\"**\n- \"Very interested\": 58%\n- \"Somewhat interested\": 29%\n- \"Not interested\": 13%\n\n**\"Confidence in skills transfer?\"**\n- \"Very confident\": 34%\n- \"Somewhat confident\": 48%\n- \"Not confident\": 18%\n\n## Departmental Breakdown\n\n### Engineering (45% of division)\n- **Highest flight risk:** 18% actively looking\n- **iPhone interest:** 72% very interested\n- **Skills transferability:** High (mobile development)\n- **Key concern:** \"Will iPhone team want iPod engineers?\"\n\n### Marketing (15% of division)\n- **Moderate flight risk:** 8% actively looking\n- **iPhone interest:** 51% very interested\n- **Skills transferability:** Medium (different positioning)\n- **Key concern:** \"iPod marketing skills may not apply\"\n\n### Operations (25% of division)\n- **Low flight risk:** 6% actively looking\n- **iPhone interest:** 43% very interested\n- **Skills transferability:** High (manufacturing)\n- **Key concern:** \"Will operations be centralized?\"\n\n### Sales (15% of division)\n- **High flight risk:** 15% actively looking\n- **iPhone interest:** 39% very interested\n- **Skills transferability:** Medium (different channels)\n- **Key concern:** \"Carrier relationships vs retail\"\n\n## Leadership Sentiment\n\n### Director Level (25 people)\n- **Aware of cannibalization risk:** 100%\n- **Confident in transition plan:** 32%\n- **Requesting clear communication:** 88%\n- **Willing to lead transition:** 76%\n\n### Manager Level (120 people)\n- **Team morale concerns:** 89%\n- **Need for transparency:** 94%\n- **Resource planning clarity:** 23%\n- **Change management support:** 67%\n\n## Verbatim Comments\n\n**\"We built the most successful product in Apple's history, and now we're being told it's going to be killed by our own company. How are we supposed to feel about that?\"** - Senior Engineer\n\n**\"I love working on iPod, but I'm not stupid. I can see where this is going. I need to know what my future looks like here.\"** - Product Manager\n\n**\"The iPhone team gets all the attention and resources now. We feel like the forgotten stepchild.\"** - Marketing Manager\n\n**\"I'd rather work on iPhone than watch iPod slowly die. But will they even want us?\"** - Hardware Engineer\n\n**\"We need honest communication about the timeline. The rumors and speculation are killing morale.\"** - Operations Director\n\n## Recommendations\n\n### Immediate Actions (Next 30 days)\n1. **Transparent Communication:** CEO/GM all-hands on division future\n2. **Transition Planning:** Clear iPhone transfer opportunities\n3. **Retention Incentives:** Special bonuses for key talent\n4. **Skills Assessment:** Identify iPhone-relevant capabilities\n\n### Medium-term (3-6 months)\n1. **Dual-track Strategy:** iPod optimization + iPhone preparation\n2. **Cross-training Programs:** iPhone technology exposure\n3. **Internal Mobility:** Formal transfer processes\n4. **Recognition Programs:** Celebrate iPod achievements\n\n### Long-term (6-24 months)\n1. **Managed Transition:** Phased team migration\n2. **Legacy Celebration:** iPod impact documentation\n3. **Alumni Network:** Maintain team relationships\n4. **Knowledge Transfer:** iPod learnings to iPhone\n\n## Risk Assessment\n\n**High Risk:**\n- Mass exodus of engineering talent (18% actively looking)\n- Morale collapse affecting current performance\n- Knowledge loss during transition\n- Negative publicity about \"Apple killing iPod\"\n\n**Mitigation Required:**\n- Immediate leadership communication\n- Clear transition timeline and opportunities\n- Retention incentives for critical talent\n- Positive narrative about evolution, not elimination\n\n---\n\n*This survey was conducted under strict confidentiality. Results should be shared only with executive leadership.*"
+      }
+    },
+    {
+      "fileId": "resource_allocation",
+      "fileName": "Resource Allocation Model - iPod to iPhone Transition.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Resource Type,Current iPod,iPhone Needs,Transferable,Retraining Required,Timeline\nHardware Engineers,280,400,220,60,6 months\nSoftware Engineers,180,600,120,180,9 months\nProduct Managers,45,80,35,20,3 months\nMarketing Team,90,120,40,60,6 months\nOperations Staff,320,200,200,50,4 months\nSales Team,85,150,30,80,12 months\nSupport Staff,200,100,80,40,2 months\nManufacturing,400,300,250,100,8 months\nSupply Chain,120,180,90,60,6 months\nQuality Assurance,80,120,60,40,4 months\nTotal Headcount,1800,2250,1125,690,N/A\nBudget Allocation (M),450,680,N/A,N/A,N/A\nTraining Costs (M),N/A,N/A,N/A,45,N/A\nRetention Bonuses (M),N/A,N/A,N/A,25,N/A\nSeverance Costs (M),N/A,N/A,N/A,35,N/A"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "transition_analysis",
+      "stageTitle": "Financial Analysis & Resource Planning",
+      "challengeType": "FINANCIAL_MODELING",
+      "challengeData": {
+        "blocks": [
+          {
+            "blockId": "challenge_prompt",
+            "blockType": "PROMPT_BOX",
+            "props": {
+              "title": "The Cannibalization Challenge",
+              "content": "You are the GM of Apple's iPod division. It's early 2007, and you know the iPhone will launch in June. Your $8B business is about to be cannibalized by your own company's product.\n\nYour challenge: Create a 24-month managed decline plan that:\n1. Maximizes cash flow from iPod during the transition\n2. Efficiently transfers resources to iPhone\n3. Maintains team morale and prevents talent exodus\n4. Preserves Apple's overall profitability\n\nThis is the ultimate test of strategic leadership—managing your own disruption.",
+              "type": "challenge",
+              "metadata": {
+                "timeLimit": 75,
+                "difficulty": "advanced"
+              }
+            }
+          },
+          {
+            "blockId": "case_materials",
+            "blockType": "DOCUMENT_VIEWER",
+            "props": {
+              "title": "Division Intelligence",
+              "fileIds": ["division_financials", "iphone_projections", "team_morale_survey", "resource_allocation"],
+              "showTabs": true
+            }
+          },
+          {
+            "blockId": "transition_model",
+            "blockType": "FINANCIAL_MODEL",
+            "props": {
+              "title": "iPod-to-iPhone Transition Model",
+              "modelType": "custom",
+              "template": {
+                "ipodRevenue2008": 6100,
+                "ipodRevenue2009": 3800,
+                "iphoneRevenue2008": 6700,
+                "iphoneRevenue2009": 13000,
+                "employeeTransfers": 600,
+                "retrainingCosts": 45,
+                "retentionBonuses": 25
+              },
+              "requiredFields": ["employeeTransfers", "retrainingCosts", "retentionBonuses"],
+              "calculations": {
+                "totalRevenue2008": "ipodRevenue2008 + iphoneRevenue2008",
+                "totalRevenue2009": "ipodRevenue2009 + iphoneRevenue2009",
+                "transitionCosts": "retrainingCosts + retentionBonuses",
+                "netBenefit": "totalRevenue2009 - totalRevenue2008 - transitionCosts"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "operational_plan",
+      "stageTitle": "24-Month Operational Plan",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "blocks": [
+          {
+            "blockId": "planning_prompt",
+            "blockType": "PROMPT_BOX",
+            "props": {
+              "title": "The Managed Decline Plan",
+              "content": "Based on your financial analysis, create a detailed 24-month operational plan for managing the iPod-to-iPhone transition. Your plan must address:\n\n• Resource allocation and team transitions\n• Communication strategy to maintain morale\n• Timeline for product wind-down\n• Risk mitigation for talent retention\n• Metrics for measuring success\n\nRemember: You're not just managing numbers—you're managing people's careers and livelihoods.",
+              "type": "objective",
+              "metadata": {
+                "wordLimit": 2000
+              }
+            }
+          },
+          {
+            "blockId": "operational_plan",
+            "blockType": "RICH_TEXT_EDITOR",
+            "props": {
+              "title": "24-Month Managed Decline Plan",
+              "maxLength": 12000,
+              "minLength": 1500,
+              "placeholder": "# iPod Division: 24-Month Transition Plan\n\n**Prepared by:** GM, iPod Division  \n**Date:** January 2007  \n**Classification:** Confidential - Executive Team Only\n\n## Executive Summary\n\nThis plan outlines the strategic transition of the iPod division from a growth business to a managed decline while maximizing value extraction and enabling iPhone success...\n\n## Phase 1: Foundation (Months 1-6)\n\n### Financial Targets\n- iPod revenue: $X.XB\n- Cash flow optimization: $XXXm\n- Cost reduction: XX%\n\n### Team Management\n- Communication strategy: [Detail your approach]\n- Retention programs: [Specific initiatives]\n- Transfer planning: [Timeline and process]\n\n### Operational Focus\n- Product line rationalization\n- Inventory optimization\n- Supply chain efficiency\n\n## Phase 2: Transition (Months 7-18)\n\n[Continue with detailed planning...]\n\n## Phase 3: Integration (Months 19-24)\n\n[Final transition steps...]\n\n## Risk Mitigation\n\n[Address key risks and mitigation strategies...]\n\n## Success Metrics\n\n[Define measurable outcomes...]",
+              "showWordCount": true,
+              "autoSave": true
+            }
+          },
+          {
+            "blockId": "submit_plan",
+            "blockType": "SUBMIT_BUTTON",
+            "props": {
+              "label": "Submit Transition Plan",
+              "confirmationMessage": "Ready to submit your 24-month managed decline plan? Ensure it addresses both financial optimization and team management.",
+              "requiresValidation": true,
+              "validationRules": {
+                "requiredBlocks": ["operational_plan"],
+                "minWordCount": 1500
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

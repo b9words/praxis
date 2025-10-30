@@ -1,0 +1,189 @@
+{
+  "caseId": "pricing-strategy-dilemma",
+  "title": "Pricing Strategy Crisis at DataViz Pro",
+  "description": "A B2B analytics platform faces pressure to change its pricing model. As VP of Revenue Operations, you must analyze customer data and competitive dynamics to recommend a new pricing strategy.",
+  "difficulty": "advanced",
+  "duration": 45,
+  "competencies": ["strategic-thinking", "financial-acumen", "market-awareness"],
+  "persona": {
+    "name": "Rachel Kim",
+    "role": "CEO",
+    "background": "Former McKinsey consultant, data-driven leader",
+    "personality": "Analytical and open to bold changes, but needs rigorous analysis. Concerned about short-term revenue impact."
+  },
+  "briefing": {
+    "situation": "DataViz Pro is a 4-year-old B2B analytics platform with $18M ARR. The company has grown steadily but faces increasing competitive pressure. You're the VP of Revenue Operations, tasked with analyzing whether the current pricing model is optimal.\n\n**Current Pricing Model:**\n- Seat-based: $99/user/month\n- Enterprise tier: $199/user/month (advanced features)\n- No usage-based component\n- Average contract: 15 seats = $1,485/month\n\n**The Problem:**\nRecent customer research and sales team feedback suggest the pricing model is causing friction:\n- Small teams (5-10 users) find it expensive and often churn after 6 months\n- Large enterprises (100+ potential users) deploy to only 20-30 seats due to cost\n- A competitor just launched with usage-based pricing and is winning deals\n- Sales team reports losing deals due to \"complicated ROI calculation\"\n- Power users create significant value but don't generate more revenue\n\nThe CEO wants a comprehensive pricing strategy recommendation for next quarter's launch.",
+    "objectives": [
+      "Analyze the current pricing model's strengths and weaknesses",
+      "Evaluate alternative pricing models and their impact",
+      "Recommend a specific pricing strategy with implementation plan"
+    ],
+    "datasets": {
+      "customer_segmentation": {
+        "description": "Customer analysis by size and usage",
+        "data": [
+          {
+            "segment": "Small Teams (5-15 seats)",
+            "customers": 280,
+            "avg_arr": "$14,400",
+            "avg_seats": 12,
+            "ltv": "$32,000",
+            "churn_rate_annual": "35%",
+            "usage_intensity": "Medium"
+          },
+          {
+            "segment": "Mid-Market (16-50 seats)",
+            "customers": 145,
+            "avg_arr": "$42,000",
+            "avg_seats": 28,
+            "ltv": "$98,000",
+            "churn_rate_annual": "18%",
+            "usage_intensity": "High"
+          },
+          {
+            "segment": "Enterprise (51+ potential seats)",
+            "customers": 35,
+            "avg_arr": "$72,000",
+            "avg_seats_deployed": 32,
+            "avg_seats_potential": 180,
+            "ltv": "$180,000",
+            "churn_rate_annual": "8%",
+            "usage_intensity": "Very High"
+          }
+        ]
+      },
+      "usage_patterns": {
+        "description": "Product usage distribution",
+        "data": {
+          "power_users_10_percentile": "Create 60% of all reports, use 80% of advanced features",
+          "average_users_70_percentile": "Create 35% of reports, use 40% of features",
+          "light_users_20_percentile": "Create 5% of reports, mostly view shared content",
+          "feature_adoption": {
+            "basic_dashboards": "95% of users",
+            "advanced_analytics": "35% of users",
+            "api_integrations": "18% of users",
+            "custom_reports": "42% of users"
+          }
+        }
+      },
+      "competitive_landscape": {
+        "description": "Competitor pricing models",
+        "data": [
+          {
+            "competitor": "Competitor A (market leader)",
+            "model": "Tiered seat-based",
+            "pricing": "$150-250/user/month",
+            "approach": "Premium positioning"
+          },
+          {
+            "competitor": "Competitor B (new entrant)",
+            "model": "Usage-based (reports generated)",
+            "pricing": "$0.50 per report + $20/user base fee",
+            "approach": "Disruptive, usage-aligned"
+          },
+          {
+            "competitor": "Competitor C",
+            "model": "Value-based (data processed)",
+            "pricing": "$500-5000/month based on data volume",
+            "approach": "Scales with value delivered"
+          }
+        ]
+      },
+      "financial_impact_analysis": {
+        "description": "Sensitivity analysis of pricing changes",
+        "assumptions": {
+          "current_arr": "$18M",
+          "current_customers": 460,
+          "avg_cac": "$12,000",
+          "gross_margin": "82%"
+        }
+      }
+    }
+  },
+  "challenges": [
+    {
+      "id": "pricing-analysis",
+      "order": 1,
+      "title": "Current Model Analysis",
+      "description": "Analyze the strengths and weaknesses of the current seat-based pricing model. Use the data to identify specific problems and opportunities. What customer behaviors and business metrics indicate the model needs to change?",
+      "type": "text",
+      "config": {
+        "minWords": 200,
+        "maxWords": 400,
+        "placeholder": "Strengths:\n1. ...\n\nWeaknesses:\n1. ...\n\nKey Problems:\n- ...\n\nData Supporting Change:\n- ..."
+      },
+      "rubricMapping": ["financial-acumen", "strategic-thinking"]
+    },
+    {
+      "id": "model-evaluation",
+      "order": 2,
+      "title": "Alternative Models",
+      "description": "Evaluate at least 3 alternative pricing models for DataViz Pro. For each model, explain the structure, estimate the revenue impact, and identify pros/cons. Consider: pure usage-based, hybrid (base + usage), value-based, or tiered approaches.",
+      "type": "text",
+      "config": {
+        "minWords": 300,
+        "maxWords": 600,
+        "placeholder": "Model 1: [Name]\nStructure: ...\nEstimated Revenue Impact: ...\nPros:\n- ...\nCons:\n- ...\n\n[Continue for each model]"
+      },
+      "rubricMapping": ["strategic-thinking", "financial-acumen", "market-awareness"]
+    },
+    {
+      "id": "recommendation",
+      "order": 3,
+      "title": "Strategic Recommendation",
+      "description": "Recommend a specific pricing strategy for DataViz Pro. Include: (1) Detailed pricing structure, (2) Rationale and expected business impact, (3) Implementation plan and migration strategy for existing customers, (4) Success metrics, (5) Risks and mitigation.",
+      "type": "text",
+      "config": {
+        "minWords": 350,
+        "maxWords": 700,
+        "placeholder": "Recommended Model: ...\n\nPricing Structure:\n- ...\n\nBusiness Impact:\n- Revenue: ...\n- Retention: ...\n- Expansion: ...\n\nImplementation Plan:\n1. ...\n\nCustomer Migration:\n- ...\n\nSuccess Metrics:\n- ...\n\nRisks:\n- ..."
+      },
+      "rubricMapping": ["strategic-thinking", "financial-acumen", "market-awareness"]
+    }
+  ],
+  "rubric": {
+    "criteria": {
+      "financial-acumen": {
+        "weight": 0.35,
+        "description": "Demonstrates understanding of pricing economics, revenue models, and financial impact analysis",
+        "scoring": {
+          "5": "Exceptional financial analysis. Correctly identifies unit economics issues (undermonetized enterprises, overpriced small teams). Quantifies revenue impact of alternatives with realistic assumptions. Considers LTV, CAC payback, and margin implications.",
+          "4": "Strong financial thinking. Good analysis of current model economics. Reasonable revenue projections for alternatives with some supporting logic.",
+          "3": "Adequate financial analysis. Identifies obvious economic issues. Revenue projections are directional but lack rigorous support.",
+          "2": "Limited financial depth. Superficial analysis of economics. Weak or absent revenue impact projections.",
+          "1": "Poor financial understanding. Fails to analyze economics meaningfully or makes significant errors."
+        }
+      },
+      "strategic-thinking": {
+        "weight": 0.35,
+        "description": "Shows strategic thinking about pricing as competitive advantage, customer value alignment, and market positioning",
+        "scoring": {
+          "5": "Excellent strategic thinking. Connects pricing to value creation and capture. Considers competitive dynamics and customer psychology. Recommendation addresses root issues (value-usage misalignment, enterprise under-penetration). Migration strategy is thoughtful.",
+          "4": "Good strategic analysis. Understands pricing strategy beyond just numbers. Considers market dynamics. Recommendation is well-reasoned with practical implementation plan.",
+          "3": "Adequate strategy. Considers multiple factors but analysis may be surface-level. Recommendation is reasonable but may miss important strategic implications.",
+          "2": "Limited strategic thinking. Focuses narrowly on pricing mechanics without broader strategic context. Weak implementation planning.",
+          "1": "Poor strategy. Fails to consider strategic implications or makes recommendations disconnected from market reality."
+        }
+      },
+      "market-awareness": {
+        "weight": 0.30,
+        "description": "Demonstrates understanding of competitive landscape, customer needs, and market trends in SaaS pricing",
+        "scoring": {
+          "5": "Exceptional market awareness. Understands SaaS pricing trends (usage-based gaining traction). Correctly reads competitive signals. Customer segmentation analysis is sophisticated. Recommendation positions company appropriately vs. competitors.",
+          "4": "Good market understanding. Aware of competitive models and customer preferences. Segmentation analysis is sound. Positioning considerations are reasonable.",
+          "3": "Adequate market awareness. Basic understanding of competitive landscape and customer needs. Some consideration of positioning.",
+          "2": "Limited market awareness. Superficial competitive analysis. Weak understanding of customer preferences or market trends.",
+          "1": "Poor market understanding. Fails to consider competitive or customer context meaningfully."
+        }
+      }
+    }
+  },
+  "status": "published",
+  "metadata": {
+    "author": "Praxis Team",
+    "version": "1.0",
+    "created_at": "2025-10-29",
+    "target_audience": "Operator's Residency - Year 1"
+  }
+}
+

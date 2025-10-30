@@ -1,0 +1,130 @@
+{
+  "caseId": "cs_skill_02_second_order",
+  "version": "1.0",
+  "title": "Second-Order Thinking: The Price War Trap",
+  "description": "You are the CEO of RideShare, the #2 player in a brutal duopoly. Your #1 competitor just slashed prices 30%. Your team is screaming to match immediately. Your task: model the second and third-order effects of this decision and write the 'What Happens Next?' memo that goes beyond the obvious first-order response.",
+  "competencies": ["Strategic Thinking", "Systems Thinking", "Financial Modeling", "Scenario Planning"],
+  "estimatedDuration": 75,
+  "difficulty": "advanced",
+
+  "caseFiles": [
+    {
+      "fileId": "market_dynamics",
+      "fileName": "Ride-Share Market Dynamics Q3 2024.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,UberLift (Competitor),RideShare (Us),Market Total\nMarket Share (%),58,35,93\nMonthly Rides (M),145,87,232\nAverage Fare ($),18.50,19.20,18.75\nRevenue (M/month),2683,1670,4353\nDriver Count,850000,520000,1370000\nActive Riders (M),42,28,70\nDriver Utilization (%),67,71,68\nCustomer Acquisition Cost ($),45,52,48\nDriver Acquisition Cost ($),280,320,295\nChurn Rate - Riders (%),8.2,6.9,7.8\nChurn Rate - Drivers (%),12.1,9.8,11.2\nAverage Wait Time (min),4.2,3.8,4.1\nDriver Earnings ($/hour),16.80,18.20,17.30\nFuel Costs (% of fare),22,22,22\nInsurance Costs (% of fare),8,8,8\nPlatform Commission (%),25,23,24\nNet Margin (%),12,15,13"
+      }
+    },
+    {
+      "fileId": "competitor_financials",
+      "fileName": "UberLift Financial Model & Price Cut Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Scenario,Current,30% Price Cut,Our Response,Price War\nUberLift Avg Fare ($),18.50,12.95,12.95,10.36\nUberLift Monthly Revenue (M),2683,1878,1878,1503\nUberLift Rides (M),145,145,145,145\nUberLift Driver Earnings ($/hr),16.80,11.76,11.76,9.41\nUberLift Driver Retention (%),87.9,72.3,72.3,58.7\nUberLift Available Drivers,850000,614500,614500,498950\nUberLift Wait Times (min),4.2,6.8,6.8,8.9\nUberLift Customer Satisfaction,7.2,6.1,6.1,5.3\nUberLift Cash Burn (M/month),420,890,890,1340\nUberLift Cash Runway (months),36,17,17,11\nUberLift Market Share (%),58,52,48,45\nRideShare Market Share (%),35,41,45,48\nTotal Market Rides (M),232,232,232,232\nDriver Supply Shortage (%),0,18,25,35\nRegulatory Scrutiny (1-10),3,6,7,9"
+      }
+    },
+    {
+      "fileId": "supplier_analysis",
+      "fileName": "Driver Economics & Supply Chain Analysis.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Driver Economics & Supply Chain Analysis\n\n**Prepared by:** Operations Research Team  \n**Date:** Current  \n**Classification:** Internal Use Only\n\n## Executive Summary\n\nOur driver network represents our most critical asset and vulnerability. Price cuts directly impact driver economics, creating cascading effects throughout our supply chain that extend far beyond immediate revenue impacts.\n\n## Driver Economics Breakdown\n\n### Current State (Pre-Price Cut)\n- **Average Hourly Earnings:** $18.20\n- **After Expenses:** $14.60/hour\n- **Driver Satisfaction:** 8.1/10\n- **Monthly Churn:** 9.8%\n- **New Driver Signups:** 45,000/month\n\n### Price Cut Impact Modeling\n\n**30% Fare Reduction Scenario:**\n- Driver earnings drop to $12.74/hour\n- After expenses: $10.19/hour\n- **Critical Threshold:** Drivers need minimum $12/hour after expenses\n- **Predicted Churn:** 28% of drivers quit within 60 days\n- **New Signups:** Drop 65% as word spreads\n\n## Second-Order Effects: The Driver Death Spiral\n\n### Month 1-2: Initial Shock\n- 15% of drivers immediately reduce hours\n- 8% quit outright\n- New driver applications drop 40%\n- Driver online time decreases 22%\n\n### Month 3-4: Supply Crunch\n- Wait times increase from 3.8 to 6.2 minutes\n- Customer complaints spike 340%\n- Surge pricing triggers more frequently\n- Premium drivers (highest rated) leave first\n\n### Month 5-6: Quality Degradation\n- Average driver rating drops from 4.7 to 4.2\n- Safety incidents increase 45%\n- Customer satisfaction plummets\n- Regulatory scrutiny intensifies\n\n### Month 7-12: Market Repositioning\n- Service becomes \"budget option\" in consumer minds\n- Premium customers switch to competitors\n- Brand perception permanently damaged\n- Recovery requires 18+ months and massive investment\n\n## Third-Order Effects: Ecosystem Collapse\n\n### Regulatory Response\n- Government intervention likely when driver earnings fall below minimum wage\n- New regulations on \"gig worker protection\"\n- Potential reclassification of drivers as employees\n- Industry-wide compliance costs increase\n\n### Competitive Dynamics\n- Smaller players (taxis, regional apps) gain market share\n- New entrants see opportunity in \"premium\" segment\n- Technology companies delay partnerships\n- Investor confidence in entire sector declines\n\n### Urban Transportation Impact\n- Reduced ride availability increases drunk driving\n- Public transit usage spikes, reducing overall market\n- City planning departments reconsider ride-share policies\n- Parking demand increases as people return to car ownership\n\n## Financial Cascade Analysis\n\n### Customer Lifetime Value Impact\n- Current CLV: $340\n- Post-price cut CLV: $238 (30% reduction)\n- Quality degradation further reduces to $186\n- Net CLV impact: -45%\n\n### Unit Economics Breakdown\n```\nCurrent State:\nRevenue per ride: $19.20\nDriver payment: $14.78\nPlatform costs: $2.31\nNet margin: $2.11 (11%)\n\n30% Price Cut:\nRevenue per ride: $13.44\nDriver payment: $10.35\nPlatform costs: $2.31\nNet margin: $0.78 (6%)\n\nWith Driver Churn:\nRevenue per ride: $13.44\nDriver payment: $10.35\nPlatform costs: $3.47 (higher acquisition)\nNet margin: -$0.38 (-3%)\n```\n\n## The Competitor's Real Strategy\n\nUberLift's price cut is not about winning customers—it's about:\n\n1. **Forcing us into unprofitability**\n2. **Destroying our driver network**\n3. **Creating a two-tier market** (premium vs budget)\n4. **Triggering regulatory intervention** that hurts smaller players more\n5. **Testing our financial reserves** and investor patience\n\n## Alternative Response Strategies\n\n### Strategy A: Selective Response\n- Match prices only in contested markets (top 10 cities)\n- Maintain premium pricing in stronghold markets\n- Invest savings in driver retention programs\n\n### Strategy B: Quality Differentiation\n- Maintain pricing, emphasize service quality\n- Launch \"RideShare Premium\" tier\n- Invest in driver training and vehicle standards\n\n### Strategy C: Market Segmentation\n- Let UberLift own the \"budget\" segment\n- Focus on business travelers and premium users\n- Partner with corporate accounts and hotels\n\n### Strategy D: Operational Excellence\n- Use superior efficiency to maintain margins\n- Invest in AI for better driver-rider matching\n- Reduce operational costs through automation\n\n## Recommendation\n\nDo NOT match the price cut across all markets. This plays directly into UberLift's strategy and will trigger the driver death spiral outlined above.\n\nInstead, implement a hybrid approach:\n- Selective geographic response (protect key markets)\n- Accelerated investment in driver experience\n- Premium service differentiation\n- Operational efficiency improvements\n\nThe goal is not to win the price war, but to avoid fighting it on their terms.\n\n---\n\n*This analysis is based on proprietary data and should not be shared outside the executive team.*"
+      }
+    },
+    {
+      "fileId": "customer_behavior",
+      "fileName": "Customer Behavior & Price Sensitivity Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Customer Segment,% of Base,Price Sensitivity,Switching Threshold,Quality Sensitivity,Loyalty Score\nBusiness Travelers,25,Low,>40% increase,High,8.2\nDaily Commuters,35,Medium,>25% increase,Medium,6.8\nOccasional Users,30,High,>15% increase,Low,4.1\nPrice-Sensitive,10,Very High,>5% increase,Very Low,2.3\nCurrent Avg Fare,$19.20,$19.20,$19.20,$19.20,$19.20\nCompetitor 30% Cut,$12.95,$12.95,$12.95,$12.95,$12.95\nSwitching Probability,15%,35%,65%,85%,45%\nRevenue Impact,-3.75%,-12.25%,-19.5%,-8.5%,-43.75%\nWait Time Tolerance (min),8,6,4,3,5\nService Quality Minimum,8.5,7.0,6.0,5.0,6.5\nWillingness to Pay Premium,High,Medium,Low,None,Medium"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "scenario_modeling",
+      "stageTitle": "Second-Order Effects Modeling",
+      "challengeType": "FINANCIAL_MODELING",
+      "challengeData": {
+        "blocks": [
+          {
+            "blockId": "challenge_prompt",
+            "blockType": "PROMPT_BOX",
+            "props": {
+              "title": "The Second-Order Thinking Challenge",
+              "content": "UberLift just announced a 30% price cut across all markets. Your marketing team is panicking. Your investors are calling. Everyone wants you to match immediately.\n\nBut you're the CEO. Your job is to think beyond the obvious first-order effect ('we'll lose customers if we don't match'). You need to model the second and third-order consequences of different responses.\n\nFirst, build a financial model that shows what happens in each scenario. Then write your 'What Happens Next?' memo that explains the chain reaction of consequences most people can't see.",
+              "type": "challenge",
+              "metadata": {
+                "timeLimit": 60,
+                "difficulty": "advanced"
+              }
+            }
+          },
+          {
+            "blockId": "case_materials",
+            "blockType": "DOCUMENT_VIEWER",
+            "props": {
+              "title": "Market Intelligence",
+              "fileIds": ["market_dynamics", "competitor_financials", "supplier_analysis", "customer_behavior"],
+              "showTabs": true
+            }
+          },
+          {
+            "blockId": "scenario_model",
+            "blockType": "FINANCIAL_MODEL",
+            "props": {
+              "title": "Price War Scenario Model",
+              "modelType": "scenario",
+              "template": {
+                "currentRevenue": 1670,
+                "currentMargin": 15,
+                "priceReduction": 0,
+                "driverChurnRate": 9.8,
+                "customerSwitchingRate": 0,
+                "waitTimeIncrease": 0
+              },
+              "requiredFields": ["priceReduction", "driverChurnRate", "customerSwitchingRate"],
+              "calculations": {
+                "newRevenue": "currentRevenue * (1 - priceReduction/100) * (1 - customerSwitchingRate/100)",
+                "driverSupplyImpact": "driverChurnRate * (priceReduction/10)",
+                "serviceQualityScore": "8.1 - (waitTimeIncrease * 0.5) - (driverSupplyImpact * 0.1)",
+                "longTermRevenue": "newRevenue * (serviceQualityScore/8.1)"
+              }
+            }
+          },
+          {
+            "blockId": "analysis_memo",
+            "blockType": "RICH_TEXT_EDITOR",
+            "props": {
+              "title": "The 'What Happens Next?' Memo",
+              "maxLength": 10000,
+              "minLength": 1200,
+              "placeholder": "TO: Executive Leadership Team\nFROM: CEO\nSUBJECT: What Happens Next - Second & Third Order Effects of Price War Response\n\nTeam,\n\nEveryone is focused on the first-order effect: 'If we don't match UberLift's 30% price cut, we'll lose customers.' But as leaders, we must think deeper. Here's what REALLY happens next:\n\nSECOND-ORDER EFFECTS (Months 1-6):\n1. Driver Economics Collapse\n[Explain how price cuts destroy driver supply...]\n\n2. Service Quality Degradation\n[Model the wait time and satisfaction impacts...]\n\n3. Customer Segmentation Shift\n[Analyze how different customer types respond...]\n\nTHIRD-ORDER EFFECTS (Months 6-18):\n1. Market Repositioning\n[Explain how we become the 'budget option'...]\n\n2. Regulatory Response\n[Predict government intervention...]\n\n3. Ecosystem Disruption\n[Model broader transportation impacts...]\n\nCONCLUSION:\nMatching the price cut triggers a death spiral that benefits no one except...\n\n[Continue your analysis using data from your model...]",
+              "showWordCount": true,
+              "autoSave": true
+            }
+          },
+          {
+            "blockId": "submit_analysis",
+            "blockType": "SUBMIT_BUTTON",
+            "props": {
+              "label": "Submit Second-Order Analysis",
+              "confirmationMessage": "Ready to submit your second-order thinking analysis? Ensure your financial model supports your strategic reasoning.",
+              "requiresValidation": true,
+              "validationRules": {
+                "requiredBlocks": ["scenario_model", "analysis_memo"],
+                "minWordCount": 1200
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

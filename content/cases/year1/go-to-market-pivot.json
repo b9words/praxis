@@ -1,0 +1,182 @@
+{
+  "caseId": "go-to-market-pivot",
+  "title": "Go-to-Market Strategy Reset at SecureCloud",
+  "description": "A cybersecurity startup with strong product-market fit struggles with inefficient go-to-market motion. As VP of Sales, you must redesign the sales strategy and organizational structure.",
+  "difficulty": "advanced",
+  "duration": 50,
+  "competencies": ["strategic-thinking", "market-awareness", "leadership-judgment"],
+  "persona": {
+    "name": "Tom Anderson",
+    "role": "Co-founder & CEO",
+    "background": "Former security engineer, technical founder, learning sales",
+    "personality": "Humble and eager to learn. Trusts data. Concerned about team morale during change."
+  },
+  "briefing": {
+    "situation": "SecureCloud is a 2-year-old cybersecurity SaaS platform focused on cloud infrastructure security. The product has strong technical differentiation and happy customers, but sales are inefficient and unpredictable. You joined as VP of Sales 4 months ago after the previous VP left.\n\n**Current Situation:**\n- ARR: $8M (grew from $2M last year)\n- 85 customers (average ACV: $94,000)\n- Sales team: 8 AEs, 5 SDRs, no sales engineers\n- Sales cycle: 6-9 months (longer than competitors)\n- Win rate: 12% of qualified opportunities\n- CAC: $140,000 (unsustainable)\n- Pipeline generation is inconsistent\n- AEs are overwhelmed with technical questions\n- No clear ICP or sales playbook\n\n**The Problem:**\nThe CEO acknowledges the GTM motion is broken but isn't sure why. Recent analysis reveals:\n- Deals come from 3 distinct buyer personas with different needs\n- Technical evaluation takes 50% of sales cycle (competitors bypass this)\n- No clear path to $50M ARR with current approach\n- Best AE closed $2M, worst closed $200K (10x variance)\n- Marketing generates leads, but quality is inconsistent\n- Partners keep asking about referral programs (no formal program exists)\n\nBoard pressure is mounting to \"fix sales\" before next funding round.",
+    "objectives": [
+      "Diagnose the root causes of GTM inefficiency",
+      "Design a scalable go-to-market strategy",
+      "Recommend organizational and process changes with implementation plan"
+    ],
+    "datasets": {
+      "deal_analysis": {
+        "description": "Win/loss analysis by segment",
+        "data": [
+          {
+            "segment": "DevOps Teams (bottom-up)",
+            "deals_evaluated": 45,
+            "win_rate": "22%",
+            "avg_deal_size": "$48,000",
+            "sales_cycle": "3-4 months",
+            "key_buyers": "Engineering Directors",
+            "notes": "Product-led motion works here. They trial, love it, then buy."
+          },
+          {
+            "segment": "Security Teams (mid-market)",
+            "deals_evaluated": 65,
+            "win_rate": "8%",
+            "avg_deal_size": "$85,000",
+            "sales_cycle": "7-9 months",
+            "key_buyers": "CISOs",
+            "notes": "Requires extensive technical validation, compliance review, competitive bake-offs."
+          },
+          {
+            "segment": "Enterprise (top-down)",
+            "deals_evaluated": 25,
+            "win_rate": "16%",
+            "avg_deal_size": "$220,000",
+            "sales_cycle": "9-12 months",
+            "key_buyers": "VP Security + Procurement",
+            "notes": "Complex sales with multiple stakeholders. Need executive access and business case support."
+          }
+        ]
+      },
+      "sales_team_performance": {
+        "description": "Rep-level performance analysis",
+        "insights": [
+          "Top 2 AEs (both technical backgrounds): $2M and $1.8M booked",
+          "Middle 4 AEs (mixed backgrounds): $600K-900K each",
+          "Bottom 2 AEs (traditional enterprise sales): $200K-300K each",
+          "SDR team: 50% of leads are unqualified, 30% go cold during technical validation",
+          "Common bottleneck: Technical questions during evaluation phase",
+          "Best deals: Customer had clear security incident or compliance deadline (urgency)"
+        ]
+      },
+      "competitive_intelligence": {
+        "description": "How competitors approach GTM",
+        "data": [
+          {
+            "competitor": "Competitor A (market leader)",
+            "gtm_motion": "Enterprise-focused, large field sales team, solution engineers for every deal",
+            "differentiation": "Brand, relationships, professional services"
+          },
+          {
+            "competitor": "Competitor B (fast-growing)",
+            "gtm_motion": "Product-led growth, self-serve trial, inside sales for expansion",
+            "differentiation": "Easy to adopt, developer-friendly, usage-based pricing"
+          },
+          {
+            "competitor": "Competitor C",
+            "gtm_motion": "Channel/partner-led, security VARs and MSPs",
+            "differentiation": "Partner ecosystem, white-label options"
+          }
+        ]
+      },
+      "resource_constraints": {
+        "description": "Budget and hiring realities",
+        "data": {
+          "sales_marketing_budget": "$3.5M/year",
+          "hiring_timeline": "Can hire 3-5 key roles in next 6 months",
+          "ceo_availability": "Limited - focused on product and fundraising",
+          "current_team_morale": "Mixed - some reps frustrated, others thriving"
+        }
+      }
+    }
+  },
+  "challenges": [
+    {
+      "id": "gtm-diagnosis",
+      "order": 1,
+      "title": "GTM Diagnosis",
+      "description": "Analyze the root causes of SecureCloud's GTM inefficiency. Why is CAC so high? Why is win rate low? What patterns in the data explain the performance variance? Identify the 2-3 most critical issues to address.",
+      "type": "text",
+      "config": {
+        "minWords": 200,
+        "maxWords": 450,
+        "placeholder": "Root Cause #1: ...\nSupporting Evidence: ...\n\nRoot Cause #2: ...\n\n[Continue analysis...]\n\nCritical Issues:\n1. ...\n2. ..."
+      },
+      "rubricMapping": ["strategic-thinking", "market-awareness"]
+    },
+    {
+      "id": "gtm-strategy",
+      "order": 2,
+      "title": "Redesigned GTM Strategy",
+      "description": "Propose a new go-to-market strategy for SecureCloud. Should they focus on one segment or pursue multiple motions? What sales model(s) fit best? How should marketing align? Explain your strategic choices and how they address the root causes.",
+      "type": "text",
+      "config": {
+        "minWords": 300,
+        "maxWords": 600,
+        "placeholder": "Recommended GTM Strategy:\n\nTarget Segments & Motions:\n1. [Segment]: [Motion]\n   - Why: ...\n   - Sales model: ...\n   - Marketing approach: ...\n\nStrategic Rationale:\n- ...\n\nHow This Addresses Root Causes:\n- ..."
+      },
+      "rubricMapping": ["strategic-thinking", "market-awareness", "leadership-judgment"]
+    },
+    {
+      "id": "implementation-plan",
+      "order": 3,
+      "title": "Implementation & Organizational Design",
+      "description": "Develop a 6-month implementation plan. Include: (1) Organizational changes (roles to hire, team restructuring), (2) Process and playbook development, (3) Sequencing and milestones, (4) Change management for current team, (5) Success metrics by month.",
+      "type": "text",
+      "config": {
+        "minWords": 350,
+        "maxWords": 700,
+        "placeholder": "Organizational Changes:\n- Roles to hire: ...\n- Team restructuring: ...\n\nProcess Development:\n- Playbooks needed: ...\n- Enablement: ...\n\nImplementation Timeline:\n\nMonth 1-2: ...\nMonth 3-4: ...\nMonth 5-6: ...\n\nChange Management:\n- Current team: ...\n\nSuccess Metrics:\n- Month 3: ...\n- Month 6: ..."
+      },
+      "rubricMapping": ["leadership-judgment", "strategic-thinking"]
+    }
+  ],
+  "rubric": {
+    "criteria": {
+      "strategic-thinking": {
+        "weight": 0.35,
+        "description": "Demonstrates strategic thinking about go-to-market design, market segmentation, and competitive positioning",
+        "scoring": {
+          "5": "Exceptional strategic thinking. Correctly identifies that different segments need different motions. Recognizes product-led opportunity for DevOps segment and need for sales support for others. GTM strategy is coherent and addresses root causes. Considers scalability and competitive dynamics.",
+          "4": "Strong strategic analysis. Good segment-motion alignment. GTM strategy is well-reasoned with clear prioritization. Some consideration of competitive positioning.",
+          "3": "Adequate strategy. Recognizes need for different approaches by segment. GTM proposal is reasonable but may lack depth or miss important trade-offs.",
+          "2": "Limited strategic thinking. Generic GTM recommendations that don't address specific challenges. Weak segmentation or motion design.",
+          "1": "Poor strategy. Fails to develop coherent GTM approach or misses critical strategic considerations."
+        }
+      },
+      "market-awareness": {
+        "weight": 0.30,
+        "description": "Shows understanding of B2B SaaS GTM models, buyer behaviors, and competitive dynamics",
+        "scoring": {
+          "5": "Excellent market awareness. Understands different GTM motions (product-led, enterprise sales, partner-led). Correctly reads buyer behavior patterns (DevOps teams want self-serve, Security teams need validation). Competitive positioning is thoughtful.",
+          "4": "Good market understanding. Aware of different GTM approaches and when they apply. Reasonable buyer behavior analysis. Some competitive considerations.",
+          "3": "Adequate market awareness. Basic understanding of GTM models. Some buyer insights but may be superficial.",
+          "2": "Limited market awareness. Generic understanding of sales approaches. Weak buyer or competitive analysis.",
+          "1": "Poor market understanding. Fails to demonstrate knowledge of effective GTM approaches for this market."
+        }
+      },
+      "leadership-judgment": {
+        "weight": 0.35,
+        "description": "Shows sound judgment in organizational design, change management, and practical implementation",
+        "scoring": {
+          "5": "Exceptional judgment. Org design enables GTM strategy (e.g., solutions engineers to reduce AE burden, specialized teams by motion). Change management addresses current team concerns. Implementation plan is realistic with clear milestones and contingencies. Balances urgency with team stability.",
+          "4": "Good judgment. Reasonable org design and implementation plan. Some consideration of change management and team morale. Timeline is realistic.",
+          "3": "Adequate judgment. Org changes support strategy but may lack detail. Implementation plan covers basics but may be generic. Limited change management consideration.",
+          "2": "Limited judgment. Org design is unclear or doesn't support strategy. Implementation plan is vague or unrealistic. Minimal change management thinking.",
+          "1": "Poor judgment. Org design is ineffective. Implementation plan is unrealistic or absent. No consideration of people/change management."
+        }
+      }
+    }
+  },
+  "status": "published",
+  "metadata": {
+    "author": "Praxis Team",
+    "version": "1.0",
+    "created_at": "2025-10-29",
+    "target_audience": "Operator's Residency - Year 1"
+  }
+}
+

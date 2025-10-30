@@ -1,0 +1,177 @@
+{
+  "caseId": "organizational-restructuring",
+  "title": "Organizational Restructuring at TechFlow",
+  "description": "A Series C SaaS company must restructure its organization to support the next phase of growth. As Chief People Officer, you must design a new structure while managing the human cost of change.",
+  "difficulty": "intermediate",
+  "duration": 50,
+  "competencies": ["leadership-judgment", "strategic-thinking"],
+  "persona": {
+    "name": "David Park",
+    "role": "CEO & Founder",
+    "background": "Technical founder, first-time CEO, values loyalty and hates conflict",
+    "personality": "Thoughtful and empathetic but struggles with tough decisions. Needs clear frameworks to make hard calls."
+  },
+  "briefing": {
+    "situation": "TechFlow is a 5-year-old B2B marketing automation platform that recently raised a $50M Series C. The company has grown from 120 to 280 employees in 18 months. You're the Chief People Officer (CPO), hired 6 months ago.\n\nThe CEO has acknowledged what everyone knows: the current org structure is broken and holding back growth. However, previous attempts at reorganization have failed due to political resistance and execution challenges.\n\n**Current Situation:**\n- Revenue: $32M ARR (target: $60M in 18 months)\n- Three co-equal SVPs reporting to CEO: Sales, Product, and Engineering\n- Marketing reports to Sales SVP (source of conflict)\n- Customer Success is split between Sales and Product (major dysfunction)\n- No CPO equivalent previously (you're the first)\n- Engineering and Product don't collaborate well (separate roadmaps)\n- Key leadership gaps: no CFO, no Chief Revenue Officer\n- Morale issues: confusion about priorities, slow decision-making, political infighting\n\n**Key Challenges:**\n- The Sales SVP (Jennifer) is a founding team member and top revenue driver but poor manager\n- The Product SVP (Alex) is brilliant but alienates people and resists collaboration\n- Several high-potential directors are frustrated and considering leaving\n- The board wants \"adult supervision\" - considering hiring experienced C-suite executives\n- Need to reorganize quickly to hit next year's aggressive targets\n- Company culture is at risk - historically collaborative, now becoming siloed\n\nThe CEO has asked you to design a new organizational structure and change management plan.",
+    "objectives": [
+      "Design an effective organizational structure for the next growth stage",
+      "Navigate the people/political challenges of reorganization",
+      "Develop a change management plan that preserves culture while enabling growth"
+    ],
+    "datasets": {
+      "current_structure": {
+        "description": "Current organizational setup",
+        "data": {
+          "sales_org": {
+            "leader": "Jennifer Chen (SVP Sales, founding team)",
+            "team_size": 65,
+            "sub_functions": ["Sales Team (45)", "Marketing (15)", "Half of CS team (5)"],
+            "issues": ["Marketing leader wants to report to CEO", "CS split causing customer issues", "Jennifer spread too thin"]
+          },
+          "product_org": {
+            "leader": "Alex Rodriguez (SVP Product)",
+            "team_size": 25,
+            "sub_functions": ["Product Management (12)", "Product Design (8)", "Half of CS team (5)"],
+            "issues": ["Weak collaboration with Engineering", "Separate product roadmap", "CS split causing confusion"]
+          },
+          "engineering_org": {
+            "leader": "Sam Williams (SVP Engineering)",
+            "team_size": 85,
+            "sub_functions": ["Backend (40)", "Frontend (25)", "Infrastructure (20)"],
+            "issues": ["Not aligned with Product priorities", "Engineering-led initiatives conflict with product roadmap"]
+          },
+          "support_functions": {
+            "description": "Finance, HR, Legal report directly to CEO",
+            "team_size": 25,
+            "issues": ["No CFO (CEO managing finances)", "No clear operational leadership"]
+          }
+        }
+      },
+      "leadership_assessment": {
+        "description": "Leadership team evaluation (360 feedback summary)",
+        "data": [
+          {
+            "leader": "Jennifer Chen (SVP Sales)",
+            "strengths": "Revenue driver, customer relationships, company loyalty",
+            "weaknesses": "Poor manager, resists delegation, territorial",
+            "potential": "IC sales leader or advisor role?",
+            "risk": "Might leave if demoted, taking relationships"
+          },
+          {
+            "leader": "Alex Rodriguez (SVP Product)",
+            "strengths": "Product vision, technical depth, user focus",
+            "weaknesses": "Poor collaborator, creates silos, abrasive style",
+            "potential": "Could thrive with clear boundaries and structure",
+            "risk": "May resist reporting to a CPO or CTO"
+          },
+          {
+            "leader": "Sam Williams (SVP Engineering)",
+            "strengths": "Technical excellence, team builder, scalable systems",
+            "weaknesses": "Needs more strategic thinking, sometimes builds without product input",
+            "potential": "Strong CTO candidate with right support",
+            "risk": "Low risk, adaptable and collaborative"
+          },
+          {
+            "leader": "Other High Performers",
+            "notes": "3 directors (in Sales, Product, Eng) are flight risks. All cite org dysfunction. All would thrive with clearer structure and career paths."
+          }
+        ]
+      },
+      "industry_benchmarks": {
+        "description": "Typical org structures at this stage",
+        "patterns": [
+          "Most companies at $30-60M ARR have CRO (unifying Sales, Marketing, CS), CPO, and CTO (unifying Prod + Eng)",
+          "Some split Product and Engineering under separate leaders (works if strong collaboration process)",
+          "CFO typically hired at Series B or C",
+          "Founding team often transitions to advisory or IC roles at this stage"
+        ]
+      }
+    }
+  },
+  "challenges": [
+    {
+      "id": "org-design",
+      "order": 1,
+      "title": "Organizational Design",
+      "description": "Propose a new organizational structure for TechFlow. Show reporting lines for key functions (Sales, Marketing, CS, Product, Engineering, etc.) and explain your structural choices. What are the pros and cons of your design?",
+      "type": "text",
+      "config": {
+        "minWords": 200,
+        "maxWords": 450,
+        "placeholder": "Proposed Structure:\n\nCEO\n├── CRO (or equivalent)\n│   ├── Sales\n│   ├── Marketing\n│   └── Customer Success\n├── [Continue structure...]\n\nKey Design Choices:\n1. ...\n2. ...\n\nTrade-offs: ..."
+      },
+      "rubricMapping": ["strategic-thinking", "leadership-judgment"]
+    },
+    {
+      "id": "people-decisions",
+      "order": 2,
+      "title": "People Decisions",
+      "description": "For each current SVP (Jennifer, Alex, Sam), recommend a specific path forward. Should they stay in role, transition to a different role, or be moved out? If you recommend hiring new executives, specify which roles. Explain your reasoning for each decision.",
+      "type": "text",
+      "config": {
+        "minWords": 250,
+        "maxWords": 500,
+        "placeholder": "Jennifer Chen (current SVP Sales):\nRecommendation: ...\nReasoning: ...\nAlternative role (if applicable): ...\n\nAlex Rodriguez (current SVP Product):\n[Similar format]\n\nNew Hires Needed:\n- [Role]: ...\n\nRationale for changes: ..."
+      },
+      "rubricMapping": ["leadership-judgment", "strategic-thinking"]
+    },
+    {
+      "id": "change-management",
+      "order": 3,
+      "title": "Change Management Plan",
+      "description": "Develop a 90-day change management plan. Include: (1) How you'll communicate the changes, (2) Sequence and timing of announcements, (3) How you'll handle resistance, (4) How you'll protect company culture, (5) Success metrics to track the reorganization's impact.",
+      "type": "text",
+      "config": {
+        "minWords": 300,
+        "maxWords": 600,
+        "placeholder": "Phase 1 (Days 1-30): Communication & Announcement\n- ...\n\nPhase 2 (Days 31-60): Transition & Stabilization\n- ...\n\nPhase 3 (Days 61-90): Reinforcement & Measurement\n- ...\n\nAnticipated Resistance:\n- ...\n\nMitigation Strategies:\n- ...\n\nSuccess Metrics:\n- ..."
+      },
+      "rubricMapping": ["leadership-judgment", "strategic-thinking"]
+    }
+  ],
+  "rubric": {
+    "criteria": {
+      "leadership-judgment": {
+        "weight": 0.45,
+        "description": "Demonstrates sound judgment in making difficult people decisions, balancing competing stakeholder needs, and managing organizational change",
+        "scoring": {
+          "5": "Exceptional leadership judgment. Org design balances growth needs with cultural preservation. People decisions are thoughtful, considering both business needs and human impact. Change management plan is comprehensive, realistic, and addresses resistance proactively. Shows empathy without avoiding hard decisions.",
+          "4": "Strong judgment. Org design is sound with clear rationale. People decisions are reasonable with good supporting logic. Change plan addresses key issues though may miss some nuances.",
+          "3": "Adequate judgment. Org design is functional but may not optimize for growth. People decisions are defensible but may prioritize avoiding conflict. Change plan covers basics but lacks depth.",
+          "2": "Limited judgment. Org design has significant flaws. People decisions avoid tough calls or lack clear reasoning. Change plan is superficial or unrealistic.",
+          "1": "Poor judgment. Org design is ineffective. People decisions are unfair or poorly reasoned. No meaningful change management plan."
+        }
+      },
+      "strategic-thinking": {
+        "weight": 0.35,
+        "description": "Shows strategic thinking about organizational design, alignment with business strategy, and systems-level consideration of impacts",
+        "scoring": {
+          "5": "Excellent strategic thinking. Org structure clearly enables growth strategy. Recognizes that structure isn't enough - needs right people and processes. Understands cascade effects of changes. Balances short-term stability with long-term needs.",
+          "4": "Good strategic thinking. Org structure aligns with business needs. Considers multiple factors in design choices. Some understanding of systemic impacts.",
+          "3": "Adequate strategic thinking. Org structure is logical but may not fully optimize for strategy. Limited consideration of systemic effects.",
+          "2": "Limited strategic thinking. Org design is generic or doesn't align with business needs. Fails to consider broader implications.",
+          "1": "Poor strategic thinking. Org design lacks clear strategic rationale or would hinder business goals."
+        }
+      },
+      "risk-management": {
+        "weight": 0.20,
+        "description": "Identifies and addresses risks including talent retention, execution, and cultural impact",
+        "scoring": {
+          "5": "Exceptional risk management. Identifies key risks (Jennifer leaving, Alex resistance, high-potential retention). Develops specific mitigation strategies. Balances speed with careful change management.",
+          "4": "Good risk awareness. Identifies major risks and has reasonable mitigation plans. Some consideration of cultural impact.",
+          "3": "Adequate risk consideration. Identifies obvious risks but may miss important ones or have generic mitigation plans.",
+          "2": "Limited risk awareness. Superficial risk analysis or weak mitigation strategies.",
+          "1": "Poor risk management. Fails to identify key risks or creates new significant risks."
+        }
+      }
+    }
+  },
+  "status": "published",
+  "metadata": {
+    "author": "Praxis Team",
+    "version": "1.0",
+    "created_at": "2025-10-29",
+    "target_audience": "Operator's Residency - Year 1"
+  }
+}
+

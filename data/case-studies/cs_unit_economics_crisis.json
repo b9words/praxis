@@ -1,0 +1,264 @@
+{
+  "caseId": "cs_unit_economics_crisis",
+  "version": "1.0",
+  "title": "The Unit Economics Crisis: SaaS Startup Burning Cash",
+  "description": "You are the Finance & Operations Manager at CloudSync, a B2B SaaS startup. With only 6 months of runway remaining and concerning unit economics, you must analyze the situation and present recommendations to save the company. The founding team is split on strategy, and the board wants answers in 2 weeks.",
+  "competencies": ["Financial Analysis", "Unit Economics", "Strategic Decision Making", "Crisis Management"],
+  "estimatedDuration": 120,
+  "difficulty": "intermediate",
+
+  "caseFiles": [
+    {
+      "fileId": "financial_overview",
+      "fileName": "CloudSync Financial Dashboard Q4 2023.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Current Value,Industry Benchmark,Status\nMonthly Recurring Revenue (MRR),$180000,N/A,Growing\nAnnual Run Rate (ARR),$2160000,N/A,Growing\nMonthly Burn Rate,$550000,N/A,Unsustainable\nCash Remaining,$3200000,N/A,Critical\nRunway (months),5.8,12+,Critical\nGross Margin (%),42,70-80,Poor\nNet Margin (%),-306,10-20,Critical\nTotal Customers,360,N/A,Growing\nMonthly New Customers,45,N/A,Plateaued\nAverage Deal Size,$500,N/A,Low\nCustomer Acquisition Cost (CAC),$4800,$1200-2400,High\nCAC Payback Period (months),9.6,6-12,Poor\nLifetime Value (LTV),$7200,$15000+,Low\nLTV:CAC Ratio,1.5:1,3:1+,Critical\nChurn Rate (monthly),8%,2-5%,High\nAverage Customer Lifetime (months),12.5,24+,Low"
+      }
+    },
+    {
+      "fileId": "cohort_analysis",
+      "fileName": "Customer Cohort Analysis - Last 12 Months.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Month,New Customers,MRR Added,Churn Rate (%),Net MRR Change\nJan 2023,30,$15000,5%,+$12000\nFeb 2023,35,$17500,6%,+$14000\nMar 2023,40,$20000,7%,+$15500\nApr 2023,45,$22500,7%,+$17000\nMay 2023,50,$25000,8%,+$18000\nJun 2023,50,$25000,8%,+$17500\nJul 2023,48,$24000,9%,+$14500\nAug 2023,45,$22500,8%,+$15000\nSep 2023,45,$22500,9%,+$13500\nOct 2023,45,$22500,8%,+$15000\nNov 2023,45,$22500,8%,+$15000\nDec 2023,45,$22500,8%,+$15000"
+      }
+    },
+    {
+      "fileId": "customer_segmentation",
+      "fileName": "Customer Segmentation Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Segment,Customers,Percentage,Avg MRR,Churn Rate (%),LTV,CAC,LTV:CAC Ratio,Profitability\nSmall (1-10 users),180,50%,$300,12%,$3000,$3500,0.86:1,Unprofitable\nMid (11-50 users),144,40%,$600,6%,$12000,$5000,2.4:1,Marginally Profitable\nLarge (51+ users),36,10%,$1500,3%,$60000,$8000,7.5:1,Highly Profitable"
+      }
+    },
+    {
+      "fileId": "marketing_channels",
+      "fileName": "Marketing Channel Performance Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Channel,Monthly Spend,Customers Acquired,CAC,LTV:CAC Ratio,Payback Period (months),ROI Status\nGoogle Ads,$30000,15,$2000,3.6:1,4,Good\nContent Marketing,$15000,12,$1250,5.8:1,2.5,Excellent\nOutbound Sales,$20000,8,$2500,2.9:1,5,Fair\nEvents/Conferences,$10000,5,$2000,3.6:1,4,Good\nCold Calling,$5000,5,$1000,7.2:1,2,Excellent"
+      }
+    },
+    {
+      "fileId": "infrastructure_costs",
+      "fileName": "AWS Infrastructure Cost Breakdown.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "AWS Service,Monthly Cost,Usage,Cost per Customer,Industry Benchmark,Variance\nEC2 (Compute),$25000,80 instances,$69.44,$40-60,+73%\nS3 (Storage),$18000,500 TB,$50.00,$30-45,+67%\nRDS (Database),$12000,10 instances,$33.33,$20-30,+67%\nCloudFront (CDN),$6000,2 PB transfer,$16.67,$10-15,+67%\nOther Services,$4000,Various,$11.11,$8-12,+39%\nTotal,$65000,N/A,$180.56,$80-120,+125%"
+      }
+    },
+    {
+      "fileId": "sales_performance",
+      "fileName": "Sales Team Performance Q4 2023.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Sales Rep,Customers Closed,Avg Deal Size,Close Rate (%),Time to Close (days),Performance Tier\nRep 1,8,$750,15%,45,Top\nRep 2,6,$400,10%,60,Top\nRep 3,7,$650,12%,50,Top\nRep 4,5,$350,8%,70,Middle\nRep 5,4,$300,7%,75,Middle\nRep 6,4,$280,6%,80,Bottom\nRep 7,3,$250,5%,90,Bottom\nRep 8,3,$240,5%,95,Bottom\nRep 9,3,$220,4%,100,Bottom\nRep 10,2,$200,3%,110,Bottom"
+      }
+    },
+    {
+      "fileId": "ceo_memo",
+      "fileName": "URGENT: Board Presentation Requirements.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO: Board Presentation in 2 Weeks\n\n**From:** Sarah Chen, CEO  \n**To:** Finance & Operations Manager  \n**Date:** Current  \n**Subject:** Critical Analysis Required for Board Meeting\n\n## Situation\n\nOur board meeting is in exactly 14 days, and they're expecting a comprehensive analysis of our unit economics crisis. The VCs are getting nervous, and we need to present a clear path forward or risk a down-round or worse.\n\n## Current Team Positions\n\n**My Position (CEO):** \"We need to grow faster to hit Series B metrics. Let's increase marketing spend and accelerate customer acquisition. Growth solves everything.\"\n\n**Mike's Position (CTO):** \"We're scaling too fast. Our infrastructure costs are completely out of control. We need to optimize our technical stack before we can grow sustainably.\"\n\n**James's Position (VP Sales):** \"Our sales team is crushing it. We just need more leads. The problem isn't our sales process—it's marketing not generating enough qualified prospects.\"\n\n## What I Need from You\n\nAs our Finance & Operations Manager, you have the analytical skills to cut through the noise. I need you to:\n\n1. **Analyze the root causes** of our unit economics problem\n2. **Evaluate each team's proposed solution** with hard data\n3. **Recommend immediate actions** for the next 30-90 days\n4. **Present strategic options** for the board to consider\n\n## Board's Key Concerns\n\n- **Runway:** We have 5.8 months left at current burn\n- **Unit Economics:** LTV:CAC of 1.5:1 is unsustainable\n- **Churn:** 8% monthly churn is destroying our LTV\n- **Growth:** Customer acquisition has plateaued\n- **Competition:** Competitors are raising larger rounds\n\n## Success Criteria\n\nYour analysis needs to:\n- Be data-driven with specific recommendations\n- Include financial projections for each scenario\n- Address both short-term survival and long-term growth\n- Present clear trade-offs and risks\n- Give the board confidence in our path forward\n\n## Timeline\n\n- **Week 1:** Complete analysis and initial recommendations\n- **Week 2:** Refine presentation and prepare for board questions\n- **Board Meeting:** Present findings and get approval for next steps\n\nThe company's future depends on getting this right. I'm counting on your analytical rigor to help us navigate this crisis.\n\n---\n*This memo contains confidential CloudSync information.*"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "immediate_action",
+      "stageTitle": "Immediate Action Decision (Next 30 Days)",
+      "description": "The board wants to see improved unit economics in 30 days. What's your immediate priority?",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "CloudSync is at a critical juncture with only 5.8 months of runway remaining. The board wants to see immediate improvement in unit economics within 30 days, or they'll push for a down-round or acquihire. You've analyzed the data—what's your immediate action plan?",
+        "context": "Current Situation: $550K monthly burn, 8% churn rate, LTV:CAC of 1.5:1, $3.2M cash remaining",
+        "aiPersonas": [
+          {
+            "name": "Sarah Chen",
+            "role": "CEO",
+            "description": "Growth-focused leader who believes scaling solves everything. Pushes for aggressive customer acquisition.",
+            "perspective": "We need to grow faster to hit Series B metrics. More marketing spend will solve our problems.",
+            "initialMessage": "I've been thinking about our situation. We can't cut our way to growth. We need to double down on customer acquisition and show the board we can scale. What's your take on increasing marketing spend?"
+          },
+          {
+            "name": "Mike Rodriguez", 
+            "role": "CTO",
+            "description": "Technical leader focused on operational efficiency and infrastructure optimization.",
+            "perspective": "We're scaling too fast and our infrastructure costs are out of control. Need to optimize before growing.",
+            "initialMessage": "I've been analyzing our AWS costs - we're spending 125% more than industry benchmarks. I think we need to pause growth and fix our unit economics first. The technical debt is killing us."
+          },
+          {
+            "name": "Linda Park",
+            "role": "Former COO at Stripe (AI Coach)",
+            "description": "Experienced operator who has seen this crisis before. Provides strategic guidance on unit economics.",
+            "perspective": "Focus on the fundamentals: LTV:CAC ratio, churn reduction, and customer segmentation. Data-driven decisions only.",
+            "initialMessage": "I've seen this exact situation at three different startups. The key is understanding which customers are actually profitable. Have you looked at your cohort analysis by customer segment?"
+          }
+        ],
+        "options": [
+          {
+            "id": "cut_costs_aggressively",
+            "title": "Cut Costs Aggressively",
+            "description": "Lay off bottom 5 sales reps and reduce marketing spend by 50%. Saves $150K/month, extends runway to 11 months. Risk: May kill growth momentum and crash team morale.",
+            "impact": {
+              "runway": "+5.2 months",
+              "monthlyBurn": "-$150K",
+              "growthRate": "-40%",
+              "teamMorale": "High Risk"
+            }
+          },
+          {
+            "id": "focus_churn_reduction",
+            "title": "Focus on Reducing Churn",
+            "description": "Reassign 3 engineers to product quality and hire 2 customer success managers. Goal: Reduce churn from 8% to 4% within 90 days. Short-term: Increases burn, reduces runway to 4.5 months.",
+            "impact": {
+              "runway": "-1.3 months",
+              "churnRate": "-50% (target)",
+              "ltv": "+100% (if successful)",
+              "shortTermRisk": "High"
+            }
+          },
+          {
+            "id": "optimize_customer_mix",
+            "title": "Optimize Customer Mix",
+            "description": "Stop acquiring small customers (<$500 MRR) and focus sales team on mid/large segments. Short-term: New customer count drops, but LTV:CAC improves significantly.",
+            "impact": {
+              "newCustomers": "-60%",
+              "avgDealSize": "+150%",
+              "ltvCacRatio": "+120%",
+              "timeToSeeResults": "60-90 days"
+            }
+          },
+          {
+            "id": "raise_bridge_round",
+            "title": "Raise Bridge Round Immediately",
+            "description": "Raise $3-5M bridge round to extend runway and buy time to fix unit economics. Risk: Dilution, signaling weakness to market, may not succeed in current environment.",
+            "impact": {
+              "runway": "+6-10 months",
+              "dilution": "15-25%",
+              "marketSignal": "Weakness",
+              "successProbability": "60%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "pricing_strategy",
+      "stageTitle": "Pricing Strategy Analysis (60 Days)",
+      "description": "After analyzing customer data, you realize pricing may be too low and not differentiated by segment.",
+      "challengeType": "FINANCIAL_MODELING",
+      "challengeData": {
+        "prompt": "Your analysis reveals that 70% of Enterprise customers would pay 50% more for better features, while small customers won't pay more but consume disproportionate support resources. Design a new pricing strategy.",
+        "currentPricing": {
+          "starter": "$300/month (1-10 users)",
+          "growth": "$600/month (11-50 users)", 
+          "enterprise": "$1500/month (51+ users)"
+        },
+        "customerFeedback": {
+          "enterprise": "70% would pay 50% more for advanced features",
+          "small": "Price sensitive, won't pay more, high support costs",
+          "midMarket": "Value reliability, somewhat price sensitive"
+        },
+        "modelingRequirements": {
+          "scenarios": 4,
+          "timeHorizon": "12 months",
+          "keyMetrics": ["MRR Impact", "Churn Risk", "Customer Segmentation", "Support Cost Allocation"]
+        }
+      }
+    },
+    {
+      "stageId": "infrastructure_optimization",
+      "stageTitle": "Infrastructure Cost Decision (90 Days)",
+      "description": "CTO Mike presents infrastructure optimization options requiring engineering time investment.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Your CTO has prepared three infrastructure optimization proposals. As Finance & Operations Manager, critique each option's business case and recommend the best approach for the board.",
+        "documentData": {
+          "title": "Infrastructure Optimization Proposals",
+          "sections": [
+            {
+              "title": "Option 1: Quick Wins (3 weeks, 3 engineers)",
+              "content": "Right-size EC2 instances (20% savings), implement S3 lifecycle policies (15% savings), optimize database queries (10% savings). Total Savings: $29,250/month (45% reduction). Cost: $60K in engineering time (lost feature development)."
+            },
+            {
+              "title": "Option 2: Architectural Overhaul (3 months, 5 engineers)", 
+              "content": "Migrate to serverless architecture, implement multi-tenancy, build internal caching layer. Total Savings: $45,500/month (70% reduction). Cost: $300K in engineering time + potential stability issues."
+            },
+            {
+              "title": "Option 3: Hybrid Approach (6 weeks, 4 engineers)",
+              "content": "Quick wins plus some architectural improvements with phased rollout. Total Savings: $35,750/month (55% reduction). Cost: $120K in engineering time."
+            }
+          ]
+        },
+        "critiqueAreas": [
+          "ROI analysis and payback period",
+          "Risk assessment and mitigation",
+          "Opportunity cost of engineering time",
+          "Impact on product development roadmap",
+          "Scalability and long-term benefits"
+        ]
+      }
+    },
+    {
+      "stageId": "strategic_recommendation",
+      "stageTitle": "Final Board Recommendation",
+      "description": "Present your comprehensive strategic recommendation to the board: Growth vs. Profitability path.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You've implemented changes over 90 days and achieved improved metrics. The board meeting is tomorrow. Present your strategic recommendation for CloudSync's path forward: prioritize growth or profitability?",
+        "improvedMetrics": {
+          "mrr": "$240,000 (up from $180K)",
+          "churn": "5% (down from 8%)",
+          "cac": "$3,600 (down from $4,800)",
+          "ltv": "$11,520 (up from $7,200)",
+          "ltvCacRatio": "3.2:1 (up from 1.5:1)",
+          "monthlyBurn": "$295,000 (down from $550K)",
+          "runway": "10.8 months"
+        },
+        "strategicPaths": [
+          {
+            "name": "Growth Mode",
+            "description": "Raise Series B ($20M) and accelerate growth. Target $10M ARR in 18 months.",
+            "requirements": "3x YoY growth, LTV:CAC >3:1, churn <5%"
+          },
+          {
+            "name": "Profitability Mode", 
+            "description": "Reach cash-flow positive without new funding. Target $5M ARR in 24 months.",
+            "requirements": "Break-even in 12 months, slower growth acceptable"
+          },
+          {
+            "name": "Hybrid Mode",
+            "description": "Moderate growth, extend runway, raise Series B from strength. Target $6M ARR in 18 months.",
+            "requirements": "2x YoY growth, LTV:CAC >3:1, break-even in 18-24 months"
+          }
+        ],
+        "deliverables": [
+          "Financial model (3 scenarios, 24-month projection)",
+          "Key metrics to track monthly", 
+          "Risk mitigation plan",
+          "Team communication strategy",
+          "Board presentation outline"
+        ],
+        "wordLimit": 2000,
+        "keyPoints": [
+          "Clear strategic recommendation with rationale",
+          "Quantified financial projections for each path",
+          "Risk assessment and mitigation strategies",
+          "Implementation timeline and resource requirements",
+          "Success metrics and monitoring plan"
+        ]
+      }
+    }
+  ]
+}

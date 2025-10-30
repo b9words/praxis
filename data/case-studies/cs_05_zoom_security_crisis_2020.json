@@ -1,0 +1,103 @@
+{
+  "caseId": "cs_05_zoom_security_crisis_2020",
+  "version": "1.0",
+  "title": "Zoom's Security Crisis: Trust and Growth Under Fire (2020)",
+  "description": "You are Eric Yuan, CEO of Zoom, in April 2020. COVID-19 has made Zoom essential for remote work and education, but security flaws and 'Zoombombing' incidents are creating a PR nightmare. How do you balance rapid growth with security concerns while maintaining user trust?",
+  "competencies": ["Crisis Management", "Product Security", "Rapid Scaling", "Public Relations"],
+  "estimatedDuration": 60,
+  "difficulty": "intermediate",
+
+  "caseFiles": [
+    {
+      "fileId": "zoom_growth_metrics",
+      "fileName": "Zoom Growth & Security Incident Data Q1-Q2 2020.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Jan 2020,Feb 2020,Mar 2020,Apr 2020,May 2020,Jun 2020\nDaily Active Users (M),10,10,200,300,300,300\nMonthly Active Users (M),10,10,200,300,300,300\nRevenue (M),188,188,328,328,328,328\nSecurity Incidents Reported,5,8,450,1200,800,400\nZoombombing Reports,0,2,350,800,500,200\nEnterprise Customers,81000,81000,265000,370000,370000,370000\nEducation Users (M),0.5,0.5,90,120,120,120\nApp Downloads (M),2,2,62,131,90,50\nCustomer Support Tickets,15000,15000,180000,250000,200000,150000\nSecurity Updates Released,1,1,5,8,6,4\nMedia Mentions (Security),50,45,2500,3800,2200,1100"
+      }
+    },
+    {
+      "fileId": "security_assessment",
+      "fileName": "Zoom Security Vulnerability Assessment - Internal Report.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Zoom Security Vulnerability Assessment\n\n**CONFIDENTIAL - Internal Security Team Report**  \n**Date:** April 10, 2020  \n**Prepared by:** Chief Information Security Officer\n\n## Executive Summary\n\nZoom's unprecedented growth from 10M to 300M daily users in three months has exposed critical security vulnerabilities and design decisions that prioritized ease-of-use over security. Immediate action is required to address these issues while maintaining the user experience that drove our growth.\n\n## Critical Security Issues Identified\n\n### 1. Meeting ID Vulnerabilities\n**Issue:** Sequential and predictable Meeting IDs enable \"Zoombombing\"\n- 9-11 digit sequential IDs are easily guessable\n- No rate limiting on meeting join attempts\n- Default settings allow anyone to join meetings\n\n**Impact:**\n- 1,200+ reported Zoombombing incidents in April\n- High-profile disruptions (UK Parliament, schools)\n- Regulatory scrutiny from multiple governments\n\n**Immediate Fix:**\n- Implement random Meeting ID generation\n- Add waiting rooms as default\n- Require passwords for all meetings\n\n### 2. End-to-End Encryption Claims\n**Issue:** Marketing claimed \"end-to-end encryption\" but used transport encryption\n- Zoom servers can decrypt all meeting content\n- Encryption keys managed by Zoom, not users\n- Misleading security claims to customers\n\n**Impact:**\n- Loss of enterprise customer trust\n- Potential regulatory violations (GDPR, CCPA)\n- Competitive disadvantage vs. secure alternatives\n\n**Long-term Fix:**\n- Implement true end-to-end encryption\n- Update all marketing materials\n- Transparent communication about encryption model\n\n### 3. Client Software Vulnerabilities\n**Issue:** Multiple zero-day vulnerabilities in desktop clients\n- Privilege escalation on macOS\n- Remote code execution possibilities\n- Automatic software installation without user consent\n\n**Impact:**\n- Security researcher criticism\n- Enterprise IT department concerns\n- Potential malware distribution vector\n\n**Immediate Fix:**\n- Emergency security patches\n- Improved update mechanisms\n- Enhanced client-side security controls\n\n### 4. Data Routing Concerns\n**Issue:** Some calls routed through China-based servers\n- Encryption keys generated in China for some calls\n- Compliance concerns for government/enterprise users\n- Geopolitical security implications\n\n**Impact:**\n- Government bans (India, Singapore schools)\n- Enterprise customer churn\n- National security scrutiny\n\n**Immediate Fix:**\n- Geographic routing controls\n- Data residency options\n- Transparent data flow documentation\n\n## Incident Response Analysis\n\n### Zoombombing Incident Patterns\n- **Peak incidents:** 800+ reports in April 2020\n- **Common targets:** Educational institutions (60%), corporate meetings (25%)\n- **Attack methods:** Meeting ID scanning, social engineering, public meeting links\n- **Content:** Inappropriate images, hate speech, disruption\n\n### Media and Regulatory Response\n- **Negative coverage:** 3,800 security-focused articles in April\n- **Government actions:** Bans in multiple countries\n- **Stock impact:** 15% decline from security concerns\n- **Competitive response:** Microsoft Teams, Google Meet emphasizing security\n\n## User Behavior Analysis\n\n### Security vs. Usability Trade-offs\n**Current User Preferences:**\n- 78% prefer one-click meeting join\n- 65% don't want to manage passwords\n- 45% share meeting links publicly\n- 23% understand encryption implications\n\n**Security-Conscious Segments:**\n- Enterprise IT: Demand granular controls\n- Healthcare: HIPAA compliance requirements\n- Government: National security considerations\n- Education: Child safety priorities\n\n## Competitive Landscape Impact\n\n### Microsoft Teams\n- Emphasizing enterprise security features\n- Integration with Office 365 security model\n- Gaining market share in enterprise segment\n\n### Google Meet\n- Leveraging Google's security reputation\n- Free tier expansion during COVID-19\n- Education market focus\n\n### Cisco Webex\n- Enterprise security messaging\n- Government compliance certifications\n- Traditional telecom security model\n\n## Recommended Response Strategy\n\n### Phase 1: Crisis Management (Immediate - 30 days)\n1. **Public Acknowledgment**\n   - CEO blog post acknowledging issues\n   - Transparent communication about fixes\n   - Regular security update communications\n\n2. **Immediate Security Fixes**\n   - Default passwords for all meetings\n   - Waiting rooms enabled by default\n   - Enhanced admin controls\n\n3. **\"90-Day Security Plan\"**\n   - Freeze feature development\n   - Focus entire engineering team on security\n   - Daily security updates to users\n\n### Phase 2: Trust Rebuilding (30-90 days)\n1. **Security Infrastructure Overhaul**\n   - Third-party security audits\n   - Bug bounty program expansion\n   - Security advisory board creation\n\n2. **Transparency Initiatives**\n   - Monthly security reports\n   - Open source security components\n   - Regular penetration testing results\n\n3. **User Education**\n   - Security best practices guides\n   - Admin training programs\n   - In-app security recommendations\n\n### Phase 3: Long-term Security Leadership (90+ days)\n1. **End-to-End Encryption Implementation**\n   - True E2E encryption for all meetings\n   - User-controlled encryption keys\n   - Compliance with highest security standards\n\n2. **Security-First Culture**\n   - Security training for all employees\n   - Security review for all features\n   - Regular security assessments\n\n## Success Metrics\n\n### Short-term (30 days)\n- Zoombombing incidents: <50/month\n- Security-related support tickets: <20,000/month\n- Negative security coverage: <500 articles/month\n\n### Medium-term (90 days)\n- Enterprise customer retention: >95%\n- Security audit scores: >90%\n- User trust surveys: >70% confidence\n\n### Long-term (12 months)\n- Industry security leadership recognition\n- Government/enterprise security certifications\n- Zero critical security vulnerabilities\n\n## Resource Requirements\n\n### Engineering Resources\n- 200+ engineers dedicated to security (90 days)\n- $50M additional security infrastructure investment\n- External security consulting: $10M\n\n### Communication Resources\n- Dedicated crisis communication team\n- Security-focused marketing campaigns\n- Customer success team expansion\n\n## Risk Assessment\n\n### High-Risk Scenarios\n- Additional zero-day vulnerabilities discovered\n- Regulatory fines or legal action\n- Major enterprise customer departures\n- Permanent reputation damage\n\n### Mitigation Strategies\n- Proactive vulnerability disclosure\n- Legal compliance review\n- Customer retention programs\n- Long-term trust rebuilding initiatives\n\n## Conclusion\n\nZoom's security crisis represents both an existential threat and an opportunity to establish security leadership in the video conferencing market. Success requires immediate action, transparent communication, and long-term commitment to security excellence.\n\nThe next 90 days will determine whether Zoom emerges stronger or loses its market position to security-focused competitors.\n\n---\n*This report contains confidential information and should not be distributed outside the executive team.*"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "crisis_response_strategy",
+      "title": "Immediate Crisis Response",
+      "description": "Define your immediate response to the security crisis and Zoombombing incidents",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Zoombombing incidents are spiking, major customers are threatening to leave, and the media is calling Zoom a security nightmare. You have 48 hours to announce your crisis response. What's your approach?",
+        "options": [
+          {
+            "id": "security_freeze",
+            "title": "90-Day Security Freeze",
+            "description": "Halt all feature development and dedicate entire engineering team to security fixes. Implement immediate security defaults (passwords, waiting rooms). Risk: Slower innovation, competitor advantage."
+          },
+          {
+            "id": "balanced_approach",
+            "title": "Balanced Security & Growth",
+            "description": "Implement key security fixes while maintaining feature development. Gradual rollout of security measures to avoid user friction. Risk: Continued security incidents during transition."
+          },
+          {
+            "id": "transparency_first",
+            "title": "Radical Transparency",
+            "description": "Open-source security components, publish all vulnerability reports, create public security roadmap. Build trust through complete transparency. Risk: Exposing additional vulnerabilities."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stakeholder_communication",
+      "title": "Crisis Communication Strategy",
+      "description": "Craft your public response to address users, media, and regulators",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You need to address multiple stakeholder groups: concerned users experiencing Zoombombing, enterprise customers threatening to switch platforms, media outlets covering security flaws, and regulators considering bans. Write a comprehensive communication strategy that rebuilds trust while acknowledging serious security issues.",
+        "wordLimit": 750,
+        "keyPoints": [
+          "Acknowledge security issues without admitting legal liability",
+          "Provide specific timeline and actions for fixes",
+          "Address different stakeholder concerns (users, enterprises, regulators)",
+          "Balance transparency with competitive considerations",
+          "Maintain confidence in Zoom's long-term security commitment"
+        ]
+      }
+    },
+    {
+      "stageId": "product_security_roadmap",
+      "title": "Long-term Security Strategy",
+      "description": "Present your long-term security roadmap and investment strategy",
+      "challengeType": "EARNINGS_CALL_QA",
+      "challengeData": {
+        "prompt": "Three months after the security crisis, you're presenting Zoom's security transformation to investors and analysts. You've implemented immediate fixes, but questions remain about long-term security leadership and competitive positioning.",
+        "analystQuestions": [
+          {
+            "persona": "Morgan Stanley - Software Analyst",
+            "question": "Eric, you've spent $50M on security improvements and hired 200 security engineers. How do you balance these investments with profitability, especially as growth normalizes post-COVID?"
+          },
+          {
+            "persona": "Goldman Sachs - Technology Analyst",
+            "question": "Microsoft Teams has gained significant market share by emphasizing security during your crisis. How do you win back enterprise customers who switched platforms, and what's your sustainable competitive advantage?"
+          },
+          {
+            "persona": "JPMorgan - Communications Analyst",
+            "question": "Your end-to-end encryption rollout has been slower than promised. When will this be available for all users, and how does it impact your business model that relies on some data access for features?"
+          },
+          {
+            "persona": "Barclays - Security Technology Analyst",
+            "question": "Government and enterprise customers now demand security certifications and compliance that Zoom historically didn't prioritize. What's the timeline and cost for achieving these certifications across global markets?"
+          }
+        ]
+      }
+    }
+  ]
+}

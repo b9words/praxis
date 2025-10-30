@@ -1,0 +1,106 @@
+{
+  "caseId": "cs_01_tesla_production_crisis_2018",
+  "version": "1.0",
+  "title": "Tesla's Model 3 Production Hell: Operational Excellence Under Pressure (2018)",
+  "description": "You are Elon Musk in Q2 2018. Tesla is burning cash at an alarming rate while struggling to meet Model 3 production targets. Wall Street is skeptical, short sellers are circling, and your company's survival depends on achieving manufacturing excellence at unprecedented speed.",
+  "competencies": ["Operations Management", "Crisis Leadership", "Capital Efficiency", "Stakeholder Communication"],
+  "estimatedDuration": 90,
+  "difficulty": "advanced",
+
+  "caseFiles": [
+    {
+      "fileId": "tesla_production_data",
+      "fileName": "Tesla Production & Financial Metrics Q1-Q2 2018.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1 2018,Q2 2018 Target,Q2 2018 Actual,Industry Benchmark\nModel 3 Weekly Production,2000,5000,5000,N/A\nTotal Vehicle Deliveries,29980,55000,40740,N/A\nAutomotive Gross Margin (%),-4.9,15.0,20.6,18-22\nCash Burn Rate (M/month),745,200,400,N/A\nCash on Hand (B),2.7,2.2,2.2,N/A\nCapEx (M),785,600,571,N/A\nR&D Spend (M),378,350,387,N/A\nEmployee Count,37543,45000,46000,N/A\nFactory Utilization (%),65,85,78,85-90\nDefect Rate (PPM),850,200,180,100-200\nSupplier On-Time Delivery (%),87,95,92,95-98"
+      }
+    },
+    {
+      "fileId": "operations_memo",
+      "fileName": "URGENT: Production Line Analysis & Recommendations.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO: Model 3 Production Crisis Analysis\n\n**From:** VP of Manufacturing  \n**To:** CEO  \n**Date:** June 2018  \n**Subject:** Critical Production Bottlenecks & Immediate Actions Required\n\n## Current Situation\n\nWe are facing unprecedented production challenges that threaten Tesla's financial viability. Despite heroic efforts, we are consistently missing production targets due to systemic issues across our manufacturing operations.\n\n### Primary Bottlenecks Identified:\n\n1. **Battery Pack Assembly (Station 4)**\n   - Current throughput: 3,200 units/week\n   - Target throughput: 5,000 units/week\n   - Issue: Manual processes, quality control delays\n   - Solution timeline: 4-6 weeks with automation investment\n\n2. **Paint Shop Capacity**\n   - Current throughput: 4,100 units/week\n   - Target throughput: 5,000 units/week\n   - Issue: Oven capacity constraints, color change delays\n   - Solution timeline: 8-12 weeks (new equipment required)\n\n3. **Final Assembly Line**\n   - Current throughput: 4,800 units/week\n   - Target throughput: 5,000 units/week\n   - Issue: Ergonomic challenges, worker fatigue\n   - Solution timeline: 2-3 weeks (process optimization)\n\n### Financial Impact:\n- Each week below 5,000 units costs approximately $50M in lost revenue\n- Cash runway reduced to 10 months at current burn rate\n- Supplier payment delays creating supply chain risks\n\n### Strategic Options:\n\n**Option A: Gradual Ramp (Conservative)**\n- Target 3,500 units/week by Q3, 5,000 by Q4\n- Lower risk, preserves cash\n- May not satisfy investor expectations\n\n**Option B: Aggressive Push (\"Production Hell\")**\n- All-hands effort to hit 5,000 units/week by end of Q2\n- High risk, high reward\n- Requires significant overtime, potential quality risks\n\n**Option C: Hybrid Approach**\n- Focus on sustainable 4,000 units/week with quality\n- Parallel investment in automation for Q4 ramp\n- Balanced risk profile\n\n### Recommendation:\nI recommend Option B with strict quality controls. The market window is closing, and we must demonstrate manufacturing competence to survive the current crisis.\n\n**Critical Success Factors:**\n- 24/7 operations with proper shift management\n- Quality gate enforcement at each station\n- Real-time production monitoring dashboard\n- Daily executive review meetings\n\n**Risks:**\n- Employee burnout and safety incidents\n- Quality issues leading to recalls\n- Supplier relationship strain\n- Regulatory scrutiny\n\nTime is our enemy. We must act decisively within the next 48 hours.\n\n---\n*This memo contains confidential Tesla information. Distribution limited to C-suite executives only.*"
+      }
+    },
+    {
+      "fileId": "analyst_report",
+      "fileName": "Wall Street Research: Tesla Viability Analysis.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Tesla Inc. (TSLA) - Critical Juncture Analysis\n\n**Goldman Sachs Equity Research**  \n**Date:** June 15, 2018  \n**Rating:** SELL  \n**Price Target:** $210 (Current: $342)\n\n## Executive Summary\n\nTesla faces an existential crisis as production challenges mount and cash reserves dwindle. Our analysis suggests a 40% probability of bankruptcy within 18 months unless dramatic operational improvements are achieved immediately.\n\n## Key Concerns\n\n### 1. Production Execution Risk\n- Model 3 production consistently missing targets by 30-40%\n- Manufacturing learning curve steeper than anticipated\n- Quality issues emerging as production scales\n\n### 2. Financial Stress\n- Cash burn rate of $745M/quarter unsustainable\n- Debt maturities of $1.2B due in Q1 2019\n- Limited access to capital markets at reasonable terms\n\n### 3. Competitive Pressure\n- German luxury automakers accelerating EV programs\n- Chinese manufacturers scaling rapidly\n- Traditional OEMs with superior manufacturing expertise\n\n### 4. Management Execution\n- History of overpromising on production targets\n- Key executive departures in manufacturing\n- CEO distraction with other ventures (SpaceX, Boring Company)\n\n## Scenario Analysis\n\n### Bear Case (40% probability)\n- Production remains below 3,000 units/week\n- Cash depletion by Q4 2018\n- Forced restructuring or acquisition\n- **Price Target: $150**\n\n### Base Case (45% probability)\n- Production reaches 4,000 units/week by Q4\n- Additional capital raise required ($2-3B)\n- Margin pressure from scaling challenges\n- **Price Target: $210**\n\n### Bull Case (15% probability)\n- Production exceeds 5,000 units/week sustainably\n- Positive free cash flow by Q4 2018\n- Market leadership in premium EV segment\n- **Price Target: $400**\n\n## Investment Thesis\n\nWhile Tesla's long-term vision remains compelling, near-term execution risks are severe. The company must demonstrate manufacturing competence within the next 6 months to avoid financial distress.\n\n**Key Catalysts:**\n- Weekly production reports\n- Q2 earnings call (July 2018)\n- Cash flow trajectory\n- Management guidance updates\n\n**Recommendation:** SELL - Risk/reward unfavorable at current levels. Wait for evidence of sustainable production ramp before considering investment.\n\n---\n*This research report is for institutional clients only. Past performance does not guarantee future results.*"
+      }
+    }
+  ],
+
+  "stages": [
+    {
+      "stageId": "production_strategy",
+      "title": "Production Strategy Decision",
+      "description": "Choose your approach to solving Tesla's production crisis",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Tesla is at a critical juncture. Your production team has identified three strategic approaches to address the Model 3 manufacturing crisis. Each option carries different risks and rewards. Wall Street is watching, employees are exhausted, and cash is running low. What's your decision?",
+        "options": [
+          {
+            "id": "gradual_ramp",
+            "title": "Gradual Ramp (Conservative)",
+            "description": "Target 3,500 units/week by Q3, 5,000 by Q4. Focus on sustainable processes and employee wellbeing. Lower risk but may not satisfy investor expectations or cash flow requirements."
+          },
+          {
+            "id": "production_hell",
+            "title": "Production Hell (Aggressive)",
+            "description": "All-hands effort to hit 5,000 units/week by end of Q2. 24/7 operations, maximum overtime, CEO sleeping on factory floor. High risk but potentially company-saving if successful."
+          },
+          {
+            "id": "hybrid_approach",
+            "title": "Hybrid Approach (Balanced)",
+            "description": "Sustainable 4,000 units/week with parallel automation investment for Q4 ramp. Balanced risk profile but requires additional capital investment during cash crunch."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "investor_communication",
+      "title": "Investor Communication Strategy",
+      "description": "Craft your message to Wall Street and Tesla shareholders",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You must address Tesla's stakeholders about the production challenges and your chosen strategy. Write a comprehensive investor communication that balances transparency with confidence. Consider: How do you maintain investor confidence while acknowledging serious challenges? How do you set realistic expectations while preserving Tesla's growth narrative?",
+        "wordLimit": 800,
+        "keyPoints": [
+          "Acknowledge production challenges honestly",
+          "Explain your strategic approach and rationale",
+          "Provide realistic timeline and milestones",
+          "Address cash flow and financing concerns",
+          "Maintain long-term vision while focusing on near-term execution"
+        ]
+      }
+    },
+    {
+      "stageId": "operational_execution",
+      "title": "Operational Execution Plan",
+      "description": "Define specific actions to implement your production strategy",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Your operations team has prepared an implementation plan for your chosen production strategy. Review the operational details and provide your executive feedback on priorities, resource allocation, and risk mitigation.",
+        "documentData": {
+          "fileId": "operations_memo",
+          "fileName": "Production Implementation Plan",
+          "fileType": "PRESENTATION_DECK"
+        },
+        "critiqueAreas": [
+          "Resource allocation priorities",
+          "Timeline feasibility",
+          "Risk mitigation strategies",
+          "Quality control measures",
+          "Employee safety considerations"
+        ]
+      }
+    }
+  ]
+}

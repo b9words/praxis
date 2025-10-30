@@ -1,0 +1,156 @@
+'use client'
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useCaseFile } from '@/hooks/useCaseFile'
+import { AlertCircle, Building2, FileText, TrendingUp } from 'lucide-react'
+
+interface CaseDataViewerProps {
+  fileIds: string[]
+  className?: string
+}
+
+export default function CaseDataViewer({ fileIds, className = '' }: CaseDataViewerProps) {
+  const fileData = fileIds.map(fileId => useCaseFile(fileId))
+
+  const getFileIcon = (fileType: string) => {
+    switch (fileType) {
+      case 'FINANCIAL_DATA':
+        return <TrendingUp className="h-4 w-4 text-green-600" />
+      case 'MEMO':
+        return <FileText className="h-4 w-4 text-blue-600" />
+      case 'REPORT':
+        return <AlertCircle className="h-4 w-4 text-orange-600" />
+      case 'PRESENTATION_DECK':
+        return <Building2 className="h-4 w-4 text-purple-600" />
+      default:
+        return <FileText className="h-4 w-4 text-neutral-600" />
+    }
+  }
+
+  const renderFileContent = (file: any) => {
+    if (file.isLoading) {
+      return (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-neutral-600">Loading...</span>
+        </div>
+      )
+    }
+
+    if (file.error) {
+      return (
+        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+          Error: {file.error}
+        </div>
+      )
+    }
+
+    // Handle CSV data (financial data)
+    if (file.fileType === 'FINANCIAL_DATA' && Array.isArray(file.content)) {
+      const data = file.content as any[]
+      if (data.length === 0) return <div>No data available</div>
+
+      const headers = Object.keys(data[0])
+      
+      return (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-neutral-300">
+            <thead>
+              <tr className="bg-neutral-100">
+                {headers.map((header) => (
+                  <th key={header} className="border border-neutral-300 px-3 py-2 text-left font-medium text-neutral-900">
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, index) => (
+                <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-neutral-50'}>
+                  {headers.map((header) => (
+                    <td key={header} className="border border-neutral-300 px-3 py-2 text-neutral-800">
+                      {row[header]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+
+    // Handle text content (memos, reports)
+    if (typeof file.content === 'string') {
+      return (
+        <div className="prose prose-neutral max-w-none">
+          <MarkdownRenderer content={file.content} />
+        </div>
+      )
+    }
+
+    return <div>Unsupported content type</div>
+  }
+
+  if (fileData.length === 0) {
+    return (
+      <Card className={className}>
+        <CardContent className="p-8 text-center">
+          <FileText className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
+          <p className="text-neutral-500">No case files available</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Building2 className="h-5 w-5" />
+          Case Materials
+        </CardTitle>
+        <CardDescription>
+          Review all available data before making your decision
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue={fileData[0]?.fileId} className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            {fileData.map((file) => (
+              <TabsTrigger
+                key={file.fileId}
+                value={file.fileId}
+                className="flex items-center gap-1 text-xs"
+              >
+                {getFileIcon(file.fileType)}
+                <span className="truncate">{file.fileName.split('.')[0]}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {fileData.map((file) => (
+            <TabsContent key={file.fileId} value={file.fileId} className="mt-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    {getFileIcon(file.fileType)}
+                    {file.fileName}
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    {file.fileType.replace('_', ' ').toLowerCase()}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {renderFileContent(file)}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </CardContent>
+    </Card>
+  )
+}
