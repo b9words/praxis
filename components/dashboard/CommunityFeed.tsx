@@ -28,14 +28,14 @@ export default function CommunityFeed({ threads }: CommunityFeedProps) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Community Feed</CardTitle>
-          <CardDescription>Latest discussions from the forum</CardDescription>
+          <CardTitle>Network Activity</CardTitle>
+          <CardDescription>Latest discussions from the exchange</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-gray-500">
             <p className="text-sm">No recent discussions</p>
             <Button asChild size="sm" className="mt-4">
-              <Link href="/community">Start a Discussion</Link>
+              <Link href="/community">Open a Thread</Link>
             </Button>
           </div>
         </CardContent>
@@ -47,11 +47,11 @@ export default function CommunityFeed({ threads }: CommunityFeedProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-600" />
-            Community Feed
+            Network Activity
           </CardTitle>
-          <CardDescription>Latest discussions from the forum</CardDescription>
+          <CardDescription>Latest discussions from the exchange</CardDescription>
         </div>
         <Button asChild variant="outline" size="sm">
           <Link href="/community">View All</Link>

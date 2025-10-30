@@ -77,7 +77,7 @@ function extractStagesFromMarkdown(content: string): SimulationStage[] {
   const stages: SimulationStage[] = []
   
   // Look for "Decision Point" sections
-  const decisionPointRegex = /### Decision Point (\d+): (.+?)\n\n\*\*Situation\*\*: (.+?)\n\n(.+?)(?=### Decision Point|\n## |$)/gs
+  const decisionPointRegex = /### Decision Point (\d+): ([^\n]+)\n\n\*\*Situation\*\*: ([^\n]+)\n\n([\s\S]+?)(?=### Decision Point|\n## |$)/g
   
   let match
   while ((match = decisionPointRegex.exec(content)) !== null) {
@@ -154,7 +154,7 @@ function extractStrategicOptions(content: string): any {
   const options: any[] = []
   
   // Look for Option A, Option B, etc.
-  const optionRegex = /\*\*Option ([A-Z])\*\*: (.+?)\n- (.+?)(?=\*\*Option [A-Z]|\*\*Your Recommendation|\n\n|$)/gs
+  const optionRegex = /\*\*Option ([A-Z])\*\*: ([^\n]+)\n- ([\s\S]+?)(?=\*\*Option [A-Z]|\*\*Your Recommendation|\n\n|$)/g
   
   let match
   while ((match = optionRegex.exec(content)) !== null) {
@@ -292,7 +292,7 @@ function determineFileType(fileName: string, content: string): CaseFile['fileTyp
  */
 function extractDescription(content: string): string {
   // Look for the first paragraph after "## Case Brief" or similar
-  const briefMatch = content.match(/## Case Brief\s*\n\s*(.+?)(?=\n\n|\n###)/s)
+  const briefMatch = content.match(/## Case Brief\s*\n\s*([\s\S]+?)(?=\n\n|\n###)/)
   if (briefMatch) {
     return briefMatch[1].trim()
   }

@@ -162,7 +162,7 @@ export default function EarningsCallQALayout({ challengeData }: EarningsCallQALa
                 <Textarea
                   value={responses[currentQuestion] || ''}
                   onChange={(e) => handleResponseChange(currentQuestion, e.target.value)}
-                  placeholder="Provide a clear, confident response that addresses the analyst's concerns while staying consistent with your strategic choice. Reference specific data points from the case materials to support your position..."
+                  placeholder="Provide a clear, confident response that addresses the analyst's concerns while staying consistent with your strategic choice. Reference specific data points from the briefing documents to support your position."
                   className="min-h-[150px] resize-y"
                 />
               </div>

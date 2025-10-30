@@ -52,7 +52,7 @@ export default function MarkCompleteButton({
 
         if (error) throw error
         setIsCompleted(true)
-        toast.success('Article marked as complete!')
+        toast.success('Article internalized')
       }
 
       router.refresh()
@@ -74,12 +74,12 @@ export default function MarkCompleteButton({
       {isCompleted ? (
         <>
           <CheckCircle className="h-4 w-4" />
-          Completed
+          Internalized
         </>
       ) : (
         <>
           <Check className="h-4 w-4" />
-          Mark as Complete
+          Internalize
         </>
       )}
     </Button>

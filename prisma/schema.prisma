@@ -52,10 +52,11 @@ model Profile {
   fullName  String?  @map("full_name")
   avatarUrl String?  @map("avatar_url")
   bio       String?
-  isPublic  Boolean  @default(false) @map("is_public")
-  role      UserRole @default(member)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  isPublic                 Boolean  @default(false) @map("is_public")
+  role                     UserRole @default(member)
+  emailNotificationsEnabled Boolean  @default(true) @map("email_notifications_enabled")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
 
   // Relations
   articlesCreated   Article[]              @relation("ArticleCreator")
@@ -69,6 +70,11 @@ model Profile {
   articleProgress   UserArticleProgress[] @relation("UserArticleProgress")
   residency         UserResidency?
   subscription      Subscription?
+  applications      UserApplication[]
+  notifications     Notification[]
+  reviewedApplications UserApplication[] @relation("ApplicationReviewer")
+  reportsCreated    Report[]             @relation("ReportCreator")
+  reportsReviewed   Report[]             @relation("ReportReviewer")
 
   @@index([username])
   @@index([isPublic])
@@ -199,6 +205,7 @@ model Debrief {
   scores          Json
   summaryText     String   @map("summary_text")
   radarChartData  Json     @map("radar_chart_data")
+  rubricVersion   String?  @map("rubric_version")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -231,6 +238,7 @@ model ForumThread {
   title     String
   content   String
   isPinned  Boolean  @default(false) @map("is_pinned")
+  metadata  Json?    @default("{}")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -351,7 +359,7 @@ enum SubscriptionStatus {
 
 model Subscription {
   id                  String             @id @default(uuid())
-  userId              String             @map("user_id")
+  userId              String             @unique @map("user_id")
   paddleSubscriptionId String            @unique @map("paddle_subscription_id")
   paddlePlanId        String             @map("paddle_plan_id")
   status              SubscriptionStatus
@@ -367,5 +375,102 @@ model Subscription {
   @@index([paddleSubscriptionId])
   @@index([status])
   @@map("subscriptions")
+}
+
+enum ApplicationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum NotificationType {
+  application_approved
+  application_rejected
+  forum_reply
+  simulation_complete
+  weekly_summary
+  general
+}
+
+model UserApplication {
+  id          String            @id @default(uuid())
+  userId      String?           @map("user_id")
+  email       String
+  fullName    String?           @map("full_name")
+  motivation  String
+  background  String?
+  status      ApplicationStatus @default(pending)
+  reviewedBy  String?           @map("reviewed_by")
+  reviewedAt  DateTime?         @map("reviewed_at")
+  notes       String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  user        Profile?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer    Profile?          @relation("ApplicationReviewer", fields: [reviewedBy], references: [id])
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("user_applications")
+}
+
+model Notification {
+  id        String          @id @default(uuid())
+  userId    String          @map("user_id")
+  type      NotificationType
+  title     String
+  message   String
+  read      Boolean         @default(false)
+  link      String?
+  metadata  Json?           @default("{}")
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  user      Profile         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+enum ReportStatus {
+  pending
+  reviewed
+  dismissed
+}
+
+enum ReportedType {
+  thread
+  post
+}
+
+model Report {
+  id            String        @id @default(uuid())
+  reportedType  ReportedType  @map("reported_type")
+  reportedId    String        @map("reported_id") // UUID but stored as String for flexibility
+  reason        String
+  createdById   String        @map("created_by")
+  status        ReportStatus  @default(pending)
+  reviewedById  String?       @map("reviewed_by")
+  reviewedAt    DateTime?     @map("reviewed_at")
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  createdBy     Profile       @relation("ReportCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  reviewedBy    Profile?      @relation("ReportReviewer", fields: [reviewedById], references: [id])
+
+  @@index([reportedType, reportedId])
+  @@index([createdById])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reports")
 }
 

@@ -2,19 +2,21 @@ import LeaderboardTable from '@/components/community/LeaderboardTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
-import { redirect } from 'next/navigation'
 
 export default async function LeaderboardPage() {
   const user = await getCurrentUser()
 
+  // Auth protection is handled by middleware
   if (!user) {
-    redirect('/login')
+    return null
   }
 
-  // Get global leaderboard (all time)
-  const globalLeaderboard = await prisma.profile.findMany({
-    take: 50,
-    orderBy: [
+  // Get global leaderboard (all time) with error handling
+  let globalLeaderboard: any[] = []
+  try {
+    globalLeaderboard = await prisma.profile.findMany({
+      take: 50,
+      orderBy: [
       {
         simulations: {
           _count: 'desc',
@@ -39,14 +41,17 @@ export default async function LeaderboardPage() {
         },
       },
     },
-  })
+    })
+  } catch (error) {
+    console.error('Error fetching global leaderboard:', error)
+  }
 
   // Calculate average scores for global leaderboard
-  const globalWithScores = globalLeaderboard.map((profile) => {
-    const completedSims = profile.simulations.filter((s) => s.debrief)
+  const globalWithScores = globalLeaderboard.map((profile: any) => {
+    const completedSims = profile.simulations.filter((s: any) => s.debrief)
     const allScores: number[] = []
 
-    completedSims.forEach((sim) => {
+    completedSims.forEach((sim: any) => {
       if (sim.debrief?.scores) {
         const scores = sim.debrief.scores as any
         const scoreArray = Array.isArray(scores) ? scores : Object.values(scores)
@@ -85,10 +90,12 @@ export default async function LeaderboardPage() {
   const oneWeekAgo = new Date()
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-  const weeklySimulations = await prisma.simulation.findMany({
-    where: {
-      status: 'completed',
-      completedAt: {
+  let weeklySimulations: any[] = []
+  try {
+    weeklySimulations = await prisma.simulation.findMany({
+      where: {
+        status: 'completed',
+        completedAt: {
         gte: oneWeekAgo,
       },
     },
@@ -107,7 +114,10 @@ export default async function LeaderboardPage() {
         },
       },
     },
-  })
+    })
+  } catch (error) {
+    console.error('Error fetching weekly simulations:', error)
+  }
 
   // Aggregate weekly scores
   const weeklyMap = new Map<
@@ -164,8 +174,8 @@ export default async function LeaderboardPage() {
   return (
     <div className="max-w-5xl mx-auto py-12 space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900">Leaderboard</h1>
-        <p className="mt-3 text-lg text-gray-600">See how you rank against the Praxis community</p>
+        <h1 className="text-4xl font-bold text-gray-900">Performance Rankings</h1>
+        <p className="mt-3 text-lg text-gray-600">Operative performance metrics across all engagements</p>
       </div>
 
       <Tabs defaultValue="global" className="w-full">

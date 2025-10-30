@@ -92,7 +92,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
   const shareDebrief = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
-      toast.success('Debrief link copied to clipboard!')
+      toast.success('Debrief link copied to clipboard')
     } catch (error) {
       toast.error('Failed to copy link')
     }
@@ -101,13 +101,16 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-          className="text-blue-600"
-        >
-          <Sparkles className="h-12 w-12" />
-        </motion.div>
+        <div className="text-center space-y-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            className="text-blue-600 mx-auto"
+          >
+            <Sparkles className="h-12 w-12" />
+          </motion.div>
+          <p className="text-sm text-gray-600">Processing simulation data...</p>
+        </div>
       </div>
     )
   }
@@ -161,7 +164,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
             transition={{ delay: 0.7, duration: 0.8 }}
             className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4"
           >
-            Simulation Complete!
+            After-Action Report: {simulation.case?.title || 'Unknown Case'}
           </motion.h1>
 
           <motion.p
@@ -203,7 +206,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
             <CardContent>
               <p className="text-lg text-blue-800 leading-relaxed">
                 {debrief.summaryText ||
-                  "You've completed this simulation and demonstrated your business acumen across multiple competencies."}
+                  "You have completed this simulation and demonstrated analytical acumen across multiple competencies."}
               </p>
             </CardContent>
           </Card>
@@ -218,7 +221,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
               transition={{ duration: 0.6 }}
               className="text-3xl font-bold text-center text-gray-900 mb-8"
             >
-              Your Competency Breakdown
+              Competency Analysis
             </motion.h2>
 
             {scores.map((score: any, index: number) => (
@@ -254,7 +257,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
           >
             <Button onClick={shareDebrief} variant="outline" size="lg" className="gap-2">
               <Share2 className="h-4 w-4" />
-              Share Results
+              Transmit Debrief
             </Button>
 
             <Button asChild size="lg">

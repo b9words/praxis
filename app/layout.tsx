@@ -1,4 +1,5 @@
 import DevTools from "@/components/dev/DevTools";
+import Footer from "@/components/layout/Footer";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
@@ -27,7 +28,12 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-white text-neutral-800`}
       >
         <QueryProvider>
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
           <Toaster />
           <DevTools />
         </QueryProvider>

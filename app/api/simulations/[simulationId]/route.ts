@@ -4,14 +4,14 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ simulationId: string }> }
 ) {
   try {
     const user = await requireAuth()
-    const { id } = await params
+    const { simulationId } = await params
 
     const simulation = await prisma.simulation.findUnique({
-      where: { id },
+      where: { id: simulationId },
       include: {
         case: true,
         debrief: true,
@@ -39,16 +39,16 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ simulationId: string }> }
 ) {
   try {
     const user = await requireAuth()
-    const { id } = await params
+    const { simulationId } = await params
     const body = await request.json()
 
     // Check ownership
     const existing = await prisma.simulation.findUnique({
-      where: { id },
+      where: { id: simulationId },
     })
 
     if (!existing) {
@@ -60,7 +60,7 @@ export async function PUT(
     }
 
     const simulation = await prisma.simulation.update({
-      where: { id },
+      where: { id: simulationId },
       data: body,
       include: {
         case: {
@@ -84,16 +84,16 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ simulationId: string }> }
 ) {
   try {
     const user = await requireAuth()
-    const { id } = await params
+    const { simulationId } = await params
     const body = await request.json()
 
     // Check ownership
     const existing = await prisma.simulation.findUnique({
-      where: { id },
+      where: { id: simulationId },
     })
 
     if (!existing) {
@@ -105,7 +105,7 @@ export async function PATCH(
     }
 
     const simulation = await prisma.simulation.update({
-      where: { id },
+      where: { id: simulationId },
       data: body,
       include: {
         case: {
@@ -126,4 +126,3 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update simulation' }, { status: 500 })
   }
 }
-

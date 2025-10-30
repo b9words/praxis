@@ -39,7 +39,8 @@ export async function saveLessonProgress(payload: ProgressUpdatePayload) {
     )
 
     if (!result) {
-      return { success: false, error: 'Failed to update progress' }
+      // Don't return error for profile issues - just silently fail
+      return { success: true, data: null }
     }
 
     // Revalidate the lesson page

@@ -1,4 +1,5 @@
 import BookmarkButton from '@/components/library/BookmarkButton'
+import LessonViewTracker from '@/components/library/LessonViewTracker'
 import ProgressTracker from '@/components/library/ProgressTracker'
 import { Button } from '@/components/ui/button'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
@@ -150,23 +151,55 @@ flowchart TD
 export default async function LessonPage({ params }: LessonPageProps) {
   const { domain: domainId, module: moduleId, lesson: lessonId } = await params
   
-  // Try to load from database first
-  const articleFromDb = await prisma.article.findFirst({
-    where: {
-      status: 'published',
-      storagePath: {
-        contains: `${domainId}/${moduleId}/${lessonId}.md`,
+  // Try to load from database first with error handling
+  let articleFromDb = null
+  try {
+    // First try with enum value (if enum exists in DB)
+    articleFromDb = await prisma.article.findFirst({
+      where: {
+        status: 'published',
+        storagePath: {
+          contains: `${domainId}/${moduleId}/${lessonId}.md`,
+        },
       },
-    },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      storagePath: true,
-      metadata: true,
-      status: true,
-    },
-  })
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        storagePath: true,
+        metadata: true,
+        status: true,
+      },
+    })
+  } catch (error: any) {
+    // If enum doesn't exist in DB, try querying without status filter
+    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+      // Import error suppression helper
+      const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
+      logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+      try {
+        articleFromDb = await prisma.article.findFirst({
+          where: {
+            storagePath: {
+              contains: `${domainId}/${moduleId}/${lessonId}.md`,
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            storagePath: true,
+            metadata: true,
+            status: true,
+          },
+        })
+      } catch (fallbackError) {
+        console.error('Error fetching article from database:', fallbackError)
+      }
+    } else {
+      console.error('Error fetching article from database:', error)
+    }
+  }
 
   let lessonContent: string
   let lessonDuration = 12
@@ -175,16 +208,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let lessonDescription = ''
 
   // If found in database, fetch content from storage
-  if (articleFromDb && articleFromDb.storage_path) {
+  if (articleFromDb && articleFromDb.storagePath) {
     lessonTitle = articleFromDb.title
     lessonDescription = articleFromDb.description || ''
     
-    const metadata = articleFromDb.metadata || {}
+    const metadata = (articleFromDb.metadata || {}) as Record<string, any>
     lessonDuration = metadata.duration || 12
     lessonDifficulty = metadata.difficulty || 'intermediate'
     
     // Fetch full markdown content from Supabase Storage
-    const { success, content, error } = await fetchFromStorageServer(articleFromDb.storage_path)
+    const { success, content, error } = await fetchFromStorageServer(articleFromDb.storagePath)
     
     if (success && content) {
       lessonContent = content
@@ -353,6 +386,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
               <MarkdownRenderer content={lessonContent} />
             </div>
             
+            {/* Analytics Tracking */}
+            {user && (
+              <LessonViewTracker
+                lessonId={lessonId}
+                domainId={domainId}
+                moduleId={moduleId}
+                userId={user.id}
+              />
+            )}
+
             {/* Progress Tracker */}
             {user && (
               <ProgressTracker

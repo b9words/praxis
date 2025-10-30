@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useCaseStudyStore } from '@/lib/case-study-store'
+import { createClient } from '@/lib/supabase/client'
 import { Bot, Send, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -76,21 +77,60 @@ export default function AIPersonaChatBlock({
   }, [messages, currentStageId, blockId, updateBlockState])
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
-    // Simulate AI response - in production, this would call OpenAI/Anthropic
     setIsLoading(true)
     
-    // Simple response simulation based on persona
-    await new Promise(resolve => setTimeout(resolve, 1500)) // Simulate API delay
-    
-    const responses = [
-      `As ${personaRole}, I think ${userMessage.toLowerCase().includes('strategy') ? 'we need to consider the strategic implications carefully' : 'that\'s an interesting point'}.`,
-      `From my perspective as ${personaRole}, ${userMessage.toLowerCase().includes('risk') ? 'the risks are significant but manageable' : 'we should explore this further'}.`,
-      `In my experience, ${userMessage.toLowerCase().includes('cost') ? 'cost considerations are crucial here' : 'this requires careful analysis'}.`,
-      `Let me be direct: ${userMessage.toLowerCase().includes('timeline') ? 'the timeline is aggressive but achievable' : 'I have concerns about this approach'}.`
-    ]
-    
-    setIsLoading(false)
-    return responses[Math.floor(Math.random() * responses.length)]
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        throw new Error('Not authenticated')
+      }
+
+      // Get case study data from store
+      const { caseStudyData } = useCaseStudyStore.getState()
+      
+      if (!caseStudyData) {
+        throw new Error('Case study data not loaded')
+      }
+
+      // Call AI persona chat edge function
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-persona-chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          caseData: {
+            title: caseStudyData.title,
+            description: caseStudyData.description,
+            caseFiles: caseStudyData.caseFiles,
+          },
+          personaName,
+          personaRole,
+          chatHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+          userMessage,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('AI persona chat error:', errorText)
+        throw new Error('Failed to get AI response')
+      }
+
+      const { reply } = await response.json()
+      setIsLoading(false)
+      return reply || 'I apologize, but I\'m having trouble responding right now.'
+    } catch (error) {
+      console.error('Error generating AI response:', error)
+      setIsLoading(false)
+      throw error
+    }
   }
 
   const handleSendMessage = async () => {

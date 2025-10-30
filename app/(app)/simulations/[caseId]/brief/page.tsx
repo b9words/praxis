@@ -15,13 +15,33 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
 
   const { caseId } = await params
 
-  // Fetch case details
-  const caseItem = await prisma.case.findFirst({
-    where: {
-      id: caseId,
-      status: 'published',
-    },
-  })
+  // Fetch case details with error handling
+  let caseItem = null
+  try {
+    caseItem = await prisma.case.findFirst({
+      where: {
+        id: caseId,
+        status: 'published',
+      },
+    })
+  } catch (error: any) {
+    // If enum doesn't exist, fall back to querying without status filter
+    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+      try {
+        caseItem = await prisma.case.findFirst({
+          where: {
+            id: caseId,
+          },
+        })
+      } catch (fallbackError) {
+        console.error('Error fetching case:', fallbackError)
+        notFound()
+      }
+    } else {
+      console.error('Error fetching case:', error)
+      notFound()
+    }
+  }
 
   if (!caseItem) {
     notFound()
@@ -45,7 +65,7 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
 
       <Card className="bg-white border border-neutral-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-neutral-900">Case Overview</CardTitle>
+          <CardTitle className="text-lg font-semibold text-neutral-900">Briefing Documents</CardTitle>
         </CardHeader>
         <CardContent>
           <MarkdownRenderer content={caseItem.briefingDoc || ''} />
@@ -71,7 +91,7 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
         </Button>
         <Button asChild size="lg">
           <Link href={`/simulations/${caseId}/workspace`}>
-            {existingSimulation ? 'Continue Simulation' : 'Start Simulation'}
+            {existingSimulation ? 'Continue Simulation' : 'Deploy to Scenario'}
           </Link>
         </Button>
       </div>

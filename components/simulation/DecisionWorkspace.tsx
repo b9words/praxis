@@ -38,7 +38,7 @@ export default function DecisionWorkspace({
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle>All Decisions Complete</CardTitle>
-            <CardDescription>You've completed all decision points in this simulation</CardDescription>
+            <CardDescription>All decision points have been completed in this simulation</CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={onComplete} className="w-full" size="lg">
@@ -79,7 +79,7 @@ export default function DecisionWorkspace({
       <div className="bg-white border-b border-gray-200 p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">
-            Decision {currentIndex + 1} of {decisionPoints.length}
+            Decision Point {String(currentIndex + 1).padStart(2, '0')}: {currentDecision.title}
           </span>
           <span className="text-sm text-gray-600">
             {decisions.length} completed
@@ -145,7 +145,7 @@ export default function DecisionWorkspace({
         {currentDecision.type === 'multiple_choice' && currentDecision.options && (
           <Card>
             <CardHeader>
-              <CardTitle>Choose Your Approach</CardTitle>
+              <CardTitle>Select the optimal strategic path</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {currentDecision.options.map((option) => (
@@ -179,12 +179,12 @@ export default function DecisionWorkspace({
 
         {/* Justification */}
         <Card>
-          <CardHeader>
-            <CardTitle>Your Justification</CardTitle>
-            <CardDescription>
-              Explain your reasoning. Consider the case data, stakeholders, and business principles.
-            </CardDescription>
-          </CardHeader>
+            <CardHeader>
+              <CardTitle>Quantitative Reasoning</CardTitle>
+              <CardDescription>
+                Analyze the provided data. Justify your decision below with quantitative reasoning.
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <Label htmlFor="justification">
@@ -194,7 +194,7 @@ export default function DecisionWorkspace({
                 id="justification"
                 value={justification}
                 onChange={(e) => setJustification(e.target.value)}
-                placeholder="Explain your decision-making process, the data you considered, and why you believe this is the right approach..."
+                placeholder="Analyze the provided data. Select the optimal strategic path. Justify your decision below with quantitative reasoning."
                 rows={8}
                 className="resize-none"
               />

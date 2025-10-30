@@ -52,6 +52,7 @@ export default function BookmarkButton({
       onClick={handleToggle}
       disabled={isToggling}
       className="h-8 px-2.5 text-neutral-600 hover:text-yellow-600 hover:bg-yellow-50"
+      title="Save for future analysis"
     >
       <Star 
         className={`h-4 w-4 ${bookmarked ? 'text-yellow-500 fill-yellow-500' : ''}`} 

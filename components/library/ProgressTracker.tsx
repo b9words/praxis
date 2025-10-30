@@ -1,6 +1,7 @@
 'use client'
 
 import { markLessonAsCompleted, saveLessonProgress } from '@/app/actions/progress'
+import { trackEvents } from '@/lib/analytics'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -29,23 +30,28 @@ export default function ProgressTracker({
   const [status, setStatus] = useState<'not_started' | 'in_progress' | 'completed'>(initialStatus)
   const [timeSpent, setTimeSpent] = useState(initialTimeSpent)
   const [isSaving, setIsSaving] = useState(false)
+  const [failureCount, setFailureCount] = useState(0)
+  const [isDisabled, setIsDisabled] = useState(false)
   
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const startTimeRef = useRef<number>(0)
   const lastSaveTimeRef = useRef<number>(0)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Circuit breaker: disable progress tracking after 3 consecutive failures
+  const MAX_FAILURES = 3
+
   const saveProgress = useCallback(async (
     progressValue: number,
     statusValue: 'not_started' | 'in_progress' | 'completed',
     timeValue?: number
   ) => {
-    if (isSaving) return
+    if (isSaving || isDisabled) return
 
     setIsSaving(true)
     
     try {
-      await saveLessonProgress({
+      const result = await saveLessonProgress({
         domainId,
         moduleId,
         lessonId,
@@ -57,13 +63,37 @@ export default function ProgressTracker({
           timestamp: Date.now()
         }
       })
+      
+      // Reset failure count on success
+      if (result.success && result.data) {
+        setFailureCount(0)
+      } else if (!result.success) {
+        // Increment failure count
+        const newFailureCount = failureCount + 1
+        setFailureCount(newFailureCount)
+        
+        // Disable after max failures
+        if (newFailureCount >= MAX_FAILURES) {
+          setIsDisabled(true)
+          console.debug('Progress tracking disabled after repeated failures')
+        }
+      }
     } catch (error) {
-      console.error('Error saving progress:', error)
-      toast.error('Failed to save progress', { duration: 2000 })
+      // Increment failure count on error
+      const newFailureCount = failureCount + 1
+      setFailureCount(newFailureCount)
+      
+      // Disable after max failures
+      if (newFailureCount >= MAX_FAILURES) {
+        setIsDisabled(true)
+        console.debug('Progress tracking disabled after repeated failures')
+      } else {
+        console.debug('Progress save failed (this is normal for users without profiles):', error)
+      }
     } finally {
       setIsSaving(false)
     }
-  }, [domainId, moduleId, lessonId, isSaving])
+  }, [domainId, moduleId, lessonId, isSaving, isDisabled, failureCount])
 
   const handleComplete = useCallback(async () => {
     if (status === 'completed') return
@@ -73,6 +103,9 @@ export default function ProgressTracker({
       if (result.success) {
         setStatus('completed')
         setProgress(100)
+        
+        // Track lesson completion
+        trackEvents.lessonCompleted(lessonId, domainId, moduleId, userId)
       } else {
         toast.error('Failed to mark lesson as completed')
       }
@@ -80,7 +113,7 @@ export default function ProgressTracker({
       console.error('Error marking lesson as completed:', error)
       toast.error('Failed to mark lesson as completed')
     }
-  }, [domainId, moduleId, lessonId, status])
+  }, [domainId, moduleId, lessonId, status, userId])
 
   // Calculate scroll progress
   useEffect(() => {

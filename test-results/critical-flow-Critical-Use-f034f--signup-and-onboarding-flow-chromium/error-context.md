@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - main [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]: Request Access
+          - generic [ref=e8]: Create your account to access the proving ground
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - generic [ref=e11]: Too many signup attempts. Please wait a few minutes and try again.
+            - generic [ref=e12]:
+              - generic [ref=e13]: Username
+              - textbox "Username" [ref=e14]:
+                - /placeholder: johndoe
+                - text: testuser1761843332606
+            - generic [ref=e15]:
+              - generic [ref=e16]: Full Name
+              - textbox "Full Name" [ref=e17]:
+                - /placeholder: John Doe
+            - generic [ref=e18]:
+              - generic [ref=e19]: Email
+              - textbox "Email" [ref=e20]:
+                - /placeholder: you@example.com
+                - text: test-1761843332606@gmail.com
+            - generic [ref=e21]:
+              - generic [ref=e22]: Password
+              - textbox "Password" [ref=e23]:
+                - /placeholder: Minimum 6 characters
+                - text: password123
+          - generic [ref=e24]:
+            - button "Sign Up" [ref=e25]
+            - paragraph [ref=e26]:
+              - text: Already have an account?
+              - link "Sign in" [ref=e27] [cursor=pointer]:
+                - /url: /login
+    - contentinfo [ref=e28]:
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - heading "Praxis" [level=3] [ref=e32]
+            - paragraph [ref=e33]: Building the next generation of business leaders through practical, hands-on education.
+          - generic [ref=e34]:
+            - heading "Product" [level=4] [ref=e35]
+            - list [ref=e36]:
+              - listitem [ref=e37]:
+                - link "Curriculum" [ref=e38] [cursor=pointer]:
+                  - /url: /library/curriculum
+              - listitem [ref=e39]:
+                - link "Simulations" [ref=e40] [cursor=pointer]:
+                  - /url: /simulations
+              - listitem [ref=e41]:
+                - link "Community" [ref=e42] [cursor=pointer]:
+                  - /url: /community
+          - generic [ref=e43]:
+            - heading "Company" [level=4] [ref=e44]
+            - list [ref=e45]:
+              - listitem [ref=e46]:
+                - link "About" [ref=e47] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e48]:
+                - link "Apply" [ref=e49] [cursor=pointer]:
+                  - /url: /apply
+              - listitem [ref=e50]:
+                - link "Contact" [ref=e51] [cursor=pointer]:
+                  - /url: /contact
+          - generic [ref=e52]:
+            - heading "Legal" [level=4] [ref=e53]
+            - list [ref=e54]:
+              - listitem [ref=e55]:
+                - link "Terms of Service" [ref=e56] [cursor=pointer]:
+                  - /url: /legal/terms
+              - listitem [ref=e57]:
+                - link "Privacy Policy" [ref=e58] [cursor=pointer]:
+                  - /url: /legal/privacy
+              - listitem [ref=e59]:
+                - link "Cookie Policy" [ref=e60] [cursor=pointer]:
+                  - /url: /legal/cookies
+              - listitem [ref=e61]:
+                - link "Support" [ref=e62] [cursor=pointer]:
+                  - /url: mailto:support@praxisplatform.com
+        - paragraph [ref=e64]: © 2025 Praxis Platform. All rights reserved.
+  - region "Notifications alt+T"
+  - generic [ref=e66]:
+    - generic [ref=e68]:
+      - generic [ref=e69]: 🛠️ Dev Tools
+      - generic [ref=e70]:
+        - button "−" [ref=e71]
+        - button "✕" [ref=e72]
+    - generic [ref=e74]:
+      - tablist [ref=e75]:
+        - tab "Auth" [selected] [ref=e76]
+        - tab "User" [ref=e77]
+        - tab "Data" [ref=e78]
+        - tab "Info" [ref=e79]
+      - tabpanel "Auth" [ref=e80]:
+        - generic [ref=e81]:
+          - heading "Quick Login" [level=3] [ref=e82]
+          - generic [ref=e83]:
+            - button "👑 Admin" [ref=e84]
+            - button "✏️ Editor" [ref=e85]
+            - button "👤 User" [ref=e86]
+          - paragraph [ref=e87]: Creates account if doesn't exist
+        - generic [ref=e88]:
+          - heading "Current Session" [level=3] [ref=e89]
+          - paragraph [ref=e90]: Not logged in
+  - generic [ref=e91]:
+    - img [ref=e93]
+    - button "Open Tanstack query devtools" [ref=e141] [cursor=pointer]:
+      - img [ref=e142]
+  - button "Open Next.js Dev Tools" [ref=e195] [cursor=pointer]:
+    - img [ref=e196]
+  - alert [ref=e199]
+```

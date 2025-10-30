@@ -82,7 +82,7 @@ const STEPS = [
   { id: 'welcome', title: 'Welcome', description: 'Learn about the Praxis method' },
   { id: 'goals', title: 'Your Goals', description: 'Tell us about your aspirations' },
   { id: 'residency', title: 'Choose Path', description: 'Select your learning journey' },
-  { id: 'complete', title: 'Ready!', description: 'Start your first lesson' }
+  { id: 'complete', title: 'Ready', description: 'Start your first lesson' }
 ]
 
 export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowProps) {
@@ -141,7 +141,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
 
       if (residencyError) throw residencyError
 
-      toast.success('Welcome to Praxis! Let\'s start your journey.')
+      toast.success('Onboarding complete. Access your dashboard.')
       router.push('/dashboard')
     } catch (error) {
       console.error('Failed to complete onboarding:', error)
@@ -160,9 +160,9 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
               <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                 <Target className="h-10 w-10 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Welcome to Praxis</h2>
+              <h2 className="text-3xl font-bold text-gray-900">Access the Proving Ground</h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                The proving ground for ambitious business leaders. You're about to embark on a systematic journey 
+                The proving ground for ambitious business leaders. You are about to embark on a systematic journey 
                 to build world-class business acumen through interactive learning.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
             </div>
 
             <Button onClick={handleNext} size="lg" className="px-8">
-              Get Started
+              Proceed
             </Button>
           </div>
         )
@@ -372,9 +372,9 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
               <div className="mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="h-10 w-10 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">You're All Set!</h2>
+              <h2 className="text-3xl font-bold text-gray-900">Setup Complete</h2>
               <p className="text-lg text-gray-600">
-                Welcome to {selectedPath?.title}. You're about to begin a transformative journey 
+                Access to {selectedPath?.title} is active. Begin your analytical journey 
                 in business decision-making.
               </p>
             </div>

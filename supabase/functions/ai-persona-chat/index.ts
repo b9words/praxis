@@ -1,4 +1,5 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,9 +52,33 @@ Based on the case information above, respond to the user's messages as this char
       parts: [{ text: msg.content }]
     }))
 
-    // Call Gemini API
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    // Retry helper for Deno with exponential backoff
+    async function retryWithBackoff<T>(
+      fn: () => Promise<T>,
+      maxRetries: number = 3,
+      initialDelay: number = 1000
+    ): Promise<T> {
+      let lastError: Error | null = null
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          return await fn()
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error))
+          if (attempt === maxRetries) throw lastError
+          
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.min(initialDelay * Math.pow(2, attempt), 8000)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`)
+        }
+      }
+      throw lastError || new Error('Retry exhausted')
+    }
+
+    // Call Gemini API with retry logic
+    const geminiResponse = await retryWithBackoff(async () => {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
@@ -75,16 +100,51 @@ Based on the case information above, respond to the user's messages as this char
           }
         }),
       }
-    )
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text()
-      console.error('Gemini API error:', errorText)
-      throw new Error(`Gemini API request failed: ${geminiResponse.status}`)
-    }
+      if (!response.ok) {
+        const errorText = await response.text()
+        const error = new Error(`Gemini API request failed: ${response.status} - ${errorText}`)
+        ;(error as any).status = response.status
+        throw error
+      }
+
+      return response
+    })
 
     const geminiData = await geminiResponse.json()
     const reply = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || 'I need a moment to think about that.'
+
+    // Track token usage
+    const usageMetadata = geminiData.usageMetadata
+    if (usageMetadata) {
+      try {
+        const supabaseServiceClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          }
+        )
+
+        const today = new Date().toISOString().split('T')[0]
+        
+        await supabaseServiceClient
+          .from('token_usage')
+          .insert({
+            date: today,
+            model: 'gemini-1.5-flash',
+            prompt_tokens: usageMetadata.promptTokenCount || 0,
+            completion_tokens: usageMetadata.candidatesTokenCount || 0,
+            total_tokens: usageMetadata.totalTokenCount || 0,
+          })
+      } catch (tokenError) {
+        // Log but don't fail the request if token tracking fails
+        console.error('Failed to track token usage:', tokenError)
+      }
+    }
 
     return new Response(
       JSON.stringify({ reply }),

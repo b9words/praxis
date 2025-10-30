@@ -7,8 +7,42 @@ import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserAggregateScores } from '@/lib/database-functions'
 import { prisma } from '@/lib/prisma/server'
 import { Award, Calendar, Edit, Target, TrendingUp } from 'lucide-react'
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>
+}): Promise<Metadata> {
+  const { username } = await params
+  const profile = await prisma.profile.findUnique({
+    where: { username },
+    select: {
+      fullName: true,
+      username: true,
+      bio: true,
+      isPublic: true,
+    },
+  })
+
+  if (!profile || !profile.isPublic) {
+    return {
+      title: 'Profile',
+    }
+  }
+
+  return {
+    title: `${profile.fullName || profile.username} | Praxis Profile`,
+    description: profile.bio || `View ${profile.fullName || profile.username}'s Praxis profile and competency scores.`,
+    openGraph: {
+      title: `${profile.fullName || profile.username} | Praxis Profile`,
+      description: profile.bio || `View ${profile.fullName || profile.username}'s Praxis profile.`,
+      type: 'profile',
+    },
+  }
+}
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const currentUser = await getCurrentUser()
@@ -16,8 +50,20 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   const { username } = await params
 
   // Fetch profile by username
+  // Exclude email_notifications_enabled as it may not exist in all database instances
   const profile = await prisma.profile.findUnique({
     where: { username },
+    select: {
+      id: true,
+      username: true,
+      fullName: true,
+      avatarUrl: true,
+      bio: true,
+      isPublic: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   })
 
   if (!profile) {
@@ -102,7 +148,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-900">{profile.fullName || profile.username}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{profile.fullName || profile.username}'s Dossier</h1>
                     <p className="text-gray-600">@{profile.username}</p>
                     {profile.bio && <p className="mt-2 text-gray-700">{profile.bio}</p>}
                   </div>
@@ -110,7 +156,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                     <Button asChild variant="outline">
                       <Link href="/profile/edit">
                         <Edit className="h-4 w-4 mr-2" />
-                        Edit Profile
+                        Update Dossier
                       </Link>
                     </Button>
                   )}
@@ -139,11 +185,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
         {aggregateScores && (
           <Card>
             <CardHeader>
-              <CardTitle>Praxis Profile</CardTitle>
+              <CardTitle>Competency Matrix</CardTitle>
               <CardDescription>Your competency scores across all completed simulations</CardDescription>
             </CardHeader>
             <CardContent>
-              <PraxisRadarChart scores={aggregateScores} />
+              <PraxisRadarChart data={aggregateScores} />
             </CardContent>
           </Card>
         )}
@@ -152,8 +198,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
         {simulations.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Recent Simulations</CardTitle>
-              <CardDescription>Your completed case studies</CardDescription>
+              <CardTitle>Engagement History</CardTitle>
+              <CardDescription>Your completed simulations</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

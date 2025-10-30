@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getAllUserProgress } from '@/lib/progress-tracking'
-import { getCurrentUser } from '@/lib/auth/get-user'
 import { BookOpen, CheckCircle, Clock, Star, Target } from 'lucide-react'
 import Link from 'next/link'
 
@@ -116,16 +116,31 @@ export default async function BookmarksPage() {
             </Card>
           ) : (
             <div className="space-y-6">
-              {Object.entries(groupedByDomain).map(([domainTitle, lessons]) => (
+              {Object.entries(groupedByDomain).map(([domainTitle, lessons]) => {
+                const typedLessons = lessons as Array<{
+                  domainId: string
+                  moduleId: string
+                  lessonId: string
+                  title: string
+                  domainTitle: string
+                  moduleTitle: string
+                  description: string
+                  status: string
+                  progressPercentage: number
+                  timeSpent: number
+                  completedAt: string | null
+                }>
+                
+                return (
                 <div key={domainTitle} className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Target className="h-4 w-4 text-neutral-600" />
                     <h2 className="text-base font-semibold text-neutral-900">{domainTitle}</h2>
-                    <span className="text-xs text-neutral-500">({lessons.length})</span>
+                    <span className="text-xs text-neutral-500">({typedLessons.length})</span>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {lessons.map((lesson) => {
+                    {typedLessons.map((lesson) => {
                       const isCompleted = lesson.status === 'completed'
 
                       return (
@@ -174,7 +189,7 @@ export default async function BookmarksPage() {
                               )}
 
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2取的
+                                <div className="flex items-center gap-2">
                                   {isCompleted ? (
                                     <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
                                       <CheckCircle className="h-3 w-3 text-white" />
@@ -206,7 +221,8 @@ export default async function BookmarksPage() {
                     })}
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

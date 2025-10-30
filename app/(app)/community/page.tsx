@@ -6,28 +6,44 @@ import { BookOpen, MessageCircle, Target } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CommunityPage() {
-  // Fetch all channels with thread counts
-  const channels = await prisma.forumChannel.findMany({
-    orderBy: {
-      createdAt: 'asc',
-    },
-  })
-
-  // For each channel, get thread count
-  const channelsWithCounts = await Promise.all(
-    channels.map(async (channel) => {
-      const threadCount = await prisma.forumThread.count({
-        where: {
-          channelId: channel.id,
-        },
-      })
-
-      return { ...channel, threadCount }
+  // Fetch all channels with thread counts with error handling
+  let channels: any[] = []
+  try {
+    channels = await prisma.forumChannel.findMany({
+      orderBy: {
+        createdAt: 'asc',
+      },
     })
-  )
+  } catch (error) {
+    console.error('Error fetching channels:', error)
+  }
 
-  // Get recent threads across all channels
-  const recentThreads = await prisma.forumThread.findMany({
+  // For each channel, get thread count with error handling
+  let channelsWithCounts: any[] = []
+  try {
+    channelsWithCounts = await Promise.all(
+      channels.map(async (channel: any) => {
+        try {
+          const threadCount = await prisma.forumThread.count({
+            where: {
+              channelId: channel.id,
+            },
+          })
+          return { ...channel, threadCount }
+        } catch (error) {
+          console.error(`Error fetching thread count for channel ${channel.id}:`, error)
+          return { ...channel, threadCount: 0 }
+        }
+      })
+    )
+  } catch (error) {
+    console.error('Error processing channels:', error)
+  }
+
+  // Get recent threads across all channels with error handling
+  let recentThreads: any[] = []
+  try {
+    recentThreads = await prisma.forumThread.findMany({
     include: {
       author: {
         select: {
@@ -46,13 +62,16 @@ export default async function CommunityPage() {
       updatedAt: 'desc',
     },
     take: 10,
-  })
+    })
+  } catch (error) {
+    console.error('Error fetching recent threads:', error)
+  }
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Community Forum</h1>
-        <p className="mt-2 text-gray-600">Connect with fellow Praxis members</p>
+        <h1 className="text-3xl font-bold text-gray-900">The Exchange</h1>
+        <p className="mt-2 text-gray-600">Connect with operatives in the network</p>
       </div>
 
       {/* Channels */}

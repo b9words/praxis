@@ -36,9 +36,9 @@ export default function RecommendedReading({ recommendations, delay }: Recommend
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <div>
-              <CardTitle className="text-xl text-purple-900">Recommended Reading</CardTitle>
+              <CardTitle className="text-xl text-purple-900">Further Intelligence</CardTitle>
               <CardDescription className="text-purple-700">
-                Strengthen your knowledge in areas for improvement
+                Your performance indicates gaps in understanding. The following intelligence addresses these gaps.
               </CardDescription>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function RecommendedReading({ recommendations, delay }: Recommend
                       <p className="text-sm text-gray-600 italic">{article.reason}</p>
                     </div>
                     <Button asChild variant="outline" size="sm" className="shrink-0">
-                      <Link href={`/library/curriculum`} className="gap-2">
+                      <Link href={`/library/curriculum?focus=${article.id}`} className="gap-2">
                         Read
                         <ExternalLink className="h-3 w-3" />
                       </Link>

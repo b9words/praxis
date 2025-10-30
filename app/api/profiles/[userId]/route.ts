@@ -67,6 +67,17 @@ export async function PUT(
         bio,
         isPublic,
       },
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        avatarUrl: true,
+        bio: true,
+        isPublic: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     })
 
     return NextResponse.json({ profile })
@@ -92,10 +103,24 @@ export async function PATCH(
     }
 
     const body = await request.json()
+    
+    // Filter out emailNotificationsEnabled as it may not exist in all database instances
+    const { emailNotificationsEnabled, ...updateData } = body
 
     const profile = await prisma.profile.update({
       where: { id: userId },
-      data: body,
+      data: updateData,
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        avatarUrl: true,
+        bio: true,
+        isPublic: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     })
 
     return NextResponse.json({ profile })

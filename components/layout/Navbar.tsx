@@ -1,5 +1,6 @@
 'use client'
 
+import NotificationCenter from '@/components/notifications/NotificationCenter'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -107,7 +108,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     router.push('/login')
-    router.refresh()
+    // Don't refresh after signout - navigation handles it
   }
 
   const navLinks = [
@@ -115,25 +116,25 @@ export default function Navbar({ user, profile }: NavbarProps) {
       href: '/dashboard', 
       label: 'Dashboard',
       icon: BarChart3,
-      description: 'Your learning hub'
+      description: 'Your analytical workspace'
     },
     { 
       href: '/library/curriculum', 
-      label: 'Library',
+      label: 'Intel',
       icon: BookOpen,
-      description: userProgress ? `${userProgress.articlesCompleted}/${userProgress.totalArticles} articles` : 'Business frameworks'
+      description: userProgress ? `${userProgress.articlesCompleted}/${userProgress.totalArticles} articles` : 'Intelligence library'
     },
     { 
       href: '/simulations', 
-      label: 'Simulations',
+      label: 'The Arena',
       icon: Target,
-      description: userProgress ? `${userProgress.simulationsCompleted} completed` : 'Practice scenarios'
+      description: userProgress ? `${userProgress.simulationsCompleted} completed` : 'Simulation scenarios'
     },
     { 
       href: '/community', 
-      label: 'Community',
+      label: 'The Network',
       icon: Users,
-      description: 'Connect & discuss'
+      description: 'Connect with operatives'
     },
   ]
 
@@ -209,6 +210,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                 </div>
               </div>
             )}
+            <NotificationCenter />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -239,7 +241,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href={`/profile/${profile?.username}`}>
-                    Profile
+                    Your Dossier
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

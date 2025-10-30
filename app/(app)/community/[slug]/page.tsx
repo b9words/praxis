@@ -15,38 +15,49 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
 
   const { slug } = await params
 
-  // Fetch channel
-  const channel = await prisma.forumChannel.findUnique({
-    where: { slug },
-  })
+  // Fetch channel with error handling
+  let channel = null
+  try {
+    channel = await prisma.forumChannel.findUnique({
+      where: { slug },
+    })
+  } catch (error) {
+    console.error('Error fetching channel:', error)
+    notFound()
+  }
 
   if (!channel) {
     notFound()
   }
 
-  // Fetch threads in this channel
-  const threads = await prisma.forumThread.findMany({
-    where: {
-      channelId: channel.id,
-    },
-    include: {
-      author: {
-        select: {
-          username: true,
-          avatarUrl: true,
+  // Fetch threads in this channel with error handling
+  let threads: any[] = []
+  try {
+    threads = await prisma.forumThread.findMany({
+      where: {
+        channelId: channel.id,
+      },
+      include: {
+        author: {
+          select: {
+            username: true,
+            avatarUrl: true,
+          },
+        },
+        _count: {
+          select: {
+            posts: true,
+          },
         },
       },
-      _count: {
-        select: {
-          posts: true,
-        },
-      },
-    },
-    orderBy: [
-      { isPinned: 'desc' },
-      { updatedAt: 'desc' },
-    ],
-  })
+      orderBy: [
+        { isPinned: 'desc' },
+        { updatedAt: 'desc' },
+      ],
+    })
+  } catch (error) {
+    console.error('Error fetching threads:', error)
+  }
 
   return (
     <div className="space-y-6">
@@ -56,7 +67,7 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
           <p className="mt-2 text-gray-600">{channel.description}</p>
         </div>
         <Button asChild>
-          <Link href={`/community/${slug}/new`}>New Thread</Link>
+          <Link href={`/community/${slug}/new`}>Open a New Thread</Link>
         </Button>
       </div>
 

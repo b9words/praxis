@@ -20,8 +20,8 @@ interface RichTextEditorBlockProps {
 
 export default function RichTextEditorBlock({
   blockId,
-  title = 'Your Response',
-  placeholder = 'Start writing your analysis here...',
+  title = 'Response',
+  placeholder = 'Begin your analysis. Reference specific data points and case materials.',
   maxLength = 5000,
   minLength = 100,
   required = true,

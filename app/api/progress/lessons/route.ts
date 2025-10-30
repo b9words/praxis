@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
+import { getAllUserProgress, updateLessonProgress } from '@/lib/progress-tracking'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -9,23 +9,22 @@ export async function GET(request: NextRequest) {
     const domainId = searchParams.get('domainId')
     const status = searchParams.get('status')
 
-    const where: any = {
-      userId: user.id,
-    }
+    // Use the helper function instead of direct Prisma calls
+    const progressMap = await getAllUserProgress(user.id)
+    let progress = Array.from(progressMap.values())
 
+    // Filter by domainId if specified
     if (domainId) {
-      where.domainId = domainId
-    }
-    if (status) {
-      where.status = status
+      progress = progress.filter(p => p.domain_id === domainId)
     }
 
-    const progress = await prisma.userLessonProgress.findMany({
-      where,
-      orderBy: {
-        updatedAt: 'desc',
-      },
-    })
+    // Filter by status if specified  
+    if (status) {
+      progress = progress.filter(p => p.status === status)
+    }
+
+    // Sort by updated date (most recent first)
+    progress.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
 
     return NextResponse.json({ progress })
   } catch (error) {
@@ -57,39 +56,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const progress = await prisma.userLessonProgress.upsert({
-      where: {
-        userId_domainId_moduleId_lessonId: {
-          userId: user.id,
-          domainId,
-          moduleId,
-          lessonId,
-        },
-      },
-      update: {
-        status,
-        progressPercentage,
-        timeSpentSeconds,
-        lastReadPosition: lastReadPosition as any,
-        bookmarked,
-        completedAt: status === 'completed' ? new Date() : undefined,
-      },
-      create: {
-        userId: user.id,
-        domainId,
-        moduleId,
-        lessonId,
-        status,
-        progressPercentage,
-        timeSpentSeconds,
-        lastReadPosition: lastReadPosition as any,
-        bookmarked,
-        completedAt: status === 'completed' ? new Date() : null,
-      },
+    const progress = await updateLessonProgress(user.id, domainId, moduleId, lessonId, {
+      status,
+      progress_percentage: progressPercentage,
+      time_spent_seconds: timeSpentSeconds,
+      last_read_position: lastReadPosition,
+      bookmarked,
+      completed_at: status === 'completed' ? new Date().toISOString() : undefined,
     })
 
+    if (!progress) {
+      return NextResponse.json({ error: 'Failed to create progress' }, { status: 500 })
+    }
+
     return NextResponse.json({ progress }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
@@ -118,27 +99,21 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const progress = await prisma.userLessonProgress.update({
-      where: {
-        userId_domainId_moduleId_lessonId: {
-          userId: user.id,
-          domainId,
-          moduleId,
-          lessonId,
-        },
-      },
-      data: {
-        status,
-        progressPercentage,
-        timeSpentSeconds,
-        lastReadPosition: lastReadPosition as any,
-        bookmarked,
-        completedAt: status === 'completed' ? new Date() : undefined,
-      },
+    const progress = await updateLessonProgress(user.id, domainId, moduleId, lessonId, {
+      status,
+      progress_percentage: progressPercentage,
+      time_spent_seconds: timeSpentSeconds,
+      last_read_position: lastReadPosition,
+      bookmarked,
+      completed_at: status === 'completed' ? new Date().toISOString() : undefined,
     })
 
+    if (!progress) {
+      return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 })
+    }
+
     return NextResponse.json({ progress })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }

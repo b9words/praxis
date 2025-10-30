@@ -54,7 +54,7 @@ export default function ReplyForm({ threadId }: ReplyFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="reply">Add a reply</Label>
+        <Label htmlFor="reply">Add to Analysis</Label>
         <Textarea
           id="reply"
           placeholder="Share your thoughts..."
@@ -67,7 +67,7 @@ export default function ReplyForm({ threadId }: ReplyFormProps) {
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={loading || !content.trim()}>
-          {loading ? 'Posting...' : 'Post Reply'}
+          {loading ? 'Posting...' : 'Add to Analysis'}
         </Button>
       </div>
     </form>

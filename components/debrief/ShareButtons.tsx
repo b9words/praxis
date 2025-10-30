@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { trackEvents } from '@/lib/analytics'
 import { Check, Copy, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -25,18 +26,27 @@ export default function ShareButtons({ simulationTitle, scores, profileUrl }: Sh
     setCopiedLink(true)
     toast.success('Profile link copied!')
     setTimeout(() => setCopiedLink(false), 2000)
+    
+    // Track share event
+    trackEvents.debriefShared(simulationTitle, 'link')
   }
 
   const handleShareLinkedIn = () => {
     const url = profileUrl || window.location.origin + '/profile'
     const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shareText)}`
     window.open(linkedinUrl, '_blank', 'width=600,height=600')
+    
+    // Track share event
+    trackEvents.debriefShared(simulationTitle, 'linkedin')
   }
 
   const handleShareTwitter = () => {
     const url = profileUrl || window.location.origin + '/profile'
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`
     window.open(twitterUrl, '_blank', 'width=600,height=400')
+    
+    // Track share event
+    trackEvents.debriefShared(simulationTitle, 'twitter')
   }
 
   return (

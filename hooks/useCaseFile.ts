@@ -50,7 +50,7 @@ export function useCaseFile(fileId: string): CaseFileData {
                   resolve(results.data)
                 }
               },
-              error: (error) => {
+              error: (error: any) => {
                 reject(new Error(`CSV parsing error: ${error.message}`))
               }
             })

@@ -52,7 +52,7 @@ export default function FinancialModelingLayout({ challengeData }: FinancialMode
       blockId: 'documents',
       blockType: 'DOCUMENT_VIEWER',
       props: {
-        title: 'Case Materials',
+        title: 'Briefing Documents',
         fileIds: fileIds,
         showTabs: true
       }
@@ -77,7 +77,7 @@ export default function FinancialModelingLayout({ challengeData }: FinancialMode
         title: 'Strategic Recommendation',
         maxLength: 8000,
         minLength: 500,
-        placeholder: 'Based on your financial model, provide your strategic recommendation. Explain your key assumptions, discuss the scenarios you modeled, and justify your final recommendation with specific numbers from your analysis...',
+        placeholder: 'Based on your financial model, provide your strategic recommendation. Explain your key assumptions, discuss the scenarios you modeled, and justify your final recommendation with specific numbers from your analysis.',
         showWordCount: true,
         autoSave: true
       }
@@ -87,7 +87,7 @@ export default function FinancialModelingLayout({ challengeData }: FinancialMode
       blockType: 'SUBMIT_BUTTON',
       props: {
         label: 'Submit Analysis & Model',
-        confirmationMessage: 'Are you ready to submit your financial model and analysis? Ensure your model is complete and your recommendation is well-supported.',
+        confirmationMessage: 'Confirm submission. Ensure your model is complete and your recommendation is well-supported.',
         requiresValidation: true,
         validationRules: {
           requiredBlocks: ['model', 'analysis'],
@@ -113,7 +113,7 @@ export default function FinancialModelingLayout({ challengeData }: FinancialMode
             <BlockComponent
               key={block.blockId}
               blockId={block.blockId}
-              {...block.props}
+              {...(block.props as any)}
             />
           )
         })}

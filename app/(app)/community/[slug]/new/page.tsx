@@ -83,8 +83,8 @@ export default function NewThreadPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">New Thread in #{channel.name}</h1>
-        <p className="mt-2 text-gray-600">Start a new discussion</p>
+        <h1 className="text-3xl font-bold text-gray-900">Open a New Thread</h1>
+        <p className="mt-2 text-gray-600">Start an analytical discussion</p>
       </div>
 
       <Card>
@@ -129,7 +129,7 @@ export default function NewThreadPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={loading || !title || !content}>
-                {loading ? 'Creating...' : 'Create Thread'}
+                {loading ? 'Opening thread...' : 'Open Thread'}
               </Button>
             </div>
           </form>

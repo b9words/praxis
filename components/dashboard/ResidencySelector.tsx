@@ -85,7 +85,8 @@ export default function ResidencySelector({ currentResidency, userId }: Residenc
       if (error) throw error
 
       toast.success(`Welcome to ${RESIDENCIES[year - 1].title}!`)
-      router.refresh()
+      // Navigate to dashboard instead of refresh to avoid potential loops
+      router.push('/dashboard')
     } catch (error) {
       console.error('Failed to select residency:', error)
       toast.error('Failed to select residency')

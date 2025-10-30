@@ -174,7 +174,7 @@ export default function MultiStageLayout({ challengeData }: MultiStageLayoutProp
             <BlockComponent
               key={prefixedBlockId}
               blockId={prefixedBlockId}
-              {...block.props}
+              {...(block.props as any)}
             />
           )
         })}

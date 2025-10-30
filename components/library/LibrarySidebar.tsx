@@ -219,7 +219,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
         <div className="relative">
           <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
                <Input
-                 placeholder="Search curriculum..."
+                 placeholder="Search frameworks, models, case files..."
                  value={searchQuery}
                  onChange={(e) => setSearchQuery(e.target.value)}
                  className="pl-8 pr-8 h-11 md:h-8 text-sm bg-neutral-50 border border-neutral-300 text-neutral-800 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded"

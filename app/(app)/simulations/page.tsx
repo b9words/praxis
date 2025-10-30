@@ -14,50 +14,89 @@ export default async function SimulationsPage() {
     return null
   }
 
-  // Get all published cases with associated competencies
-  const cases = await prisma.case.findMany({
-    where: {
-      status: 'published',
-    },
-    include: {
-      competencies: {
-        include: {
-          competency: {
-            select: {
-              name: true,
+  // Get all published cases with associated competencies with error handling
+  let cases: any[] = []
+  try {
+    cases = await prisma.case.findMany({
+      where: {
+        status: 'published',
+      },
+      include: {
+        competencies: {
+          include: {
+            competency: {
+              select: {
+                name: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: {
-      createdAt: 'asc',
-    },
-  })
+      orderBy: {
+        createdAt: 'asc',
+      },
+    })
+  } catch (error: any) {
+    // If enum doesn't exist, fall back to querying without status filter
+    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+      try {
+        cases = await prisma.case.findMany({
+          include: {
+            competencies: {
+              include: {
+                competency: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        })
+      } catch (fallbackError) {
+        console.error('Error fetching cases (fallback):', fallbackError)
+      }
+    } else {
+      console.error('Error fetching cases:', error)
+    }
+  }
 
-  // Get user's completed simulations
-  const completedSimulations = await prisma.simulation.findMany({
-    where: {
-      userId: user.id,
-      status: 'completed',
-    },
-    select: {
-      caseId: true,
-    },
-  })
+  // Get user's completed simulations with error handling
+  let completedSimulations: any[] = []
+  try {
+    completedSimulations = await prisma.simulation.findMany({
+      where: {
+        userId: user.id,
+        status: 'completed',
+      },
+      select: {
+        caseId: true,
+      },
+    })
+  } catch (error) {
+    console.error('Error fetching completed simulations:', error)
+  }
 
-  const completedCaseIds = new Set(completedSimulations.map((s) => s.caseId))
+  const completedCaseIds = new Set(completedSimulations.map((s: any) => s.caseId))
 
-  // Check for in-progress simulations
-  const inProgressSimulations = await prisma.simulation.findMany({
-    where: {
-      userId: user.id,
-      status: 'in_progress',
-    },
-    select: {
-      caseId: true,
-    },
-  })
+  // Check for in-progress simulations with error handling
+  let inProgressSimulations: any[] = []
+  try {
+    inProgressSimulations = await prisma.simulation.findMany({
+      where: {
+        userId: user.id,
+        status: 'in_progress',
+      },
+      select: {
+        caseId: true,
+      },
+    })
+  } catch (error) {
+    console.error('Error fetching in-progress simulations:', error)
+  }
 
   const inProgressCaseIds = new Set(inProgressSimulations.map((s) => s.caseId))
 
@@ -77,8 +116,8 @@ export default async function SimulationsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Case Simulations</h1>
-        <p className="mt-2 text-gray-600">Apply your knowledge in realistic business scenarios</p>
+        <h1 className="text-3xl font-bold text-gray-900">The Arena</h1>
+        <p className="mt-2 text-gray-600">Deploy to scenarios and apply your analytical frameworks</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -149,7 +188,7 @@ export default async function SimulationsPage() {
                 </div>
                 <Button asChild className="w-full" variant={isInProgress ? 'default' : isCompleted ? 'outline' : 'default'}>
                   <Link href={`/simulations/${caseItem.id}/brief`}>
-                    {isInProgress ? 'Continue' : isCompleted ? 'Review Case' : 'Start Simulation'}
+                    {isInProgress ? 'Continue' : isCompleted ? 'Review Case' : 'Deploy to Scenario'}
                   </Link>
                 </Button>
               </CardContent>

@@ -50,14 +50,12 @@ function MermaidDiagram({ chart }: { chart: string }) {
         gantt: {
           titleTopMargin: 25,
           barHeight: 20,
-          fontFamily: 'ui-sans-serif, system-ui, sans-serif',
           fontSize: 11,
           gridLineStartPadding: 35,
-          bottomPadding: 50,
           leftPadding: 75,
           topPadding: 50,
           rightPadding: 35
-        }
+        } as any
       })
 
       // Generate unique ID for this diagram

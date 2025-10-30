@@ -1,9 +1,58 @@
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/server'
+import { BookOpen, DollarSign, Shield, Target, TrendingUp, Users } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+
+export const metadata: Metadata = {
+  title: 'Praxis - The Proving Ground for Business Leaders',
+  description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment. A curated platform for analytical professionals.',
+  openGraph: {
+    title: 'Praxis - The Proving Ground for Business Leaders',
+    description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment. A curated platform for analytical professionals.',
+    type: 'website',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Praxis - The Proving Ground for Business Leaders',
+    description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment.',
+  },
+}
+
+// Architectural accent component - creates uniform design language across sections
+function SectionAccent({ variant, className = '' }: { variant: 'vertical' | 'horizontal' | 'corner' | 'edge' | 'center'; className?: string }) {
+  const baseClasses = 'absolute pointer-events-none'
+  
+  switch (variant) {
+    case 'vertical':
+      return (
+        <div className={`${baseClasses} left-0 top-0 bottom-0 w-px bg-neutral-200 ${className}`} />
+      )
+    case 'horizontal':
+      return (
+        <div className={`${baseClasses} left-0 right-0 top-0 h-px bg-neutral-200 ${className}`} />
+      )
+    case 'corner':
+      return (
+        <div className={`${baseClasses} left-0 top-0 w-12 h-px bg-neutral-900 ${className}`} />
+      )
+    case 'edge':
+      return (
+        <>
+          <div className={`${baseClasses} left-0 top-0 bottom-0 w-px bg-neutral-100 ${className}`} />
+          <div className={`${baseClasses} right-0 top-0 bottom-0 w-px bg-neutral-100 ${className}`} />
+        </>
+      )
+    case 'center':
+      return (
+        <div className={`${baseClasses} left-1/2 top-0 bottom-0 w-px bg-white/10 transform -translate-x-1/2 ${className}`} />
+      )
+    default:
+      return null
+  }
+}
 
 export default async function Home() {
   const supabase = await createClient()
@@ -17,24 +66,34 @@ export default async function Home() {
     <div className="min-h-screen bg-white">
       {/* Navigation Header */}
       <nav className="border-b border-neutral-200 bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/" className="text-2xl font-bold text-neutral-900">
+            <div className="flex items-center gap-12">
+              <Link href="/" className="text-lg font-semibold text-neutral-900 tracking-tight relative">
                 Praxis
+                <div className="absolute -bottom-1 left-0 w-full h-[0.5px] bg-neutral-900"></div>
               </Link>
-              <div className="hidden md:flex gap-6">
-                <Link href="#how-it-works" className="text-sm text-neutral-600 hover:text-neutral-900">How It Works</Link>
-                <Link href="#curriculum" className="text-sm text-neutral-600 hover:text-neutral-900">Curriculum</Link>
-                <Link href="/pricing" className="text-sm text-neutral-600 hover:text-neutral-900">Pricing</Link>
+              <div className="hidden md:flex gap-8">
+                <Link href="#method" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
+                  Method
+                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
+                </Link>
+                <Link href="#curriculum" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
+                  Curriculum
+                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
+                </Link>
+                <Link href="/pricing" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
+                  Pricing
+                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
+                </Link>
               </div>
             </div>
-            <div className="flex gap-3">
-              <Button asChild variant="ghost" size="sm" className="text-neutral-700">
-                <Link href="/login">Sign In</Link>
+            <div className="flex gap-4">
+              <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
+                <Link href="/login">Authenticate</Link>
               </Button>
-              <Button asChild size="sm" className="bg-blue-700 hover:bg-blue-800 text-white">
-                <Link href="/signup">Get Started</Link>
+              <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
+                <Link href="/signup">Request Access</Link>
               </Button>
             </div>
           </div>
@@ -42,195 +101,222 @@ export default async function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="text-center max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-blue-700 text-white px-4 py-1.5 text-xs font-medium">
-              FOR AMBITIOUS PROFESSIONALS
-            </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold text-neutral-900 leading-tight mb-6">
-              The Proving Ground for
-              <br />
-              <span className="text-blue-700">Business Leaders</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-neutral-600 mb-10 leading-relaxed max-w-3xl mx-auto">
-              Build and demonstrate world-class business acumen through interactive simulations, AI-powered coaching, and a vetted network of high-performing peers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-blue-700 hover:bg-blue-800 text-white px-10 h-14 text-lg">
+      <section className="border-b border-neutral-200 relative">
+        <SectionAccent variant="vertical" className="opacity-30" />
+        <SectionAccent variant="corner" className="top-24 opacity-20" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 md:py-32 relative">
+          <div className="max-w-4xl space-y-8">
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-12 bg-neutral-900"></div>
+                <div className="text-xs uppercase tracking-wider text-neutral-500 font-medium">
+                  Curated for Analytical Rigor
+                </div>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight max-w-3xl">
+                The Proving Ground for Business Leaders
+              </h1>
+              <p className="text-lg text-neutral-700 leading-relaxed max-w-2xl">
+                Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button asChild size="lg" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none px-8 h-12 text-sm font-medium">
                 <Link href="/signup">
-                  Start Your Journey
+                  Request Access
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-2 border-neutral-300 hover:border-neutral-400 h-14 px-10 text-lg">
-                <Link href="#how-it-works">
-                  See How It Works
+              <Button asChild variant="outline" size="lg" className="border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 rounded-none px-8 h-12 text-sm font-medium">
+                <Link href="#method">
+                  Review Method
                 </Link>
               </Button>
             </div>
-            <p className="mt-8 text-sm text-neutral-500">
-              Join 10,000+ professionals from Google, McKinsey, Goldman Sachs, and leading startups
-            </p>
+            <div className="pt-8 border-t border-neutral-200">
+              <p className="text-xs text-neutral-500 uppercase tracking-wider">
+                Trusted by professionals from leading firms and high-growth organizations
+              </p>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Stats */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+      {/* Stats */}
+      <section className="border-b border-neutral-200 bg-neutral-50 relative">
+        <SectionAccent variant="edge" className="opacity-30" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 relative">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
             {[
-              { number: '52+', label: 'Expert-Curated Articles' },
-              { number: '14+', label: 'Business Simulations' },
-              { number: '10K+', label: 'Active Members' },
-              { number: '5-Year', label: 'Comprehensive Curriculum' }
+              { number: '52', label: 'Intelligence Articles' },
+              { number: '14', label: 'Simulation Scenarios' },
+              { number: '5-Year', label: 'Structured Curriculum' },
+              { number: '24/7', label: 'Analytical Workspace' }
             ].map((stat, idx) => (
-              <div key={idx}>
-                <div className="text-4xl font-bold text-blue-700 mb-2">{stat.number}</div>
-                <div className="text-sm text-neutral-600">{stat.label}</div>
+              <div key={idx} className="relative">
+                <div className="text-3xl font-light text-neutral-900 mb-2 tracking-tight">{stat.number}</div>
+                <div className="text-xs text-neutral-600 uppercase tracking-wider">{stat.label}</div>
+                {idx < 3 && (
+                  <div className="absolute right-0 top-0 w-px h-full bg-neutral-200 hidden md:block opacity-40"></div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-neutral-900 mb-4">The Praxis Method</h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              A systematic, proven approach to building business decision-making skills
+      {/* Method */}
+      <section id="method" className="border-b border-neutral-200 relative">
+        <SectionAccent variant="vertical" className="opacity-30" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+          <div className="mb-20 relative">
+            <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
+            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">The Praxis Method</h2>
+            <p className="text-base text-neutral-700 max-w-2xl">
+              A systematic approach to developing analytical business decision-making capabilities
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 relative">
+            {/* Connecting guide lines behind method cards (desktop only) */}
+            <div className="hidden lg:block absolute left-1/4 top-12 bottom-12 w-px bg-neutral-100 transform -translate-x-1/2"></div>
+            <div className="hidden lg:block absolute left-1/2 top-12 bottom-12 w-px bg-neutral-100 transform -translate-x-1/2"></div>
+            <div className="hidden lg:block absolute left-3/4 top-12 bottom-12 w-px bg-neutral-100 transform -translate-x-1/2"></div>
+            
             {[
               {
                 number: '01',
-                title: 'Learn',
-                description: 'Master business frameworks through our expert-curated Competency Library. Every article is structured for maximum retention with core principles, frameworks, common pitfalls, and real examples.',
-                icon: '📚',
-                features: ['52+ Articles', 'AI Study Assistant', 'Progressive Curriculum']
+                title: 'Intelligence',
+                description: 'Access curated business frameworks in the Intelligence Library. Each article is structured to build systematic understanding through principles, models, common traps, and applied examples.',
+                icon: BookOpen,
+                features: ['52 Intelligence Articles', 'Query Assistant', 'Structured Progression']
               },
               {
                 number: '02',
-                title: 'Practice',
-                description: 'Apply knowledge in realistic business simulations with actual datasets, financial models, and AI stakeholders who challenge your thinking.',
-                icon: '🎯',
-                features: ['14+ Simulations', 'Real Data', 'AI Role-Play']
+                title: 'Simulation',
+                description: 'Deploy to scenarios with real datasets and financial models. Engage with AI stakeholders that challenge your analytical framework.',
+                icon: Target,
+                features: ['14 Scenarios', 'Real Data Models', 'Interactive Stakeholders']
               },
               {
                 number: '03',
-                title: 'Debrief',
-                description: 'Receive detailed AI-powered performance analysis. Our AI Coach evaluates your decisions against expert rubrics and provides actionable feedback.',
-                icon: '📊',
-                features: ['AI Coaching', 'Competency Scores', 'Personalized Feedback']
+                title: 'After-Action Analysis',
+                description: 'Receive performance debriefs that evaluate your decisions against expert rubrics. Analysis focuses on competency gaps and strategic reasoning.',
+                icon: TrendingUp,
+                features: ['Competency Analysis', 'Performance Scoring', 'Gap Identification']
               },
               {
                 number: '04',
-                title: 'Connect',
-                description: 'Discuss strategies and learn from a vetted community of ambitious professionals. Share insights and build your network.',
-                icon: '🤝',
-                features: ['Private Forum', 'Peer Learning', 'Vetted Community']
+                title: 'The Network',
+                description: 'Engage with a curated community of analytical professionals. Exchange strategic insights and validate frameworks.',
+                icon: Users,
+                features: ['The Exchange', 'Peer Analysis', 'Curated Community']
               }
-            ].map((step) => (
-              <Card key={step.number} className="bg-white border-neutral-200 relative hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="text-5xl mb-4">{step.icon}</div>
-                  <div className="absolute top-6 right-6 text-7xl font-bold text-neutral-100 select-none">{step.number}</div>
-                  <CardTitle className="text-xl font-bold text-neutral-900 mb-2">{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-neutral-600 leading-relaxed">{step.description}</p>
-                  <div className="space-y-1">
-                    {step.features.map((feature, idx) => (
-                      <div key={idx} className="text-xs text-neutral-500 flex items-center gap-2">
-                        <span className="text-blue-700">✓</span>
-                        <span>{feature}</span>
-                      </div>
-                    ))}
+            ].map((step) => {
+              const IconComponent = step.icon
+              return (
+              <div key={step.number} className="space-y-4 relative">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="p-2 border border-neutral-200 hover:border-neutral-300 transition-colors relative">
+                    <IconComponent className="h-5 w-5 text-neutral-700" />
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="text-4xl font-light text-neutral-200">{step.number}</div>
+                </div>
+                <h3 className="text-lg font-medium text-neutral-900 mb-3">{step.title}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed mb-6">{step.description}</p>
+                <div className="space-y-2 pt-4 border-t border-neutral-100">
+                  {step.features.map((feature, idx) => (
+                    <div key={idx} className="text-xs text-neutral-500 flex items-center gap-2">
+                      <div className="w-1 h-1 bg-neutral-400 rounded-full"></div>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )})}
           </div>
         </div>
       </section>
 
       {/* Core Competencies */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-neutral-900 mb-4">Five Core Competencies</h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Build a comprehensive, demonstrable skill set across all dimensions of business leadership
+      <section className="border-b border-neutral-200 bg-neutral-50 relative">
+        <SectionAccent variant="horizontal" className="top-0 opacity-20" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+          <div className="mb-20 relative">
+            <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
+            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">Core Competencies</h2>
+            <p className="text-base text-neutral-700 max-w-2xl">
+              Build demonstrable capabilities across five dimensions of strategic business analysis
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 title: 'Financial Acumen',
-                description: 'Master financial statements, metrics, unit economics, and capital allocation. Make data-driven decisions with confidence.',
-                icon: '💰',
+                description: 'Analyze financial statements, metrics, unit economics, and capital allocation. Develop data-driven decision frameworks.',
+                icon: DollarSign,
                 topics: ['P&L Analysis', 'ROI & CAC', 'Capital Allocation', 'Financial Modeling']
               },
               {
                 title: 'Strategic Thinking',
-                description: 'Develop frameworks for competitive strategy, market positioning, innovation, and long-term planning.',
-                icon: '🎯',
+                description: 'Apply frameworks for competitive strategy, market positioning, innovation, and long-term planning.',
+                icon: Target,
                 topics: ['Porter\'s 5 Forces', 'Competitive Strategy', 'Market Entry', 'Innovation']
               },
               {
                 title: 'Market Awareness',
-                description: 'Understand customer needs, competitive dynamics, and industry trends that drive business outcomes.',
-                icon: '📈',
+                description: 'Assess customer needs, competitive dynamics, and industry trends that drive business outcomes.',
+                icon: TrendingUp,
                 topics: ['Customer Analysis', 'Market Sizing', 'Competitive Intelligence', 'Trend Analysis']
               },
               {
                 title: 'Risk Management',
-                description: 'Identify, assess, and mitigate business risks while intelligently balancing growth opportunities.',
-                icon: '🛡️',
+                description: 'Identify, assess, and mitigate business risks while balancing growth opportunities analytically.',
+                icon: Shield,
                 topics: ['Risk Assessment', 'Scenario Planning', 'Crisis Management', 'Due Diligence']
               },
               {
                 title: 'Leadership Judgment',
                 description: 'Navigate complex stakeholder dynamics and make sound decisions under uncertainty and pressure.',
-                icon: '👥',
+                icon: Users,
                 topics: ['Stakeholder Management', 'Decision-Making', 'Negotiation', 'Organizational Politics']
               }
-            ].map((competency, idx) => (
-              <Card key={idx} className="bg-neutral-50 border-neutral-200 hover:border-blue-700 hover:shadow-md transition-all">
-                <CardHeader>
-                  <div className="text-4xl mb-4">{competency.icon}</div>
-                  <CardTitle className="text-lg font-bold text-neutral-900 mb-2">{competency.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-neutral-600 leading-relaxed">{competency.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {competency.topics.map((topic, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs border-neutral-300 text-neutral-700">
-                        {topic}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            ].map((competency, idx) => {
+              const IconComponent = competency.icon
+              return (
+              <div key={idx} className="bg-white border border-neutral-200 p-6 hover:border-neutral-300 transition-colors relative">
+                <div className="absolute top-0 left-0 w-full h-[0.5px] bg-neutral-900 opacity-0 hover:opacity-20 transition-opacity"></div>
+                <div className="mb-6">
+                  <IconComponent className="h-6 w-6 text-neutral-700" />
+                </div>
+                <h3 className="text-base font-medium text-neutral-900 mb-3">{competency.title}</h3>
+                <p className="text-sm text-neutral-600 leading-relaxed mb-6">{competency.description}</p>
+                <div className="space-y-2 pt-4 border-t border-neutral-100">
+                  {competency.topics.map((topic, idx) => (
+                    <div key={idx} className="text-xs text-neutral-500">
+                      {topic}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )})}
           </div>
         </div>
       </section>
 
       {/* The Curriculum */}
-      <section id="curriculum" className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-neutral-900 mb-4">A 5-Year Journey to Mastery</h2>
-            <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
-              Progressive curriculum from operational execution to executive leadership—designed for working professionals
+      <section id="curriculum" className="border-b border-neutral-200 relative">
+        <SectionAccent variant="vertical" className="opacity-30" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+          <div className="mb-20 relative">
+            <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
+            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">A 5-Year Journey to Mastery</h2>
+            <p className="text-base text-neutral-700 max-w-2xl">
+              Progressive curriculum from operational execution to executive leadership
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-1">
             {[
               {
                 year: 'Year 1',
@@ -273,159 +359,125 @@ export default async function Home() {
                 stats: { articles: 6, cases: 2 }
               }
             ].map((year, idx) => (
-              <Card key={idx} className="bg-white border-neutral-200 hover:shadow-md transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-4 mb-3">
-                        <Badge className="bg-blue-700 text-white text-sm px-3 py-1">{year.year}</Badge>
-                        <Badge variant="outline" className="text-xs border-neutral-300 text-neutral-600">
-                          {year.stats.articles} Articles • {year.stats.cases} Cases
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-2xl font-bold text-neutral-900 mb-2">{year.title}</CardTitle>
-                      <p className="text-base text-neutral-600 italic mb-3">"{year.theme}"</p>
-                      <p className="text-sm text-neutral-700 leading-relaxed mb-4">{year.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {year.domains.map((domain, idx) => (
-                          <span key={idx} className="text-xs text-neutral-600 bg-neutral-100 px-2 py-1 rounded">
-                            {domain}
-                          </span>
-                        ))}
-                      </div>
+              <div key={idx} className="border-b border-neutral-200 py-8 hover:bg-neutral-50 transition-colors relative group pl-8">
+                {/* Timeline indicator */}
+                <div className="absolute left-0 top-8 bottom-8 w-px bg-neutral-200 group-hover:bg-neutral-900 transition-colors opacity-50 group-hongsTo:opacity-100"></div>
+                <div className="absolute left-0 top-8 w-2 h-2 bg-neutral-900 rounded-full transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <div className="flex items-start justify-between gap-8">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm font-medium text-neutral-900">{year.year}</span>
+                      <span className="text-xs text-neutral-500 uppercase tracking-wider">
+                        {year.stats.articles} Articles • {year.stats.cases} Cases
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-medium text-neutral-900">{year.title}</h3>
+                    <p className="text-sm text-neutral-600 italic">"{year.theme}"</p>
+                    <p className="text-sm text-neutral-700 leading-relaxed max-w-2xl">{year.description}</p>
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {year.domains.map((domain, idx) => (
+                        <span key={idx} className="text-xs text-neutral-600 border border-neutral-200 px-2 py-1">
+                          {domain}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                </CardHeader>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Social Proof */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-neutral-900 mb-4">Trusted by Ambitious Professionals</h2>
-            <p className="text-lg text-neutral-600">From Fortune 500 to leading startups</p>
+      <section className="border-b border-neutral-200 bg-neutral-50 relative">
+        <SectionAccent variant="edge" className="opacity-20" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+          <div className="mb-20 relative">
+            <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
+            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">Trusted by Analytical Professionals</h2>
+            <p className="text-base text-neutral-700">Across Fortune 500 companies and high-growth organizations</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "Praxis gave me the business fluency I needed to transition from engineering to product management. The simulations are incredibly realistic—I use the frameworks daily.",
+                quote: "Praxis provided the analytical framework necessary for my transition from engineering to product management. The simulation scenarios are realistic; I apply the mental models daily in strategic decisions.",
                 author: "Sarah Chen",
                 role: "Senior Product Manager",
                 company: "Meta"
               },
               {
-                quote: "The AI coaching is phenomenal. It''s like having a Harvard Business School professor review every decision with detailed, personalized feedback.",
+                quote: "The performance debriefs are rigorous. Each decision is evaluated against expert rubrics with precise feedback on competency gaps and strategic reasoning.",
                 author: "Marcus Rodriguez",
                 role: "Strategy Consultant",
                 company: "McKinsey & Company"
               },
               {
-                quote: "I completed the Financial Acumen track and immediately applied it to my startup. Our investors noticed the difference in my board presentations and financial modeling.",
+                quote: "The Financial Acumen curriculum strengthened my analytical capabilities. The frameworks improved the rigor of my board presentations and financial models.",
                 author: "Jennifer Park",
                 role: "Founder & CEO",
                 company: "Series A FinTech Startup"
               }
             ].map((testimonial, idx) => (
-              <Card key={idx} className="bg-neutral-50 border-neutral-200">
-                <CardContent className="pt-6">
-                  <div className="mb-6">
-                    <svg className="w-8 h-8 text-blue-700 mb-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-neutral-700 italic mb-6 leading-relaxed">{testimonial.quote}</p>
-                  <div className="border-t border-neutral-200 pt-4">
-                    <p className="font-semibold text-sm text-neutral-900">{testimonial.author}</p>
-                    <p className="text-xs text-neutral-600 mt-1">{testimonial.role}</p>
-                    <p className="text-xs text-neutral-500">{testimonial.company}</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={idx} className="bg-white border border-neutral-200 p-6 relative">
+                <div className="absolute top-0 left-0 w-12 h-px bg-neutral-900 opacity-20"></div>
+                <div className="mb-6">
+                  <svg className="w-6 h-6 text-neutral-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+                  </svg>
+                </div>
+                <p className="text-sm text-neutral-700 leading-relaxed mb-6">{testimonial.quote}</p>
+                <div className="border-t border-neutral-100 pt-4">
+                  <p className="text-sm font-medium text-neutral-900">{testimonial.author}</p>
+                  <p className="text-xs text-neutral-500 mt-1">{testimonial.role}, {testimonial.company}</p>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-700 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Build World-Class Business Acumen?</h2>
-          <p className="text-xl mb-10 text-blue-100 leading-relaxed">
-            Join thousands of ambitious professionals transforming their careers through systematic, applied learning
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-white text-blue-700 hover:bg-neutral-100 px-10 h-14 text-lg font-semibold">
-              <Link href="/signup">
-                Start Free Trial
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="border-2 border-white text-white hover:bg-blue-800 px-10 h-14 text-lg">
-              <Link href="/pricing">
-                View Pricing
-              </Link>
-            </Button>
+      <section className="bg-neutral-900 text-white relative overflow-hidden">
+        {/* Subtle diagonal pattern */}
+        <div className="absolute inset-0 opacity-[0.015]">
+          <svg className="absolute inset-0 h-full w-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="diagonal" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M0 40 L40 0" stroke="currentColor" strokeWidth="0.5" className="text-white"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#diagonal)" />
+          </svg>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+          <div className="max-w-4xl mx-auto text-center relative">
+            <SectionAccent variant="center" />
+            <h2 className="text-3xl font-light mb-6 tracking-tight">Begin Your Analytical Journey</h2>
+            <p className="text-base text-neutral-300 mb-10 leading-relaxed max-w-2xl mx-auto">
+              Join professionals building demonstrable business acumen through systematic analysis and rigorous assessment
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
+                <Link href="/signup">
+                  Request Access
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-neutral-600 text-white hover:bg-neutral-800 rounded-none px-8 h-12 text-sm font-medium">
+                <Link href="/pricing">
+                  View Pricing
+                </Link>
+              </Button>
+            </div>
+            <p className="mt-8 text-xs text-neutral-400 uppercase tracking-wider">
+              Curated community • Assessment-based access • 30-day evaluation period
+            </p>
           </div>
-          <p className="mt-6 text-sm text-blue-200">
-            No credit card required • Cancel anytime • 30-day money-back guarantee
-          </p>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-neutral-900 text-neutral-400 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
-            <div className="md:col-span-2">
-              <h3 className="text-white font-bold text-2xl mb-4">Praxis</h3>
-              <p className="text-sm leading-relaxed mb-6">
-                The proving ground for the next generation of business leaders. Build demonstrable business acumen through interactive simulations and AI-powered coaching.
-              </p>
-              <div className="flex gap-4">
-                <a href="https://twitter.com" className="text-neutral-400 hover:text-white transition-colors" aria-label="Twitter">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" /></svg>
-                </a>
-                <a href="https://linkedin.com" className="text-neutral-400 hover:text-white transition-colors" aria-label="LinkedIn">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
-                </a>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wide">Product</h4>
-              <ul className="space-y-3 text-sm">
-                <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link href="#curriculum" className="hover:text-white transition-colors">Curriculum</Link></li>
-                <li><Link href="/for-teams" className="hover:text-white transition-colors">For Teams</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wide">Company</h4>
-              <ul className="space-y-3 text-sm">
-                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wide">Legal</h4>
-              <ul className="space-y-3 text-sm">
-                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="/security" className="hover:text-white transition-colors">Security</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-neutral-800 mt-12 pt-8 text-center text-sm">
-            <p>&copy; 2025 Praxis Program, Inc. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }

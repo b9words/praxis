@@ -76,9 +76,19 @@ async function importArticles() {
         content: string 
       }
 
+      // Validate frontmatter
+      const validation = validateArticleFrontmatter(frontmatter)
+      if (!validation.valid) {
+        console.log(`⚠️  Skipping ${path.basename(filePath)}: Validation errors:`)
+        validation.errors.forEach(err => console.log(`   - ${err}`))
+        errors++
+        continue
+      }
+
       // Validate required fields
       if (!frontmatter.title || !frontmatter.competency || !content.trim()) {
         console.log(`⚠️  Skipping ${path.basename(filePath)}: Missing required fields`)
+        errors++
         continue
       }
 
@@ -138,34 +148,104 @@ async function importArticles() {
   console.log(`   Errors: ${errors}`)
 }
 
+/**
+ * Validate case study JSON structure against schema
+ */
+function validateCaseStudyJSON(data: any): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!data.caseId) errors.push('Missing required field: caseId')
+  if (!data.version) errors.push('Missing required field: version')
+  if (!data.title) errors.push('Missing required field: title')
+  if (!data.description) errors.push('Missing required field: description')
+  if (!Array.isArray(data.competencies)) errors.push('Missing or invalid competencies array')
+  if (!Array.isArray(data.stages)) errors.push('Missing or invalid stages array')
+  
+  // Validate stages
+  if (Array.isArray(data.stages)) {
+    data.stages.forEach((stage: any, index: number) => {
+      if (!stage.stageId) errors.push(`Stage ${index}: Missing stageId`)
+      if (!stage.challengeType) errors.push(`Stage ${index}: Missing challengeType`)
+      if (!stage.challengeData) errors.push(`Stage ${index}: Missing challengeData`)
+    })
+  }
+  
+  // Validate caseFiles
+  if (data.caseFiles && !Array.isArray(data.caseFiles)) {
+    errors.push('caseFiles must be an array')
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
+/**
+ * Validate article frontmatter against Prisma schema
+ */
+function validateArticleFrontmatter(frontmatter: ArticleFrontmatter): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+  
+  if (!frontmatter.title || frontmatter.title.trim().length === 0) {
+    errors.push('Title is required')
+  }
+  
+  if (!frontmatter.competency || frontmatter.competency.trim().length === 0) {
+    errors.push('Competency ID is required')
+  }
+  
+  if (frontmatter.status && !['draft', 'in_review', 'approved', 'published'].includes(frontmatter.status)) {
+    errors.push(`Invalid status: ${frontmatter.status}. Must be one of: draft, in_review, approved, published`)
+  }
+  
+  if (frontmatter.year && (frontmatter.year < 1 || frontmatter.year > 5)) {
+    errors.push(`Invalid year: ${frontmatter.year}. Must be between 1 and 5`)
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+  }
+}
+
 async function importCases() {
-  console.log('\n🎯 Importing cases from markdown files...\n')
+  console.log('\n🎯 Importing cases from markdown files and JSON files...\n')
 
   const casesDir = path.join(process.cwd(), 'content', 'cases')
+  const jsonCasesDir = path.join(process.cwd(), 'data', 'case-studies')
   
-  if (!fs.existsSync(casesDir)) {
-    console.log('⚠️  Cases directory not found, skipping...')
-    return
-  }
-
   const caseFiles: string[] = []
+  const jsonCaseFiles: string[] = []
   
   // Recursively find all .md files in cases directory
-  function findMarkdownFiles(dir: string) {
-    const files = fs.readdirSync(dir)
+  if (fs.existsSync(casesDir)) {
+    function findMarkdownFiles(dir: string) {
+      const files = fs.readdirSync(dir)
+      for (const file of files) {
+        const filePath = path.join(dir, file)
+        if (fs.statSync(filePath).isDirectory()) {
+          findMarkdownFiles(filePath)
+        } else if (file.endsWith('.md')) {
+          caseFiles.push(filePath)
+        }
+      }
+    }
+    findMarkdownFiles(casesDir)
+  }
+  
+  // Find all .json files in data/case-studies directory
+  if (fs.existsSync(jsonCasesDir)) {
+    const files = fs.readdirSync(jsonCasesDir)
     for (const file of files) {
-      const filePath = path.join(dir, file)
-      if (fs.statSync(filePath).isDirectory()) {
-        findMarkdownFiles(filePath)
-      } else if (file.endsWith('.md')) {
-        caseFiles.push(filePath)
+      if (file.endsWith('.json')) {
+        jsonCaseFiles.push(path.join(jsonCasesDir, file))
       }
     }
   }
   
-  findMarkdownFiles(casesDir)
-  
-  console.log(`Found ${caseFiles.length} case files\n`)
+  console.log(`Found ${caseFiles.length} markdown case files`)
+  console.log(`Found ${jsonCaseFiles.length} JSON case files\n`)
 
   let imported = 0
   let updated = 0
@@ -253,6 +333,94 @@ async function importCases() {
             if (compError) {
               console.log(`  ⚠️  Error linking competencies: ${compError.message}`)
             }
+          }
+        }
+      }
+    } catch (error: any) {
+      console.log(`❌ Error processing ${path.basename(filePath)}: ${error.message}`)
+      errors++
+    }
+  }
+
+  // Process JSON case files
+  for (const filePath of jsonCaseFiles) {
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8')
+      const caseData = JSON.parse(fileContent)
+
+      // Validate JSON structure
+      const validation = validateCaseStudyJSON(caseData)
+      if (!validation.valid) {
+        console.log(`⚠️  Skipping ${path.basename(filePath)}: Validation errors:`)
+        validation.errors.forEach(err => console.log(`   - ${err}`))
+        errors++
+        continue
+      }
+
+      // Generate storage path
+      const storagePath = `cases/${path.basename(filePath)}`
+
+      // Check if case exists by storage_path
+      const { data: existing } = await supabase
+        .from('cases')
+        .select('id')
+        .eq('storage_path', storagePath)
+        .single()
+
+      const casePayload = {
+        title: caseData.title,
+        description: caseData.description || '',
+        briefing_doc: JSON.stringify(caseData), // Store full JSON as briefing_doc
+        status: 'published' as const,
+        difficulty: (caseData.difficulty || 'intermediate').toLowerCase() as 'beginner' | 'intermediate' | 'advanced',
+        estimated_minutes: caseData.estimatedDuration || 120,
+        storage_path: storagePath,
+        metadata: {
+          version: caseData.version,
+          caseId: caseData.caseId,
+          competencies: caseData.competencies,
+          stages: caseData.stages?.length || 0,
+        },
+        rubric: caseData.rubric || {},
+      }
+
+      if (existing) {
+        // Update existing
+        const { error } = await supabase
+          .from('cases')
+          .update({
+            ...casePayload,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existing.id)
+
+        if (error) {
+          console.log(`❌ Error updating ${caseData.title}: ${error.message}`)
+          errors++
+        } else {
+          console.log(`✅ Updated: ${caseData.title}`)
+          updated++
+        }
+      } else {
+        // Insert new
+        const { data: newCase, error } = await supabase
+          .from('cases')
+          .insert(casePayload)
+          .select('id')
+          .single()
+
+        if (error) {
+          console.log(`❌ Error creating ${caseData.title}: ${error.message}`)
+          errors++
+        } else {
+          console.log(`✨ Created: ${caseData.title}`)
+          imported++
+
+          // Link competencies if provided (assuming competency names map to IDs)
+          if (newCase && caseData.competencies && Array.isArray(caseData.competencies)) {
+            // Note: In practice, would need to resolve competency names to IDs
+            console.log(`   Note: Competencies found: ${caseData.competencies.join(', ')}`)
+            console.log(`   Manual competency linking may be required`)
           }
         }
       }

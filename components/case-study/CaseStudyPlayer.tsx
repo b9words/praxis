@@ -241,15 +241,15 @@ export default function CaseStudyPlayer({ className = '', simulationId = null }:
           <div className="flex items-center gap-4">
             <div className="text-sm text-neutral-600">
               Status: <span className={`font-medium ${
-                stageStates[currentStageId]?.status === 'completed' ? 'text-green-600' :
-                stageStates[currentStageId]?.status === 'in_progress' ? 'text-blue-600' :
+                currentStageId && stageStates[currentStageId]?.status === 'completed' ? 'text-green-600' :
+                currentStageId && stageStates[currentStageId]?.status === 'in_progress' ? 'text-blue-600' :
                 'text-neutral-500'
               }`}>
-                {stageStates[currentStageId]?.status?.replace('_', ' ') || 'Not Started'}
+                {currentStageId && stageStates[currentStageId]?.status?.replace('_', ' ') || 'Not Started'}
               </span>
             </div>
             
-            {isStageCompleted(currentStageId) && (
+            {currentStageId && isStageCompleted(currentStageId) && (
               <div className="flex items-center gap-1 text-green-600 text-sm">
                 <Play className="h-4 w-4" />
                 <span>Stage Complete</span>
@@ -278,7 +278,7 @@ export default function CaseStudyPlayer({ className = '', simulationId = null }:
         header={headerContent}
         footer={footerContent}
       >
-        <LayoutComponent challengeData={currentStage.challengeData} />
+        <LayoutComponent challengeData={currentStage.challengeData as any} />
       </CaseStudyLayout>
     </div>
   )

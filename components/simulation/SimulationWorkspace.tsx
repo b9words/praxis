@@ -3,6 +3,7 @@
 import CaseFileViewer from '@/components/simulation/CaseFileViewer'
 import DecisionWorkspace from '@/components/simulation/DecisionWorkspace'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import { trackEvents } from '@/lib/analytics'
 import { parseCaseBriefing } from '@/lib/parse-case-template'
 import { createClient } from '@/lib/supabase/client'
 import { fetchFromStorage } from '@/lib/supabase/storage'
@@ -103,17 +104,24 @@ export default function SimulationWorkspace({
     loadCaseData()
   }, [caseItem])
 
+  // Track simulation started when component mounts
+  useEffect(() => {
+    if (caseItem && simulation && !isLoading) {
+      trackEvents.simulationStarted(simulation.id, caseItem.id, userId)
+    }
+  }, [caseItem, simulation, userId, isLoading])
+
   // Parse case structure for briefing doc (backward compatibility)
   const caseStructure = caseData?.briefing || parseCaseBriefing(caseItem.briefing_doc)
   
   // Get decision points from case data
-  const decisionPoints: DecisionPoint[] = caseData?.challenges || [
+  const decisionPoints: DecisionPoint[] = (caseData?.challenges as DecisionPoint[]) || [
     {
       id: 'decision-1',
       order: 1,
       title: 'Analyze the Situation',
       description: 'Based on the case information and data provided, what is your recommended approach?',
-      type: 'text',
+      type: 'text' as const,
       rubricMapping: Object.keys(caseItem.rubric?.criteria || {}),
     },
   ]
@@ -162,32 +170,75 @@ export default function SimulationWorkspace({
 
   const handleComplete = async () => {
     try {
-      // Mark simulation as completed
+      // Save final state first
       const { error: updateError } = await supabase
         .from('simulations')
         .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
           user_inputs: state,
+          updated_at: new Date().toISOString(),
         })
         .eq('id', simulation.id)
 
       if (updateError) throw updateError
 
-      // Generate debrief
-      toast.loading('Generating your performance debrief...')
+      // Complete simulation via API (handles forum thread creation and notifications)
+      toast.loading('Completing simulation...')
       
-      const response = await fetch('/api/generate-debrief', {
+      const completeResponse = await fetch(`/api/simulations/${simulation.id}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ simulationId: simulation.id }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to generate debrief')
+      if (!completeResponse.ok) {
+        throw new Error('Failed to complete simulation')
       }
 
-      const { debriefId } = await response.json()
+      // Generate debrief with retry logic for transient 5xx errors
+      toast.loading('Generating your performance debrief...')
+      
+      let debriefResponse: Response | null = null
+      let retries = 0
+      const maxRetries = 3
+      const retryDelay = 1000 // 1 second
+
+      while (retries <= maxRetries) {
+        try {
+          debriefResponse = await fetch('/api/generate-debrief', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ simulationId: simulation.id }),
+          })
+
+          if (debriefResponse.ok) {
+            break
+          }
+
+          // Only retry on 5xx errors
+          if (debriefResponse.status >= 500 && retries < maxRetries) {
+            retries++
+            await new Promise(resolve => setTimeout(resolve, retryDelay * retries))
+            continue
+          }
+
+          throw new Error('Failed to generate debrief')
+        } catch (error) {
+          if (retries >= maxRetries) {
+            throw error
+          }
+          // Retry on network errors too
+          retries++
+          await new Promise(resolve => setTimeout(resolve, retryDelay * retries))
+        }
+      }
+
+      if (!debriefResponse || !debriefResponse.ok) {
+        throw new Error('Failed to generate debrief after retries')
+      }
+
+      const { debriefId } = await debriefResponse.json()
+      
+      // Track simulation completion
+      trackEvents.simulationCompleted(simulation.id, caseItem.id, userId)
       
       toast.success('Debrief generated!')
       router.push(`/debrief/${simulation.id}`)

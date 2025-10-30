@@ -47,7 +47,7 @@ export default function BoardDeckCritiqueLayout({ challengeData }: BoardDeckCrit
       blockId: 'critique',
       blockType: 'RICH_TEXT_EDITOR',
       props: {
-        title: 'Your Detailed Critique',
+        title: 'Critique',
         placeholder: 'Provide at least 8 specific, actionable comments on the presentation. Focus on:\n\n1. Narrative structure and flow\n2. Data presentation and clarity\n3. Addressing potential board objections\n4. Strategic positioning\n5. Financial justification\n6. Risk mitigation\n7. Implementation timeline\n8. Success metrics\n\nFor each comment, specify the slide number and provide concrete suggestions for improvement.',
         minLength: 500,
         maxLength: 5000,
@@ -59,7 +59,7 @@ export default function BoardDeckCritiqueLayout({ challengeData }: BoardDeckCrit
       blockType: 'SUBMIT_BUTTON',
       props: {
         label: 'Submit Critique',
-        confirmationMessage: 'Are you ready to submit your board presentation critique? Make sure you have provided detailed, actionable feedback.',
+        confirmationMessage: 'Confirm submission. Ensure you have provided detailed, actionable feedback.',
         requiresValidation: true
       }
     }

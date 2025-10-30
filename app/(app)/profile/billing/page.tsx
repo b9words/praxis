@@ -2,19 +2,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
-import { redirect } from 'next/navigation'
 import { handleManageBilling } from './actions'
 
 export default async function BillingPage() {
   const user = await getCurrentUser()
 
+  // Auth protection is handled by middleware
   if (!user) {
-    redirect('/login')
+    return null
   }
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
-  })
+  let subscription = null
+  try {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+    })
+  } catch (error) {
+    console.error('Error fetching subscription:', error)
+  }
 
 
   return (

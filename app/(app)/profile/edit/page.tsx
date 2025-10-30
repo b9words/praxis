@@ -174,8 +174,8 @@ export default function ProfileEditPage() {
           {/* Public/Private Toggle */}
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="space-y-0.5">
-              <Label htmlFor="isPublic">Public Profile</Label>
-              <p className="text-sm text-gray-500">Make your profile and scores visible to others</p>
+              <Label htmlFor="isPublic">Profile Visibility: {isPublic ? 'Public' : 'Classified'}</Label>
+              <p className="text-sm text-gray-500">A public dossier can be shared as a signal of your demonstrated acumen.</p>
             </div>
             <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
           </div>

@@ -65,6 +65,51 @@ serve(async (req) => {
       )
     }
 
+    // Validate that case data exists
+    if (!simulation.case) {
+      return new Response(
+        JSON.stringify({ error: 'Case data not found for simulation' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Validate that rubric exists
+    if (!simulation.case.rubric) {
+      return new Response(
+        JSON.stringify({ error: 'Rubric not found for case' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Extract rubric version if present
+    const rubricVersion = (simulation.case.rubric as any)?.version || null
+
+    // Check if debrief already exists (idempotency)
+    const { data: existingDebrief } = await supabaseClient
+      .from('debriefs')
+      .select('*')
+      .eq('simulation_id', simulationId)
+      .single()
+
+    if (existingDebrief) {
+      return new Response(
+        JSON.stringify({ 
+          debriefId: existingDebrief.id, 
+          debrief: existingDebrief,
+          fromCache: true,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Validate that user inputs exist
+    if (!simulation.user_inputs || typeof simulation.user_inputs !== 'object') {
+      return new Response(
+        JSON.stringify({ error: 'User inputs not found or invalid for simulation' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
     if (!GEMINI_API_KEY) {
       throw new Error('GEMINI_API_KEY not configured')
@@ -104,43 +149,103 @@ ${JSON.stringify(simulation.case.rubric, null, 2)}
 **User Inputs:**
 ${JSON.stringify(simulation.user_inputs, null, 2)}`
 
-    // Call Gemini API with JSON mode
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: systemPrompt },
-                { text: userPrompt }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 2000,
-            responseMimeType: 'application/json',
-          }
-        }),
+    // Retry helper for Deno with exponential backoff
+    async function retryWithBackoff<T>(
+      fn: () => Promise<T>,
+      maxRetries: number = 3,
+      initialDelay: number = 1000
+    ): Promise<T> {
+      let lastError: Error | null = null
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          return await fn()
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error))
+          if (attempt === maxRetries) throw lastError
+          
+          // Exponential backoff: 1s, 2s, 4s
+          const delay = Math.min(initialDelay * Math.pow(2, attempt), 8000)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`)
+        }
       }
-    )
-
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text()
-      console.error('Gemini API error:', errorText)
-      throw new Error(`Gemini API request failed: ${geminiResponse.status}`)
+      throw lastError || new Error('Retry exhausted')
     }
+
+    // Call Gemini API with retry logic
+    const geminiResponse = await retryWithBackoff(async () => {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: systemPrompt },
+                  { text: userPrompt }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 2000,
+              responseMimeType: 'application/json',
+            }
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        const error = new Error(`Gemini API request failed: ${response.status} - ${errorText}`)
+        ;(error as any).status = response.status
+        throw error
+      }
+
+      return response
+    })
 
     const geminiData = await geminiResponse.json()
     const rawResponse = geminiData.candidates?.[0]?.content?.parts?.[0]?.text
 
     if (!rawResponse) {
       throw new Error('No response from Gemini API')
+    }
+
+    // Track token usage
+    const usageMetadata = geminiData.usageMetadata
+    if (usageMetadata) {
+      try {
+        const supabaseServiceClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          }
+        )
+
+        const today = new Date().toISOString().split('T')[0]
+        
+        await supabaseServiceClient
+          .from('token_usage')
+          .insert({
+            date: today,
+            model: 'gemini-1.5-flash',
+            prompt_tokens: usageMetadata.promptTokenCount || 0,
+            completion_tokens: usageMetadata.candidatesTokenCount || 0,
+            total_tokens: usageMetadata.totalTokenCount || 0,
+          })
+      } catch (tokenError) {
+        // Log but don't fail the request if token tracking fails
+        console.error('Failed to track token usage:', tokenError)
+      }
     }
 
     // Parse the JSON response
@@ -157,14 +262,17 @@ ${JSON.stringify(simulation.user_inputs, null, 2)}`
       throw new Error('Invalid response structure from AI')
     }
 
-    // Insert debrief into database
+    // Insert debrief into database (upsert for idempotency)
     const { data: debrief, error: insertError } = await supabaseClient
       .from('debriefs')
-      .insert({
+      .upsert({
         simulation_id: simulationId,
         scores: debriefData.scores,
         summary_text: debriefData.summaryText,
         radar_chart_data: debriefData.radarChartData,
+        rubric_version: rubricVersion,
+      }, {
+        onConflict: 'simulation_id',
       })
       .select()
       .single()

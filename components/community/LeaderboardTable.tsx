@@ -111,7 +111,7 @@ export default function LeaderboardTable({ entries, currentUserId }: Leaderboard
                     )}
                   </Link>
                   <p className="text-sm text-gray-600">
-                    {entry.simulations_completed} simulations • {entry.articles_completed} articles
+                    {entry.simulations_completed} engagements completed
                   </p>
                 </div>
 
@@ -120,7 +120,7 @@ export default function LeaderboardTable({ entries, currentUserId }: Leaderboard
                   <div className="text-2xl font-bold text-gray-900">
                     {entry.average_score.toFixed(1)}
                   </div>
-                  <p className="text-xs text-gray-500">Avg Score</p>
+                  <p className="text-xs text-gray-500">Mean Competency Score</p>
                 </div>
               </div>
             </CardContent>

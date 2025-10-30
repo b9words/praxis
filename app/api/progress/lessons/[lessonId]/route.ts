@@ -1,5 +1,5 @@
 import { requireAuth } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
+import { getLessonProgress, updateLessonProgress } from '@/lib/progress-tracking'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -17,16 +17,7 @@ export async function GET(
       return NextResponse.json({ error: 'Missing domainId or moduleId' }, { status: 400 })
     }
 
-    const progress = await prisma.userLessonProgress.findUnique({
-      where: {
-        userId_domainId_moduleId_lessonId: {
-          userId: user.id,
-          domainId,
-          moduleId,
-          lessonId,
-        },
-      },
-    })
+    const progress = await getLessonProgress(user.id, domainId, moduleId, lessonId)
 
     if (!progress) {
       return NextResponse.json({ error: 'Progress not found' }, { status: 404 })
@@ -65,39 +56,21 @@ export async function PUT(
       return NextResponse.json({ error: 'Missing domainId or moduleId' }, { status: 400 })
     }
 
-    const progress = await prisma.userLessonProgress.upsert({
-      where: {
-        userId_domainId_moduleId_lessonId: {
-          userId: user.id,
-          domainId,
-          moduleId,
-          lessonId,
-        },
-      },
-      update: {
-        status,
-        progressPercentage,
-        timeSpentSeconds,
-        lastReadPosition: lastReadPosition as any,
-        bookmarked,
-        completedAt: status === 'completed' ? new Date() : undefined,
-      },
-      create: {
-        userId: user.id,
-        domainId,
-        moduleId,
-        lessonId,
-        status: status || 'in_progress',
-        progressPercentage: progressPercentage || 0,
-        timeSpentSeconds: timeSpentSeconds || 0,
-        lastReadPosition: (lastReadPosition || {}) as any,
-        bookmarked: bookmarked || false,
-        completedAt: status === 'completed' ? new Date() : null,
-      },
+    const progress = await updateLessonProgress(user.id, domainId, moduleId, lessonId, {
+      status,
+      progress_percentage: progressPercentage,
+      time_spent_seconds: timeSpentSeconds,
+      last_read_position: lastReadPosition,
+      bookmarked,
+      completed_at: status === 'completed' ? new Date().toISOString() : undefined,
     })
 
+    if (!progress) {
+      return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 })
+    }
+
     return NextResponse.json({ progress })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }

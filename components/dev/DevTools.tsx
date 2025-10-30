@@ -48,44 +48,53 @@ export default function DevTools() {
   if (!isDev) return null
 
   const quickLogin = async (email: string, password: string, username: string, role?: 'member' | 'editor' | 'admin') => {
-    // Try to sign in
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (signInError) {
-      // If sign in fails, create the account
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            full_name: username.charAt(0).toUpperCase() + username.slice(1),
-          },
+    try {
+      // First, try to use the dev auth bypass API (bypasses rate limits and email confirmation)
+      const response = await fetch('/api/dev/auth-bypass', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          email,
+          password,
+          username,
+          fullName: username.charAt(0).toUpperCase() + username.slice(1),
+          role: role || 'member',
+        }),
       })
 
-      if (signUpError) {
-        toast.error('Failed to create account: ' + signUpError.message)
+      const result = await response.json()
+
+      if (!response.ok) {
+        // Display error with hint if available
+        const errorMsg = result.error || 'Failed to create/update user'
+        const hintMsg = result.hint ? `\n\n${result.hint}` : ''
+        toast.error(errorMsg + hintMsg, {
+          duration: 10000, // Show for 10 seconds to give time to read
+        })
         return
       }
 
-      // Set role if specified
-      if (role && signUpData.user) {
-        await supabase
-          .from('profiles')
-          .update({ role })
-          .eq('id', signUpData.user.id)
+      // Since the user is created/updated with email confirmed via admin API,
+      // we can sign in with password immediately (no magic link needed)
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError || !signInData.session) {
+        toast.error(`User created but sign-in failed: ${signInError?.message || 'Unknown error'}`)
+        return
       }
 
-      toast.success(`Account created and logged in as ${username}`)
-    } else {
       toast.success(`Logged in as ${username}`)
+      // Explicitly navigate to dashboard after successful login
+      router.push('/dashboard')
+      router.refresh()
+    } catch (error: any) {
+      toast.error('Login failed: ' + (error.message || 'Unknown error'))
     }
-
-    router.refresh()
   }
 
   const changeRole = async (newRole: 'member' | 'editor' | 'admin') => {

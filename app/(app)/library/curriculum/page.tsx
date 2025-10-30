@@ -6,23 +6,55 @@ import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CurriculumLibraryPage() {
-  // Try to load curriculum structure from database
-  const articlesFromDb = await prisma.article.findMany({
-    where: {
-      status: 'published',
-      storagePath: {
-        not: null,
+  // Try to load curriculum structure from database with error handling
+  let articlesFromDb: any[] = []
+  try {
+    // First try with enum value (if enum exists in DB)
+    articlesFromDb = await prisma.article.findMany({
+      where: {
+        status: 'published',
+        storagePath: {
+          not: null,
+        },
       },
-    },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      storagePath: true,
-      metadata: true,
-      status: true,
-    },
-  })
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        storagePath: true,
+        metadata: true,
+        status: true,
+      },
+    })
+  } catch (error: any) {
+    // If enum doesn't exist in DB, try querying without status filter
+    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+      // Import error suppression helper
+      const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
+      logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+      try {
+        articlesFromDb = await prisma.article.findMany({
+          where: {
+            storagePath: {
+              not: null,
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            storagePath: true,
+            metadata: true,
+            status: true,
+          },
+        })
+      } catch (fallbackError) {
+        console.error('Error fetching articles from database:', fallbackError)
+      }
+    } else {
+      console.error('Error fetching articles from database:', error)
+    }
+  }
 
   // Build curriculum structure from database articles if available
   let curriculumData = completeCurriculumData
@@ -69,7 +101,7 @@ export default async function CurriculumLibraryPage() {
     if (domainMap.size > 0) {
       curriculumData = Array.from(domainMap.values()).map((domain) => ({
         ...domain,
-        modules: Array.from(domain.modules.values()).sort((a, b) => a.number - b.number),
+        modules: Array.from(domain.modules.values()).sort((a: any, b: any) => a.number - b.number),
       }))
       useDbData = true
     }
@@ -218,9 +250,10 @@ export default async function CurriculumLibraryPage() {
                 <Button asChild variant="outline">
                   <Link href="/residency">View Learning Paths</Link>
                 </Button>
-              <Button asChild>
-                <Link href="/admin/content/generate">🤖 Generate Content</Link>
-              </Button>
+                <Button asChild>
+                  <Link href="/admin/content/generate">🤖 Generate Content</Link>
+                </Button>
+              </div>
             </div>
           </div>
 

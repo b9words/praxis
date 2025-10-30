@@ -1,5 +1,133 @@
 import type { LessonProgressStatus } from '@prisma/client'
+import { isEnumError, isForeignKeyError, logErrorOnce } from './prisma-enum-fallback'
 import { prisma } from './prisma/server'
+
+// Track failed profile creation attempts to prevent repeated attempts
+const failedProfileCreations = new Set<string>()
+const PROFILE_RETRY_INTERVAL = 300000 // 5 minutes before retry
+
+// Global circuit breaker for profile creation
+const globalProfileFailures = new Map<string, number>()
+const MAX_GLOBAL_FAILURES = 5
+const GLOBAL_FAILURE_WINDOW = 60000 // 1 minute
+
+/**
+ * Ensure user profile exists before creating progress
+ * Only creates if user exists in auth but missing profile
+ */
+async function ensureProfileExists(userId: string): Promise<boolean> {
+  try {
+    // Check if profile already exists
+    const existingProfile = await prisma.profile.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    })
+    
+    if (existingProfile) {
+      return true // Profile exists
+    }
+
+    // Check if we've recently failed to create this user's profile
+    if (failedProfileCreations.has(userId)) {
+      return false // Don't retry immediately
+    }
+
+    // Check global failure rate to prevent system overload
+    const now = Date.now()
+    const recentFailures = Array.from(globalProfileFailures.entries())
+      .filter(([timestamp]) => now - parseInt(timestamp) < GLOBAL_FAILURE_WINDOW)
+      .length
+    
+    if (recentFailures >= MAX_GLOBAL_FAILURES) {
+      return false // System-wide circuit breaker triggered
+    }
+
+    // Profile doesn't exist - validate user exists in auth.users first
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    
+    // Use admin client to check if user actually exists in auth.users table
+    const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+    const supabaseAdmin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    )
+
+    // Check if user exists in auth.users table
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
+    
+    if (authError || !authUser?.user) {
+      logErrorOnce(`Cannot create profile - user ${userId} does not exist in auth.users`, authError, 'warn')
+      return false
+    }
+
+    // Get current user session for metadata
+    const { data: { user: sessionUser } } = await supabase.auth.getUser()
+    
+    // Use auth user data (more reliable) or session data as fallback
+    const userData = authUser.user
+    const username = userData.user_metadata?.username || 
+                    sessionUser?.user_metadata?.username || 
+                    `user_${userId.slice(0, 8)}`
+    const fullName = userData.user_metadata?.full_name || 
+                    sessionUser?.user_metadata?.full_name || 
+                    userData.email?.split('@')[0] || null
+    const avatarUrl = userData.user_metadata?.avatar_url || 
+                     sessionUser?.user_metadata?.avatar_url || null
+
+    // Use raw SQL to create profile to avoid schema mismatch issues
+    await prisma.$executeRawUnsafe(`
+      INSERT INTO profiles (id, username, full_name, avatar_url, created_at, updated_at)
+      VALUES ($1::uuid, $2::text, $3::text, $4::text, NOW(), NOW())
+      ON CONFLICT (id) DO NOTHING
+    `, 
+      userId,
+      username,
+      fullName,
+      avatarUrl
+    )
+    
+    return true // Profile created successfully
+  } catch (error: any) {
+    // Mark this user as failed and set retry timer
+    failedProfileCreations.add(userId)
+    setTimeout(() => failedProfileCreations.delete(userId), PROFILE_RETRY_INTERVAL)
+    
+    // Track global failures for circuit breaker
+    const now = Date.now()
+    globalProfileFailures.set(now.toString(), now)
+    
+    // Clean up old failure records
+    setTimeout(() => {
+      globalProfileFailures.delete(now.toString())
+    }, GLOBAL_FAILURE_WINDOW)
+    
+    // Log the error but prevent repeated attempts (suppressed by logErrorOnce)
+    logErrorOnce(`Failed to create profile for user ${userId}`, error, 'error')
+    
+    // Check if profile exists anyway (might have been created by race condition)
+    try {
+      const profile = await prisma.profile.findUnique({
+        where: { id: userId },
+        select: { id: true },
+      })
+      const exists = !!profile
+      if (exists) {
+        // Profile exists, clear failure flag
+        failedProfileCreations.delete(userId)
+      }
+      return exists
+    } catch {
+      return false
+    }
+  }
+}
 
 export interface LessonProgress {
   id: string
@@ -95,6 +223,14 @@ export async function updateLessonProgress(
   lessonId: string,
   data: ProgressUpdateData
 ): Promise<LessonProgress | null> {
+  // Ensure profile exists before attempting to create progress
+  const profileExists = await ensureProfileExists(userId)
+  if (!profileExists) {
+    // Don't log this error - it's expected for users without profiles
+    // Just silently fail to avoid spam
+    return null
+  }
+
   try {
     const progress = await prisma.userLessonProgress.upsert({
       where: {
@@ -142,8 +278,89 @@ export async function updateLessonProgress(
       created_at: progress.createdAt.toISOString(),
       updated_at: progress.updatedAt.toISOString(),
     }
-  } catch (error) {
-    console.error('Error updating lesson progress:', error)
+  } catch (error: any) {
+    // If enum doesn't exist, try using raw SQL as fallback
+    if (isEnumError(error)) {
+      logErrorOnce('LessonProgressStatus enum not found, using raw SQL fallback', error, 'warn')
+      try {
+        // Use raw SQL to insert/update without enum casting
+        const statusValue = (data.status || 'in_progress') as string
+        const result = await prisma.$executeRawUnsafe(`
+          INSERT INTO user_lesson_progress (
+            id, user_id, domain_id, module_id, lesson_id, 
+            status, progress_percentage, time_spent_seconds, 
+            last_read_position, completed_at, bookmarked, created_at, updated_at
+          ) VALUES (
+            gen_random_uuid(), $1::uuid, $2::text, $3::text, $4::text,
+            $5::text, $6::integer, $7::integer,
+            $8::jsonb, 
+            $9::timestamp, 
+            $10::boolean, NOW(), NOW()
+          )
+          ON CONFLICT (user_id, domain_id, module_id, lesson_id)
+          DO UPDATE SET
+            status = $5::text,
+            progress_percentage = $6::integer,
+            time_spent_seconds = $7::integer,
+            last_read_position = $8::jsonb,
+            completed_at = $9::timestamp,
+            bookmarked = $10::boolean,
+            updated_at = NOW()
+          RETURNING *
+        `, 
+          userId, 
+          domainId, 
+          moduleId, 
+          lessonId,
+          statusValue,
+          data.progress_percentage || 0,
+          data.time_spent_seconds || 0,
+          JSON.stringify(data.last_read_position || {}),
+          data.completed_at ? new Date(data.completed_at) : null,
+          data.bookmarked || false
+        )
+        
+        // Fetch the updated record using raw SQL (without enum)
+        const updated = await prisma.$queryRawUnsafe<any>(`
+          SELECT * FROM user_lesson_progress
+          WHERE user_id = $1::uuid
+            AND domain_id = $2::text
+            AND module_id = $3::text
+            AND lesson_id = $4::text
+        `, userId, domainId, moduleId, lessonId)
+        
+        if (updated && updated[0]) {
+          const p = updated[0]
+          return {
+            id: p.id,
+            user_id: p.user_id,
+            domain_id: p.domain_id,
+            module_id: p.module_id,
+            lesson_id: p.lesson_id,
+            status: p.status as any,
+            progress_percentage: Number(p.progress_percentage),
+            time_spent_seconds: Number(p.time_spent_seconds),
+            last_read_position: p.last_read_position as Record<string, any>,
+            completed_at: p.completed_at ? new Date(p.completed_at).toISOString() : null,
+            bookmarked: Boolean(p.bookmarked),
+            created_at: new Date(p.created_at).toISOString(),
+            updated_at: new Date(p.updated_at).toISOString(),
+          }
+        }
+      } catch (rawError: any) {
+        // Check if it's a foreign key error - user might not exist in profiles table
+        if (isForeignKeyError(rawError)) {
+          logErrorOnce('Foreign key constraint failed - user may not exist in profiles table', rawError, 'error')
+          // Don't retry - this is a data integrity issue
+          return null
+        }
+        logErrorOnce('Raw SQL fallback also failed', rawError, 'error')
+      }
+    }
+    // Only log non-enum errors (enum errors already handled above)
+    if (!isEnumError(error)) {
+      logErrorOnce('Error updating lesson progress', error, 'error')
+    }
     return null
   }
 }

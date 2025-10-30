@@ -58,8 +58,11 @@ export default function SmartStudyAssistant({ articleId }: SmartStudyAssistantPr
 
   return (
     <div className="space-y-4">
+      <div className="text-sm font-semibold text-gray-900">
+        Query Assistant
+      </div>
       <div className="text-sm text-gray-600">
-        Ask questions about this article. The assistant will answer based solely on the article content.
+        Ask clarifying questions about this document. Responses are based solely on the article content.
       </div>
 
       {/* Conversation History */}
@@ -68,7 +71,7 @@ export default function SmartStudyAssistant({ articleId }: SmartStudyAssistantPr
           {conversation.map((message, index) => (
             <Card key={index} className={`p-3 ${message.role === 'user' ? 'bg-blue-50' : 'bg-gray-50'}`}>
               <p className="text-xs font-semibold text-gray-500 mb-1">
-                {message.role === 'user' ? 'You' : 'Study Assistant'}
+                {message.role === 'user' ? 'You' : 'Query Assistant'}
               </p>
               <p className="text-sm text-gray-700">{message.content}</p>
             </Card>
@@ -79,7 +82,7 @@ export default function SmartStudyAssistant({ articleId }: SmartStudyAssistantPr
       {/* Input Area */}
       <div className="space-y-2">
         <Textarea
-          placeholder="Ask a question about this article..."
+          placeholder="Ask a clarifying question. Precision is key."
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => {

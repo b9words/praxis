@@ -1,20 +1,25 @@
 import ResidencySelector from '@/components/dashboard/ResidencySelector'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
-import { redirect } from 'next/navigation'
 
 export default async function ResidencyPage() {
   const user = await getCurrentUser()
 
+  // Auth protection is handled by middleware
   if (!user) {
-    redirect('/login')
+    return null
   }
 
-  // Get user's current residency
-  const userResidency = await prisma.userResidency.findUnique({
-    where: { userId: user.id },
-    select: { currentResidency: true },
-  })
+  // Get user's current residency with error handling
+  let userResidency = null
+  try {
+    userResidency = await prisma.userResidency.findUnique({
+      where: { userId: user.id },
+      select: { currentResidency: true },
+    })
+  } catch (error) {
+    console.error('Error fetching user residency:', error)
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">

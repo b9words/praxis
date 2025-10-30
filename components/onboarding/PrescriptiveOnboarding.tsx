@@ -67,7 +67,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
             {getGreeting()}, {user.user_metadata?.full_name?.split(' ')[0] || 'there'}
           </h1>
           <p className="text-xl text-gray-600">
-            Welcome to your executive development journey
+            Access the proving ground
           </p>
           <div className="flex items-center justify-center gap-4">
             <Progress value={progress} className="w-64" />

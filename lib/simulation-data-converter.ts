@@ -1,0 +1,179 @@
+/**
+ * Utility functions to convert between different simulation data formats
+ * Bridges compatibility between SimulationWorkspace (legacy) and CaseStudyPlayer (new format)
+ */
+
+import { CaseStudyData, CaseStudyStage } from './case-study-store'
+
+/**
+ * Convert legacy case data format to CaseStudyData format for store
+ */
+export function convertCaseDataToStoreFormat(
+  caseData: {
+    title: string
+    description: string
+    briefing?: any
+    datasets?: any
+    challenges?: Array<{
+      id: string
+      order: number
+      title: string
+      description: string
+      type: string
+      rubricMapping?: string[]
+    }>
+    rubric?: any
+    caseId?: string
+    version?: string
+    competencies?: string[]
+    stages?: any[]
+    caseFiles?: any[]
+  },
+  caseId: string
+): CaseStudyData {
+  // If it already has stages (new format), use them directly
+  if (caseData.stages && Array.isArray(caseData.stages) && caseData.stages.length > 0) {
+    return {
+      caseId: caseData.caseId || caseId,
+      version: caseData.version || '1.0',
+      title: caseData.title,
+      description: caseData.description || '',
+      competencies: caseData.competencies || [],
+      caseFiles: caseData.caseFiles || [],
+      stages: caseData.stages.map((stage: any) => ({
+        stageId: stage.stageId || stage.id || `stage-${stage.order}`,
+        stageTitle: stage.stageTitle || stage.title || `Stage ${stage.order}`,
+        challengeType: stage.challengeType || stage.type || 'STRATEGIC_OPTIONS',
+        challengeLayout: stage.challengeLayout,
+        challengeData: stage.challengeData || {
+          prompt: stage.description,
+          options: stage.options,
+        },
+      })),
+    }
+  }
+
+  // Convert legacy challenges format to stages
+  const stages: CaseStudyStage[] = (caseData.challenges || []).map((challenge, index) => ({
+    stageId: challenge.id || `decision-${challenge.order || index + 1}`,
+    stageTitle: challenge.title,
+    challengeType: mapLegacyTypeToChallengeType(challenge.type),
+    challengeData: {
+      prompt: challenge.description,
+      rubricMapping: challenge.rubricMapping || [],
+    },
+  }))
+
+  // If no challenges, create a default stage
+  if (stages.length === 0) {
+    stages.push({
+      stageId: 'decision-1',
+      stageTitle: 'Analyze the Situation',
+      challengeType: 'WRITTEN_ANALYSIS',
+      challengeData: {
+        prompt: 'Based on the case information and data provided, what is your recommended approach?',
+      },
+    })
+  }
+
+  return {
+    caseId: caseData.caseId || caseId,
+    version: caseData.version || '1.0',
+    title: caseData.title,
+    description: caseData.description || '',
+    competencies: caseData.competencies || [],
+    caseFiles: caseData.caseFiles || [],
+    stages,
+  }
+}
+
+/**
+ * Map legacy challenge types to new challenge types
+ */
+function mapLegacyTypeToChallengeType(legacyType: string): string {
+  const typeMap: Record<string, string> = {
+    text: 'WRITTEN_ANALYSIS',
+    'written-analysis': 'WRITTEN_ANALYSIS',
+    'strategic-options': 'STRATEGIC_OPTIONS',
+    'financial-modeling': 'FINANCIAL_MODELING',
+    'board-deck': 'BOARD_DECK_CRITIQUE',
+    'earnings-call': 'EARNINGS_CALL_QA',
+    negotiation: 'NEGOTIATION',
+  }
+
+  return typeMap[legacyType?.toLowerCase()] || 'STRATEGIC_OPTIONS'
+}
+
+/**
+ * Convert legacy simulation state to store format
+ */
+export function convertLegacyStateToStoreFormat(
+  legacyState: {
+    currentDecisionPoint?: number
+    decisions?: any[]
+    startedAt?: string
+    lastUpdated?: string
+  },
+  stages: CaseStudyStage[]
+): {
+  stageStates: Record<string, any>
+  currentStageId: string | null
+  eventLog: Array<{ event: string; timestamp: number; data?: any }>
+} {
+  const stageStates: Record<string, any> = {}
+  const eventLog: Array<{ event: string; timestamp: number; data?: any }> = []
+
+  // Initialize all stages
+  stages.forEach((stage, index) => {
+    stageStates[stage.stageId] = {
+      status: 'not_started',
+      userSubmissions: {},
+      validation: { isValid: false, errors: [] },
+      blockStates: {},
+    }
+
+    // If we have legacy decisions, map them to stages
+    if (legacyState.decisions && index < legacyState.decisions.length) {
+      stageStates[stage.stageId] = {
+        ...stageStates[stage.stageId],
+        status: 'completed',
+        userSubmissions: { decision: legacyState.decisions[index] },
+        validation: { isValid: true, errors: [] },
+        completedAt: Date.now(),
+      }
+    } else if (legacyState.currentDecisionPoint !== undefined && index === legacyState.currentDecisionPoint) {
+      stageStates[stage.stageId] = {
+        ...stageStates[stage.stageId],
+        status: 'in_progress',
+        startedAt: legacyState.startedAt ? new Date(legacyState.startedAt).getTime() : Date.now(),
+      }
+    } else if (legacyState.currentDecisionPoint !== undefined && index < legacyState.currentDecisionPoint) {
+      stageStates[stage.stageId] = {
+        ...stageStates[stage.stageId],
+        status: 'completed',
+      }
+    }
+  })
+
+  // Set current stage
+  let currentStageId: string | null = null
+  if (legacyState.currentDecisionPoint !== undefined && stages[legacyState.currentDecisionPoint]) {
+    currentStageId = stages[legacyState.currentDecisionPoint].stageId
+  } else if (stages.length > 0) {
+    currentStageId = stages[0].stageId
+  }
+
+  // Create event log entries
+  if (legacyState.startedAt) {
+    eventLog.push({
+      event: 'CASE_LOADED',
+      timestamp: new Date(legacyState.startedAt).getTime(),
+    })
+  }
+
+  return {
+    stageStates,
+    currentStageId,
+    eventLog,
+  }
+}

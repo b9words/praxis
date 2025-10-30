@@ -67,7 +67,7 @@ export default async function ThreadPage({
       {/* Breadcrumb */}
       <div className="text-sm text-gray-600">
         <Link href="/community" className="hover:text-gray-900">
-          Community
+          The Exchange
         </Link>
         {' / '}
         <Link href={`/community/${slug}`} className="hover:text-gray-900">

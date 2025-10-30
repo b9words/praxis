@@ -17,7 +17,7 @@ interface DocumentViewerBlockProps {
 
 export default function DocumentViewerBlock({
   blockId,
-  title = 'Case Documents',
+  title = 'Briefing Documents',
   fileIds,
   defaultFileId,
   showTabs = true

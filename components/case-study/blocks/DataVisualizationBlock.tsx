@@ -164,7 +164,7 @@ export default function DataVisualizationBlock({
                 cy="50%"
                 outerRadius={120}
                 dataKey="value"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={(props: any) => `${props.name}: ${(props.percent * 100).toFixed(0)}%`}
               >
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />

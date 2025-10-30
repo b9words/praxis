@@ -34,8 +34,8 @@ export default function WrittenAnalysisLayout({ challengeData }: WrittenAnalysis
       blockId: 'prompt',
       blockType: 'PROMPT_BOX',
       props: {
-        title: 'Your Task',
-        content: prompt || 'Write a comprehensive analysis based on the case materials provided.',
+        title: 'Objective',
+        content: prompt || 'Analyze the provided case materials and produce a comprehensive assessment.',
         type: 'objective'
       }
     },
@@ -43,10 +43,10 @@ export default function WrittenAnalysisLayout({ challengeData }: WrittenAnalysis
       blockId: 'editor',
       blockType: 'RICH_TEXT_EDITOR',
       props: {
-        title: 'Your Analysis',
+        title: 'Analysis',
         maxLength: wordLimit * 6, // Rough character estimate
         minLength: Math.floor(wordLimit * 0.7), // 70% of target
-        placeholder: 'Begin your analysis here. Reference specific data points and case materials to support your arguments...',
+        placeholder: 'Analyze the provided data. Reference specific data points and case materials to support your arguments.',
         showWordCount: true,
         autoSave: true
       }
@@ -56,7 +56,7 @@ export default function WrittenAnalysisLayout({ challengeData }: WrittenAnalysis
       blockType: 'SUBMIT_BUTTON',
       props: {
         label: 'Submit Analysis',
-        confirmationMessage: 'Are you ready to submit your analysis? This action cannot be undone.',
+        confirmationMessage: 'Confirm submission. This action cannot be undone.',
         requiresValidation: true,
         validationRules: {
           requiredBlocks: ['editor'],
@@ -80,7 +80,7 @@ export default function WrittenAnalysisLayout({ challengeData }: WrittenAnalysis
           <BlockComponent
             key={block.blockId}
             blockId={block.blockId}
-            {...block.props}
+            {...(block.props as any)}
           />
         )
       })}

@@ -95,7 +95,7 @@ export default async function LibraryPage() {
       <div className="hidden md:block border-b border-neutral-200 bg-white flex-shrink-0">
         <div className="px-0 py-4">
           <h1 className="text-xl font-semibold leading-tight text-neutral-900">
-            Executive Library
+            Intelligence Library
         </h1>
           <p className="mt-1 text-sm text-neutral-500 leading-snug">
             Foundational knowledge for business decision-making

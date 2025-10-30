@@ -39,7 +39,7 @@ export default function StrategicOptionsLayout({ challengeData }: StrategicOptio
       blockType: 'PROMPT_BOX',
       props: {
         title: 'Strategic Decision',
-        content: prompt || 'Choose your strategic path from the options below.',
+        content: prompt || 'Analyze the strategic options. Select the optimal path based on quantitative reasoning.',
         type: 'info'
       }
     },
@@ -57,7 +57,7 @@ export default function StrategicOptionsLayout({ challengeData }: StrategicOptio
       blockType: 'SUBMIT_BUTTON',
       props: {
         label: 'Confirm Strategic Choice',
-        confirmationMessage: 'Are you sure about this strategic choice? This decision will influence the rest of the case study.',
+        confirmationMessage: 'Confirm your strategic choice. This decision will influence the rest of the scenario.',
         requiresValidation: true
       }
     }
@@ -84,7 +84,7 @@ export default function StrategicOptionsLayout({ challengeData }: StrategicOptio
             <BlockComponent
               key={block.blockId}
               blockId={block.blockId}
-              {...block.props}
+              {...(block.props as any)}
             />
           )
         })}

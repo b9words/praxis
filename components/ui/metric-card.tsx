@@ -67,7 +67,7 @@ export default function MetricCard({
   const cardProps = href ? { href } : {}
 
   return (
-    <CardWrapper {...cardProps}>
+    <CardWrapper {...(cardProps as any)}>
       <Card className={cn(
         'transition-all duration-200',
         config.card,

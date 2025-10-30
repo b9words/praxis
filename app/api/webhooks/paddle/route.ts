@@ -1,4 +1,8 @@
+import { serverAnalyticsTracker } from '@/lib/analytics'
+import { sendSubscriptionConfirmationEmail } from '@/lib/email'
 import { prisma } from '@/lib/prisma/server'
+import * as Sentry from '@sentry/nextjs'
+import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -54,6 +58,41 @@ export async function POST(request: NextRequest) {
 
     const data = JSON.parse(body)
 
+    // Check for idempotency using event_id from Paddle
+    const eventId = data?.event_id || data?.event?.id || null
+    if (eventId) {
+      // Use Supabase Admin client to check webhook_events table
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+          },
+        }
+      )
+
+      const { data: existingEvent } = await supabaseAdmin
+        .from('webhook_events')
+        .select('id')
+        .eq('event_id', eventId.toString())
+        .single()
+
+      if (existingEvent) {
+        // Event already processed
+        return NextResponse.json({ received: true, duplicate: true })
+      }
+
+      // Store event for idempotency
+      await supabaseAdmin.from('webhook_events').insert({
+        event_id: eventId.toString(),
+        event_type: paddleEventType,
+        payload: data,
+        headers: Object.fromEntries(request.headers.entries()),
+      })
+    }
+
     // Handle subscription events
     if (paddleEventType.includes('subscription')) {
       const subscription = data.data
@@ -64,31 +103,161 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
       }
 
-      // Find user by customer_id stored in metadata or by email
-      // Paddle webhooks include customer.email in the subscription data
-      const customerEmail = subscription.customer?.emailFact || subscription.items?.[0]?.price?.product?.name
+      // Extract customer email from Paddle webhook data
+      const customerEmail = subscription.customer?.email || subscription.customer?.email_address
       
-      // Try to find profile by email or customer_id metadata
-      // Note: In production, you may want to store paddle_customer_id in Profile model
-      let profile = null
-      if (customerEmail) {
-        // Find by matching email in auth.users via Supabase Admin API or store email in profile
-        // For now, we'll need to query by a custom field or use a different lookup method
-        profile = await prisma.profile.findFirst({
-          where: {
-            // This is a placeholder - you may need to join with auth.users or store email in profile
-            // For MVP, you could query Supabase auth.users via admin API
-          },
-        })
+      // Try to find user by paddleCustomerId stored in passthrough or by email
+      // First, check if passthrough contains userId (from checkout)
+      let userId: string | null = null
+      if (subscription.custom_data) {
+        try {
+          const customData = typeof subscription.custom_data === 'string' 
+            ? JSON.parse(subscription.custom_data) 
+            : subscription.custom_data
+          userId = customData.userId || null
+        } catch {
+          // Ignore parse errors
+        }
       }
 
-      // Fallback: If profile not found and it's a creation event, we may need to create it
-      // This should ideally be handled during checkout when user is authenticated
+      // Try passthrough field if custom_data didn't work
+      if (!userId && subscription.passthrough) {
+        try {
+          const passthrough = typeof subscription.passthrough === 'string'
+            ? JSON.parse(subscription.passthrough)
+            : subscription.passthrough
+          userId = passthrough.userId || null
+        } catch {
+          // Ignore parse errors
+        }
+      }
+
+      let profile = null
+
+      // Try to find profile by userId first (most reliable)
+      if (userId) {
+        profile = await prisma.profile.findUnique({
+          where: { id: userId },
+          select: {
+            id: true,
+            username: true,
+            fullName: true,
+            avatarUrl: true,
+            bio: true,
+            isPublic: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+        
+        if (!profile) {
+          console.error('Paddle webhook: userId provided in passthrough but user not found', {
+            userId,
+            paddleSubscriptionId,
+            eventType: paddleEventType,
+          })
+          // Continue to email fallback below
+        } else {
+          console.log('Paddle webhook: Successfully found user by userId from passthrough', {
+            userId,
+            paddleSubscriptionId,
+            eventType: paddleEventType,
+          })
+        }
+      }
+
+      // Fallback: Look up by email using Supabase Admin API
+      if (!profile && customerEmail) {
+        console.log('Paddle webhook: Falling back to email lookup', {
+          customerEmail,
+          paddleSubscriptionId,
+          eventType: paddleEventType,
+          hadUserId: !!userId,
+        })
+        try {
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+              },
+            }
+          )
+
+          // Query auth.users for email
+          const { data: authUsers, error: authError } = await supabaseAdmin.auth.admin.listUsers()
+          
+          if (!authError && authUsers?.users) {
+            const authUser = authUsers.users.find(user => 
+              user.email?.toLowerCase() === customerEmail.toLowerCase()
+            )
+            
+            if (authUser) {
+              profile = await prisma.profile.findUnique({
+                where: { id: authUser.id },
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                  avatarUrl: true,
+                  bio: true,
+                  isPublic: true,
+                  role: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              })
+            }
+          }
+        } catch (error) {
+          console.error('Error looking up user by email:', error)
+        }
+      }
+
+      // If still no profile found and it's a creation event, log error
       if (!profile && paddleEventType === 'subscription.created') {
-        // If user doesn't exist yet, the subscription creation will fail
-        // This should be handled during checkout flow
-        console.error('User not found for Paddle customer:', customerId)
-        return NextResponse.json({ error: 'User not found' }, { status: 404 })
+        console.error('User not found for Paddle customer:', customerId, 'Email:', customerEmail)
+        return NextResponse.json({ 
+          error: 'User not found',
+          details: 'No matching user found for Paddle customer. User must be authenticated during checkout.'
+        }, { status: 404 })
+      }
+
+      // For update/cancel events, subscription might already exist
+      if (!profile && (paddleEventType === 'subscription.updated' || paddleEventType === 'subscription.canceled')) {
+        // Try to find existing subscription and get userId from there
+        const existingSubscription = await prisma.subscription.findUnique({
+          where: { paddleSubscriptionId },
+        })
+        
+        if (existingSubscription) {
+          profile = await prisma.profile.findUnique({
+            where: { id: existingSubscription.userId },
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
+              avatarUrl: true,
+              bio: true,
+              isPublic: true,
+              role: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          })
+        }
+      }
+
+      // If we still don't have a profile, we can't proceed
+      if (!profile) {
+        console.error('Unable to resolve user for Paddle subscription:', paddleSubscriptionId)
+        return NextResponse.json({ 
+          error: 'User not found',
+          details: 'Unable to resolve user for subscription event'
+        }, { status: 404 })
       }
 
       const status = mapPaddleStatus(subscription.status)
@@ -101,7 +270,7 @@ export async function POST(request: NextRequest) {
 
       switch (paddleEventType) {
         case 'subscription.created':
-          await prisma.subscription.upsert({
+          const createdSubscription = await prisma.subscription.upsert({
             where: { paddleSubscriptionId },
             update: {
               status,
@@ -118,6 +287,47 @@ export async function POST(request: NextRequest) {
               currentPeriodEnd,
             },
           })
+          
+          // Send subscription confirmation email
+          try {
+            // Get user email from Supabase auth
+            const supabaseAdmin = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              {
+                auth: {
+                  autoRefreshToken: false,
+                  persistSession: false,
+                },
+              }
+            )
+            
+            const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(profile!.id)
+            
+            if (authUser?.user?.email) {
+              await sendSubscriptionConfirmationEmail(
+                authUser.user.email,
+                subscription.plan_id?.toString() || 'Subscription',
+                profile!.fullName || undefined
+              )
+            }
+          } catch (emailError) {
+            console.error('Failed to send subscription confirmation email:', emailError)
+            // Don't fail webhook if email fails
+          }
+
+          // Track subscription started event
+          try {
+            await serverAnalyticsTracker.track('subscription_started', {
+              subscriptionId: paddleSubscriptionId,
+              planId: subscription.plan_id?.toString() || '',
+              userId: profile!.id,
+            })
+          } catch (analyticsError) {
+            console.error('Failed to track subscription started:', analyticsError)
+            // Don't fail webhook if analytics fails
+          }
+          
           break
 
         case 'subscription.updated':
@@ -152,6 +362,11 @@ export async function POST(request: NextRequest) {
 
       if (subscriptionId) {
         // Update subscription status if payment successful
+        const updatedSubscription = await prisma.subscription.findFirst({
+          where: { paddleSubscriptionId: subscriptionId },
+          select: { userId: true, paddlePlanId: true },
+        })
+
         await prisma.subscription.updateMany({
           where: { paddleSubscriptionId: subscriptionId },
           data: {
@@ -159,12 +374,33 @@ export async function POST(request: NextRequest) {
             updatedAt: new Date(),
           },
         })
+
+        // Track subscription started event on first successful payment
+        if (updatedSubscription) {
+          try {
+            await serverAnalyticsTracker.track('subscription_started', {
+              subscriptionId,
+              planId: updatedSubscription.paddlePlanId || '',
+              userId: updatedSubscription.userId,
+            })
+          } catch (analyticsError) {
+            console.error('Failed to track subscription started from transaction:', analyticsError)
+            // Don't fail webhook if analytics fails
+          }
+        }
       }
     }
 
     return NextResponse.json({ received: true })
   } catch (error) {
     console.error('Error processing Paddle webhook:', error)
+    Sentry.addBreadcrumb({
+      category: 'webhook',
+      level: 'error',
+      message: 'Paddle webhook processing failed',
+      data: { error: error instanceof Error ? error.message : String(error) },
+    })
+    Sentry.captureException(error)
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
   }
 }

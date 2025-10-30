@@ -77,7 +77,7 @@ export default function FocusedDashboard({
             </div>
           </div>
         ) : (
-          <p className="text-xl text-gray-600">Ready to begin your executive journey?</p>
+          <p className="text-xl text-gray-600">Your dashboard is now active. Your primary objective: improve these metrics.</p>
         )}
       </div>
 
@@ -248,10 +248,10 @@ export default function FocusedDashboard({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Community Insights
+              Network Activity
             </CardTitle>
             <CardDescription>
-              Learn from fellow executives in your cohort
+              Insights from operatives in the network
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -53,7 +53,7 @@ export default function SubmitButtonBlock({
         if (!blockState || !blockState.content || blockState.content.trim() === '') {
           return {
             isValid: false,
-            message: `Please complete the required field: ${requiredBlockId}`
+            message: `Required field incomplete: ${requiredBlockId}`
           }
         }
       }
@@ -92,7 +92,7 @@ export default function SubmitButtonBlock({
     if (invalidBlocks.length > 0) {
       return {
         isValid: false,
-        message: `Please fix validation errors in: ${invalidBlocks.map(([id]) => id).join(', ')}`
+        message: `Validation errors must be resolved in: ${invalidBlocks.map(([id]) => id).join(', ')}`
       }
     }
 
@@ -140,7 +140,7 @@ export default function SubmitButtonBlock({
         <CardContent className="p-4">
           <div className="flex items-center justify-center gap-2 text-green-700">
             <CheckCircle className="h-5 w-5" />
-            <span className="font-medium">Stage Completed Successfully</span>
+            <span className="font-medium">Stage Complete</span>
           </div>
           <p className="text-sm text-green-600 text-center mt-2">
             Submitted on {new Date(stageState.completedAt || '').toLocaleString()}

@@ -27,10 +27,15 @@ export async function GET(
       // Fetch from storage
       const { success, content } = await fetchFromStorageServer(caseItem.storagePath)
       if (success && content) {
-        return NextResponse.json({
-          ...caseItem,
-          caseData: JSON.parse(content),
-        })
+        try {
+          return NextResponse.json({
+            ...caseItem,
+            caseData: JSON.parse(content),
+          })
+        } catch (parseError) {
+          console.error('Failed to parse case data JSON:', parseError)
+          // Fall through to return caseItem without caseData
+        }
       }
     }
 
@@ -46,9 +51,16 @@ export async function GET(
     }
 
     const fileContents = fs.readFileSync(filePath, 'utf8')
-    const caseStudyData = JSON.parse(fileContents)
-
-    return NextResponse.json(caseStudyData)
+    try {
+      const caseStudyData = JSON.parse(fileContents)
+      return NextResponse.json(caseStudyData)
+    } catch (parseError) {
+      console.error('Failed to parse case study JSON file:', parseError)
+      return NextResponse.json(
+        { error: 'Invalid case study file format' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     console.error('Error loading case study:', error)
     return NextResponse.json({ error: 'Failed to load case study' }, { status: 500 })

@@ -69,7 +69,7 @@ export default function StrategicOptionsBlock({
       setSelectedOptions([optionId])
     }
 
-    logEvent('OPTION_SELECTED', currentStageId, { 
+    logEvent('OPTION_SELECTED', currentStageId || undefined, {
       blockId, 
       optionId, 
       allowMultiple 

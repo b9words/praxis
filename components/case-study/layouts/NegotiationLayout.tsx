@@ -137,7 +137,7 @@ export default function NegotiationLayout({ challengeData }: NegotiationLayoutPr
                 <BlockComponent
                   key={block.blockId}
                   blockId={block.blockId}
-                  {...block.props}
+                  {...(block.props as any)}
                 />
               )
             })}
@@ -161,7 +161,7 @@ export default function NegotiationLayout({ challengeData }: NegotiationLayoutPr
                   <BlockComponent
                     key={block.blockId}
                     blockId={block.blockId}
-                    {...block.props}
+                    {...(block.props as any)}
                   />
                 )
               })}
@@ -184,7 +184,7 @@ export default function NegotiationLayout({ challengeData }: NegotiationLayoutPr
                 <BlockComponent
                   key={block.blockId}
                   blockId={block.blockId}
-                  {...block.props}
+                  {...(block.props as any)}
                 />
               )
             })}

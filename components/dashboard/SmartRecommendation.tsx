@@ -17,7 +17,7 @@ export default function SmartRecommendation({ recommendation }: SmartRecommendat
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Recommended Next Step</CardTitle>
+          <CardTitle>Optimal Next Move</CardTitle>
           <CardDescription>Your personalized learning path</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -52,7 +52,7 @@ export default function SmartRecommendation({ recommendation }: SmartRecommendat
         <CardContent>
           <div className="space-y-3">
             <p className="text-sm text-yellow-800">
-              Congratulations! You've completed all content in Year {recommendation.residencyYear}.
+              You have completed all content in Year {recommendation.residencyYear}. Advance to the next residency.
             </p>
             <Button asChild variant="default" className="w-full">
               <Link href="/residency">Advance to Next Year</Link>
@@ -69,7 +69,7 @@ export default function SmartRecommendation({ recommendation }: SmartRecommendat
     <Card className={`border-l-4 ${isCurriculum ? 'border-blue-500' : 'border-green-500'}`}>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Recommended Next Step</CardTitle>
+          <CardTitle>Optimal Next Move</CardTitle>
           {recommendation.residencyYear && (
             <Badge variant="outline" className="text-xs">
               Year {recommendation.residencyYear}
@@ -97,7 +97,7 @@ export default function SmartRecommendation({ recommendation }: SmartRecommendat
 
         <Button asChild className="w-full">
           <Link href={recommendation.type === 'curriculum' ? recommendation.url : `/simulations/${recommendation.id}/brief`}>
-            {recommendation.type === 'curriculum' ? 'Continue Learning' : 'Start Simulation'}
+            {recommendation.type === 'curriculum' ? 'Engage Target' : 'Deploy to Scenario'}
           </Link>
         </Button>
       </CardContent>
