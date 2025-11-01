@@ -106,7 +106,7 @@ export async function fetchFromStorageServer(
 }
 
 /**
- * Call the Edge Function to sync file metadata to Postgres
+ * Sync file metadata to database via API route
  * @param bucket - The storage bucket name
  * @param path - The storage path
  * @returns Success status and any error message
@@ -116,17 +116,21 @@ export async function syncFileMetadata(
   path: string
 ): Promise<{ success: boolean; error?: string; data?: any }> {
   try {
-    const supabase = createClient()
-    
-    const { data, error } = await supabase.functions.invoke('sync-file-metadata', {
-      body: { bucket, path }
+    const response = await fetch('/api/storage/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ bucket, path }),
     })
 
-    if (error) {
-      console.error('Edge function error:', error)
-      return { success: false, error: error.message }
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: response.statusText }))
+      console.error('Sync API error:', errorData)
+      return { success: false, error: errorData.error || response.statusText }
     }
 
+    const data = await response.json()
     return { success: true, data }
   } catch (error) {
     console.error('Sync exception:', error)

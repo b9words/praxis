@@ -10,42 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  member
-  editor
-  admin
-}
-
-enum CompetencyLevel {
-  domain
-  competency
-  micro_skill
-}
-
-enum ContentStatus {
-  draft
-  in_review
-  approved
-  published
-}
-
-enum SimulationStatus {
-  in_progress
-  completed
-}
-
-enum LessonProgressStatus {
-  not_started
-  in_progress
-  completed
-}
-
-enum CaseDifficulty {
-  beginner
-  intermediate
-  advanced
-}
-
 model Profile {
   id        String   @id
   username  String   @unique
@@ -53,7 +17,7 @@ model Profile {
   avatarUrl String?  @map("avatar_url")
   bio       String?
   isPublic                 Boolean  @default(false) @map("is_public")
-  role                     UserRole @default(member)
+  role                     String   @default("member")
   emailNotificationsEnabled Boolean  @default(true) @map("email_notifications_enabled")
   createdAt                DateTime @default(now()) @map("created_at")
   updatedAt                DateTime @updatedAt @map("updated_at")
@@ -86,7 +50,7 @@ model Competency {
   name         String
   description  String?
   parentId     String?          @map("parent_id")
-  level        CompetencyLevel
+  level        String
   residencyYear Int?            @map("residency_year")
   displayOrder Int              @default(0) @map("display_order")
   createdAt    DateTime         @default(now()) @map("created_at")
@@ -109,7 +73,7 @@ model Article {
   title       String
   content     String?
   description String?
-  status      ContentStatus @default(draft)
+  status      String  @default("draft")
   storagePath String?       @map("storage_path")
   metadata    Json?         @default("{}")
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -138,8 +102,8 @@ model Case {
   description  String?
   datasets     Json?
   rubric       Json
-  status       ContentStatus @default(draft)
-  difficulty   CaseDifficulty?
+  status       String  @default("draft")
+  difficulty   String?
   estimatedMinutes Int?      @map("estimated_minutes")
   prerequisites Json?        @default("[]")
   storagePath  String?       @map("storage_path")
@@ -180,7 +144,7 @@ model Simulation {
   id         String           @id @default(uuid())
   userId     String           @map("user_id")
   caseId     String           @map("case_id")
-  status     SimulationStatus @default(in_progress)
+  status     String           @default("in_progress")
   userInputs Json             @default("{}") @map("user_inputs")
   startedAt  DateTime         @default(now()) @map("started_at")
   completedAt DateTime?       @map("completed_at")
@@ -279,7 +243,7 @@ model UserLessonProgress {
   domainId          String              @map("domain_id")
   moduleId          String              @map("module_id")
   lessonId          String              @map("lesson_id")
-  status            LessonProgressStatus @default(not_started)
+  status            String              @default("not_started")
   progressPercentage Int                @default(0) @map("progress_percentage")
   timeSpentSeconds  Int                 @default(0) @map("time_spent_seconds")
   lastReadPosition  Json                @default("{}") @map("last_read_position")
@@ -349,20 +313,12 @@ model TokenUsage {
   @@map("token_usage")
 }
 
-enum SubscriptionStatus {
-  active
-  canceled
-  past_due
-  paused
-  trialing
-}
-
 model Subscription {
   id                  String             @id @default(uuid())
   userId              String             @unique @map("user_id")
   paddleSubscriptionId String            @unique @map("paddle_subscription_id")
   paddlePlanId        String             @map("paddle_plan_id")
-  status              SubscriptionStatus
+  status              String
   currentPeriodStart  DateTime           @map("current_period_start")
   currentPeriodEnd    DateTime           @map("current_period_end")
   createdAt           DateTime           @default(now()) @map("created_at")
@@ -377,21 +333,6 @@ model Subscription {
   @@map("subscriptions")
 }
 
-enum ApplicationStatus {
-  pending
-  approved
-  rejected
-}
-
-enum NotificationType {
-  application_approved
-  application_rejected
-  forum_reply
-  simulation_complete
-  weekly_summary
-  general
-}
-
 model UserApplication {
   id          String            @id @default(uuid())
   userId      String?           @map("user_id")
@@ -399,7 +340,7 @@ model UserApplication {
   fullName    String?           @map("full_name")
   motivation  String
   background  String?
-  status      ApplicationStatus @default(pending)
+  status      String            @default("pending")
   reviewedBy  String?           @map("reviewed_by")
   reviewedAt  DateTime?         @map("reviewed_at")
   notes       String?
@@ -420,7 +361,7 @@ model UserApplication {
 model Notification {
   id        String          @id @default(uuid())
   userId    String          @map("user_id")
-  type      NotificationType
+  type      String
   title     String
   message   String
   read      Boolean         @default(false)
@@ -439,24 +380,13 @@ model Notification {
   @@map("notifications")
 }
 
-enum ReportStatus {
-  pending
-  reviewed
-  dismissed
-}
-
-enum ReportedType {
-  thread
-  post
-}
-
 model Report {
   id            String        @id @default(uuid())
-  reportedType  ReportedType  @map("reported_type")
+  reportedType  String        @map("reported_type")
   reportedId    String        @map("reported_id") // UUID but stored as String for flexibility
   reason        String
   createdById   String        @map("created_by")
-  status        ReportStatus  @default(pending)
+  status        String        @default("pending")
   reviewedById  String?       @map("reviewed_by")
   reviewedAt    DateTime?     @map("reviewed_at")
   notes         String?

@@ -10,10 +10,13 @@ import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { fetchJson } from '@/lib/api'
 import { ContentGenerator, DEFAULT_MODELS, GeneratedLesson, GenerationOptions, LessonStructure } from '@/lib/content-generator'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
 import { TokenTracker } from '@/lib/token-tracker'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Circle, Download, Eye, Play, Settings, Sparkles, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -32,6 +35,7 @@ interface GenerationProgress {
 }
 
 export default function CurriculumGenerator({ competencies }: CurriculumGeneratorProps) {
+  const queryClient = useQueryClient()
   const supabase = createClient()
   
   // Generator instance
@@ -71,6 +75,23 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
   // UI state
   const [selectedLessons, setSelectedLessons] = useState<Set<number>>(new Set())
   const [previewLesson, setPreviewLesson] = useState<GeneratedLesson | null>(null)
+
+  // Bulk save mutation
+  const bulkSaveMutation = useMutation({
+    mutationFn: (articles: Array<{ title: string; content: string; competencyId: string; status: string }>) =>
+      fetchJson('/api/articles/bulk', {
+        method: 'POST',
+        body: { articles },
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
+      toast.success(`Saved ${variables.length} lessons to database!`)
+      setProgress(prev => ({ ...prev, results: [] }))
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to save to database')
+    },
+  })
 
   useEffect(() => {
     // Initialize generator and curriculum
@@ -157,39 +178,20 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     }
   }
 
-  const handleSaveToDatabase = async () => {
+  const handleSaveToDatabase = () => {
     if (progress.results.length === 0) {
       toast.error('No generated content to save')
       return
     }
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
+    const articlesToInsert = progress.results.map(lesson => ({
+      title: lesson.title,
+      content: lesson.content,
+      competencyId: lesson.competencyId,
+      status: lesson.status || 'draft',
+    }))
 
-      const articlesToInsert = progress.results.map(lesson => ({
-        title: lesson.title,
-        content: lesson.content,
-        competency_id: lesson.competencyId,
-        status: lesson.status,
-        created_by: user.id,
-        updated_by: user.id
-      }))
-
-      const { error } = await supabase
-        .from('articles')
-        .insert(articlesToInsert)
-
-      if (error) throw error
-
-      toast.success(`Saved ${progress.results.length} lessons to database!`)
-      
-      // Clear results after saving
-      setProgress(prev => ({ ...prev, results: [] }))
-    } catch (error) {
-      console.error('Save error:', error)
-      toast.error('Failed to save to database')
-    }
+    bulkSaveMutation.mutate(articlesToInsert)
   }
 
   const toggleLessonSelection = (index: number) => {

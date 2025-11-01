@@ -34,9 +34,13 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({ competencies })
-  } catch (error) {
+  } catch (error: any) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching competencies:', error)
-    return NextResponse.json({ error: 'Failed to fetch competencies' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

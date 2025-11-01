@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { completeCurriculumData, getCurriculumStats } from '@/lib/curriculum-data'
 import { prisma } from '@/lib/prisma/server'
 import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
@@ -158,44 +157,42 @@ export default async function CurriculumLibraryPage() {
           {/* Domain Cards */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {curriculumData.map((domain, index) => (
-              <Card
+              <div
                 key={domain.id}
-                className="bg-neutral-50 border border-neutral-200 rounded-lg group hover:bg-neutral-100 transition-colors duration-100"
+                className="bg-neutral-50 border border-neutral-200 group hover:border-neutral-300 transition-colors"
               >
-                <CardHeader className="p-3">
-                  <div className="flex items-start justify-between">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <CardTitle className="text-base font-semibold leading-tight text-neutral-900 mb-1 group-hover:text-blue-700 transition-colors">
+                      <h3 className="text-base font-medium leading-tight text-neutral-900 mb-2">
                         {domain.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm text-neutral-500 leading-snug">
+                      </h3>
+                      <p className="text-sm text-neutral-600 leading-snug">
                         {domain.philosophy.length > 200
                           ? `${domain.philosophy.substring(0, 200)}...`
                           : domain.philosophy}
-                      </CardDescription>
+                      </p>
                     </div>
                     <div className="ml-3 text-xs text-neutral-400 font-mono">
                       {String(index + 1).padStart(2, '0')}
                     </div>
                   </div>
-                </CardHeader>
 
-                <CardContent className="pt-0">
                   <div className="space-y-4">
                     {/* Stats */}
-                    <div className="flex items-center gap-6 text-sm text-gray-500">
+                    <div className="flex items-center gap-6 text-xs text-gray-500">
                       <div className="flex items-center gap-1">
-                        <Target className="h-4 w-4" />
+                        <Target className="h-3 w-3" />
                         <span>{domain.modules.length} modules</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <BookOpen className="h-4 w-4" />
+                        <BookOpen className="h-3 w-3" />
                         <span>
                           {domain.modules.reduce((sum, m) => sum + m.lessons.length, 0)} lessons
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
+                        <Clock className="h-3 w-3" />
                         <span>
                           {domain.modules.reduce((sum, m) => sum + m.lessons.length, 0) * 12} min
                         </span>
@@ -203,27 +200,29 @@ export default async function CurriculumLibraryPage() {
                     </div>
 
                     {/* Sample Modules */}
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium text-gray-700">Key Modules:</div>
-                      <div className="space-y-1">
-                        {domain.modules.slice(0, 3).map((module) => (
-                          <div key={module.id} className="text-sm text-gray-600 flex items-center gap-2">
-                            <ChevronRight className="h-3 w-3 text-gray-400" />
-                            <span className="font-medium">Module {module.number}:</span>
-                            <span>{module.title}</span>
-                          </div>
-                        ))}
-                        {domain.modules.length > 3 && (
-                          <div className="text-sm text-gray-500 ml-5">
-                            +{domain.modules.length - 3} more modules
-                          </div>
-                        )}
+                    {domain.modules.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="text-xs font-medium text-gray-700">Key Modules:</div>
+                        <div className="space-y-1">
+                          {domain.modules.slice(0, 3).map((module) => (
+                            <div key={module.id} className="text-xs text-gray-600 flex items-center gap-2">
+                              <ChevronRight className="h-3 w-3 text-gray-400" />
+                              <span className="font-medium">Module {module.number}:</span>
+                              <span>{module.title}</span>
+                            </div>
+                          ))}
+                          {domain.modules.length > 3 && (
+                            <div className="text-xs text-gray-500 ml-5">
+                              +{domain.modules.length - 3} more modules
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Action Button */}
                     <div className="pt-2">
-                      <Button asChild className="w-full group-hover:bg-blue-600 transition-colors">
+                      <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none">
                         <Link href={`/library/curriculum/${domain.id}`}>
                           Explore Domain
                           <ChevronRight className="ml-2 h-4 w-4" />
@@ -231,27 +230,25 @@ export default async function CurriculumLibraryPage() {
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
           {/* Learning Path Recommendations */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
+          <div className="bg-gray-50 border border-gray-200 p-8">
             <div className="text-center space-y-4">
-              <Users className="h-12 w-12 text-blue-600 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Structured Learning Paths</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Follow our curated learning paths designed for different executive roles and
-                experience levels. Each path combines multiple domains for comprehensive skill
-                development.
+              <Users className="h-10 w-10 text-gray-400 mx-auto" />
+              <h2 className="text-xl font-medium text-gray-900">Structured Learning Paths</h2>
+              <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+                Follow our curated learning paths designed for different executive roles and experience levels. Each path combines multiple domains for comprehensive skill development.
               </p>
-              <div className="flex justify-center gap-4 pt-4">
-                <Button asChild variant="outline">
+              <div className="flex justify-center gap-3 pt-4">
+                <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
                   <Link href="/residency">View Learning Paths</Link>
                 </Button>
-                <Button asChild>
-                  <Link href="/admin/content/generate">🤖 Generate Content</Link>
+                <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+                  <Link href="/admin/content/generate">Generate Content</Link>
                 </Button>
               </div>
             </div>
@@ -259,32 +256,32 @@ export default async function CurriculumLibraryPage() {
 
           {/* Quick Access */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="text-center p-6">
-              <BookOpen className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Browse All Articles</h3>
-              <p className="text-sm text-gray-600 mb-4">Access traditional article-based learning</p>
-              <Button asChild variant="outline" size="sm">
+            <div className="bg-white border border-gray-200 text-center p-6">
+              <BookOpen className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Browse All Articles</h3>
+              <p className="text-xs text-gray-600 mb-4">Access traditional article-based learning</p>
+              <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
                 <Link href="/library">View Articles</Link>
               </Button>
-            </Card>
+            </div>
 
-            <Card className="text-center p-6">
-              <Target className="h-8 w-8 text-green-600 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Track Progress</h3>
-              <p className="text-sm text-gray-600 mb-4">Monitor your learning journey</p>
-              <Button asChild variant="outline" size="sm">
+            <div className="bg-white border border-gray-200 text-center p-6">
+              <Target className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Track Progress</h3>
+              <p className="text-xs text-gray-600 mb-4">Monitor your learning journey</p>
+              <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
                 <Link href="/dashboard">View Dashboard</Link>
               </Button>
-            </Card>
+            </div>
 
-            <Card className="text-center p-6">
-              <Users className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-              <h3 className="font-semibold mb-2">Join Community</h3>
-              <p className="text-sm text-gray-600 mb-4">Connect with fellow executives</p>
-              <Button asChild variant="outline" size="sm">
+            <div className="bg-white border border-gray-200 text-center p-6">
+              <Users className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Join Community</h3>
+              <p className="text-xs text-gray-600 mb-4">Connect with fellow executives</p>
+              <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
                 <Link href="/community">Join Discussion</Link>
               </Button>
-            </Card>
+            </div>
           </div>
         </div>
       </div>

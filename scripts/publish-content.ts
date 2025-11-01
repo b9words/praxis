@@ -62,7 +62,7 @@ async function publishByPath(type: 'article' | 'case', storagePath: string) {
   }
   
   if (!record) {
-    throw new Error(`${type} not found in database. Run sync-file-metadata first.`)
+    throw new Error(`${type} not found in database. Run /api/storage/sync or the generation script first.`)
   }
   
   console.log(`   Found: ${record.title}`)

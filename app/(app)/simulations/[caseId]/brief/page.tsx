@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
@@ -48,48 +47,56 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
   }
 
   // Check if user has an in-progress simulation
-  const existingSimulation = await prisma.simulation.findFirst({
-    where: {
-      userId: user.id,
-      caseId: caseId,
-      status: 'in_progress',
-    },
-  })
+  let existingSimulation = null
+  try {
+    existingSimulation = await prisma.simulation.findFirst({
+      where: {
+        userId: user.id,
+        caseId: caseId,
+        status: 'in_progress',
+      },
+    })
+  } catch (error: any) {
+    // Handle any Prisma errors gracefully
+    // If query fails, just continue without existing simulation
+    console.error('Error checking existing simulation:', error)
+    existingSimulation = null
+  }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">{caseItem.title}</h1>
-        <p className="mt-2 text-gray-600">Case Briefing</p>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">{caseItem.title}</h1>
+        <p className="text-sm text-gray-600">Case Briefing</p>
       </div>
 
-      <Card className="bg-white border border-neutral-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-neutral-900">Briefing Documents</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="bg-white border border-gray-200 mb-6">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <h2 className="text-lg font-medium text-gray-900">Briefing Documents</h2>
+        </div>
+        <div className="p-6">
           <MarkdownRenderer content={caseItem.briefingDoc || ''} />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {caseItem.datasets && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Case Data</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm">
+        <div className="bg-white border border-gray-200 mb-6">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Case Data</h2>
+          </div>
+          <div className="p-6">
+            <pre className="bg-gray-50 p-4 border border-gray-200 overflow-x-auto text-xs">
               {JSON.stringify(caseItem.datasets, null, 2)}
             </pre>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      <div className="flex justify-between items-center pt-6">
-        <Button asChild variant="outline">
+      <div className="flex justify-between items-center">
+        <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
           <Link href="/simulations">Back to Simulations</Link>
         </Button>
-        <Button asChild size="lg">
+        <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
           <Link href={`/simulations/${caseId}/workspace`}>
             {existingSimulation ? 'Continue Simulation' : 'Deploy to Scenario'}
           </Link>

@@ -10,9 +10,13 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({ channels })
-  } catch (error) {
+  } catch (error: any) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching forum channels:', error)
-    return NextResponse.json({ error: 'Failed to fetch forum channels' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

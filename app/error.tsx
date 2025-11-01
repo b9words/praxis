@@ -23,7 +23,7 @@ export default function Error({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 w-full">
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 w-full">
         <div className="flex justify-center">
           <div className="max-w-md w-full text-center">
             <div className="bg-white border border-neutral-200 p-8">

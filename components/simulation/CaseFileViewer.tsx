@@ -69,7 +69,7 @@ function JSONDataViewer({ data }: { data: Record<string, any> }) {
   return (
     <div className="space-y-6">
       {Object.entries(data).map(([key, value]) => (
-        <div key={key} className="border border-gray-200 rounded-lg overflow-hidden">
+        <div key={key} className="border border-gray-200 overflow-hidden">
           <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
             <h4 className="font-semibold text-gray-900 capitalize">
               {key.replace(/_/g, ' ')}
@@ -77,7 +77,7 @@ function JSONDataViewer({ data }: { data: Record<string, any> }) {
           </div>
           <div className="p-4">
             {typeof value === 'object' ? (
-              <pre className="bg-gray-50 p-4 rounded text-xs overflow-x-auto">
+              <pre className="bg-gray-50 p-4 text-xs overflow-x-auto">
                 {JSON.stringify(value, null, 2)}
               </pre>
             ) : (

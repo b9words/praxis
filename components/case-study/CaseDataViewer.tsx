@@ -1,6 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCaseFile } from '@/hooks/useCaseFile'
@@ -33,16 +34,19 @@ export default function CaseDataViewer({ fileIds, className = '' }: CaseDataView
     if (file.isLoading) {
       return (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-neutral-600">Loading...</span>
+          <LoadingSkeleton className="h-32 w-full" />
         </div>
       )
     }
 
     if (file.error) {
       return (
-        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-          Error: {file.error}
+        <div className="p-4 bg-red-50 border border-red-200 rounded-none">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <span className="text-sm font-medium text-red-900">Error Loading File</span>
+          </div>
+          <p className="text-xs text-red-700">{file.error}</p>
         </div>
       )
     }

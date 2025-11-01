@@ -1,54 +1,46 @@
 'use client'
 
 import ContentEditor from '@/components/admin/ContentEditor'
-import { createClient } from '@/lib/supabase/client'
+import { LoadingState } from '@/components/ui/loading-skeleton'
+import { fetchJson } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense } from 'react'
 
 function NewContentForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type') || 'article'
-  const supabase = createClient()
-  const [loading, setLoading] = useState(true)
-  const [hasPermission, setHasPermission] = useState(false)
 
-  useEffect(() => {
-    async function checkPermission() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push('/login')
-        return
-      }
+  // Check permission
+  const { data: profileData, isLoading: loading } = useQuery({
+    queryKey: ['auth', 'profile'],
+    queryFn: ({ signal }) => fetchJson<{ profile: { role: string } }>('/api/auth/profile', { signal }),
+    retry: false,
+    onError: () => {
+      router.push('/login')
+    },
+  })
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (!profile || (profile.role !== 'admin' && profile.role !== 'editor')) {
-        router.push('/dashboard')
-        return
-      }
-
-      setHasPermission(true)
-      setLoading(false)
-    }
-
-    checkPermission()
-  }, [supabase, router])
+  const hasPermission = profileData?.profile?.role === 'admin' || profileData?.profile?.role === 'editor'
 
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingState type="dashboard" />
+      </div>
+    )
   }
 
   if (!hasPermission) {
+    if (profileData) {
+      router.push('/dashboard')
+    }
     return null
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
       <ContentEditor
         contentType={type as 'article' | 'case'}
         mode="create"
@@ -59,7 +51,11 @@ function NewContentForm() {
 
 export default function NewContentPage() {
   return (
-    <Suspense fallback={<div className="text-center py-12">Loading...</div>}>
+    <Suspense fallback={
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingState type="dashboard" />
+      </div>
+    }>
       <NewContentForm />
     </Suspense>
   )

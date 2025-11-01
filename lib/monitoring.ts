@@ -111,3 +111,25 @@ export function addBreadcrumb(message: string, category: string, data?: Record<s
     })
   }
 }
+
+/**
+ * Log once per key to prevent spam
+ * Uses in-memory map (server-side) or sessionStorage (client-side)
+ */
+const loggedKeys = new Set<string>()
+
+export function logOnce(key: string, level: 'warn' | 'error', message: string, data?: any): void {
+  if (loggedKeys.has(key)) {
+    return
+  }
+
+  loggedKeys.add(key)
+  
+  if (level === 'error') {
+    console.error(`[${key}]`, message, data || '')
+    captureMessage(message, 'error', { key, ...data })
+  } else {
+    console.warn(`[${key}]`, message, data || '')
+    captureMessage(message, 'warning', { key, ...data })
+  }
+}

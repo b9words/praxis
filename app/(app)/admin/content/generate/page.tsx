@@ -1,7 +1,6 @@
 import CurriculumGenerator from '@/components/admin/CurriculumGenerator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { requireRole } from '@/lib/auth/authorize'
 import { prisma } from '@/lib/prisma/server'
 import Link from 'next/link'
@@ -28,93 +27,81 @@ export default async function AdminGeneratePage() {
   })
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Curriculum Generator</h1>
-          <p className="mt-2 text-gray-600">Generate comprehensive curriculum content using AI</p>
-        </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/admin/content">← Back to Content</Link>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-medium text-gray-900 mb-2">Curriculum Generator</h1>
+            <p className="text-sm text-gray-600">Generate comprehensive curriculum content using AI</p>
+          </div>
+          <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
+            <Link href="/admin/content">Back to Content</Link>
           </Button>
         </div>
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Capital Allocation Curriculum</CardTitle>
-            <CardDescription>Complete 12-module program</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Modules</span>
-                <Badge variant="outline">12</Badge>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Total Lessons</span>
-                <Badge variant="outline">30</Badge>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span>Est. Content</span>
-                <Badge variant="outline">~180 pages</Badge>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white border border-gray-200 p-6">
+          <h3 className="text-base font-medium text-gray-900 mb-2">Capital Allocation Curriculum</h3>
+          <p className="text-xs text-gray-500 mb-4">Complete 12-module program</p>
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-600">Modules</span>
+              <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">12</Badge>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-600">Total Lessons</span>
+              <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">30</Badge>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-600">Est. Content</span>
+              <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">~180 pages</Badge>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">AI Features</CardTitle>
-            <CardDescription>Advanced content generation</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Mermaid Diagrams</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Data Tables</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Case Studies</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>Calculations</span>
-              </div>
+        <div className="bg-white border border-gray-200 p-6">
+          <h3 className="text-base font-medium text-gray-900 mb-2">AI Features</h3>
+          <p className="text-xs text-gray-500 mb-4">Advanced content generation</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>Mermaid Diagrams</span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>Data Tables</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>Case Studies</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>Calculations</span>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Pro Models Only</CardTitle>
-            <CardDescription>High-quality generation</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>GPT-4o</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span>GPT-4 Turbo</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>Gemini 1.5 Pro</span>
-              </div>
+        <div className="bg-white border border-gray-200 p-6">
+          <h3 className="text-base font-medium text-gray-900 mb-2">Pro Models Only</h3>
+          <p className="text-xs text-gray-500 mb-4">High-quality generation</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>GPT-4o</span>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>GPT-4 Turbo</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-600">
+              <div className="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>
+              <span>Gemini 1.5 Pro</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Generator Component */}

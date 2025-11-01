@@ -13,13 +13,15 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 import type { User } from '@supabase/supabase-js'
+import { useQuery } from '@tanstack/react-query'
 import { BarChart3, BookOpen, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -40,70 +42,13 @@ export default function Navbar({ user, profile }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
-  const [userProgress, setUserProgress] = useState<UserProgress | null>(null)
 
-  useEffect(() => {
-    async function fetchUserProgress() {
-      if (!user) return
-
-      try {
-        // Get user residency
-        const { data: residency, error: residencyError } = await supabase
-          .from('user_residency')
-          .select('current_residency')
-          .eq('user_id', user.id)
-          .maybeSingle()
-
-        // If no residency record exists, that's okay - user hasn't completed onboarding yet
-        if (residencyError && residencyError.code !== 'PGRST116') {
-          throw residencyError
-        }
-
-        if (!residency?.current_residency) {
-          setUserProgress(null)
-          return
-        }
-
-        // Get articles for current residency
-        const { data: articles } = await supabase
-          .from('articles')
-          .select('id, competency:competencies!inner(residency_year)')
-          .eq('competency.residency_year', residency.current_residency)
-          .eq('status', 'published')
-
-        // Get completed articles
-        const { data: completedArticles } = await supabase
-          .from('user_article_progress')
-          .select('article_id')
-          .eq('user_id', user.id)
-          .eq('status', 'completed')
-
-        // Get completed simulations
-        const { data: completedSimulations } = await supabase
-          .from('simulations')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('status', 'completed')
-
-        const totalArticles = articles?.length || 0
-        const articlesCompleted = completedArticles?.length || 0
-        const simulationsCompleted = completedSimulations?.length || 0
-        const progressPercentage = totalArticles > 0 ? Math.round((articlesCompleted / totalArticles) * 100) : 0
-
-        setUserProgress({
-          currentResidency: residency.current_residency,
-          articlesCompleted,
-          totalArticles,
-          simulationsCompleted,
-          progressPercentage
-        })
-      } catch (error) {
-        console.error('Failed to fetch user progress:', error)
-      }
-    }
-
-    fetchUserProgress()
-  }, [user, supabase])
+  // Fetch user progress with React Query
+  const { data: userProgress } = useQuery({
+    queryKey: queryKeys.user.progress(),
+    queryFn: ({ signal }) => fetchJson<UserProgress | null>('/api/user/progress', { signal }),
+    retry: false,
+  })
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -149,13 +94,13 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/dashboard" className="flex items-center">
-              <span className="text-2xl font-bold text-gray-900">Praxis</span>
+              <span className="text-xl font-semibold text-gray-900">Praxis</span>
               {userProgress?.currentResidency && (
-                <Badge variant="outline" className="ml-3 text-xs">
+                <Badge variant="outline" className="ml-3 text-xs font-medium text-gray-700 border-gray-300">
                   Year {userProgress.currentResidency}
                 </Badge>
               )}
@@ -167,10 +112,10 @@ export default function Navbar({ user, profile }: NavbarProps) {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`inline-flex items-center px-3 py-2 border-b-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    className={`inline-flex items-center px-3 py-2 border-b-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? 'border-blue-500 text-blue-600 bg-blue-50'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 hover:bg-gray-50'
+                        ? 'border-gray-900 text-gray-900 bg-gray-50'
+                        : 'border-transparent text-gray-600 hover:border-gray-300 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
                     <link.icon className="h-4 w-4 mr-2" />
@@ -188,7 +133,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                     key={link.href}
                     href={link.href}
                     className={`inline-flex items-center px-2 py-1 text-sm font-medium ${
-                      isActive ? 'text-blue-600' : 'text-gray-500'
+                      isActive ? 'text-gray-900' : 'text-gray-600'
                     }`}
                   >
                     <link.icon className="h-4 w-4" />

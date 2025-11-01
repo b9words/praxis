@@ -1,13 +1,16 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 export default function NewThreadPage() {
@@ -15,126 +18,125 @@ export default function NewThreadPage() {
   const params = useParams()
   const slug = params.slug as string
   const supabase = createClient()
+  const queryClient = useQueryClient()
 
-  const [loading, setLoading] = useState(false)
-  const [channel, setChannel] = useState<any>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
 
-  useEffect(() => {
-    async function loadChannel() {
-      // Fetch channel info from channels API
-      const response = await fetch(`/api/forum/channels`)
-      if (!response.ok) {
-        toast.error('Failed to load channel')
-        return
-      }
+  // Fetch channels to find current channel
+  const { data: channelsData, isLoading: channelsLoading } = useQuery({
+    queryKey: queryKeys.forum.channels(),
+    queryFn: ({ signal }) => fetchJson<{ channels: any[] }>('/api/forum/channels', { signal }),
+    retry: 2,
+  })
 
-      const { channels } = await response.json()
-      const channelData = channels?.find((c: any) => c.slug === slug)
-      if (channelData) {
-        setChannel(channelData)
-      } else {
-        // Fallback: use slug as name
-        setChannel({ slug, name: slug })
-      }
-    }
-    loadChannel()
-  }, [slug])
+  const channel = channelsData?.channels?.find((c: any) => c.slug === slug) || { slug, name: slug }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      toast.error('You must be logged in')
-      setLoading(false)
-      return
-    }
-
-    // Create thread using API route
-    const response = await fetch(`/api/forum/channels/${slug}/threads`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title,
-        content,
-      }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      toast.error(error.error || 'Failed to create thread')
-      setLoading(false)
-      return
-    }
-
-    toast.success('Thread created successfully')
-    router.push(`/community/${slug}`)
+  if (channelsLoading) {
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <LoadingSkeleton className="h-8 w-48 mb-2" />
+          <LoadingSkeleton className="h-4 w-96" />
+        </div>
+        <div className="bg-white border border-gray-200 p-6">
+          <LoadingSkeleton className="h-10 w-full mb-4" />
+          <LoadingSkeleton className="h-32 w-full" />
+        </div>
+      </div>
+    )
   }
 
+  const createThreadMutation = useMutation({
+    mutationFn: async (data: { title: string; content: string }) => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('You must be logged in')
+      return fetchJson(`/api/forum/channels/${slug}/threads`, {
+        method: 'POST',
+        body: data,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.forum.threads.byChannel(slug) })
+      toast.success('Thread created successfully')
+      router.push(`/community/${slug}`)
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to create thread')
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    createThreadMutation.mutate({ title, content })
+  }
+
+  const loading = createThreadMutation.isPending
+
   if (!channel) {
-    return <div className="text-center py-12">Loading...</div>
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingSkeleton className="h-4 w-32" />
+      </div>
+    )
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Open a New Thread</h1>
-        <p className="mt-2 text-gray-600">Start an analytical discussion</p>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">Open a New Thread</h1>
+        <p className="text-sm text-gray-600">Start an analytical discussion</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Thread</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="What's your thread about?"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="mt-1"
-              />
-            </div>
+      <div className="max-w-3xl">
+        <div className="bg-white border border-gray-200">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Create Thread</h2>
+          </div>
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  type="text"
+                  placeholder="Thread title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="mt-1 rounded-none"
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                placeholder="Share your thoughts..."
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-               
-            
-                required
-                className="mt-1"
-              />
-            </div>
+              <div>
+                <Label htmlFor="content">Content</Label>
+                <Textarea
+                  id="content"
+                  placeholder="Share your analytical insights..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  required
+                  className="mt-1 rounded-none"
+                />
+              </div>
 
-            <div className="flex justify-between pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push(`/community/${slug}`)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={loading || !title || !content}>
-                {loading ? 'Opening thread...' : 'Open Thread'}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push(`/community/${slug}`)}
+                  className="border-gray-300 hover:border-gray-400 rounded-none"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading || !title || !content} className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+                  {loading ? 'Opening thread...' : 'Open Thread'}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,14 +1,25 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { isMissingTable } from '@/lib/api/route-helpers'
+import { ensureProfileExists } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
+import { ensureNotificationsTable } from '@/lib/db/schemaGuard'
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * GET /api/notifications
  * Get user's notifications
+ * Soft-fails: returns empty arrays if profile missing or table missing
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const user = await getCurrentUser()
+    
+    if (!user) {
+      return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
+    }
+
+    // Ensure profile exists (non-blocking)
+    await ensureProfileExists(user.id, user.email || undefined)
 
     const { searchParams } = new URL(request.url)
     const read = searchParams.get('read')
@@ -22,34 +33,69 @@ export async function GET(request: NextRequest) {
       where.read = read === 'true'
     }
 
-    const notifications = await prisma.notification.findMany({
-      where,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: limit,
-    })
+    try {
+      const notifications = await prisma.notification.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+      })
 
-    const unreadCount = await prisma.notification.count({
-      where: {
-        userId: user.id,
-        read: false,
-      },
-    })
+      const unreadCount = await prisma.notification.count({
+        where: {
+          userId: user.id,
+          read: false,
+        },
+      })
 
-    return NextResponse.json({ 
-      notifications,
-      unreadCount,
-    })
+      return NextResponse.json({ 
+        notifications,
+        unreadCount,
+      })
+    } catch (error: any) {
+      // Handle missing table (P2021)
+      if (isMissingTable(error)) {
+        // In dev, try to create the table
+        if (process.env.NODE_ENV === 'development') {
+          await ensureNotificationsTable()
+          
+          // Retry once after creating table
+          try {
+            const notifications = await prisma.notification.findMany({
+              where,
+              orderBy: {
+                createdAt: 'desc',
+              },
+              take: limit,
+            })
+
+            const unreadCount = await prisma.notification.count({
+              where: {
+                userId: user.id,
+                read: false,
+              },
+            })
+
+            return NextResponse.json({ 
+              notifications,
+              unreadCount,
+            })
+          } catch (retryError) {
+            // Still failed, return defaults
+            return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
+          }
+        }
+        
+        // Non-dev or retry failed: return empty arrays
+        return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
+      }
+      
+      // Other errors: return empty arrays
+      return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
+    }
   } catch (error) {
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
-    }
-    if (error instanceof Error && error.message === 'Profile not found') {
-      return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
-    }
-    console.error('Error fetching notifications:', error)
-    // Return empty array instead of 500 to prevent refresh loops
+    // Always return 200 with empty arrays - never crash
     return NextResponse.json({ notifications: [], unreadCount: 0 }, { status: 200 })
   }
 }
@@ -65,7 +111,16 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { userId, type, title, message, link, metadata } = body
 
-    const currentUser = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    // Ensure profile exists
+    await ensureProfileExists(user.id, user.email || undefined)
+    const currentUser = { id: user.id, role: 'member' as const }
 
     // If creating for another user, require admin role
     if (userId && userId !== currentUser.id) {
@@ -95,12 +150,17 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ notification }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error creating notification:', error)
-    return NextResponse.json({ error: 'Failed to create notification' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -110,14 +170,22 @@ export async function POST(request: NextRequest) {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const user = await getCurrentUser()
+    
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
+    // Ensure profile exists
+    await ensureProfileExists(user.id, user.email || undefined)
+    const authUser = { id: user.id, role: 'member' as const }
     const body = await request.json()
     const { notificationIds, markAllAsRead } = body
 
     if (markAllAsRead) {
       await prisma.notification.updateMany({
         where: {
-          userId: user.id,
+          userId: authUser.id,
           read: false,
         },
         data: {
@@ -138,7 +206,7 @@ export async function PATCH(request: NextRequest) {
     await prisma.notification.updateMany({
       where: {
         id: { in: notificationIds },
-        userId: user.id, // Ensure user can only update their own notifications
+        userId: authUser.id, // Ensure user can only update their own notifications
       },
       data: {
         read: true,
@@ -146,11 +214,16 @@ export async function PATCH(request: NextRequest) {
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating notifications:', error)
-    return NextResponse.json({ error: 'Failed to update notifications' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }

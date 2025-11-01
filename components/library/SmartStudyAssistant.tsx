@@ -3,8 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface SmartStudyAssistantProps {
   articleId: string
@@ -13,48 +16,44 @@ interface SmartStudyAssistantProps {
 export default function SmartStudyAssistant({ articleId }: SmartStudyAssistantProps) {
   const [question, setQuestion] = useState('')
   const [conversation, setConversation] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([])
-  const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
-  const handleAsk = async () => {
+  const askMutation = useMutation({
+    mutationFn: async (userQuestion: string) => {
+      const session = await supabase.auth.getSession()
+      return fetchJson<{ answer: string }>('/api/ai/study-assistant', {
+        method: 'POST',
+        body: {
+          articleId,
+          userQuestion,
+        },
+        headers: {
+          Authorization: `Bearer ${session.data.session?.access_token}`,
+        },
+      })
+    },
+    onSuccess: (data, userQuestion) => {
+      setConversation(prev => [...prev, { role: 'assistant', content: data.answer }])
+    },
+    onError: (error) => {
+      setConversation(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      }])
+      toast.error(error instanceof Error ? error.message : 'Failed to get answer')
+    },
+  })
+
+  const handleAsk = () => {
     if (!question.trim()) return
 
-    setLoading(true)
     const userQuestion = question
     setQuestion('')
     setConversation(prev => [...prev, { role: 'user', content: userQuestion }])
-
-    try {
-      const session = await supabase.auth.getSession()
-      
-      const response = await fetch('/api/ai/study-assistant', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.data.session?.access_token}`,
-        },
-        body: JSON.stringify({
-          articleId,
-          userQuestion,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to get answer')
-      }
-
-      const { answer } = await response.json()
-      setConversation(prev => [...prev, { role: 'assistant', content: answer }])
-    } catch (error) {
-      console.error('Error asking study assistant:', error)
-      setConversation(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I encountered an error. Please try again.' 
-      }])
-    } finally {
-      setLoading(false)
-    }
+    askMutation.mutate(userQuestion)
   }
+
+  const loading = askMutation.isPending
 
   return (
     <div className="space-y-4">

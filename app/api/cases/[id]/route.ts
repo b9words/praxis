@@ -40,8 +40,10 @@ export async function GET(
 
     return NextResponse.json({ case: caseItem })
   } catch (error) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error fetching case:', error)
-    return NextResponse.json({ error: 'Failed to fetch case' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -53,6 +55,15 @@ export async function PUT(
     const user = await requireRole(['editor', 'admin'])
     const { id } = await params
     const body = await request.json()
+
+    // Check if case exists before updating
+    const existing = await prisma.case.findUnique({
+      where: { id },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Case not found' }, { status: 404 })
+    }
 
     const { competencyIds, ...updateData } = body
 
@@ -91,12 +102,22 @@ export async function PUT(
     })
 
     return NextResponse.json({ case: caseItem })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Case not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating case:', error)
-    return NextResponse.json({ error: 'Failed to update case' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -108,17 +129,36 @@ export async function DELETE(
     await requireRole(['admin'])
     const { id } = await params
 
+    // Check if case exists before deleting
+    const existing = await prisma.case.findUnique({
+      where: { id },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Case not found' }, { status: 404 })
+    }
+
     await prisma.case.delete({
       where: { id },
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Case not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error deleting case:', error)
-    return NextResponse.json({ error: 'Failed to delete case' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

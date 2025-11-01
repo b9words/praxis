@@ -41,14 +41,19 @@ export default function ProgressTracker({
   // Circuit breaker: disable progress tracking after 3 consecutive failures
   const MAX_FAILURES = 3
 
+  // Use refs to track state without causing re-renders
+  const isSavingRef = useRef(false)
+  const isDisabledRef = useRef(false)
+  const failureCountRef = useRef(0)
+
   const saveProgress = useCallback(async (
     progressValue: number,
     statusValue: 'not_started' | 'in_progress' | 'completed',
     timeValue?: number
   ) => {
-    if (isSaving || isDisabled) return
+    if (isSavingRef.current || isDisabledRef.current) return
 
-    setIsSaving(true)
+    isSavingRef.current = true
     
     try {
       const result = await saveLessonProgress({
@@ -66,43 +71,55 @@ export default function ProgressTracker({
       
       // Reset failure count on success
       if (result.success && result.data) {
+        failureCountRef.current = 0
         setFailureCount(0)
       } else if (!result.success) {
         // Increment failure count
-        const newFailureCount = failureCount + 1
+        const newFailureCount = failureCountRef.current + 1
+        failureCountRef.current = newFailureCount
         setFailureCount(newFailureCount)
         
         // Disable after max failures
         if (newFailureCount >= MAX_FAILURES) {
+          isDisabledRef.current = true
           setIsDisabled(true)
           console.debug('Progress tracking disabled after repeated failures')
         }
       }
     } catch (error) {
       // Increment failure count on error
-      const newFailureCount = failureCount + 1
+      const newFailureCount = failureCountRef.current + 1
+      failureCountRef.current = newFailureCount
       setFailureCount(newFailureCount)
       
       // Disable after max failures
       if (newFailureCount >= MAX_FAILURES) {
+        isDisabledRef.current = true
         setIsDisabled(true)
         console.debug('Progress tracking disabled after repeated failures')
       } else {
         console.debug('Progress save failed (this is normal for users without profiles):', error)
       }
     } finally {
+      isSavingRef.current = false
       setIsSaving(false)
     }
-  }, [domainId, moduleId, lessonId, isSaving, isDisabled, failureCount])
+  }, [domainId, moduleId, lessonId])
+
+  const statusRef = useRef<'not_started' | 'in_progress' | 'completed'>(status)
+  useEffect(() => {
+    statusRef.current = status
+  }, [status])
 
   const handleComplete = useCallback(async () => {
-    if (status === 'completed') return
+    if (statusRef.current === 'completed') return
 
     try {
       const result = await markLessonAsCompleted(domainId, moduleId, lessonId)
       if (result.success) {
         setStatus('completed')
         setProgress(100)
+        statusRef.current = 'completed'
         
         // Track lesson completion
         trackEvents.lessonCompleted(lessonId, domainId, moduleId, userId)
@@ -113,7 +130,10 @@ export default function ProgressTracker({
       console.error('Error marking lesson as completed:', error)
       toast.error('Failed to mark lesson as completed')
     }
-  }, [domainId, moduleId, lessonId, status, userId])
+  }, [domainId, moduleId, lessonId, userId])
+
+  // Track last saved progress to avoid unnecessary saves
+  const lastSavedProgressRef = useRef(initialProgress)
 
   // Calculate scroll progress
   useEffect(() => {
@@ -135,38 +155,52 @@ export default function ProgressTracker({
       return Math.round(scrollProgress)
     }
 
+    let lastProgressValue = initialProgress
+
     const handleScroll = () => {
       const newProgress = calculateProgress()
-      setProgress((prev) => {
-        // Auto-complete if scrolled 80%+ and reading for 2+ minutes
-        if (newProgress >= 80 && status !== 'completed') {
-          const timeReading = (Date.now() - startTimeRef.current) / 1000
-          if (timeReading >= 120) {
-            // Auto-mark as completed
-            handleComplete()
-          } else if (status === 'not_started') {
+      const currentStatus = statusRef.current
+      
+      // Only update state if progress changed significantly (5%)
+      if (Math.abs(newProgress - lastProgressValue) >= 5) {
+        setProgress((prev) => {
+          // Auto-complete if scrolled 80%+ and reading for 2+ minutes
+          if (newProgress >= 80 && currentStatus !== 'completed') {
+            const timeReading = (Date.now() - startTimeRef.current) / 1000
+            if (timeReading >= 120) {
+              // Auto-mark as completed
+              handleComplete()
+            } else if (currentStatus === 'not_started') {
+              setStatus('in_progress')
+              statusRef.current = 'in_progress'
+            }
+          } else if (newProgress > 0 && currentStatus === 'not_started') {
             setStatus('in_progress')
+            statusRef.current = 'in_progress'
           }
-        } else if (newProgress > 0 && status === 'not_started') {
-          setStatus('in_progress')
+          lastProgressValue = newProgress
+          return newProgress
+        })
+
+        // Debounce save (save every 5 seconds) - only if progress changed meaningfully from last saved
+        if (Math.abs(newProgress - lastSavedProgressRef.current) >= 10) {
+          if (saveTimeoutRef.current) {
+            clearTimeout(saveTimeoutRef.current)
+          }
+
+          saveTimeoutRef.current = setTimeout(() => {
+            if (!isSavingRef.current && !isDisabledRef.current) {
+              saveProgress(newProgress, statusRef.current)
+              lastSavedProgressRef.current = newProgress
+            }
+          }, 5000) // Increased debounce to 5 seconds
         }
-        return newProgress
-      })
-
-      // Debounce save (save every 3 seconds)
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current)
       }
-
-      saveTimeoutRef.current = setTimeout(() => {
-        saveProgress(newProgress, 'in_progress')
-      }, 3000)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     
-    // Initial calculation
-    handleScroll()
+    // Don't trigger initial calculation - wait for actual scroll
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
@@ -174,43 +208,53 @@ export default function ProgressTracker({
         clearTimeout(saveTimeoutRef.current)
       }
     }
-  }, [status, saveProgress, handleComplete])
+  }, [saveProgress, handleComplete])
+
+  // Track progress with ref to avoid dependency issues
+  const progressRef = useRef(initialProgress)
+  useEffect(() => {
+    progressRef.current = progress
+  }, [progress])
 
   // Track reading time
   useEffect(() => {
-    // Update time spent every 10 seconds
+    // Update time spent every 30 seconds (reduced frequency)
     intervalRef.current = setInterval(() => {
       const elapsed = (Date.now() - startTimeRef.current) / 1000
-      const currentProgress = progress
-      const currentStatus = status
+      const currentProgress = progressRef.current
+      const currentStatus = statusRef.current
       const newTimeSpent = initialTimeSpent + elapsed
 
-      // Only save if at least 10 seconds have passed since last save
-      if (Date.now() - lastSaveTimeRef.current >= 10000) {
+      // Only save if at least 30 seconds have passed since last save
+      if (Date.now() - lastSaveTimeRef.current >= 30000) {
         setTimeSpent(newTimeSpent)
         saveProgress(currentProgress, currentStatus, newTimeSpent)
         lastSaveTimeRef.current = Date.now()
       }
-    }, 10000)
+    }, 30000) // Check every 30 seconds
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
     }
-  }, [progress, status, initialTimeSpent, saveProgress])
+  }, [initialTimeSpent, saveProgress])
 
-  // Save progress on unmount
+  // Save progress on unmount - use refs to avoid dependency issues
   useEffect(() => {
     return () => {
-      const currentStatus = status
-      const currentProgress = progress
-      if (currentStatus !== 'completed') {
+      const currentStatus = statusRef.current
+      const currentProgress = progressRef.current
+      if (currentStatus !== 'completed' && !isDisabledRef.current && !isSavingRef.current) {
         const finalTimeSpent = initialTimeSpent + (Date.now() - startTimeRef.current) / 1000
-        saveProgress(currentProgress, currentStatus, finalTimeSpent)
+        // Use a one-time save without await
+        saveProgress(currentProgress, currentStatus, finalTimeSpent).catch(() => {
+          // Silently fail on unmount
+        })
       }
     }
-  }, [status, progress, initialTimeSpent, saveProgress])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Resume reading position on mount if exists
   useEffect(() => {

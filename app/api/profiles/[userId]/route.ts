@@ -29,7 +29,13 @@ export async function GET(
     }
 
     // Check if profile is public or user is viewing their own profile
-    const currentUser = await requireAuth().catch(() => null)
+    let currentUser = null
+    try {
+      const { requireAuth } = await import('@/lib/auth/authorize')
+      currentUser = await requireAuth()
+    } catch {
+      // User not authenticated, that's OK
+    }
     const isOwnProfile = currentUser && currentUser.id === userId
 
     if (!profile.isPublic && !isOwnProfile) {
@@ -38,8 +44,10 @@ export async function GET(
 
     return NextResponse.json({ profile })
   } catch (error) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error fetching profile:', error)
-    return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -85,8 +93,10 @@ export async function PUT(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error updating profile:', error)
-    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -128,8 +138,10 @@ export async function PATCH(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error updating profile:', error)
-    return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

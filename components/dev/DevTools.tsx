@@ -4,83 +4,81 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 export default function DevTools() {
   const [isOpen, setIsOpen] = useState(true)
   const [isMinimized, setIsMinimized] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
-  const [isDev, setIsDev] = useState(false)
+  const queryClient = useQueryClient()
   const supabase = createClient()
   const router = useRouter()
 
-  useEffect(() => {
-    // Only show in development
-    setIsDev(process.env.NODE_ENV === 'development')
-    
-    async function loadUser() {
+  const isDev = process.env.NODE_ENV === 'development'
+
+  // Fetch user
+  const { data: userData } = useQuery({
+    queryKey: ['dev', 'user'],
+    queryFn: async ({ signal }) => {
       const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single()
-        setProfile(data)
-      }
-    }
-    
-    loadUser()
+      return user
+    },
+    retry: false,
+    enabled: isDev,
+  })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      loadUser()
-    })
+  const user = userData || null
 
-    return () => subscription.unsubscribe()
-  }, [supabase])
+  // Fetch profile - use /api/auth/profile for self-reads
+  const { data: profileData } = useQuery({
+    queryKey: user ? queryKeys.profiles.byId(user.id) : ['dev', 'profile', 'none'],
+    queryFn: ({ signal }) =>
+      fetchJson<{ profile: any }>('/api/auth/profile', { signal }),
+    enabled: !!user && isDev,
+  })
 
-  if (!isDev) return null
+  const profile = profileData?.profile || null
 
-  const quickLogin = async (email: string, password: string, username: string, role?: 'member' | 'editor' | 'admin') => {
-    try {
-      // First, try to use the dev auth bypass API (bypasses rate limits and email confirmation)
-      const response = await fetch('/api/dev/auth-bypass', {
+  // Dev tools mutations
+  const devToolsMutation = useMutation({
+    mutationFn: ({ action, ...params }: { action: string; [key: string]: any }) =>
+      fetchJson('/api/dev/tools', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+        body: { action, ...params },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dev', 'user'] })
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.profiles.byId(user.id) })
+      }
+      router.refresh()
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Operation failed')
+    },
+  })
+
+  const quickLoginMutation = useMutation({
+    mutationFn: ({ email, password, username, role }: { email: string; password: string; username: string; role?: string }) =>
+      fetchJson('/api/dev/auth-bypass', {
+        method: 'POST',
+        body: {
           email,
           password,
           username,
           fullName: username.charAt(0).toUpperCase() + username.slice(1),
           role: role || 'member',
-        }),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        // Display error with hint if available
-        const errorMsg = result.error || 'Failed to create/update user'
-        const hintMsg = result.hint ? `\n\n${result.hint}` : ''
-        toast.error(errorMsg + hintMsg, {
-          duration: 10000, // Show for 10 seconds to give time to read
-        })
-        return
-      }
-
-      // Since the user is created/updated with email confirmed via admin API,
-      // we can sign in with password immediately (no magic link needed)
+        },
+      }),
+    onSuccess: async (_, variables) => {
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: variables.email,
+        password: variables.password,
       })
 
       if (signInError || !signInData.session) {
@@ -88,117 +86,109 @@ export default function DevTools() {
         return
       }
 
-      toast.success(`Logged in as ${username}`)
-      // Explicitly navigate to dashboard after successful login
+      queryClient.invalidateQueries({ queryKey: ['dev', 'user'] })
+      toast.success(`Logged in as ${variables.username}`)
       router.push('/dashboard')
       router.refresh()
-    } catch (error: any) {
-      toast.error('Login failed: ' + (error.message || 'Unknown error'))
-    }
+    },
+    onError: (error: any) => {
+      const errorMsg = error.message || 'Failed to create/update user'
+      toast.error(errorMsg, { duration: 10000 })
+    },
+  })
+
+  const quickLogin = (email: string, password: string, username: string, role?: 'member' | 'editor' | 'admin') => {
+    quickLoginMutation.mutate({ email, password, username, role })
   }
 
-  const changeRole = async (newRole: 'member' | 'editor' | 'admin') => {
+  const changeRole = (newRole: 'member' | 'editor' | 'admin') => {
     if (!user) {
       toast.error('No user logged in')
       return
     }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: newRole })
-      .eq('id', user.id)
-
-    if (error) {
-      toast.error('Failed to change role')
-      return
-    }
-
-    toast.success(`Role changed to ${newRole}`)
-    router.refresh()
+    devToolsMutation.mutate({ action: 'updateRole', role: newRole }, {
+      onSuccess: () => {
+        toast.success(`Role changed to ${newRole}`)
+      },
+    })
   }
 
-  const clearSimulations = async () => {
+  const clearSimulations = () => {
     if (!user) {
       toast.error('No user logged in')
       return
     }
-
-    const { error } = await supabase
-      .from('simulations')
-      .delete()
-      .eq('user_id', user.id)
-
-    if (error) {
-      toast.error('Failed to clear simulations')
-      return
-    }
-
-    toast.success('All simulations cleared')
-    router.refresh()
+    devToolsMutation.mutate({ action: 'clearSimulations' }, {
+      onSuccess: () => {
+        toast.success('All simulations cleared')
+      },
+    })
   }
 
-  const togglePublicProfile = async () => {
+  const togglePublicProfile = () => {
     if (!user || !profile) {
       toast.error('No user logged in')
       return
     }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_public: !profile.is_public })
-      .eq('id', user.id)
-
-    if (error) {
-      toast.error('Failed to toggle profile visibility')
-      return
-    }
-
-    toast.success(`Profile is now ${!profile.is_public ? 'public' : 'private'}`)
-    setProfile({ ...profile, is_public: !profile.is_public })
-    router.refresh()
+    devToolsMutation.mutate({ action: 'toggleProfileVisibility' }, {
+      onSuccess: (data: any) => {
+        toast.success(`Profile is now ${data.isPublic ? 'public' : 'private'}`)
+      },
+    })
   }
 
   const logout = async () => {
     await supabase.auth.signOut()
+    queryClient.clear()
     toast.success('Logged out')
     router.push('/')
     router.refresh()
   }
 
-  const seedTestThread = async () => {
+  const seedTestThread = () => {
     if (!user) {
       toast.error('No user logged in')
       return
     }
-
-    const { data: channel } = await supabase
-      .from('forum_channels')
-      .select('*')
-      .limit(1)
-      .single()
-
-    if (!channel) {
-      toast.error('No channels found')
-      return
-    }
-
-    const { error } = await supabase
-      .from('forum_threads')
-      .insert({
-        channel_id: channel.id,
-        author_id: user.id,
-        title: 'Test Thread - ' + new Date().toLocaleTimeString(),
-        content: 'This is a test thread created by DevTools',
-      })
-
-    if (error) {
-      toast.error('Failed to create test thread')
-      return
-    }
-
-    toast.success('Test thread created')
-    router.refresh()
+    devToolsMutation.mutate({ action: 'createTestThread' }, {
+      onSuccess: () => {
+        toast.success('Test thread created')
+      },
+    })
   }
+
+  const seedComprehensive = () => {
+    if (!user) {
+      toast.error('No user logged in')
+      return
+    }
+    devToolsMutation.mutate({ action: 'seedComprehensive' }, {
+      onSuccess: (data: any) => {
+        const results = data.results || {}
+        const errors = results.errors || []
+        
+        if (errors.length > 0) {
+          toast.warning(
+            `Seed completed with ${errors.length} error(s). Created: ${results.simulations} simulations, ${results.debriefs} debriefs, ${results.articleProgress} article progress, ${results.notifications} notifications, ${results.threads} threads, ${results.posts} posts. Check console for details.`,
+            { duration: 10000 }
+          )
+          console.warn('Seed errors:', errors)
+        } else {
+          toast.success(
+            `Comprehensive seed completed! Created: ${results.simulations} simulations, ${results.debriefs} debriefs, ${results.articleProgress} article progress, ${results.notifications} notifications, ${results.threads} threads, ${results.posts} posts`,
+            { duration: 8000 }
+          )
+        }
+        router.refresh()
+      },
+      onError: (error: any) => {
+        toast.error(error.message || 'Failed to seed data', { duration: 10000 })
+      },
+    })
+  }
+
+  // Early return AFTER all hooks are declared
+  if (!isDev) return null
 
   return (
     <>
@@ -268,6 +258,7 @@ export default function DevTools() {
                           onClick={() => quickLogin('admin@praxis.test', 'admin123', 'admin', 'admin')}
                           variant="outline"
                           className="w-full"
+                          disabled={quickLoginMutation.isPending}
                         >
                           👑 Admin
                         </Button>
@@ -275,6 +266,7 @@ export default function DevTools() {
                           onClick={() => quickLogin('editor@praxis.test', 'editor123', 'editor', 'editor')}
                           variant="outline"
                           className="w-full"
+                          disabled={quickLoginMutation.isPending}
                         >
                           ✏️ Editor
                         </Button>
@@ -282,6 +274,7 @@ export default function DevTools() {
                           onClick={() => quickLogin('user@praxis.test', 'user123', 'testuser', 'member')}
                           variant="outline"
                           className="w-full"
+                          disabled={quickLoginMutation.isPending}
                         >
                           👤 User
                         </Button>
@@ -297,13 +290,13 @@ export default function DevTools() {
                         <div className="space-y-2">
                           <div className="flex items-center justify-between p-2 bg-green-50 rounded">
                             <span className="text-sm">
-                              <strong>{profile?.username || 'Loading...'}</strong>
+                              <strong>{profile?.username || user.email}</strong>
                               <br />
                               <span className="text-xs text-gray-600">{user.email}</span>
                             </span>
                             <Badge variant="outline">{profile?.role || 'member'}</Badge>
                           </div>
-                          <Button onClick={logout} variant="destructive" size="sm" className="w-full">
+                          <Button onClick={logout} variant="destructive" size="sm" className="w-full" disabled={quickLoginMutation.isPending}>
                             Logout
                           </Button>
                         </div>
@@ -326,6 +319,7 @@ export default function DevTools() {
                               onClick={() => changeRole('member')}
                               variant={profile?.role === 'member' ? 'default' : 'outline'}
                               size="sm"
+                              disabled={devToolsMutation.isPending}
                             >
                               Member
                             </Button>
@@ -333,6 +327,7 @@ export default function DevTools() {
                               onClick={() => changeRole('editor')}
                               variant={profile?.role === 'editor' ? 'default' : 'outline'}
                               size="sm"
+                              disabled={devToolsMutation.isPending}
                             >
                               Editor
                             </Button>
@@ -340,6 +335,7 @@ export default function DevTools() {
                               onClick={() => changeRole('admin')}
                               variant={profile?.role === 'admin' ? 'default' : 'outline'}
                               size="sm"
+                              disabled={devToolsMutation.isPending}
                             >
                               Admin
                             </Button>
@@ -355,8 +351,9 @@ export default function DevTools() {
                                 onClick={togglePublicProfile}
                                 variant="outline"
                                 size="sm"
+                                disabled={devToolsMutation.isPending}
                               >
-                                {profile?.is_public ? '🌍 Public' : '🔒 Private'}
+                                {profile?.isPublic ? '🌍 Public' : '🔒 Private'}
                               </Button>
                             </div>
                           </div>
@@ -392,12 +389,29 @@ export default function DevTools() {
                     {user ? (
                       <>
                         <div>
+                          <h3 className="font-semibold mb-3">✨ Comprehensive Seed</h3>
+                          <Button
+                            onClick={seedComprehensive}
+                            variant="default"
+                            size="sm"
+                            className="w-full bg-purple-600 hover:bg-purple-700"
+                            disabled={devToolsMutation.isPending}
+                          >
+                            {devToolsMutation.isPending ? 'Seeding...' : '🌱 Seed Full Platform Data'}
+                          </Button>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Creates simulations, debriefs, article progress, notifications, and community content for a complete demo experience
+                          </p>
+                        </div>
+
+                        <div>
                           <h3 className="font-semibold mb-3">Simulation Data</h3>
                           <Button
                             onClick={clearSimulations}
                             variant="destructive"
                             size="sm"
                             className="w-full"
+                            disabled={devToolsMutation.isPending}
                           >
                             Clear All Simulations
                           </Button>
@@ -413,6 +427,7 @@ export default function DevTools() {
                             variant="outline"
                             size="sm"
                             className="w-full"
+                            disabled={devToolsMutation.isPending}
                           >
                             Create Test Thread
                           </Button>

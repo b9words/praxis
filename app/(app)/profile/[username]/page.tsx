@@ -2,9 +2,9 @@ import PraxisRadarChart from '@/components/profile/PraxisRadarChart'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserAggregateScores } from '@/lib/database-functions'
+import { isEnumError } from '@/lib/prisma-enum-fallback'
 import { prisma } from '@/lib/prisma/server'
 import { Award, Calendar, Edit, Target, TrendingUp } from 'lucide-react'
 import { Metadata } from 'next'
@@ -74,15 +74,13 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   const isOwnProfile = currentUser?.id === profile.id
   if (!profile.isPublic && !isOwnProfile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="pt-6 text-center">
-            <p className="text-lg font-medium text-gray-900">This profile is private</p>
-            <p className="text-sm text-gray-600 mt-2">
-              This user has chosen to keep their profile private.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <div className="bg-white border border-gray-200 p-12 text-center">
+          <p className="text-base font-medium text-gray-900 mb-2">This profile is private</p>
+          <p className="text-sm text-gray-600">
+            This user has chosen to keep their profile private.
+          </p>
+        </div>
       </div>
     )
   }
@@ -90,25 +88,56 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   // Get aggregate scores
   const aggregateScores = await getUserAggregateScores(profile.id)
 
-  // Get completed simulations
-  const simulations = await prisma.simulation.findMany({
-    where: {
-      userId: profile.id,
-      status: 'completed',
-    },
-    include: {
-      case: {
-        select: {
-          title: true,
-        },
+  // Get completed simulations with enum fallback
+  let simulations: any[] = []
+  try {
+    simulations = await prisma.simulation.findMany({
+      where: {
+        userId: profile.id,
+        status: 'completed',
       },
-      debrief: true,
-    },
-    orderBy: {
-      completedAt: 'desc',
-    },
-    take: 10,
-  })
+      include: {
+        case: {
+          select: {
+            title: true,
+          },
+        },
+        debrief: true,
+      },
+      orderBy: {
+        completedAt: 'desc',
+      },
+      take: 10,
+    })
+  } catch (error: any) {
+    if (isEnumError(error)) {
+      // Fallback: query without status filter, filter by completedAt
+      try {
+        const allSimulations = await prisma.simulation.findMany({
+          where: {
+            userId: profile.id,
+          },
+          include: {
+            case: {
+              select: {
+                title: true,
+              },
+            },
+            debrief: true,
+          },
+          orderBy: {
+            completedAt: 'desc',
+          },
+          take: 10,
+        })
+        simulations = allSimulations.filter((s: any) => s.completedAt !== null)
+      } catch (fallbackError) {
+        console.error('Error fetching simulations (fallback):', fallbackError)
+      }
+    } else {
+      console.error('Error fetching simulations:', error)
+    }
+  }
 
   // Calculate statistics
   const totalSimulations = simulations.length
@@ -132,126 +161,123 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
-        {/* Profile Header */}
-        <Card className="border-2 border-blue-100 shadow-lg">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row md:items-start gap-6">
-              <Avatar className="h-24 w-24 border-4 border-white shadow-xl">
-                <AvatarImage src={profile.avatarUrl || undefined} />
-                <AvatarFallback className="text-2xl bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-                  {profile.username?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      {/* Profile Header */}
+      <div className="bg-white border border-gray-200 mb-12">
+        <div className="p-6">
+          <div className="flex flex-col md:flex-row md:items-start gap-6">
+            <Avatar className="h-20 w-20 border border-gray-300">
+              <AvatarImage src={profile.avatarUrl || undefined} />
+              <AvatarFallback className="text-lg bg-gray-100 text-gray-700">
+                {profile.username?.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
 
-              <div className="flex-1">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900">{profile.fullName || profile.username}'s Dossier</h1>
-                    <p className="text-gray-600">@{profile.username}</p>
-                    {profile.bio && <p className="mt-2 text-gray-700">{profile.bio}</p>}
-                  </div>
-                  {isOwnProfile && (
-                    <Button asChild variant="outline">
-                      <Link href="/profile/edit">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Update Dossier
-                      </Link>
-                    </Button>
-                  )}
+            <div className="flex-1">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+                <div>
+                  <h1 className="text-2xl font-medium text-gray-900 mb-1">{profile.fullName || profile.username}'s Dossier</h1>
+                  <p className="text-sm text-gray-600">@{profile.username}</p>
+                  {profile.bio && <p className="mt-3 text-sm text-gray-700">{profile.bio}</p>}
                 </div>
+                {isOwnProfile && (
+                  <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
+                    <Link href="/profile/edit">
+                      <Edit className="h-4 w-4 mr-2" />
+                      Update Dossier
+                    </Link>
+                  </Button>
+                )}
+              </div>
 
-                <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    Member since {memberSince}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Target className="h-4 w-4" />
-                    {totalSimulations} simulation{totalSimulations !== 1 ? 's' : ''} completed
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="h-4 w-4" />
-                    Avg Score: {averageScore.toFixed(1)}/5.0
-                  </div>
+              <div className="flex flex-wrap gap-6 text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  Member since {memberSince}
                 </div>
+                <div className="flex items-center gap-1">
+                  <Target className="h-3 w-3" />
+                  {totalSimulations} {totalSimulations === 1 ? 'engagement' : 'engagements'} completed
+                </div>
+                {totalSimulations > 0 && (
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    Average score: {averageScore.toFixed(1)}/5.0
+                  </div>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Praxis Profile */}
-        {aggregateScores && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Competency Matrix</CardTitle>
-              <CardDescription>Your competency scores across all completed simulations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <PraxisRadarChart data={aggregateScores} />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Completed Simulations */}
-        {simulations.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Engagement History</CardTitle>
-              <CardDescription>Your completed simulations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {simulations.map((sim) => {
-                  const debrief = sim.debrief
-                  let score = 0
-                  if (debrief && debrief.scores) {
-                    const scores = debrief.scores as any
-                    const scoreArray = Array.isArray(scores) ? scores : Object.values(scores)
-                    score = scoreArray.reduce((s: number, sc: any) => s + (sc.score || sc), 0) / scoreArray.length
-                  }
-
-                  return (
-                    <div
-                      key={sim.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900">{sim.case.title}</h3>
-                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                            <Award className="h-3 w-3 mr-1" />
-                            {score.toFixed(1)}/5.0
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-gray-500">
-                          Completed {sim.completedAt?.toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Button asChild variant="outline" size="sm">
-                        <Link href={`/debrief/${sim.id}`}>View Debrief</Link>
-                      </Button>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {simulations.length === 0 && (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No completed simulations yet</p>
-              <Button asChild className="mt-4">
-                <Link href="/simulations">Start Your First Simulation</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+          </div>
+        </div>
       </div>
+
+      {/* Competency Matrix */}
+      {aggregateScores && (
+        <div className="bg-white border border-gray-200 mb-12">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Competency Matrix</h2>
+            <p className="text-xs text-gray-500 mt-1">Competency scores across all completed engagements</p>
+          </div>
+          <div className="p-6">
+            <PraxisRadarChart data={aggregateScores} />
+          </div>
+        </div>
+      )}
+
+      {/* Engagement History */}
+      {simulations.length > 0 && (
+        <div className="bg-white border border-gray-200 mb-12">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Engagement History</h2>
+            <p className="text-xs text-gray-500 mt-1">Completed simulations</p>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {simulations.map((sim) => {
+              const debrief = sim.debrief
+              let score = 0
+              if (debrief && debrief.scores) {
+                const scores = debrief.scores as any
+                const scoreArray = Array.isArray(scores) ? scores : Object.values(scores)
+                score = scoreArray.reduce((s: number, sc: any) => s + (sc.score || sc), 0) / scoreArray.length
+              }
+
+              return (
+                <div
+                  key={sim.id}
+                  className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-base font-medium text-gray-900">{sim.case.title}</h3>
+                      <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
+                        <Award className="h-3 w-3 mr-1" />
+                        {score.toFixed(1)}/5.0
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Completed {sim.completedAt?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                  <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
+                    <Link href={`/debrief/${sim.id}`}>View Debrief</Link>
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {simulations.length === 0 && (
+        <div className="bg-white border border-gray-200 p-12 text-center">
+          <Target className="h-10 w-10 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-base font-medium text-gray-900 mb-2">No completed engagements</h3>
+          <p className="text-sm text-gray-600 mb-6">Complete your first simulation to build your engagement history</p>
+          <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            <Link href="/simulations">Deploy to Scenario</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

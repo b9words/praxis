@@ -1,6 +1,8 @@
 /**
  * Helper to handle Prisma enum errors gracefully
- * If enum doesn't exist in database, fall back to raw SQL or skip enum-dependent operations
+ * NOTE: Prisma schema has been updated to use String types instead of enums to match database TEXT columns.
+ * This fallback is kept as a safety net, but enum errors should no longer occur.
+ * If enum-related errors still appear, it indicates a mismatch between Prisma schema and database schema.
  */
 
 // Track logged errors to prevent spam

@@ -157,15 +157,17 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error in generate debrief API:', error)
     Sentry.addBreadcrumb({
       category: 'debrief',
       level: 'error',
       message: 'Debrief API error',
-      data: { error: error instanceof Error ? error.message : String(error) },
+      data: { error: error instanceof Error ? error.message : String(error), normalized },
     })
     Sentry.captureException(error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

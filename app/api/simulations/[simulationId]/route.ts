@@ -32,8 +32,10 @@ export async function GET(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error fetching simulation:', error)
-    return NextResponse.json({ error: 'Failed to fetch simulation' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -73,12 +75,22 @@ export async function PUT(
     })
 
     return NextResponse.json({ simulation })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating simulation:', error)
-    return NextResponse.json({ error: 'Failed to update simulation' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -118,11 +130,21 @@ export async function PATCH(
     })
 
     return NextResponse.json({ simulation })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating simulation:', error)
-    return NextResponse.json({ error: 'Failed to update simulation' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }

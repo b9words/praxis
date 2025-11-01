@@ -1,9 +1,10 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { useCaseFile } from '@/hooks/useCaseFile'
-import { AlertCircle, Building2, FileText, Loader2, TrendingUp } from 'lucide-react'
+import { AlertCircle, Building2, FileText, TrendingUp } from 'lucide-react'
 import Papa from 'papaparse'
 import { useState } from 'react'
 
@@ -45,20 +46,19 @@ export default function DocumentViewerBlock({
     if (file.isLoading) {
       return (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-          <span className="ml-2 text-neutral-600">Loading document...</span>
+          <LoadingSkeleton className="h-32 w-full" />
         </div>
       )
     }
 
     if (file.error) {
       return (
-        <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-none">
           <div className="flex items-center gap-2 mb-2">
-            <AlertCircle className="h-4 w-4" />
-            <span className="font-medium">Error Loading Document</span>
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <span className="text-sm font-medium text-red-900">Error Loading Document</span>
           </div>
-          <p className="text-sm">{file.error}</p>
+          <p className="text-xs text-red-700">{file.error}</p>
         </div>
       )
     }
@@ -221,8 +221,7 @@ export default function DocumentViewerBlock({
                         </div>
                         {file.isLoading && (
                           <div className="flex items-center gap-1 mt-1">
-                            <Loader2 className="h-3 w-3 animate-spin text-neutral-400" />
-                            <span className="text-xs text-neutral-400">Loading...</span>
+                            <LoadingSkeleton className="h-3 w-16" />
                           </div>
                         )}
                       </div>

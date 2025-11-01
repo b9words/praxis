@@ -3,91 +3,76 @@
 import RecommendedReading from '@/components/debrief/RecommendedReading'
 import ScoreReveal from '@/components/debrief/ScoreReveal'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { motion } from 'framer-motion'
-import { Award, Share2, Sparkles, TrendingUp, Trophy } from 'lucide-react'
+import ErrorState from '@/components/ui/error-state'
+import { LoadingState } from '@/components/ui/loading-skeleton'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useQuery } from '@tanstack/react-query'
+import { Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function DebriefPage({ params }: { params: Promise<{ simulationId: string }> }) {
   const [simulationId, setSimulationId] = useState<string>('')
-  const [simulation, setSimulation] = useState<any>(null)
-  const [debrief, setDebrief] = useState<any>(null)
-  const [recommendedArticles, setRecommendedArticles] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
   const [showScores, setShowScores] = useState(false)
 
+  // Resolve params
   useEffect(() => {
-    async function fetchData() {
-      try {
-        // Get simulationId from params
-        const resolvedParams = await params
-        const simId = resolvedParams.simulationId
-        setSimulationId(simId)
-
-        // Fetch debrief using API route
-        const response = await fetch(`/api/debriefs/${simId}`)
-        if (!response.ok) {
-          throw new Error('Debrief not found')
-        }
-
-        const { debrief: debriefData } = await response.json()
-
-        // Extract simulation and case data from debrief
-        const simulationData = debriefData.simulation
-        const caseData = simulationData?.case
-
-        // Get recommended articles based on weak areas
-        const scores = debriefData.scores as any[]
-        const weakCompetencies = scores
-          .filter((s: any) => (s.score || s) < 3)
-          .map((s: any) => s.competencyName || s.competency)
-          .filter(Boolean)
-
-        let formattedArticles: any[] = []
-        if (weakCompetencies.length > 0) {
-          // Fetch articles for weak competencies
-          const articlesResponse = await fetch(`/api/articles?status=published`)
-          if (articlesResponse.ok) {
-            const { articles } = await articlesResponse.json()
-            const filteredArticles = articles
-              .filter((article: any) => {
-                const competencyName = article.competency?.name?.toLowerCase() || ''
-                return weakCompetencies.some((wc: string) =>
-                  competencyName.includes(wc.toLowerCase())
-                )
-              })
-              .slice(0, 3)
-              .map((article: any) => ({
-                id: article.id,
-                title: article.title,
-                competencyName: article.competency?.name || 'Unknown',
-                reason: `Strengthen your ${article.competency?.name || 'this'} knowledge based on your simulation performance`,
-              }))
-            formattedArticles = filteredArticles
-          }
-        }
-
-        setSimulation({
-          ...simulationData,
-          case: caseData,
-        })
-        setDebrief(debriefData)
-        setRecommendedArticles(formattedArticles)
-        setLoading(false)
-
-        // Start score reveal animation after 2 seconds
-        setTimeout(() => setShowScores(true), 2000)
-      } catch (error) {
-        console.error('Error fetching debrief:', error)
-        toast.error('Failed to load debrief')
-        setLoading(false)
-      }
+    async function resolveParams() {
+      const resolved = await params
+      setSimulationId(resolved.simulationId)
     }
-
-    fetchData()
+    resolveParams()
   }, [params])
+
+  // Fetch debrief
+  const { data: debriefData, isLoading: debriefLoading, error: debriefError } = useQuery({
+    queryKey: queryKeys.debriefs.bySimulation(simulationId),
+    queryFn: ({ signal }) => fetchJson<{ debrief: any }>(`/api/debriefs/${simulationId}`, { signal }),
+    enabled: !!simulationId,
+    retry: 2,
+  })
+
+  // Fetch articles
+  const { data: articlesData, error: articlesError } = useQuery({
+    queryKey: queryKeys.articles.published(),
+    queryFn: ({ signal }) => fetchJson<{ articles: any[] }>('/api/articles?status=published', { signal }),
+    enabled: !!simulationId && !!debriefData,
+    retry: 2,
+  })
+
+  // Process data
+  const debrief = debriefData?.debrief
+  const simulation = debrief?.simulation
+  const scores = (debrief?.scores as any[]) || []
+
+  // Compute recommended articles
+  const weakCompetencies = scores
+    .filter((s: any) => (s.score || s) < 3)
+    .map((s: any) => s.competencyName || s.competency)
+    .filter(Boolean)
+
+  const recommendedArticles =
+    articlesData?.articles
+      ?.filter((article: any) => {
+        const competencyName = article.competency?.name?.toLowerCase() || ''
+        return weakCompetencies.some((wc: string) => competencyName.includes(wc.toLowerCase()))
+      })
+      .slice(0, 3)
+      .map((article: any) => ({
+        id: article.id,
+        title: article.title,
+        competencyName: article.competency?.name || 'Unknown',
+        reason: `Strengthen your ${article.competency?.name || 'this'} knowledge based on your simulation performance`,
+      })) || []
+
+  // Start score reveal animation
+  useEffect(() => {
+    if (debrief && !showScores) {
+      setTimeout(() => setShowScores(true), 2000)
+    }
+  }, [debrief, showScores])
 
   const shareDebrief = async () => {
     try {
@@ -98,132 +83,113 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
     }
   }
 
-  if (loading) {
+  if (debriefLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-center space-y-4">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className="text-blue-600 mx-auto"
-          >
-            <Sparkles className="h-12 w-12" />
-          </motion.div>
-          <p className="text-sm text-gray-600">Processing simulation data...</p>
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <div className="mb-8">
+          <LoadingState type="dashboard" />
         </div>
+      </div>
+    )
+  }
+
+  if (debriefError) {
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <ErrorState
+          title="Failed to load debrief"
+          message="Unable to load the simulation debrief. Please try again."
+          error={debriefError}
+          onRetry={() => window.location.reload()}
+          showBackToDashboard={true}
+        />
       </div>
     )
   }
 
   if (!simulation || !debrief) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="pt-6 text-center">
-            <p className="text-lg font-medium text-gray-900">Debrief not found</p>
-            <p className="text-sm text-gray-600 mt-2">This simulation may not be completed yet</p>
-            <Button asChild className="mt-4">
-              <Link href="/dashboard">Back to Dashboard</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <ErrorState
+          title="Debrief not found"
+          message="This simulation may not be completed yet or the debrief data is unavailable."
+          showBackToDashboard={true}
+          onRetry={undefined}
+        />
       </div>
     )
   }
 
-  const scores = (debrief.scores as any[]) || []
   const averageScore =
     scores.length > 0
       ? scores.reduce((sum: number, s: any) => sum + (s.score || s || 0), 0) / scores.length
       : 0
-  const totalPossible = scores.length * 5 // Assuming 5 is max score
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-10" />
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="relative max-w-5xl mx-auto px-6 py-16 text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.5, type: 'spring' }}
-            className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mb-6"
-          >
-            <Trophy className="h-10 w-10 text-white" />
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
-            className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4"
-          >
-            After-Action Report: {simulation.case?.title || 'Unknown Case'}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.6 }}
-            className="text-xl text-gray-700 mb-2"
-          >
-            {simulation.case?.title || 'Unknown Case'}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.1, duration: 0.5 }}
-            className="inline-flex items-center gap-2 bg-white rounded-full px-6 py-3 shadow-lg"
-          >
-            <Award className="h-5 w-5 text-yellow-600" />
-            <span className="font-semibold text-gray-900">Overall Score: {averageScore.toFixed(1)}/5.0</span>
-          </motion.div>
-        </motion.div>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">
+          After-Action Report: {simulation.case?.title || 'Unknown Case'}
+        </h1>
+        <p className="text-sm text-gray-600">{simulation.case?.title || 'Unknown Case'}</p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 pb-16">
-        {/* Summary Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.3, duration: 0.6 }}
-          className="mb-12"
-        >
-          <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 shadow-xl">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-6 w-6 text-blue-600" />
-                <CardTitle className="text-2xl text-blue-900">Performance Summary</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg text-blue-800 leading-relaxed">
-                {debrief.summaryText ||
-                  "You have completed this simulation and demonstrated analytical acumen across multiple competencies."}
-              </p>
-            </CardContent>
-          </Card>
-        </motion.div>
+      {/* Overall Score KPI */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="bg-white border border-gray-200 p-6">
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+            Overall Performance
+          </div>
+          <div className="text-3xl font-semibold text-gray-900 mb-1">
+            {averageScore.toFixed(1)}
+          </div>
+          <div className="text-xs text-gray-500">out of 5.0</div>
+        </div>
+        <div className="bg-white border border-gray-200 p-6">
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+            Competencies Assessed
+          </div>
+          <div className="text-3xl font-semibold text-gray-900 mb-1">
+            {scores.length}
+          </div>
+          <div className="text-xs text-gray-500">competency areas</div>
+        </div>
+        <div className="bg-white border border-gray-200 p-6">
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+            Completion Date
+          </div>
+          <div className="text-sm font-medium text-gray-900 mb-1">
+            {simulation.completedAt
+              ? new Date(simulation.completedAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              : 'N/A'}
+          </div>
+        </div>
+      </div>
 
-        {/* Score Reveals */}
-        {showScores && (
-          <div className="space-y-6 mb-12">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl font-bold text-center text-gray-900 mb-8"
-            >
-              Competency Analysis
-            </motion.h2>
+      {/* Performance Summary */}
+      {debrief.summaryText && (
+        <div className="bg-white border border-gray-200 mb-12">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Performance Summary</h2>
+          </div>
+          <div className="p-6">
+            <p className="text-sm text-gray-600 leading-relaxed">{debrief.summaryText}</p>
+          </div>
+        </div>
+      )}
 
+      {/* Competency Analysis */}
+      {showScores && scores.length > 0 && (
+        <div className="mb-12">
+          <div className="border-b border-gray-200 pb-4 mb-6">
+            <h2 className="text-lg font-medium text-gray-900">Competency Analysis</h2>
+          </div>
+          <div className="space-y-4">
             {scores.map((score: any, index: number) => (
               <ScoreReveal
                 key={score.competencyName || score.competency || index}
@@ -231,45 +197,38 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
                 score={score.score || score || 0}
                 maxScore={5}
                 justification={score.justification || score.feedback || ''}
-                delay={0.3 * index}
+                delay={0}
               />
             ))}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Recommended Reading */}
-        {showScores && recommendedArticles.length > 0 && (
-          <div className="mb-12">
-            <RecommendedReading
-              recommendations={recommendedArticles}
-              delay={0.3 * scores.length + 0.5}
-            />
-          </div>
-        )}
+      {/* Recommended Reading */}
+      {showScores && recommendedArticles.length > 0 && (
+        <div className="mb-12">
+          <RecommendedReading
+            recommendations={recommendedArticles}
+            delay={0}
+          />
+        </div>
+      )}
 
-        {/* Action Buttons */}
-        {showScores && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 * scores.length + 1, duration: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <Button onClick={shareDebrief} variant="outline" size="lg" className="gap-2">
-              <Share2 className="h-4 w-4" />
-              Transmit Debrief
-            </Button>
-
-            <Button asChild size="lg">
-              <Link href="/simulations">Try Another Simulation</Link>
-            </Button>
-
-            <Button asChild variant="outline" size="lg">
-              <Link href="/dashboard">Back to Dashboard</Link>
-            </Button>
-          </motion.div>
-        )}
-      </div>
+      {/* Action Buttons */}
+      {showScores && (
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button onClick={shareDebrief} variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
+            <Share2 className="h-4 w-4 mr-2" />
+            Transmit Debrief
+          </Button>
+          <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            <Link href="/simulations">Deploy to Another Scenario</Link>
+          </Button>
+          <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
+            <Link href="/dashboard">Return to Dashboard</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

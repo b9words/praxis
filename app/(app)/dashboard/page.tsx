@@ -3,6 +3,7 @@ import { getUserResidency } from '@/lib/auth/get-residency'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { cache, CacheTags } from '@/lib/cache'
 import { getUserAggregateScores } from '@/lib/database-functions'
+import { isEnumError } from '@/lib/prisma-enum-fallback'
 import { prisma } from '@/lib/prisma/server'
 import { getSmartRecommendations } from '@/lib/recommendation-engine'
 import { redirect } from 'next/navigation'
@@ -166,19 +167,40 @@ export default async function DashboardPage() {
       const completedArticleIds = new Set(completedArticles.map((a) => a.articleId))
       const articlesCompleted = articles.filter((a: { id: string }) => completedArticleIds.has(a.id)).length
 
-      // Get completed simulations
-      const completedSimulations = await prisma.simulation.findMany({
-        where: {
-          userId: user.id,
-          status: 'completed',
-        },
-        select: {
-          id: true,
-        },
-      }).catch((error) => {
-        console.error('Error fetching completed simulations:', error)
-        return []
-      })
+      // Get completed simulations with enum fallback
+      let completedSimulations: any[] = []
+      try {
+        completedSimulations = await prisma.simulation.findMany({
+          where: {
+            userId: user.id,
+            status: 'completed',
+          },
+          select: {
+            id: true,
+            completedAt: true,
+          },
+        })
+      } catch (error: any) {
+        if (isEnumError(error)) {
+          // Fallback: query without status filter, filter by completedAt
+          try {
+            const allSimulations = await prisma.simulation.findMany({
+              where: {
+                userId: user.id,
+              },
+              select: {
+                id: true,
+                completedAt: true,
+              },
+            })
+            completedSimulations = allSimulations.filter((s: any) => s.completedAt !== null)
+          } catch (fallbackError) {
+            console.error('Error fetching completed simulations (fallback):', fallbackError)
+          }
+        } else {
+          console.error('Error fetching completed simulations:', error)
+        }
+      }
 
       residencyData = {
         year: currentResidency,
@@ -306,7 +328,7 @@ export default async function DashboardPage() {
     })
   } catch (error: any) {
     // Handle enum errors and schema mismatches
-    if (error?.code === 'P2034' || error?.message?.includes('does not exist') || error?.code === 'P2022') {
+    if (isEnumError(error) || error?.code === 'P2022' || error?.message?.includes('does not exist')) {
       try {
         // Fallback query without enum dependencies
         recentSimulations = await prisma.simulation.findMany({

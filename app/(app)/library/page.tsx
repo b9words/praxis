@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getAllUserProgress, getUserReadingStats } from '@/lib/progress-tracking'
@@ -110,97 +109,84 @@ export default async function LibraryPage() {
           {/* Quick Stats Dashboard */}
           {user && readingStats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border-b border-neutral-200">
-              <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <div>
-                      <div className="text-lg font-semibold text-neutral-900">{readingStats.totalLessonsCompleted}</div>
-                      <div className="text-xs text-neutral-500">Completed</div>
-                    </div>
+              <div className="bg-neutral-50 border border-neutral-200 p-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-neutral-900">{readingStats.totalLessonsCompleted}</div>
+                    <div className="text-xs text-neutral-500">Completed</div>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-blue-600" />
-                    <div>
-                      <div className="text-lg font-semibold text-neutral-900">{Math.round(readingStats.totalTimeSpentSeconds / 60)}</div>
-                      <div className="text-xs text-neutral-500">Minutes</div>
-                    </div>
+                </div>
+              </div>
+              <div className="bg-neutral-50 border border-neutral-200 p-3">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-neutral-900">{Math.round(readingStats.totalTimeSpentSeconds / 60)}</div>
+                    <div className="text-xs text-neutral-500">Minutes</div>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-neutral-600" />
-                    <div>
-                      <div className="text-lg font-semibold text-neutral-900">{readingStats.lessonsInProgress}</div>
-                      <div className="text-xs text-neutral-500">In Progress</div>
-                    </div>
+                </div>
+              </div>
+              <div className="bg-neutral-50 border border-neutral-200 p-3">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-neutral-900">{readingStats.lessonsInProgress}</div>
+                    <div className="text-xs text-neutral-500">In Progress</div>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-                <CardContent className="p-3">
-                  <div className="flex items-center gap-2">
-                    <Target className="h-4 w-4 text-yellow-600" />
-                    <div>
-                      <div className="text-lg font-semibold text-neutral-900">{readingStats.totalBookmarks}</div>
-                      <div className="text-xs text-neutral-500">Bookmarked</div>
-                    </div>
+                </div>
+              </div>
+              <div className="bg-neutral-50 border border-neutral-200 p-3">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-gray-400" />
+                  <div>
+                    <div className="text-lg font-semibold text-neutral-900">{readingStats.totalBookmarks}</div>
+                    <div className="text-xs text-neutral-500">Bookmarked</div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Welcome Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-            <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-              <CardContent className="p-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-700 rounded">
-                    <GraduationCap className="h-4 w-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-1">
-                      Executive Curriculum
-                    </h3>
-                    <p className="text-sm text-neutral-500 leading-snug mb-3">
-                      10 domains, 219 lessons for world-class leadership
-                    </p>
-                    <Button asChild size="sm" className="h-8 px-2.5 bg-blue-700 text-white hover:bg-blue-800 active:bg-blue-900 rounded">
-                      <Link href="/library/curriculum">Explore Curriculum</Link>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-
-            <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-              <CardContent className="p-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-neutral-100 border border-neutral-200 rounded">
-                    <BookOpen className="h-4 w-4 text-neutral-700" />
+            <div className="bg-neutral-50 border border-neutral-200 p-3">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-900">
+                  <GraduationCap className="h-4 w-4 text-white" />
                 </div>
                 <div className="flex-1">
-                    <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-1">
-                      Learning Paths
+                  <h3 className="text-base font-medium leading-tight text-neutral-900 mb-1">
+                    Executive Curriculum
                   </h3>
-                    <p className="text-sm text-neutral-500 leading-snug mb-3">
-                      Structured curriculum to guide your learning journey
+                  <p className="text-sm text-neutral-500 leading-snug mb-3">
+                    10 domains, 219 lessons for world-class leadership
                   </p>
-                    <Button asChild variant="outline" size="sm" className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 rounded">
+                  <Button asChild size="sm" className="h-8 px-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-none">
+                    <Link href="/library/curriculum">Explore Curriculum</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-neutral-50 border border-neutral-200 p-3">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 border border-gray-200">
+                  <BookOpen className="h-4 w-4 text-gray-700" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-medium leading-tight text-neutral-900 mb-1">
+                    Learning Paths
+                  </h3>
+                  <p className="text-sm text-neutral-500 leading-snug mb-3">
+                    Structured curriculum to guide your learning journey
+                  </p>
+                  <Button asChild variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none">
                     <Link href="/residency">Choose Path</Link>
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
           </div>
 
           {/* Continue Learning Section */}
@@ -208,7 +194,7 @@ export default async function LibraryPage() {
             <div className="space-y-4 p-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-neutral-900">Continue Learning</h2>
-                <Button variant="outline" size="sm" className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 rounded text-xs" asChild>
+                <Button variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs" asChild>
                   <Link href="/library/curriculum">VIEW ALL</Link>
                 </Button>
               </div>
@@ -221,8 +207,8 @@ export default async function LibraryPage() {
                   
                   return (
                     <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
-                      <Card className="bg-neutral-50 border border-neutral-200 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer">
-                        <CardContent className="p-4">
+                      <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                        <div className="p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div className="text-xs text-neutral-400 font-mono">
                               {lesson.domainTitle.substring(0, 3).toUpperCase()}
@@ -244,9 +230,9 @@ export default async function LibraryPage() {
                           {/* Progress Bar */}
                           {lesson.progress > 0 && (
                             <div className="mb-3">
-                              <div className="w-full bg-neutral-200 rounded-full h-1.5">
+                                  <div className="w-full bg-neutral-200 h-1.5">
                                 <div 
-                                  className="bg-blue-600 h-1.5 rounded-full transition-all" 
+                                  className="bg-gray-900 h-1.5 transition-all" 
                                   style={{ width: `${lesson.progress}%` }}
                                 />
                               </div>
@@ -257,29 +243,29 @@ export default async function LibraryPage() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               {isCompleted ? (
-                                <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                                <div className="w-4 h-4 bg-gray-900 flex items-center justify-center">
                                   <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                 </div>
                               ) : lesson.progress > 0 ? (
-                                <div className="w-4 h-4 border-2 border-blue-600 rounded-full flex items-center justify-center">
-                                  <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                                <div className="w-4 h-4 border-2 border-gray-600 flex items-center justify-center">
+                                  <div className="w-2 h-2 bg-gray-600" />
                                 </div>
                               ) : (
-                                <div className="w-4 h-4 border-2 border-neutral-300 rounded-full"></div>
+                                <div className="w-4 h-4 border-2 border-neutral-300"></div>
                               )}
                               <span className="text-xs text-neutral-500">
                                 {isCompleted ? 'Completed' : lesson.progress > 0 ? 'In progress' : 'Not started'}
                               </span>
                             </div>
                             
-                            <Button size="sm" className="h-6 px-2 text-xs bg-blue-700 text-white hover:bg-blue-800 rounded">
+                            <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
                               {lesson.progress > 0 ? 'CONTINUE' : 'START'}
                             </Button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     </Link>
                   )
                 })}
@@ -304,8 +290,8 @@ export default async function LibraryPage() {
                 
                 return (
                   <Link key={progressKey} href={`/library/curriculum/${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`}>
-                    <Card className="bg-neutral-50 border border-neutral-200 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer">
-                      <CardContent className="p-4">
+                    <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                      <div className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="text-xs text-neutral-400 font-mono">
                             {String(index + 1).padStart(2, '0')}
@@ -327,7 +313,7 @@ export default async function LibraryPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             {isCompleted ? (
-                              <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                                <div className="w-4 h-4 bg-gray-900 flex items-center justify-center">
                                 <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
@@ -340,12 +326,12 @@ export default async function LibraryPage() {
                             </span>
                           </div>
                           
-                          <Button size="sm" className="h-6 px-2 text-xs bg-blue-700 text-white hover:bg-blue-800 rounded">
+                          <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
                             START
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </Link>
                 )
               })}
@@ -364,12 +350,12 @@ export default async function LibraryPage() {
                   
                   return (
                     <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
-                      <Card className="bg-neutral-50 border border-neutral-200 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer">
-                        <CardContent className="p-3">
+                      <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                        <div className="p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              <div className="w-8 h-8 bg-gray-100 border border-gray-200 flex items-center justify-center">
+                                <CheckCircle className="h-4 w-4 text-gray-600" />
                               </div>
                               <div>
                                 <div className="text-sm font-medium text-neutral-900">{lesson.title}</div>
@@ -380,24 +366,23 @@ export default async function LibraryPage() {
                               Review
                             </Button>
                 </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     </Link>
                   )
                 })}
               </div>
             ) : (
-              <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-                <CardContent className="p-4">
-                  <div className="text-center py-8">
+              <div className="bg-neutral-50 border border-neutral-200 p-4">
+                <div className="text-center py-8">
                     <BookOpen className="mx-auto h-8 w-8 text-neutral-400 mb-3" />
                     <h3 className="text-sm font-medium text-neutral-900 mb-1">No recent activity</h3>
                     <p className="text-sm text-neutral-500">
                       Start a lesson to see your progress here
                     </p>
               </div>
-            </CardContent>
-          </Card>
+                      </div>
+                    </div>
             )}
           </div>
         </div>

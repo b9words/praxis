@@ -11,7 +11,20 @@
 
 import matter from 'gray-matter'
 import { completeCurriculumData, getAllLessonsFlat } from '../lib/curriculum-data'
-import { articleExists, countWords, extractTables, generateWithAI, getCoreValuesPrompt, supabase, syncFileMetadata, uploadToStorage } from './generate-shared'
+import {
+    articleExists,
+    checkRequiredSections,
+    countWords,
+    extractCalculations,
+    extractTables,
+    generateWithAI,
+    getCoreValuesPrompt,
+    isSupabaseAvailable,
+    repairContent,
+    supabase,
+    syncFileMetadata,
+    uploadToStorage,
+} from './generate-shared'
 
 const TARGET_WORD_COUNT = { min: 1800, max: 2400 }
 const REQUIRED_SECTIONS = [
@@ -24,11 +37,24 @@ const REQUIRED_SECTIONS = [
   'key takeaways',
 ]
 
+const SECTION_WORD_TARGETS: Record<string, { min: number; max: number }> = {
+  'executive summary': { min: 150, max: 200 },
+  'core principle': { min: 400, max: 600 },
+  'framework': { min: 600, max: 800 },
+  'real-world examples': { min: 500, max: 700 },
+  'common pitfalls': { min: 300, max: 400 },
+  'application exercise': { min: 200, max: 300 },
+  'key takeaways': { min: 100, max: 150 },
+}
+
 interface GenerateOptions {
   domain?: string
   module?: string
   lesson?: string
   year?: number
+  dryRun?: boolean
+  maxRepairs?: number
+  testMode?: boolean // Generate shorter version for testing
 }
 
 /**
@@ -182,85 +208,179 @@ Please provide a detailed hierarchical outline with:
 - Section headings and subheadings
 - Brief notes on what content goes in each section
 - List of 2-3 companies/examples to use with specific data points
-- Identification of 2-3 tables to include (with column headers and example data types)
+- Identification of 2-3 tables to include (with column headers and example data types) - CRITICAL: These MUST be included as proper markdown tables
 - Optional: 1-2 mermaid diagram concepts if helpful
+
+CRITICAL: The outline must specify at least 2-3 tables with:
+- Specific table topics (e.g., "Financial metrics comparison", "ROI calculations")
+- Column headers for each table
+- The type of data that will populate each table
 
 Output the outline in a clear, structured format.`
 
   const systemPrompt = 'You are an expert business educator specializing in executive education. Create structured, practical outlines that emphasize real-world application and demonstrable skills.'
   
-  return await generateWithAI(prompt, systemPrompt)
+  const result = await generateWithAI(prompt, systemPrompt, { trackUsage: true })
+  return result.content
 }
 
 /**
- * Generate full lesson content from outline
+ * Generate a single section of the lesson
  */
-async function generateFullLesson(lesson: any, outline: string, coreValues: string): Promise<string> {
-  const prompt = `You are an expert business educator creating comprehensive curriculum content for executive education.
+async function generateSection(
+  sectionName: string,
+  sectionContext: string,
+  outline: string,
+  lesson: any,
+  coreValues: string,
+  testMode: boolean = false
+): Promise<string> {
+  const targetWords = testMode ? 100 : SECTION_WORD_TARGETS[sectionName.toLowerCase()]?.min || 200
+  const maxWords = testMode ? 200 : SECTION_WORD_TARGETS[sectionName.toLowerCase()]?.max || 400
+  
+  const prompt = `You are an expert business educator creating a specific section of a lesson article.
 
-Generate the COMPLETE, FULL lesson article based on this outline:
+SECTION TO GENERATE: "${sectionName}"
 
-OUTLINE:
+CONTEXT FROM OUTLINE:
+${sectionContext}
+
+FULL LESSON OUTLINE:
 ${outline}
 
 LESSON DETAILS:
 - Title: "${lesson.lessonTitle}"
 - Module: ${lesson.moduleNumber}. ${lesson.moduleTitle}
 - Domain: ${lesson.domainTitle}
-- Description: ${lesson.description}
 
-REQUIREMENTS:
-- Exact length: ${TARGET_WORD_COUNT.min}-${TARGET_WORD_COUNT.max} words (strictly enforce)
+REQUIREMENTS FOR THIS SECTION:
+- Target length: ${targetWords}-${maxWords} words
 - Professional, practical tone
-- Include ALL sections from the outline
-- Include 2-3 tables with real data (use markdown table syntax)
-- Optionally include 1-2 Mermaid diagrams wrapped in \`\`\`mermaid blocks
-- Use markdown formatting with proper headers (##, ###), lists, emphasis
+- Use markdown formatting with proper headers (### for subsections), lists, emphasis
 - Include specific numbers, metrics, and calculations where relevant
-- Make content immediately applicable for senior executives
+- Connect to the lesson's practical application focus
+${sectionName === 'The Framework' || sectionName === 'Real-World Examples' ? '- MUST include at least 1 markdown table with real data (use proper table syntax with | separators)' : ''}
 
 ${coreValues}
 
-CRITICAL: Ensure the content is comprehensive, long-form (${TARGET_WORD_COUNT.min}+ words), and includes at least 2 tables with concrete data.`
+Generate ONLY the "${sectionName}" section. Use H2 heading (## ${sectionName}) to start.`
 
-  const systemPrompt = 'You are an expert business educator and content creator specializing in executive education and strategic business thinking. Write comprehensive, practical, immediately applicable content.'
+  const systemPrompt = 'You are an expert business educator specializing in executive education. Write focused, practical sections that emphasize real-world application.'
   
-  return await generateWithAI(prompt, systemPrompt)
+  const result = await generateWithAI(prompt, systemPrompt, { trackUsage: true })
+  return result.content
 }
 
 /**
- * Validate generated content
+ * Generate full lesson content from outline (section-by-section)
  */
-function validateContent(content: string, wordCount: number, tables: number): { valid: boolean; errors: string[] } {
-  const errors: string[] = []
+async function generateFullLesson(
+  lesson: any,
+  outline: string,
+  coreValues: string,
+  testMode: boolean = false
+): Promise<string> {
+  const sections = [
+    { name: 'Executive Summary', key: 'executive summary' },
+    { name: 'Core Principle', key: 'core principle' },
+    { name: 'The Framework', key: 'framework' },
+    { name: 'Real-World Examples', key: 'real-world examples' },
+    { name: 'Common Pitfalls', key: 'common pitfalls' },
+    { name: 'Application Exercise', key: 'application exercise' },
+    { name: 'Key Takeaways', key: 'key takeaways' },
+  ]
   
+  const sectionContents: string[] = []
+  
+  // Generate each section independently
+  for (const section of sections) {
+    console.log(`  📝 Generating section: ${section.name}...`)
+    const sectionContent = await generateSection(
+      section.name,
+      outline, // Pass full outline for context
+      outline,
+      lesson,
+      coreValues,
+      testMode
+    )
+    sectionContents.push(sectionContent)
+    
+    // Add small delay between sections to avoid rate limits
+    if (sections.indexOf(section) < sections.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+  }
+  
+  // Combine sections
+  return sectionContents.join('\n\n')
+}
+
+/**
+ * Validate generated content with comprehensive checks
+ */
+function validateContent(
+  content: string,
+  wordCount: number,
+  tables: number,
+  calculations: number
+): { valid: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = []
+  const warnings: string[] = []
+  
+  // Critical validations
   if (wordCount < TARGET_WORD_COUNT.min) {
     errors.push(`Word count ${wordCount} is below minimum ${TARGET_WORD_COUNT.min}`)
+  } else if (wordCount > TARGET_WORD_COUNT.max * 1.2) {
+    warnings.push(`Word count ${wordCount} exceeds target by >20%`)
   }
   
   if (tables < 2) {
     errors.push(`Only ${tables} table(s) found, need at least 2`)
   }
   
+  if (calculations < 1) {
+    warnings.push(`No calculations found - consider adding financial metrics or formulas`)
+  }
+  
   // Check for required sections
-  const contentLower = content.toLowerCase()
-  for (const section of REQUIRED_SECTIONS) {
-    if (!contentLower.includes(section)) {
-      errors.push(`Missing required section: ${section}`)
+  const { found, missing } = checkRequiredSections(content, REQUIRED_SECTIONS)
+  for (const section of missing) {
+    errors.push(`Missing required section: ${section}`)
+  }
+  
+  // Check for proper H2 headings
+  const h2Count = (content.match(/^##\s+/gm) || []).length
+  if (h2Count < REQUIRED_SECTIONS.length - 1) {
+    warnings.push(`Only ${h2Count} H2 headings found, expected ${REQUIRED_SECTIONS.length}`)
+  }
+  
+  // Check for key takeaways count
+  const takeawaysMatch = content.match(/key takeaways/i)
+  if (takeawaysMatch) {
+    const takeawaysSection = content.substring(content.toLowerCase().indexOf('key takeaways'))
+    const bullets = (takeawaysSection.match(/^[-*]\s+/gm) || []).length
+    if (bullets < 5) {
+      warnings.push(`Key takeaways section has only ${bullets} bullets, expected 5-7`)
     }
   }
   
-  return { valid: errors.length === 0, errors }
+  return { valid: errors.length === 0, errors, warnings }
 }
 
 /**
  * Main generation function
  */
 async function generateLesson(options: GenerateOptions = {}) {
-  const { domain: domainId, module: moduleId, lesson: lessonId, year = 1 } = options
+  const { domain: domainId, module: moduleId, lesson: lessonId, year = 1, dryRun = false, maxRepairs = 2, testMode = false } = options
   
   console.log('📚 Lesson Generation Script\n')
   console.log('==========================\n')
+  if (dryRun) {
+    console.log('🔍 DRY RUN MODE - No files will be uploaded\n')
+  }
+  if (testMode) {
+    console.log('🧪 TEST MODE - Generating shorter content\n')
+  }
   
   // Find next missing lesson
   console.log('🔍 Finding next missing lesson...')
@@ -277,9 +397,14 @@ async function generateLesson(options: GenerateOptions = {}) {
   console.log(`   Module: ${lesson.moduleNumber}. ${lesson.moduleTitle}`)
   console.log(`   Path: ${storagePath}\n`)
   
-  // Resolve competency ID
+  // Resolve competency ID (skip if Supabase not available in dry-run)
   console.log('🔗 Resolving competency ID...')
-  const competencyId = await resolveCompetencyId(lesson.domain, lesson.moduleId, lesson.lessonTitle)
+  let competencyId: string | null = null
+  if (supabase) {
+    competencyId = await resolveCompetencyId(lesson.domain, lesson.moduleId, lesson.lessonTitle)
+  } else {
+    console.log('   ⚠️  Supabase not available - skipping competency resolution')
+  }
   console.log(`   Competency ID: ${competencyId || 'Not found (will use placeholder)'}\n`)
   
   // Get core values
@@ -290,23 +415,83 @@ async function generateLesson(options: GenerateOptions = {}) {
   const outline = await generateOutline(lesson, coreValues)
   console.log('✅ Outline generated\n')
   
-  // Generate full content
-  console.log('✍️  Generating full lesson content...')
-  const content = await generateFullLesson(lesson, outline, coreValues)
+  // Generate full content section-by-section
+  console.log('✍️  Generating full lesson content (section-by-section)...')
+  let content = await generateFullLesson(lesson, outline, coreValues, testMode)
   console.log('✅ Content generated\n')
   
-  // Validate
-  const wordCount = countWords(content)
-  const tables = extractTables(content)
+  // Validate with comprehensive checks
+  let wordCount = countWords(content)
+  let tables = extractTables(content)
+  let calculations = extractCalculations(content)
   console.log(`📊 Validation:`)
   console.log(`   Word count: ${wordCount}`)
   console.log(`   Tables: ${tables}`)
+  console.log(`   Calculations: ${calculations}`)
   
-  const validation = validateContent(content, wordCount, tables)
-  if (!validation.valid) {
+  let validation = validateContent(content, wordCount, tables, calculations)
+  let repairAttempts = 0
+  
+  // Auto-repair loop (only if there are critical errors, not warnings)
+  while (!validation.valid && repairAttempts < maxRepairs && validation.errors.length > 0) {
+    console.log(`\n🔧 Auto-repair attempt ${repairAttempts + 1}/${maxRepairs}...`)
+    const systemPrompt = 'You are an expert business educator specializing in executive education. Fix validation errors while EXPANDING and IMPROVING content quality.'
+    
+    try {
+      const originalWordCount = wordCount
+      const originalTables = tables
+      
+      const repaired = await repairContent(content, validation.errors, '', systemPrompt)
+      const newWordCount = countWords(repaired)
+      const newTables = extractTables(repaired)
+      const newCalculations = extractCalculations(repaired)
+      
+      // Check if repair actually improved things
+      const improved = newWordCount >= originalWordCount && newTables >= originalTables
+      
+      validation = validateContent(repaired, newWordCount, newTables, newCalculations)
+      
+      if (improved || validation.valid) {
+        if (validation.valid) {
+          console.log(`   ✅ Repair successful!`)
+        } else {
+          console.log(`   ⚠️  Repair improved content but errors remain`)
+        }
+        content = repaired
+        wordCount = newWordCount
+        tables = newTables
+        calculations = newCalculations
+        
+        if (validation.valid) {
+          break
+        }
+      } else {
+        console.log(`   ⚠️  Repair made content worse, keeping original`)
+        // Don't update content if repair made it worse
+      }
+      
+      repairAttempts++
+      if (!validation.valid && repairAttempts < maxRepairs) {
+        console.log(`   Continuing with repair attempt ${repairAttempts + 1}...`)
+      }
+    } catch (error) {
+      console.log(`   ⚠️  Repair failed: ${error}`)
+      break
+    }
+  }
+  
+  // Report validation results
+  if (validation.warnings.length > 0) {
     console.log(`\n⚠️  Validation warnings:`)
+    validation.warnings.forEach(w => console.log(`   - ${w}`))
+  }
+  
+  if (!validation.valid) {
+    console.log(`\n❌ Validation errors (after ${repairAttempts} repair attempts):`)
     validation.errors.forEach(err => console.log(`   - ${err}`))
-    console.log(`\n⚠️  Continuing despite warnings...`)
+    if (!dryRun) {
+      console.log(`\n⚠️  Continuing despite errors...`)
+    }
   } else {
     console.log(`✅ Content meets quality standards\n`)
   }
@@ -319,23 +504,47 @@ async function generateLesson(options: GenerateOptions = {}) {
     domain: lesson.domain,
     module: lesson.moduleId,
     lesson_number: lesson.lessonNumber,
-    duration: 12,
+    duration: testMode ? 6 : 12,
     difficulty: 'intermediate',
     status: 'draft',
   }
   
-  // Assemble markdown
+  // Assemble markdown (content may have been repaired)
   const markdown = matter.stringify(content, frontmatter)
+  
+  if (dryRun) {
+    console.log('\n📄 DRY RUN - Content preview (first 2000 chars):')
+    console.log(markdown.substring(0, 2000) + '...\n')
+    console.log(`\n📊 Final Stats:`)
+    console.log(`   Word count: ${wordCount}`)
+    console.log(`   Tables: ${tables}`)
+    console.log(`   Calculations: ${calculations}`)
+    console.log(`   Sections found: ${validation.warnings.length === 0 ? 'All' : 'Some missing'}`)
+    console.log('\n✅ Dry run complete - no files uploaded')
+    return
+  }
+  
+  // Check Supabase availability before uploading
+  if (!isSupabaseAvailable()) {
+    throw new Error('Supabase not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.')
+  }
   
   // Upload to storage
   console.log('☁️  Uploading to Supabase Storage...')
   await uploadToStorage(storagePath, markdown, 'text/markdown')
   console.log('✅ Uploaded\n')
   
-  // Sync metadata
+  // Sync metadata (non-blocking - file is already in storage)
   console.log('🔄 Syncing metadata to database...')
-  const syncResult = await syncFileMetadata(storagePath)
-  console.log(`✅ ${syncResult.message || 'Metadata synced'}\n`)
+  let syncResult: any = null
+  try {
+    syncResult = await syncFileMetadata(storagePath)
+    console.log(`✅ ${syncResult?.message || syncResult?.success || 'Metadata synced'}\n`)
+  } catch (syncError: any) {
+    console.warn(`⚠️  Metadata sync failed (file is in storage): ${syncError.message}`)
+    console.warn(`   You can manually sync via /api/storage/sync or the admin UI\n`)
+    // Don't throw - file is uploaded successfully
+  }
   
   // Output review links
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
@@ -344,7 +553,7 @@ async function generateLesson(options: GenerateOptions = {}) {
   console.log(`   Content Management: ${baseUrl}/admin/content`)
   console.log(`   Direct Edit: ${baseUrl}/admin/edit?path=${encodeURIComponent(storagePath)}&type=article`)
   console.log(`\n📋 Storage Path: ${storagePath}`)
-  console.log(`📋 Article ID: ${syncResult.article_id || 'N/A'}`)
+  console.log(`📋 Article ID: ${syncResult?.article_id || 'N/A'}`)
 }
 
 // CLI parsing
@@ -363,6 +572,13 @@ for (let i = 0; i < args.length; i++) {
     i++
   } else if (args[i] === '--year' && args[i + 1]) {
     options.year = parseInt(args[i + 1], 10)
+    i++
+  } else if (args[i] === '--dry-run') {
+    options.dryRun = true
+  } else if (args[i] === '--test') {
+    options.testMode = true
+  } else if (args[i] === '--max-repairs' && args[i + 1]) {
+    options.maxRepairs = parseInt(args[i + 1], 10)
     i++
   }
 }

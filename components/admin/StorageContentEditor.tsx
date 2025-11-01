@@ -2,14 +2,19 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import ErrorState from '@/components/ui/error-state'
+import { LoadingState } from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
-import { fetchFromStorage, syncFileMetadata, uploadToStorage } from '@/lib/supabase/storage'
+import { syncMetadata, uploadFileToStorage } from '@/lib/supabase/storage-client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FileCode, FileText, Save, Upload } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface StorageContentEditorProps {
@@ -20,55 +25,48 @@ interface StorageContentEditorProps {
 export default function StorageContentEditor({ contentType, storagePath }: StorageContentEditorProps) {
   const router = useRouter()
   const supabase = createClient()
-  
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const queryClient = useQueryClient()
+
   const [content, setContent] = useState('')
-  const [metadata, setMetadata] = useState<any>(null)
 
-  useEffect(() => {
-    async function loadContent() {
-      setLoading(true)
-      
-      try {
-        // Fetch file from storage
-        const { success, content: fileContent, error } = await fetchFromStorage(storagePath)
-        
-        if (!success || !fileContent) {
-          toast.error(`Failed to load file: ${error}`)
-          return
-        }
-
-        setContent(fileContent)
-
-        // Load metadata from database
-        const tableName = contentType === 'article' ? 'articles' : 'cases'
-        const { data } = await supabase
-          .from(tableName)
-          .select('*')
-          .eq('storage_path', storagePath)
-          .maybeSingle()
-        
-        if (data) {
-          setMetadata(data)
-        }
-      } catch (error) {
-        console.error('Error loading content:', error)
-        toast.error('Failed to load content')
-      } finally {
-        setLoading(false)
+  // Fetch file content with React Query
+  const { data: storageData, isLoading: loading, error: storageError } = useQuery({
+    queryKey: queryKeys.storage.byPath(storagePath),
+    queryFn: ({ signal }) =>
+      fetchJson<{ success: boolean; content?: string; error?: string }>(
+        `/api/storage?path=${encodeURIComponent(storagePath)}`,
+        { signal }
+      ),
+    onSuccess: (data) => {
+      if (data.success && data.content) {
+        setContent(data.content)
       }
-    }
+    },
+    retry: 2,
+  })
 
-    loadContent()
-  }, [contentType, storagePath, supabase])
+  // Fetch metadata with React Query
+  const { data: metadataData } = useQuery({
+    queryKey: [contentType === 'article' ? 'articles' : 'cases', 'metadata', storagePath],
+    queryFn: async ({ signal }) => {
+      // Try to find by storagePath via API
+      const items = contentType === 'article'
+        ? await fetchJson<{ articles: any[] }>(`/api/articles?status=all`, { signal })
+        : await fetchJson<{ cases: any[] }>(`/api/cases`, { signal })
+      
+      const list = contentType === 'article' ? items.articles : items.cases
+      return list?.find((item: any) => item.storagePath === storagePath) || null
+    },
+    enabled: !!storagePath,
+  })
 
-  const handleSave = async () => {
-    setSaving(true)
-    
-    try {
+  const metadata = metadataData || null
+
+  // Save mutation
+  const saveMutation = useMutation({
+    mutationFn: async (contentToSave: string) => {
       // Create a blob from the content
-      const blob = new Blob([content], { 
+      const blob = new Blob([contentToSave], { 
         type: contentType === 'article' ? 'text/markdown' : 'application/json' 
       })
       const file = new File([blob], storagePath.split('/').pop() || 'file', {
@@ -76,47 +74,54 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
       })
 
       // Upload to storage
-      const uploadResult = await uploadToStorage(storagePath, file)
-      
+      const uploadResult = await uploadFileToStorage(storagePath, file)
       if (!uploadResult.success) {
         throw new Error(uploadResult.error)
       }
 
-      // Sync metadata to database
-      const syncResult = await syncFileMetadata('assets', storagePath)
-      
+      // Sync metadata
+      const syncResult = await syncMetadata('assets', storagePath)
       if (!syncResult.success) {
         throw new Error(syncResult.error)
       }
 
+      return syncResult
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.storage.byPath(storagePath) })
+      queryClient.invalidateQueries({ queryKey: [contentType === 'article' ? 'articles' : 'cases', 'metadata', storagePath] })
+      queryClient.invalidateQueries({ queryKey: contentType === 'article' ? queryKeys.articles.all() : ['cases'] })
       toast.success('Content saved successfully')
-      
-      // Refresh metadata
-      const tableName = contentType === 'article' ? 'articles' : 'cases'
-      const { data } = await supabase
-        .from(tableName)
-        .select('*')
-        .eq('storage_path', storagePath)
-        .maybeSingle()
-      
-      if (data) {
-        setMetadata(data)
-      }
-    } catch (error) {
-      console.error('Error saving content:', error)
+    },
+    onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save content')
-    } finally {
-      setSaving(false)
-    }
+    },
+  })
+
+  const handleSave = () => {
+    saveMutation.mutate(content)
   }
+
+  const saving = saveMutation.isPending
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="text-lg font-semibold text-neutral-900 mb-2">Loading content...</div>
-          <div className="text-sm text-neutral-500">Fetching from storage</div>
-        </div>
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingState type="dashboard" />
+      </div>
+    )
+  }
+
+  if (storageError) {
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <ErrorState
+          title="Failed to load content"
+          message="Unable to load the file content. Please try again."
+          error={storageError}
+          onRetry={() => window.location.reload()}
+          showBackToDashboard={true}
+        />
       </div>
     )
   }
@@ -147,7 +152,7 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
+          <Button onClick={handleSave} disabled={saving || !content}>
             {saving ? (
               <>
                 <Upload className="h-4 w-4 mr-2 animate-pulse" />

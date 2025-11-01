@@ -53,13 +53,28 @@ export async function POST(
     const caseTitle = simulation.case.title
 
     // Mark simulation as completed
-    await prisma.simulation.update({
-      where: { id: simulationId },
-      data: {
-        status: 'completed',
-        completedAt: new Date(),
-      },
-    })
+    try {
+      await prisma.simulation.update({
+        where: { id: simulationId },
+        data: {
+          status: 'completed',
+          completedAt: new Date(),
+        },
+      })
+    } catch (updateError: any) {
+      // Handle P2025 (record not found) or any other Prisma errors
+      if (updateError?.code === 'P2025') {
+        return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+      }
+      
+      // For other errors, log and return error
+      const { normalizeError } = await import('@/lib/api/route-helpers')
+      const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+      const normalized = normalizeError(updateError)
+      const statusCode = getPrismaErrorStatusCode(updateError)
+      console.error('Error updating simulation status:', updateError)
+      return NextResponse.json({ error: normalized }, { status: statusCode })
+    }
 
     // Create forum thread for this simulation (if forum channels exist)
     try {
@@ -95,12 +110,18 @@ export async function POST(
     )
 
     return NextResponse.json({ success: true, simulationId })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle Prisma errors comprehensively
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error completing simulation:', error)
-    return NextResponse.json({ error: 'Failed to complete simulation' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

@@ -1,5 +1,4 @@
 import DevTools from "@/components/dev/DevTools";
-import Footer from "@/components/layout/Footer";
 import QueryProvider from "@/components/providers/QueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
@@ -32,7 +31,6 @@ export default function RootLayout({
             <main className="flex-1">
               {children}
             </main>
-            <Footer />
           </div>
           <Toaster />
           <DevTools />

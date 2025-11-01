@@ -31,3 +31,5 @@ export function SectionAccent({ variant, className = '' }: { variant: 'vertical'
   }
 }
 
+
+

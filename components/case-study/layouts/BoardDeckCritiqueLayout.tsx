@@ -1,10 +1,11 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCaseFile } from '@/hooks/useCaseFile'
 import { ChallengeBlock } from '@/lib/case-study-store'
-import { FileText, MessageSquare } from 'lucide-react'
+import { AlertCircle, FileText, MessageSquare } from 'lucide-react'
 import PromptBoxBlock from '../blocks/PromptBoxBlock'
 import RichTextEditorBlock from '../blocks/RichTextEditorBlock'
 import SubmitButtonBlock from '../blocks/SubmitButtonBlock'
@@ -92,12 +93,15 @@ export default function BoardDeckCritiqueLayout({ challengeData }: BoardDeckCrit
           <CardContent>
             {documentData.isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-neutral-600">Loading presentation...</span>
+                <LoadingSkeleton className="h-64 w-full" />
               </div>
             ) : documentData.error ? (
-              <div className="text-red-600 p-4 bg-red-50 rounded-lg">
-                Error loading document: {documentData.error}
+              <div className="p-4 bg-red-50 border border-red-200 rounded-none">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-900">Error Loading Document</span>
+                </div>
+                <p className="text-xs text-red-700">{documentData.error}</p>
               </div>
             ) : documentData.fileType === 'PRESENTATION_DECK' && documentData.content ? (
               <div className="prose prose-neutral max-w-none">

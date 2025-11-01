@@ -1,6 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { fetchJson } from '@/lib/api'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 
 interface PaddleCheckoutProps {
@@ -81,6 +83,13 @@ export default function PaddleCheckout({
     }
   }, [])
 
+  // Fetch user info if logged in
+  const { data: userData } = useQuery({
+    queryKey: ['auth', 'user'],
+    queryFn: ({ signal }) => fetchJson('/api/auth/user', { signal }).catch(() => null),
+    retry: false,
+  })
+
   const handleCheckout = async () => {
     if (!window.Paddle || !paddleInitialized.current) {
       onError?.(new Error('Paddle not initialized'))
@@ -89,20 +98,8 @@ export default function PaddleCheckout({
 
     setIsLoading(true)
     try {
-      // Get user info if logged in
-      let userEmail: string | undefined
-      let customerId: string | undefined
-
-      try {
-        const response = await fetch('/api/auth/user')
-        if (response.ok) {
-          const user = await response.json()
-          userEmail = user.email
-          customerId = user.id
-        }
-      } catch {
-        // User not logged in, that's ok
-      }
+      const userEmail = userData?.email
+      const customerId = userData?.id
 
       window.Paddle.Checkout.open({
         items: [{ priceId: planId, quantity: 1 }],

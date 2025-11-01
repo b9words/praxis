@@ -3,6 +3,9 @@
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -13,42 +16,33 @@ interface ReplyFormProps {
 
 export default function ReplyForm({ threadId }: ReplyFormProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   
   const [content, setContent] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-
-    try {
-      const response = await fetch(`/api/forum/threads/${threadId}/posts`, {
+  const createPostMutation = useMutation({
+    mutationFn: (data: { content: string; parentPostId: string | null }) =>
+      fetchJson(`/api/forum/threads/${threadId}/posts`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content,
-          parentPostId: null,
-        }),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        toast.error(error.error || 'Failed to post reply')
-        setLoading(false)
-        return
-      }
-
+        body: data,
+      }),
+    onSuccess: () => {
       toast.success('Reply posted successfully')
       setContent('')
-      router.refresh()
-    } catch (error) {
-      console.error('Error posting reply:', error)
-      toast.error('Failed to post reply')
-    } finally {
-      setLoading(false)
-    }
+      queryClient.invalidateQueries({ queryKey: queryKeys.forum.posts.byThread(threadId) })
+      router.refresh() // Keep refresh for server-rendered thread page
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to post reply')
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    createPostMutation.mutate({
+      content,
+      parentPostId: null,
+    })
   }
 
   return (
@@ -57,17 +51,17 @@ export default function ReplyForm({ threadId }: ReplyFormProps) {
         <Label htmlFor="reply">Add to Analysis</Label>
         <Textarea
           id="reply"
-          placeholder="Share your thoughts..."
+          placeholder="Share your analytical insights..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={4}
           required
-          className="mt-1"
+          className="mt-1 rounded-none"
         />
       </div>
       <div className="flex justify-end">
-        <Button type="submit" disabled={loading || !content.trim()}>
-          {loading ? 'Posting...' : 'Add to Analysis'}
+        <Button type="submit" disabled={createPostMutation.isPending || !content.trim()} className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+          {createPostMutation.isPending ? 'Posting...' : 'Post Reply'}
         </Button>
       </div>
     </form>

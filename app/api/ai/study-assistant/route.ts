@@ -51,8 +51,10 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error in study assistant API:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

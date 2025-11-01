@@ -2,15 +2,20 @@
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import ErrorState from '@/components/ui/error-state'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LoadingState } from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface ContentEditorProps {
@@ -21,11 +26,9 @@ interface ContentEditorProps {
 
 export default function ContentEditor({ contentType, mode, contentId }: ContentEditorProps) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const supabase = createClient()
-  
-  const [loading, setLoading] = useState(mode === 'edit')
-  const [saving, setSaving] = useState(false)
-  
+
   // Common fields
   const [title, setTitle] = useState('')
   const [status, setStatus] = useState<'draft' | 'in_review' | 'approved' | 'published'>('draft')
@@ -33,114 +36,81 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
   // Article-specific fields
   const [competencyId, setCompetencyId] = useState('')
   const [content, setContent] = useState('')
-  const [competencies, setCompetencies] = useState<any[]>([])
   
   // Case-specific fields
   const [briefingDoc, setBriefingDoc] = useState('')
   const [datasets, setDatasets] = useState('')
   const [rubric, setRubric] = useState('')
 
-  useEffect(() => {
-    async function loadData() {
-      // Load competencies for article selector
-      const { data: compData } = await supabase
-        .from('competencies')
-        .select('*')
-        .order('name', { ascending: true })
-      
-      setCompetencies(compData || [])
+  // Fetch competencies
+  const { data: competenciesData } = useQuery({
+    queryKey: queryKeys.competencies.all(),
+    queryFn: ({ signal }) => fetchJson<{ competencies: any[] }>('/api/competencies', { signal }),
+  })
 
-      // Load existing content in edit mode
-      if (mode === 'edit' && contentId) {
-        if (contentType === 'article') {
-          const { data, error } = await supabase
-            .from('articles')
-            .select('*')
-            .eq('id', contentId)
-            .single()
+  const competencies = competenciesData?.competencies || []
 
-          if (error || !data) {
-            toast.error('Failed to load article')
-            router.push('/admin/content')
-            return
-          }
-
-          setTitle(data.title)
-          setCompetencyId(data.competency_id)
-          setContent(data.content)
-          setStatus(data.status)
-        } else {
-          const { data, error } = await supabase
-            .from('cases')
-            .select('*')
-            .eq('id', contentId)
-            .single()
-
-          if (error || !data) {
-            toast.error('Failed to load case')
-            router.push('/admin/content')
-            return
-          }
-
-          setTitle(data.title)
-          setBriefingDoc(data.briefing_doc)
-          setDatasets(data.datasets ? JSON.stringify(data.datasets, null, 2) : '')
-          setRubric(data.rubric ? JSON.stringify(data.rubric, null, 2) : '')
-          setStatus(data.status)
-        }
+  // Fetch content in edit mode
+  const { data: contentData, isLoading: loading } = useQuery({
+    queryKey: contentType === 'article' 
+      ? queryKeys.articles.all()
+      : ['cases', contentId],
+    queryFn: ({ signal }) => 
+      contentType === 'article'
+        ? fetchJson<{ article: any }>(`/api/articles/${contentId}`, { signal })
+        : fetchJson<{ case: any }>(`/api/cases/${contentId}`, { signal }),
+    enabled: mode === 'edit' && !!contentId,
+    onSuccess: (data) => {
+      if (contentType === 'article' && 'article' in data) {
+        const article = data.article
+        setTitle(article.title)
+        setCompetencyId(article.competencyId)
+        setContent(article.content || '')
+        setStatus(article.status)
+      } else if ('case' in data) {
+        const caseItem = data.case
+        setTitle(caseItem.title)
+        setBriefingDoc(caseItem.briefingDoc || '')
+        setDatasets(caseItem.datasets ? JSON.stringify(caseItem.datasets, null, 2) : '')
+        setRubric(caseItem.rubric ? JSON.stringify(caseItem.rubric, null, 2) : '')
+        setStatus(caseItem.status)
       }
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to load content')
+      router.push('/admin/content')
+    },
+  })
 
-      setLoading(false)
-    }
-
-    loadData()
-  }, [mode, contentId, contentType, supabase, router])
-
-  const handleSave = async () => {
-    setSaving(true)
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
+  // Save mutation
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       if (contentType === 'article') {
         if (!title || !competencyId || !content) {
-          toast.error('Please fill in all required fields')
-          setSaving(false)
-          return
+          throw new Error('Please fill in all required fields')
         }
 
         const articleData = {
+          competencyId,
           title,
-          competency_id: competencyId,
           content,
           status,
-          updated_by: user.id,
-          ...(mode === 'create' ? { created_by: user.id } : {})
         }
 
         if (mode === 'create') {
-          const { error } = await supabase
-            .from('articles')
-            .insert(articleData)
-
-          if (error) throw error
-          toast.success('Article created successfully')
+          return fetchJson<{ article: any }>('/api/articles', {
+            method: 'POST',
+            body: articleData,
+          })
         } else {
-          const { error } = await supabase
-            .from('articles')
-            .update(articleData)
-            .eq('id', contentId)
-
-          if (error) throw error
-          toast.success('Article updated successfully')
+          return fetchJson<{ article: any }>(`/api/articles/${contentId}`, {
+            method: 'PUT',
+            body: articleData,
+          })
         }
       } else {
-        // Case
         if (!title || !briefingDoc || !rubric) {
-          toast.error('Please fill in all required fields')
-          setSaving(false)
-          return
+          throw new Error('Please fill in all required fields')
         }
 
         // Validate JSON fields
@@ -151,58 +121,74 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
           try {
             parsedDatasets = JSON.parse(datasets)
           } catch (e) {
-            toast.error('Invalid JSON in datasets field')
-            setSaving(false)
-            return
+            throw new Error('Invalid JSON in datasets field')
           }
         }
 
         try {
           parsedRubric = JSON.parse(rubric)
         } catch (e) {
-          toast.error('Invalid JSON in rubric field')
-          setSaving(false)
-          return
+          throw new Error('Invalid JSON in rubric field')
         }
 
         const caseData = {
           title,
-          briefing_doc: briefingDoc,
+          briefingDoc,
           datasets: parsedDatasets,
           rubric: parsedRubric,
           status,
-          updated_by: user.id,
-          ...(mode === 'create' ? { created_by: user.id } : {})
         }
 
         if (mode === 'create') {
-          const { error } = await supabase
-            .from('cases')
-            .insert(caseData)
-
-          if (error) throw error
-          toast.success('Case created successfully')
+          return fetchJson<{ case: any }>('/api/cases', {
+            method: 'POST',
+            body: caseData,
+          })
         } else {
-          const { error } = await supabase
-            .from('cases')
-            .update(caseData)
-            .eq('id', contentId)
-
-          if (error) throw error
-          toast.success('Case updated successfully')
+          return fetchJson<{ case: any }>(`/api/cases/${contentId}`, {
+            method: 'PUT',
+            body: caseData,
+          })
         }
       }
-
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      toast.success(`${contentType === 'article' ? 'Article' : 'Case'} ${mode === 'create' ? 'created' : 'updated'} successfully`)
       router.push('/admin/content')
-    } catch (error: any) {
-      console.error('Error saving content:', error)
-      toast.error(error.message || 'Failed to save content')
-      setSaving(false)
-    }
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to save content')
+    },
+  })
+
+  const handleSave = () => {
+    saveMutation.mutate()
   }
 
+  const saving = saveMutation.isPending
+
   if (loading) {
-    return <div className="text-center py-12">Loading...</div>
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingState type="dashboard" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <ErrorState
+          title="Failed to load content"
+          message="Unable to load the content editor. Please try again."
+          error={error}
+          onRetry={() => window.location.reload()}
+          showBackToDashboard={true}
+        />
+      </div>
+    )
   }
 
   return (

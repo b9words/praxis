@@ -62,7 +62,7 @@ async function findNextMissingCase(
 /**
  * Generate case study outline
  */
-async function generateCaseOutline(lesson: any, coreValues: string): Promise<string> {
+async function generateCaseOutline(lesson: any, coreValues: string): Promise<{ content: string; model: string }> {
   const prompt = `You are an expert business educator creating high-fidelity case study simulations for executive education.
 
 Generate a detailed outline for an interactive case study simulation that complements the lesson "${lesson.lessonTitle}" (Module ${lesson.moduleNumber}: "${lesson.moduleTitle}" in Domain: "${lesson.domainTitle}").
@@ -123,7 +123,7 @@ Please provide a detailed outline in structured format with specific details for
 /**
  * Generate full case study JSON from outline
  */
-async function generateFullCase(lesson: any, outline: string, coreValues: string): Promise<string> {
+async function generateFullCase(lesson: any, outline: string, coreValues: string): Promise<{ content: string; model: string }> {
   const prompt = `You are an expert business educator creating high-fidelity case study simulations.
 
 Generate the COMPLETE case study JSON structure based on this outline:
@@ -219,7 +219,8 @@ CRITICAL: Output ONLY valid JSON, no markdown formatting, no explanations. The J
 
   const systemPrompt = 'You are an expert business educator specializing in executive case study design. Generate complete, realistic, challenging case study JSON structures.'
   
-  return await generateWithAI(prompt, systemPrompt)
+  const result = await generateWithAI(prompt, systemPrompt, { trackUsage: true })
+  return result
 }
 
 /**
@@ -310,13 +311,15 @@ async function generateCase(options: GenerateOptions = {}) {
   
   // Generate outline
   console.log('📋 Generating case outline...')
-  const outline = await generateCaseOutline(lesson, coreValues)
-  console.log('✅ Outline generated\n')
+  const outlineResult = await generateCaseOutline(lesson, coreValues)
+  const outline = outlineResult.content
+  console.log(`✅ Outline generated (${outlineResult.model})\n`)
   
   // Generate full case JSON
   console.log('✍️  Generating full case study JSON...')
-  let caseJsonStr = await generateFullCase(lesson, outline, coreValues)
-  console.log('✅ Case JSON generated\n')
+  const caseResult = await generateFullCase(lesson, outline, coreValues)
+  let caseJsonStr = caseResult.content
+  console.log(`✅ Case JSON generated (${caseResult.model})\n`)
   
   // Clean JSON string (remove markdown code blocks if present)
   caseJsonStr = caseJsonStr.trim()
@@ -366,10 +369,17 @@ async function generateCase(options: GenerateOptions = {}) {
   await uploadToStorage(storagePath, caseJsonFinal, 'application/json')
   console.log('✅ Uploaded\n')
   
-  // Sync metadata
+  // Sync metadata (non-blocking - file is already in storage)
   console.log('🔄 Syncing metadata to database...')
-  const syncResult = await syncFileMetadata(storagePath)
-  console.log(`✅ ${syncResult.message || 'Metadata synced'}\n`)
+  let syncResult: any = null
+  try {
+    syncResult = await syncFileMetadata(storagePath)
+    console.log(`✅ ${syncResult?.message || syncResult?.success || 'Metadata synced'}\n`)
+  } catch (syncError: any) {
+    console.warn(`⚠️  Metadata sync failed (file is in storage): ${syncError.message}`)
+    console.warn(`   You can manually sync via /api/storage/sync or the admin UI\n`)
+    // Don't throw - file is uploaded successfully
+  }
   
   // Output review links
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
@@ -378,7 +388,7 @@ async function generateCase(options: GenerateOptions = {}) {
   console.log(`   Content Management: ${baseUrl}/admin/content`)
   console.log(`   Direct Edit: ${baseUrl}/admin/edit?path=${encodeURIComponent(storagePath)}&type=case`)
   console.log(`\n📋 Storage Path: ${storagePath}`)
-  console.log(`📋 Case ID: ${syncResult.case_id || caseData.caseId || 'N/A'}`)
+  console.log(`📋 Case ID: ${syncResult?.case_id || caseData.caseId || 'N/A'}`)
 }
 
 // CLI parsing

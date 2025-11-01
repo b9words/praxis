@@ -22,7 +22,11 @@ export default async function ResidencyPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">Select Residency Path</h1>
+        <p className="text-sm text-gray-600">Choose your learning trajectory</p>
+      </div>
       <ResidencySelector currentResidency={userResidency?.currentResidency} userId={user.id} />
     </div>
   )

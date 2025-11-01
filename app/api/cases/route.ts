@@ -34,9 +34,13 @@ export async function GET(request: NextRequest) {
     })
 
     return NextResponse.json({ cases })
-  } catch (error) {
+  } catch (error: any) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching cases:', error)
-    return NextResponse.json({ error: 'Failed to fetch cases' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -95,12 +99,17 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ case: caseItem }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error creating case:', error)
-    return NextResponse.json({ error: 'Failed to create case' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

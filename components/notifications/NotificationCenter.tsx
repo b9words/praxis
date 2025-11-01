@@ -10,9 +10,13 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface Notification {
   id: string
@@ -25,88 +29,93 @@ interface Notification {
 }
 
 export default function NotificationCenter() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
 
-  const fetchNotifications = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/notifications?limit=20')
-      // Always handle response, even if not ok, to prevent refresh loops
-      if (response.ok) {
-        const data = await response.json()
-        setNotifications(data.notifications || [])
-        setUnreadCount(data.unreadCount || 0)
-      } else {
-        // Set empty state if request fails to prevent refresh loops
-        setNotifications([])
-        setUnreadCount(0)
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: queryKeys.notifications.all(),
+    queryFn: ({ signal }) => fetchJson<{ notifications: Notification[]; unreadCount: number }>('/api/notifications?limit=20', { signal }),
+    refetchInterval: 30000,
+    retry: 1,
+  })
+
+  const notifications = data?.notifications || []
+  const unreadCount = data?.unreadCount || 0
+
+  const markAsReadMutation = useMutation({
+    mutationFn: (notificationIds: string[]) =>
+      fetchJson('/api/notifications', {
+        method: 'PATCH',
+        body: { notificationIds },
+      }),
+    onMutate: async (notificationIds) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.notifications.all() })
+      const previous = queryClient.getQueryData<{ notifications: Notification[]; unreadCount: number }>(
+        queryKeys.notifications.all()
+      )
+
+      if (previous) {
+        queryClient.setQueryData(queryKeys.notifications.all(), {
+          notifications: previous.notifications.map((n) =>
+            notificationIds.includes(n.id) ? { ...n, read: true } : n
+          ),
+          unreadCount: Math.max(0, previous.unreadCount - notificationIds.filter((id) =>
+            previous.notifications.find((n) => n.id === id && !n.read)
+          ).length),
+        })
       }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error)
-      // Set empty state on error to prevent refresh loops
-      setNotifications([])
-      setUnreadCount(0)
-    } finally {
-      setLoading(false)
-    }
+
+      return { previous }
+    },
+    onError: (error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.notifications.all(), context.previous)
+      }
+      toast.error(error instanceof Error ? error.message : 'Failed to mark notifications as read')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all() })
+    },
+  })
+
+  const markAllAsReadMutation = useMutation({
+    mutationFn: () =>
+      fetchJson('/api/notifications', {
+        method: 'PATCH',
+        body: { markAllAsRead: true },
+      }),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.notifications.all() })
+      const previous = queryClient.getQueryData<{ notifications: Notification[]; unreadCount: number }>(
+        queryKeys.notifications.all()
+      )
+
+      if (previous) {
+        queryClient.setQueryData(queryKeys.notifications.all(), {
+          notifications: previous.notifications.map((n) => ({ ...n, read: true })),
+          unreadCount: 0,
+        })
+      }
+
+      return { previous }
+    },
+    onError: (error, _, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.notifications.all(), context.previous)
+      }
+      toast.error(error instanceof Error ? error.message : 'Failed to mark all as read')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all() })
+    },
+  })
+
+  const markAsRead = (notificationIds: string[]) => {
+    markAsReadMutation.mutate(notificationIds)
   }
 
-  useEffect(() => {
-    // Only fetch if component is still mounted
-    let mounted = true
-    
-    fetchNotifications()
-    
-    // Refresh notifications every 30 seconds, but only if still mounted
-    const interval = setInterval(() => {
-      if (mounted) {
-        fetchNotifications()
-      }
-    }, 30000)
-    
-    return () => {
-      mounted = false
-      clearInterval(interval)
-    }
-  }, [])
-
-  const markAsRead = async (notificationIds: string[]) => {
-    try {
-      const response = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ notificationIds }),
-      })
-
-      if (response.ok) {
-        await fetchNotifications()
-      }
-    } catch (error) {
-      console.error('Failed to mark notifications as read:', error)
-    }
-  }
-
-  const markAllAsRead = async () => {
-    try {
-      const response = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ markAllAsRead: true }),
-      })
-
-      if (response.ok) {
-        await fetchNotifications()
-      }
-    } catch (error) {
-      console.error('Failed to mark all as read:', error)
-    }
+  const markAllAsRead = () => {
+    markAllAsReadMutation.mutate()
   }
 
   const handleNotificationClick = (notification: Notification) => {
@@ -158,6 +167,11 @@ export default function NotificationCenter() {
           {loading && notifications.length === 0 ? (
             <div className="p-4 text-center text-sm text-gray-500">
               Loading notifications...
+            </div>
+          ) : error ? (
+            <div className="p-4 text-center">
+              <p className="text-sm text-gray-700 mb-2">Failed to load notifications</p>
+              <p className="text-xs text-gray-500">{error instanceof Error ? error.message : 'Unknown error'}</p>
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-4 text-center text-sm text-gray-500">

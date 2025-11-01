@@ -3,8 +3,10 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { fetchJson } from '@/lib/api'
 import { completeCurriculumData } from '@/lib/curriculum-data'
-import { createClient } from '@/lib/supabase/client'
+import { queryKeys } from '@/lib/queryKeys'
+import { useQuery } from '@tanstack/react-query'
 import {
     Briefcase,
     CheckCircle,
@@ -19,7 +21,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface LibrarySidebarProps {
   className?: string
@@ -45,91 +47,44 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set())
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
-  const [progressMap, setProgressMap] = useState<Map<string, LessonProgress>>(new Map())
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true)
-  const [contentSearchResults, setContentSearchResults] = useState<Map<string, ContentSearchResult>>(new Map())
-  const [isSearchingContent, setIsSearchingContent] = useState(false)
 
-  // Fetch user progress
-  useEffect(() => {
-    async function fetchProgress() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        setIsLoadingProgress(false)
-        return
-      }
+  // Fetch user progress with React Query
+  const { data: progressData, isLoading: isLoadingProgress } = useQuery({
+    queryKey: queryKeys.progress.lessons(),
+    queryFn: ({ signal }) => fetchJson<{ progress: any[] }>('/api/progress/lessons', { signal }),
+    retry: false,
+  })
 
-      try {
-        const { data, error } = await supabase
-          .from('user_lesson_progress')
-          .select('domain_id, module_id, lesson_id, status, progress_percentage, bookmarked')
-          .eq('user_id', user.id)
+  // Build progress map from API data
+  const progressMap = new Map<string, LessonProgress>()
+  if (progressData?.progress) {
+    progressData.progress.forEach((item: any) => {
+      const key = `${item.domain_id}:${item.module_id}:${item.lesson_id}`
+      progressMap.set(key, {
+        status: item.status as 'not_started' | 'in_progress' | 'completed',
+        progress_percentage: item.progress_percentage || 0,
+        bookmarked: item.bookmarked || false,
+      })
+    })
+  }
 
-        if (error) {
-          console.error('Error fetching progress:', error)
-        } else if (data) {
-          const progress = new Map<string, LessonProgress>()
-          data.forEach((item) => {
-            const key = `${item.domain_id}:${item.module_id}:${item.lesson_id}`
-            progress.set(key, {
-              status: item.status as 'not_started' | 'in_progress' | 'completed',
-              progress_percentage: item.progress_percentage || 0,
-              bookmarked: item.bookmarked || false
-            })
-          })
-          setProgressMap(progress)
-        }
-      } catch (error) {
-        console.error('Error loading progress:', error)
-      } finally {
-        setIsLoadingProgress(false)
-      }
-    }
+  // Full content search with React Query and debouncing
+  const { data: searchData, isLoading: isSearchingContent } = useQuery({
+    queryKey: queryKeys.search.lessons(searchQuery),
+    queryFn: ({ signal }) =>
+      fetchJson<{ results: ContentSearchResult[] }>(`/api/search-lessons?q=${encodeURIComponent(searchQuery)}`, { signal }),
+    enabled: !!searchQuery && searchQuery.trim().length >= 2,
+    staleTime: 30000,
+  })
 
-    fetchProgress()
-  }, [])
-
-  // Full content search with debouncing
-  useEffect(() => {
-    if (!searchQuery || searchQuery.trim().length < 2) {
-      setContentSearchResults(new Map())
-      setIsSearchingContent(false)
-      return
-    }
-
-    setIsSearchingContent(true)
-    const timeoutId = setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/search-lessons?q=${encodeURIComponent(searchQuery)}`)
-        if (!response.ok) throw new Error('Search failed')
-        
-        const data = await response.json()
-        const resultsMap = new Map<string, ContentSearchResult>()
-        
-        data.results.forEach((result: any) => {
-          const key = `${result.domainId}:${result.moduleId}:${result.lessonId}`
-          resultsMap.set(key, {
-            domainId: result.domainId,
-            moduleId: result.moduleId,
-            lessonId: result.lessonId,
-            matchInContent: result.matchInContent,
-            snippet: result.snippet
-          })
-        })
-        
-        setContentSearchResults(resultsMap)
-      } catch (error) {
-        console.error('Error searching content:', error)
-        setContentSearchResults(new Map())
-      } finally {
-        setIsSearchingContent(false)
-      }
-    }, 500) // 500ms debounce
-
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+  // Build content search results map
+  const contentSearchResults = new Map<string, ContentSearchResult>()
+  if (searchData?.results) {
+    searchData.results.forEach((result) => {
+      const key = `${result.domainId}:${result.moduleId}:${result.lessonId}`
+      contentSearchResults.set(key, result)
+    })
+  }
 
   const toggleDomain = (domainId: string) => {
     const newExpanded = new Set(expandedDomains)
@@ -200,7 +155,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
     const parts = text.split(new RegExp(`(${query})`, 'gi'))
     return parts.map((part, index) => 
       part.toLowerCase() === query.toLowerCase() ? (
-        <span key={index} className="bg-yellow-200 font-medium">{part}</span>
+        <span key={index} className="bg-gray-200 font-medium">{part}</span>
       ) : part
     )
   }
@@ -222,7 +177,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                  placeholder="Search frameworks, models, case files..."
                  value={searchQuery}
                  onChange={(e) => setSearchQuery(e.target.value)}
-                 className="pl-8 pr-8 h-11 md:h-8 text-sm bg-neutral-50 border border-neutral-300 text-neutral-800 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded"
+                 className="pl-8 pr-8 h-11 md:h-8 text-sm bg-neutral-50 border border-neutral-300 text-neutral-800 placeholder:text-neutral-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 rounded-none"
                />
                {isSearchingContent && (
                  <Loader2 className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 animate-spin text-neutral-400" />
@@ -409,7 +364,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                                     variant="ghost"
                                     size="sm"
                                     className={`w-full justify-start p-2 min-h-[44px] md:h-auto ${
-                                      isLessonActive ? 'bg-blue-50 text-blue-700 font-medium' : 'text-neutral-600 hover:bg-neutral-50'
+                                      isLessonActive ? 'bg-gray-100 text-gray-900 font-medium' : 'text-neutral-600 hover:bg-neutral-50'
                                     }`}
                                   >
                                     <Link href={lessonPath} onClick={onMobileClose}>
@@ -418,11 +373,11 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                                           {/* Progress Indicator */}
                                           <div className="relative flex-shrink-0">
                                             {status === 'completed' ? (
-                                              <div className="w-5 h-5 rounded-full bg-green-600 flex items-center justify-center">
+                                              <div className="w-5 h-5 bg-gray-900 flex items-center justify-center">
                                                 <CheckCircle className="h-3 w-3 text-white" />
                                               </div>
                                             ) : status === 'in_progress' ? (
-                                              <div className="w-5 h-5 rounded-full bg-blue-100 border-2 border-blue-600 flex items-center justify-center relative">
+                                              <div className="w-5 h-5 bg-gray-100 border-2 border-gray-600 flex items-center justify-center relative">
                                                 {progressPercentage > 0 && (
                                                   <svg className="w-5 h-5 absolute inset-0 transform -rotate-90">
                                                     <circle
@@ -434,16 +389,16 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                                                       strokeWidth="2"
                                                       strokeDasharray={`${2 * Math.PI * 8}`}
                                                       strokeDashoffset={`${2 * Math.PI * 8 * (1 - progressPercentage / 100)}`}
-                                                      className="text-blue-600"
+                                                      className="text-gray-600"
                                                     />
                                                   </svg>
                                                 )}
-                                                <span className="text-xs font-medium text-blue-600 relative z-10">
+                                                <span className="text-xs font-medium text-gray-700 relative z-10">
                                                   {lesson.number}
                                                 </span>
                                               </div>
                                             ) : (
-                                              <div className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center">
+                                              <div className="w-5 h-5 bg-neutral-100 border border-neutral-200 flex items-center justify-center">
                                                 <span className="text-xs font-medium text-neutral-600">
                                                   {lesson.number}
                                                 </span>
@@ -459,7 +414,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                                                        <div className="text-xs font-medium text-left whitespace-normal word-wrap break-word leading-tight flex items-center gap-1.5">
                                                          {searchQuery ? highlightText(lesson.title, searchQuery) : lesson.title}
                                                          {isContentMatch && (
-                                                           <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium" title="Found in lesson content">
+                                                           <span className="text-[10px] text-gray-700 bg-gray-100 border border-gray-200 px-1.5 py-0.5 font-medium" title="Found in lesson content">
                                                              CONTENT
                                                            </span>
                                                          )}
@@ -468,7 +423,7 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
                                                          <Clock className="h-3 w-3" />
                                                          <span>12 min</span>
                                                          {progressPercentage > 0 && status !== 'completed' && (
-                                                           <span className="text-blue-600">• {progressPercentage}%</span>
+                                                           <span className="text-gray-700">• {progressPercentage}%</span>
                                                          )}
                                                        </div>
                                                      </div>

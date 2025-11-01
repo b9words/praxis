@@ -33,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-gray-50">
       {user && <Navbar user={{ id: user.id, email: user.email } as any} profile={profile as any} />}
-      <main className="">{children}</main>
+      <main>{children}</main>
     </div>
   )
 }

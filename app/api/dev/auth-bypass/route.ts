@@ -198,28 +198,74 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Wait for profile to be available via Prisma (FK constraint)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
     // Ensure user has a residency so they can access the dashboard
     // Use Prisma to create residency in the same database Prisma queries from
     const { prisma } = await import('@/lib/prisma/server')
     
-    try {
-      const existingResidency = await prisma.userResidency.findUnique({
-        where: { userId },
-      })
+    // Retry residency creation with proper waiting
+    let residencyCreated = false
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        const existingResidency = await prisma.userResidency.findUnique({
+          where: { userId },
+        })
 
-      if (!existingResidency) {
-        // Create residency for dev user (default to year 1)
+        if (existingResidency) {
+          residencyCreated = true
+          break
+        }
+
+        // Verify profile exists before creating residency
+        const profileCheck = await prisma.profile.findUnique({
+          where: { id: userId },
+          select: { id: true },
+        })
+
+        if (!profileCheck) {
+          // Profile doesn't exist yet, wait longer
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)))
+          continue
+        }
+
+        // Profile exists, try to create residency
         await prisma.userResidency.create({
           data: {
             userId,
             currentResidency: 1,
           },
         })
+        residencyCreated = true
+        break
+      } catch (residencyError: any) {
+        if (residencyError?.code === 'P2003') {
+          // FK error - wait and retry
+          await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)))
+          if (attempt === 4) {
+            console.warn('Failed to create residency after retries:', residencyError?.message)
+          }
+        } else {
+          // Other error - log and break
+          console.warn('Error creating residency:', residencyError?.message)
+          break
+        }
       }
-    } catch (residencyError: any) {
-      // Log but don't fail - user can still login and set it up later
-      console.warn('Failed to create residency for dev user:', residencyError?.message)
     }
+
+    // Automatically seed comprehensive data for test users
+    // Do this asynchronously so it doesn't block the login response
+    setTimeout(async () => {
+      try {
+        // Import and call seed function directly
+        const { seedComprehensiveData } = await import('@/lib/dev-seed')
+        await seedComprehensiveData(userId, email)
+      } catch (seedError) {
+        // Silently fail - this is a convenience feature
+        console.log('Auto-seed failed (non-blocking):', seedError)
+      }
+    }, 1000) // Wait 1 second after login completes
 
     // Since we've already confirmed the email via admin API, we don't need magic links
     // The client can directly use password login which will work immediately
@@ -229,7 +275,7 @@ export async function POST(request: NextRequest) {
       userId,
       email,
       username,
-      message: 'User created/updated successfully. Password login will work immediately.',
+      message: 'User created/updated successfully. Password login will work immediately. Data seeding in progress...',
       usePasswordLogin: true,
     })
   } catch (error: any) {

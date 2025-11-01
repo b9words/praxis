@@ -3,114 +3,146 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import ErrorState from '@/components/ui/error-state'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LoadingState } from '@/components/ui/loading-skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
+interface Profile {
+  id: string
+  username: string | null
+  fullName: string | null
+  avatarUrl: string | null
+  bio: string | null
+  isPublic: boolean
+}
+
 export default function ProfileEditPage() {
   const router = useRouter()
   const supabase = createClient()
+  const queryClient = useQueryClient()
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
   const [userId, setUserId] = useState<string | null>(null)
-
   const [username, setUsername] = useState('')
   const [fullName, setFullName] = useState('')
   const [bio, setBio] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [isPublic, setIsPublic] = useState(false)
 
+  // Get user ID from Supabase
   useEffect(() => {
-    async function loadProfile() {
+    async function getUserId() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
         return
       }
-
       setUserId(user.id)
-
-      // Fetch profile using API route
-      const response = await fetch(`/api/profiles/${user.id}`)
-      if (!response.ok) {
-        toast.error('Failed to load profile')
-        return
-      }
-
-      const data = await response.json()
-      const profileData = data.profile
-
-      setProfile(profileData)
-      setUsername(profileData.username || '')
-      setFullName(profileData.fullName || '')
-      setBio(profileData.bio || '')
-      setAvatarUrl(profileData.avatarUrl || '')
-      setIsPublic(profileData.isPublic || false)
-      setLoading(false)
     }
-
-    loadProfile()
+    getUserId()
   }, [supabase, router])
 
-  const handleSave = async () => {
-    if (!userId) return
+  // Fetch profile with React Query - use /api/auth/profile for self-reads
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: userId ? queryKeys.profiles.byId(userId) : ['profile', 'none'],
+    queryFn: ({ signal }) => fetchJson<{ profile: Profile }>('/api/auth/profile', { signal }),
+    enabled: !!userId,
+    retry: 2,
+  })
 
-    setSaving(true)
-
-    const response = await fetch(`/api/profiles/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        fullName,
-        bio,
-        avatarUrl,
-        isPublic,
-      }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      toast.error(error.error || 'Failed to save profile')
-      setSaving(false)
-      return
+  // Initialize form from fetched profile
+  useEffect(() => {
+    if (data?.profile) {
+      const profile = data.profile
+      setUsername(profile.username || '')
+      setFullName(profile.fullName || '')
+      setBio(profile.bio || '')
+      setAvatarUrl(profile.avatarUrl || '')
+      setIsPublic(profile.isPublic || false)
     }
+  }, [data])
 
-    toast.success('Profile updated successfully')
-    setSaving(false)
-    router.push(`/profile/${username}`)
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: (updates: {
+      username: string
+      fullName: string
+      bio: string
+      avatarUrl: string
+      isPublic: boolean
+    }) =>
+      fetchJson<{ profile: Profile }>(`/api/profiles/${userId}`, {
+        method: 'PUT',
+        body: updates,
+      }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profiles.byId(userId!) })
+      toast.success('Profile updated successfully')
+      router.push(`/profile/${variables.username}`)
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to save profile')
+    },
+  })
+
+  const handleSave = () => {
+    if (!userId || !username) return
+    updateMutation.mutate({
+      username,
+      fullName,
+      bio,
+      avatarUrl,
+      isPublic,
+    })
   }
+
+  const profile = data?.profile
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto">
-        <p className="text-center text-gray-500">Loading...</p>
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <LoadingState type="profile" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <ErrorState
+          title="Failed to load profile"
+          message="Unable to load your profile data. Please try again."
+          error={error}
+          onRetry={() => window.location.reload()}
+          showBackToDashboard={true}
+        />
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Profile</h1>
-        <p className="mt-2 text-gray-600">Manage your Praxis profile settings</p>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">Update Dossier</h1>
+        <p className="text-sm text-gray-600">Manage your profile settings</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
-          <CardDescription>Update your public profile details</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <div className="max-w-2xl">
+        <div className="bg-white border border-gray-200">
+          <div className="border-b border-gray-200 px-6 py-4">
+            <h2 className="text-lg font-medium text-gray-900">Profile Information</h2>
+            <p className="text-xs text-gray-500 mt-1">Update your public profile details</p>
+          </div>
+          <div className="p-6 space-y-6">
           {/* Avatar Preview */}
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
@@ -125,7 +157,7 @@ export default function ProfileEditPage() {
                 placeholder="https://example.com/avatar.jpg"
                 value={avatarUrl}
                 onChange={(e) => setAvatarUrl(e.target.value)}
-                className="mt-1"
+                className="mt-1 rounded-none"
               />
               <p className="text-xs text-gray-500 mt-1">Enter a URL to an image for your avatar</p>
             </div>
@@ -139,7 +171,7 @@ export default function ProfileEditPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1"
+              className="mt-1 rounded-none"
               required
             />
             <p className="text-xs text-gray-500 mt-1">Your unique username (used in profile URLs)</p>
@@ -153,7 +185,7 @@ export default function ProfileEditPage() {
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="mt-1"
+              className="mt-1 rounded-none"
             />
           </div>
 
@@ -164,31 +196,31 @@ export default function ProfileEditPage() {
               id="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Tell others about yourself..."
+              placeholder="Brief professional description..."
               rows={4}
-              className="mt-1"
+              className="mt-1 rounded-none"
             />
             <p className="text-xs text-gray-500 mt-1">A brief description about you (max 500 characters)</p>
           </div>
 
           {/* Public/Private Toggle */}
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-gray-200">
             <div className="space-y-0.5">
               <Label htmlFor="isPublic">Profile Visibility: {isPublic ? 'Public' : 'Classified'}</Label>
-              <p className="text-sm text-gray-500">A public dossier can be shared as a signal of your demonstrated acumen.</p>
+              <p className="text-xs text-gray-500">A public dossier can be shared as a signal of your demonstrated acumen.</p>
             </div>
             <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
           </div>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
 
       {/* Actions */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={() => router.push(`/profile/${profile.username}`)}>
+      <div className="flex justify-end gap-3 mt-6">
+        <Button variant="outline" onClick={() => router.push(`/profile/${profile?.username}`)} className="border-gray-300 hover:border-gray-400 rounded-none">
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={saving || !username}>
-          {saving ? 'Saving...' : 'Save Changes'}
+        <Button onClick={handleSave} disabled={updateMutation.isPending || !username} className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+          {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>
     </div>

@@ -359,7 +359,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                     </div>
                     {currentProgress && currentProgress.progress_percentage > 0 && (
                       <div className="flex items-center gap-1">
-                        <span className="text-blue-600">{currentProgress.progress_percentage}%</span>
+                        <span className="text-gray-700 font-medium">{currentProgress.progress_percentage}%</span>
                       </div>
                     )}
                   </div>
@@ -412,7 +412,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
             {/* Navigation */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center pt-8 mt-8 border-t border-neutral-200 gap-4">
-              <Button variant="outline" size="sm" asChild className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 rounded text-xs uppercase tracking-wide">
+              <Button variant="outline" size="sm" asChild className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs uppercase tracking-wide">
                 <Link href={`/library/curriculum/${domainId}/${moduleId}`}>
                   <ChevronLeft className="mr-2 h-3 w-3" />
                   MODULE
@@ -420,28 +420,28 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </Button>
               <div className="flex gap-2">
                 {previousLesson ? (
-                  <Button variant="outline" size="sm" asChild className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 active:bg-neutral-300 rounded text-xs uppercase tracking-wide">
+                  <Button variant="outline" size="sm" asChild className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs uppercase tracking-wide">
                     <Link href={`/library/curriculum/${previousLesson.domainId}/${previousLesson.moduleId}/${previousLesson.lessonId}`}>
                       <ChevronLeft className="mr-2 h-3 w-3" />
                       PREVIOUS
                     </Link>
                   </Button>
                 ) : (
-                  <Button variant="outline" size="sm" disabled className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-400 rounded text-xs uppercase tracking-wide">
+                  <Button variant="outline" size="sm" disabled className="h-8 px-2.5 border-gray-200 text-gray-400 rounded-none text-xs uppercase tracking-wide">
                     <ChevronLeft className="mr-2 h-3 w-3" />
                     PREVIOUS
                   </Button>
                 )}
                 
                 {nextLesson ? (
-                  <Button size="sm" asChild className="h-8 px-2.5 bg-blue-700 text-white hover:bg-blue-800 active:bg-blue-900 rounded text-xs uppercase tracking-wide">
+                  <Button size="sm" asChild className="h-8 px-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-none text-xs uppercase tracking-wide">
                     <Link href={`/library/curriculum/${nextLesson.domainId}/${nextLesson.moduleId}/${nextLesson.lessonId}`}>
                       NEXT
                       <ChevronRight className="ml-2 h-3 w-3" />
                     </Link>
                   </Button>
                 ) : (
-                  <Button size="sm" disabled className="h-8 px-2.5 bg-blue-400 text-white rounded text-xs uppercase tracking-wide">
+                  <Button size="sm" disabled className="h-8 px-2.5 bg-gray-400 text-white rounded-none text-xs uppercase tracking-wide">
                     NEXT
                     <ChevronRight className="ml-2 h-3 w-3" />
                   </Button>

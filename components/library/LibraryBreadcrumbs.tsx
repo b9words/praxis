@@ -1,10 +1,12 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useQuery } from '@tanstack/react-query'
 import { ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 
 interface BreadcrumbNode {
   id: string
@@ -16,46 +18,40 @@ interface BreadcrumbNode {
 export default function LibraryBreadcrumbs() {
   const searchParams = useSearchParams()
   const competencyId = searchParams.get('competency')
-  const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbNode[]>([])
-  const supabase = createClient()
 
-  useEffect(() => {
-    async function fetchBreadcrumbs() {
-      if (!competencyId) {
-        setBreadcrumbs([])
-        return
-      }
+  // Fetch all competencies with React Query
+  const { data: competenciesData } = useQuery({
+    queryKey: queryKeys.competencies.all(),
+    queryFn: ({ signal }) => fetchJson<{ competencies: any[] }>('/api/competencies', { signal }),
+    enabled: !!competencyId,
+  })
 
-      const { data: competencies } = await supabase
-        .from('competencies')
-        .select('id, name, level, parent_id, residency_year')
-
-      if (!competencies) return
-
-      // Build path from selected competency to root
-      const path: BreadcrumbNode[] = []
-      let currentId = competencyId
-      const compMap = new Map(competencies.map((c) => [c.id, c]))
-
-      while (currentId) {
-        const comp = compMap.get(currentId)
-        if (!comp) break
-
-        path.unshift({
-          id: comp.id,
-          name: comp.name,
-          level: comp.level,
-          residency_year: comp.residency_year,
-        })
-
-        currentId = comp.parent_id
-      }
-
-      setBreadcrumbs(path)
+  // Build breadcrumbs path from competencyId to root
+  const breadcrumbs = useMemo(() => {
+    if (!competencyId || !competenciesData?.competencies) {
+      return []
     }
 
-    fetchBreadcrumbs()
-  }, [competencyId, supabase])
+    const compMap = new Map(competenciesData.competencies.map((c) => [c.id, c]))
+    const path: BreadcrumbNode[] = []
+    let currentId: string | null = competencyId
+
+    while (currentId) {
+      const comp = compMap.get(currentId)
+      if (!comp) break
+
+      path.unshift({
+        id: comp.id,
+        name: comp.name,
+        level: comp.level,
+        residency_year: comp.residencyYear,
+      })
+
+      currentId = comp.parentId
+    }
+
+    return path
+  }, [competencyId, competenciesData])
 
   if (breadcrumbs.length === 0) {
     return null

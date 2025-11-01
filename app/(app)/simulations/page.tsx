@@ -1,8 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import MarkdownPreview from '@/components/ui/markdown-preview'
 import { getCurrentUser } from '@/lib/auth/get-user'
+import { isEnumError } from '@/lib/prisma-enum-fallback'
 import { prisma } from '@/lib/prisma/server'
 import { CheckCircle2, Clock, Signal } from 'lucide-react'
 import Link from 'next/link'
@@ -74,10 +74,29 @@ export default async function SimulationsPage() {
       },
       select: {
         caseId: true,
+        completedAt: true,
       },
     })
-  } catch (error) {
-    console.error('Error fetching completed simulations:', error)
+  } catch (error: any) {
+    if (isEnumError(error)) {
+      // Fallback: query without status filter, filter by completedAt
+      try {
+        const allSimulations = await prisma.simulation.findMany({
+          where: {
+            userId: user.id,
+          },
+          select: {
+            caseId: true,
+            completedAt: true,
+          },
+        })
+        completedSimulations = allSimulations.filter((s: any) => s.completedAt !== null)
+      } catch (fallbackError) {
+        console.error('Error fetching completed simulations (fallback):', fallbackError)
+      }
+    } else {
+      console.error('Error fetching completed simulations:', error)
+    }
   }
 
   const completedCaseIds = new Set(completedSimulations.map((s: any) => s.caseId))
@@ -92,10 +111,29 @@ export default async function SimulationsPage() {
       },
       select: {
         caseId: true,
+        completedAt: true,
       },
     })
-  } catch (error) {
-    console.error('Error fetching in-progress simulations:', error)
+  } catch (error: any) {
+    if (isEnumError(error)) {
+      // Fallback: query without status filter, filter by completedAt being null
+      try {
+        const allSimulations = await prisma.simulation.findMany({
+          where: {
+            userId: user.id,
+          },
+          select: {
+            caseId: true,
+            completedAt: true,
+          },
+        })
+        inProgressSimulations = allSimulations.filter((s: any) => s.completedAt === null)
+      } catch (fallbackError) {
+        console.error('Error fetching in-progress simulations (fallback):', fallbackError)
+      }
+    } else {
+      console.error('Error fetching in-progress simulations:', error)
+    }
   }
 
   const inProgressCaseIds = new Set(inProgressSimulations.map((s) => s.caseId))
@@ -114,10 +152,10 @@ export default async function SimulationsPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">The Arena</h1>
-        <p className="mt-2 text-gray-600">Deploy to scenarios and apply your analytical frameworks</p>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">The Arena</h1>
+        <p className="text-sm text-gray-600">Deploy to scenarios and apply your analytical frameworks</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -129,77 +167,75 @@ export default async function SimulationsPage() {
             .filter(Boolean)
 
           return (
-            <Card 
-              key={caseItem.id} 
-              className={`
-                transition-all duration-200 hover:shadow-lg hover:-translate-y-1
-                ${isCompleted ? 'border-green-200 bg-green-50' : ''}
-                ${isInProgress ? 'border-blue-200 bg-blue-50' : ''}
-              `}
+            <div
+              key={caseItem.id}
+              className={`bg-white border border-gray-200 transition-colors hover:border-gray-300 ${
+                isCompleted ? '' : ''
+              }`}
             >
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg leading-tight">{caseItem.title}</CardTitle>
-                  </div>
+              <div className="p-6">
+                <div className="flex items-start justify-between gap-2 mb-4">
+                  <h3 className="text-base font-medium text-gray-900 flex-1">{caseItem.title}</h3>
                   {isCompleted && (
-                    <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300 gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Done
+                    <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      Completed
                     </Badge>
                   )}
                   {isInProgress && !isCompleted && (
-                    <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
+                    <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
                       In Progress
                     </Badge>
                   )}
                 </div>
                 
-                <CardDescription>
-                  <div className="flex flex-wrap gap-2 mt-3">
+                <div className="space-y-3 mb-4">
+                  <div className="flex flex-wrap gap-2">
                     {caseItem.difficulty && (
                       <Badge
                         variant="outline"
-                        className={`text-xs capitalize ${getDifficultyColor(caseItem.difficulty)}`}
+                        className="text-xs font-medium text-gray-700 border-gray-300 capitalize"
                       >
                         <Signal className="h-3 w-3 mr-1" />
                         {caseItem.difficulty}
                       </Badge>
                     )}
                     {caseItem.estimatedMinutes && (
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
                         <Clock className="h-3 w-3 mr-1" />
                         {caseItem.estimatedMinutes} min
                       </Badge>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {competencies.map((comp, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {comp}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                  {competencies.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {competencies.map((comp, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs font-medium text-gray-600 border-gray-300">
+                          {comp}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
                 <div className="mb-4">
                   <MarkdownPreview content={caseItem.briefingDoc || ''} maxLength={120} />
                 </div>
-                <Button asChild className="w-full" variant={isInProgress ? 'default' : isCompleted ? 'outline' : 'default'}>
+                
+                <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none" variant={isInProgress || isCompleted ? 'outline' : 'default'}>
                   <Link href={`/simulations/${caseItem.id}/brief`}>
-                    {isInProgress ? 'Continue' : isCompleted ? 'Review Case' : 'Deploy to Scenario'}
+                    {isInProgress ? 'Continue Engagement' : isCompleted ? 'Review Case' : 'Deploy to Scenario'}
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )
         })}
       </div>
 
       {(!cases || cases.length === 0) && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No simulations available yet. Check back soon!</p>
+        <div className="bg-white border border-gray-200 p-12 text-center">
+          <p className="text-sm text-gray-600">No simulations available at this time.</p>
         </div>
       )}
     </div>

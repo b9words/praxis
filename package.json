@@ -28,6 +28,7 @@
     "test:analyze": "tsx scripts/analyze-test-results.ts",
     "test:full": "npm run test:e2e && npm run test:analyze",
     "test:fix-cycle": "tsx scripts/test-fix-cycle.ts",
+    "audit:data-layer": "bash scripts/audit.sh",
     "db:reset": "prisma db push --force-reset",
     "db:seed:test": "psql $DATABASE_URL -f tests/seed-data.sql"
   },

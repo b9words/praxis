@@ -43,8 +43,10 @@ export async function saveLessonProgress(payload: ProgressUpdatePayload) {
       return { success: true, data: null }
     }
 
-    // Revalidate the lesson page
-    revalidatePath(`/library/curriculum/${payload.domainId}/${payload.moduleId}/${payload.lessonId}`)
+    // Only revalidate on significant progress changes or completion (not every save)
+    if (payload.status === 'completed' || (payload.progressPercentage && payload.progressPercentage >= 100)) {
+      revalidatePath(`/library/curriculum/${payload.domainId}/${payload.moduleId}/${payload.lessonId}`)
+    }
 
     return { success: true, data: result }
   } catch (error) {

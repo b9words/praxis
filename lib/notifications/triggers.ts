@@ -1,5 +1,12 @@
 import { prisma } from '@/lib/prisma/server'
-import type { NotificationType } from '@prisma/client'
+
+export type NotificationType = 
+  | 'application_approved'
+  | 'application_rejected'
+  | 'forum_reply'
+  | 'simulation_complete'
+  | 'weekly_summary'
+  | 'general'
 
 /**
  * Create a notification for a user
@@ -25,9 +32,20 @@ export async function createNotification(params: {
       },
     })
     return notification
-  } catch (error) {
-    console.error('Failed to create notification:', error)
-    throw error
+  } catch (error: any) {
+    // Handle Prisma errors gracefully - don't throw to prevent cascading failures
+    const { getPrismaErrorInfo } = await import('@/lib/prisma-error-handler')
+    const errorInfo = getPrismaErrorInfo(error)
+    
+    if (errorInfo) {
+      // Log but don't throw - notification creation failures shouldn't break the app
+      console.error(`Failed to create notification (${errorInfo.code}):`, errorInfo.message)
+    } else {
+      console.error('Failed to create notification:', error)
+    }
+    
+    // Return null instead of throwing - allows calling code to handle gracefully
+    return null
   }
 }
 

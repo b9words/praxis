@@ -40,9 +40,13 @@ export async function GET(
     })
 
     return NextResponse.json({ threads })
-  } catch (error) {
+  } catch (error: any) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching threads:', error)
-    return NextResponse.json({ error: 'Failed to fetch threads' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -88,12 +92,22 @@ export async function POST(
     })
 
     return NextResponse.json({ thread }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Channel not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error creating thread:', error)
-    return NextResponse.json({ error: 'Failed to create thread' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

@@ -6,10 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { fetchJson } from '@/lib/api'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function ApplyPage() {
   const router = useRouter()
@@ -19,8 +22,6 @@ export default function ApplyPage() {
   const [fullName, setFullName] = useState('')
   const [motivation, setMotivation] = useState('')
   const [background, setBackground] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
   // Pre-fill email if user is logged in
@@ -32,38 +33,34 @@ export default function ApplyPage() {
       }
     }
     loadUserData()
-  }, [])
+  }, [supabase])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch('/api/applications', {
+  const submitMutation = useMutation({
+    mutationFn: (data: { email: string; fullName: string | null; motivation: string; background: string | null }) =>
+      fetchJson('/api/applications', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          fullName: fullName || null,
-          motivation,
-          background: background || null,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to submit application')
-      }
-
+        body: data,
+      }),
+    onSuccess: () => {
       setSubmitted(true)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit application')
-      setLoading(false)
-    }
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to submit application')
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submitMutation.mutate({
+      email,
+      fullName: fullName || null,
+      motivation,
+      background: background || null,
+    })
   }
+
+  const error = submitMutation.error?.message || null
+  const loading = submitMutation.isPending
 
   if (submitted) {
     return (

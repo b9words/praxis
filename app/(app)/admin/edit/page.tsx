@@ -22,7 +22,7 @@ export default async function AdminEditPage({
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
       <StorageContentEditor contentType={contentType} storagePath={storagePath} />
     </div>
   )

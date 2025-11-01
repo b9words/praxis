@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { fetchJson } from '@/lib/api'
 import { useCaseStudyStore } from '@/lib/case-study-store'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation } from '@tanstack/react-query'
 import { Bot, Send, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 interface Message {
   id: string
@@ -40,7 +43,7 @@ export default function AIPersonaChatBlock({
   const { getBlockState, updateBlockState, currentStageId } = useCaseStudyStore()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const supabase = createClient()
 
   // Load existing conversation
   useEffect(() => {
@@ -76,11 +79,8 @@ export default function AIPersonaChatBlock({
     }
   }, [messages, currentStageId, blockId, updateBlockState])
 
-  const generateAIResponse = async (userMessage: string): Promise<string> => {
-    setIsLoading(true)
-    
-    try {
-      const supabase = createClient()
+  const generateAIResponseMutation = useMutation({
+    mutationFn: async (userMessage: string): Promise<string> => {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session) {
@@ -94,14 +94,9 @@ export default function AIPersonaChatBlock({
         throw new Error('Case study data not loaded')
       }
 
-      // Call AI persona chat edge function
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-persona-chat`, {
+      const data = await fetchJson<{ reply: string }>(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-persona-chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
+        body: {
           caseData: {
             title: caseStudyData.title,
             description: caseStudyData.description,
@@ -114,27 +109,22 @@ export default function AIPersonaChatBlock({
             content: msg.content,
           })),
           userMessage,
-        }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('AI persona chat error:', errorText)
-        throw new Error('Failed to get AI response')
-      }
-
-      const { reply } = await response.json()
-      setIsLoading(false)
-      return reply || 'I apologize, but I\'m having trouble responding right now.'
-    } catch (error) {
+      return data.reply || 'I apologize, but I\'m having trouble responding right now.'
+    },
+    onError: (error) => {
       console.error('Error generating AI response:', error)
-      setIsLoading(false)
-      throw error
-    }
-  }
+      toast.error(error instanceof Error ? error.message : 'Failed to get AI response')
+    },
+  })
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return
+  const handleSendMessage = () => {
+    if (!inputValue.trim() || generateAIResponseMutation.isPending) return
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -147,26 +137,29 @@ export default function AIPersonaChatBlock({
     setInputValue('')
 
     // Generate AI response
-    try {
-      const aiResponse = await generateAIResponse(userMessage.content)
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: aiResponse,
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, aiMessage])
-    } catch (error) {
-      console.error('Error generating AI response:', error)
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'I apologize, but I\'m having trouble responding right now. Please try again.',
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorMessage])
-    }
+    generateAIResponseMutation.mutate(userMessage.content, {
+      onSuccess: (aiResponse) => {
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: aiResponse,
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+      },
+      onError: () => {
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'I apologize, but I\'m having trouble responding right now. Please try again.',
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
+      },
+    })
   }
+
+  const isLoading = generateAIResponseMutation.isPending
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

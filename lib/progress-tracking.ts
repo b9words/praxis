@@ -1,6 +1,7 @@
-import type { LessonProgressStatus } from '@prisma/client'
 import { isEnumError, isForeignKeyError, logErrorOnce } from './prisma-enum-fallback'
 import { prisma } from './prisma/server'
+
+export type LessonProgressStatus = 'not_started' | 'in_progress' | 'completed'
 
 // Track failed profile creation attempts to prevent repeated attempts
 const failedProfileCreations = new Set<string>()
@@ -42,45 +43,74 @@ async function ensureProfileExists(userId: string): Promise<boolean> {
       return false // System-wide circuit breaker triggered
     }
 
-    // Profile doesn't exist - validate user exists in auth.users first
-    const { createClient } = await import('@/lib/supabase/server')
-    const supabase = await createClient()
-    
-    // Use admin client to check if user actually exists in auth.users table
-    const { createClient: createAdminClient } = await import('@supabase/supabase-js')
-    const supabaseAdmin = createAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    )
+    // Profile doesn't exist - try to get user data from various sources
+    let username = `user_${userId.slice(0, 8)}`
+    let fullName: string | null = null
+    let avatarUrl: string | null = null
 
-    // Check if user exists in auth.users table
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
-    
-    if (authError || !authUser?.user) {
-      logErrorOnce(`Cannot create profile - user ${userId} does not exist in auth.users`, authError, 'warn')
-      return false
+    try {
+      // Try to get user from session first (most accessible)
+      const { createClient } = await import('@/lib/supabase/server')
+      const supabase = await createClient()
+      const { data: { user: sessionUser } } = await supabase.auth.getUser()
+      
+      if (sessionUser) {
+        username = sessionUser.user_metadata?.username || 
+                  sessionUser.user_metadata?.preferred_username ||
+                  sessionUser.email?.split('@')[0] ||
+                  username
+        fullName = sessionUser.user_metadata?.full_name || 
+                  sessionUser.user_metadata?.name || 
+                  null
+        avatarUrl = sessionUser.user_metadata?.avatar_url || 
+                   sessionUser.user_metadata?.picture || 
+                   null
+      }
+
+      // Try Admin client as fallback for more complete data (but don't fail if it doesn't work)
+      try {
+        const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+          const supabaseAdmin = createAdminClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            {
+              auth: {
+                autoRefreshToken: false,
+                persistSession: false,
+              },
+            }
+          )
+          const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId)
+          
+          if (authUser?.user) {
+            const userData = authUser.user
+            username = userData.user_metadata?.username || 
+                      userData.user_metadata?.preferred_username ||
+                      sessionUser?.user_metadata?.username ||
+                      sessionUser?.email?.split('@')[0] ||
+                      username
+            fullName = userData.user_metadata?.full_name || 
+                      userData.user_metadata?.name || 
+                      sessionUser?.user_metadata?.full_name ||
+                      userData.email?.split('@')[0] || 
+                      fullName
+            avatarUrl = userData.user_metadata?.avatar_url || 
+                       userData.user_metadata?.picture ||
+                       sessionUser?.user_metadata?.avatar_url || 
+                       avatarUrl
+          }
+        }
+      } catch (adminError) {
+        // Admin check failed - continue with session data or defaults
+        // This is expected if SERVICE_ROLE_KEY is not set or user doesn't exist in auth.users
+      }
+    } catch (sessionError) {
+      // Session fetch failed - use minimal defaults
+      // This is acceptable - we'll create profile with minimal data
     }
 
-    // Get current user session for metadata
-    const { data: { user: sessionUser } } = await supabase.auth.getUser()
-    
-    // Use auth user data (more reliable) or session data as fallback
-    const userData = authUser.user
-    const username = userData.user_metadata?.username || 
-                    sessionUser?.user_metadata?.username || 
-                    `user_${userId.slice(0, 8)}`
-    const fullName = userData.user_metadata?.full_name || 
-                    sessionUser?.user_metadata?.full_name || 
-                    userData.email?.split('@')[0] || null
-    const avatarUrl = userData.user_metadata?.avatar_url || 
-                     sessionUser?.user_metadata?.avatar_url || null
-
+    // Always attempt to create profile with whatever data we have
     // Use raw SQL to create profile to avoid schema mismatch issues
     await prisma.$executeRawUnsafe(`
       INSERT INTO profiles (id, username, full_name, avatar_url, created_at, updated_at)
@@ -93,7 +123,13 @@ async function ensureProfileExists(userId: string): Promise<boolean> {
       avatarUrl
     )
     
-    return true // Profile created successfully
+    // Verify profile was created (check again after insert)
+    const createdProfile = await prisma.profile.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    })
+    
+    return !!createdProfile // Return true if profile exists (created or already existed)
   } catch (error: any) {
     // Mark this user as failed and set retry timer
     failedProfileCreations.add(userId)

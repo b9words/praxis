@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import EmptyState from '@/components/ui/empty-state'
 import { Recommendation } from '@/lib/recommendation-engine'
 import { BookOpen, PlayCircle, Target, Trophy } from 'lucide-react'
@@ -15,12 +14,12 @@ interface SmartRecommendationProps {
 export default function SmartRecommendation({ recommendation }: SmartRecommendationProps) {
   if (!recommendation) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Optimal Next Move</CardTitle>
-          <CardDescription>Your personalized learning path</CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
+      <div className="bg-white border border-gray-200">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <h2 className="text-lg font-medium text-gray-900">Optimal Next Move</h2>
+          <p className="text-xs text-gray-500 mt-1">Your personalized learning path</p>
+        </div>
+        <div className="p-6">
           <EmptyState
             icon={Target}
             title="Choose Your Path"
@@ -31,77 +30,76 @@ export default function SmartRecommendation({ recommendation }: SmartRecommendat
             }}
             className="border-0 shadow-none"
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
   }
 
   // Residency complete
   if (!recommendation.id) {
     return (
-      <Card className="border-gold-300 bg-gradient-to-br from-yellow-50 to-amber-50">
-        <CardHeader>
+      <div className="bg-white border border-gray-200">
+        <div className="border-b border-gray-200 px-6 py-4">
           <div className="flex items-center gap-3">
-            <Trophy className="h-6 w-6 text-yellow-600" />
+            <Trophy className="h-5 w-5 text-gray-600" />
             <div>
-              <CardTitle className="text-yellow-900">{recommendation.title}</CardTitle>
-              <CardDescription className="text-yellow-700">{recommendation.reason}</CardDescription>
+              <h2 className="text-lg font-medium text-gray-900">{recommendation.title}</h2>
+              <p className="text-xs text-gray-500 mt-1">{recommendation.reason}</p>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <p className="text-sm text-yellow-800">
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
               You have completed all content in Year {recommendation.residencyYear}. Advance to the next residency.
             </p>
-            <Button asChild variant="default" className="w-full">
+            <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none">
               <Link href="/residency">Advance to Next Year</Link>
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     )
   }
 
   const isCurriculum = recommendation.type === 'curriculum'
 
   return (
-    <Card className={`border-l-4 ${isCurriculum ? 'border-blue-500' : 'border-green-500'}`}>
-      <CardHeader>
+    <div className="bg-white border border-gray-200">
+      <div className="border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
-          <CardTitle>Optimal Next Move</CardTitle>
+          <h2 className="text-lg font-medium text-gray-900">Optimal Next Move</h2>
           {recommendation.residencyYear && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
               Year {recommendation.residencyYear}
             </Badge>
           )}
         </div>
-        <CardDescription>{recommendation.reason}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        <p className="text-xs text-gray-500 mt-1">{recommendation.reason}</p>
+      </div>
+      <div className="p-6 space-y-4">
         <div className="flex items-start gap-4">
-          <div className={`p-3 rounded-lg ${isCurriculum ? 'bg-blue-100' : 'bg-green-100'}`}>
+          <div className="p-3 bg-gray-50 border border-gray-200">
             {isCurriculum ? (
-              <BookOpen className={`h-6 w-6 ${isCurriculum ? 'text-blue-600' : 'text-green-600'}`} />
+              <BookOpen className="h-6 w-6 text-gray-700" />
             ) : (
-              <PlayCircle className={`h-6 w-6 text-green-600`} />
+              <PlayCircle className="h-6 w-6 text-gray-700" />
             )}
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">{recommendation.title}</h3>
+            <h3 className="text-base font-medium text-gray-900">{recommendation.title}</h3>
             {recommendation.competencyName && (
-              <p className="text-sm text-gray-600 mt-1">{recommendation.competencyName}</p>
+              <p className="text-xs text-gray-500 mt-1">{recommendation.competencyName}</p>
             )}
           </div>
         </div>
 
-        <Button asChild className="w-full">
+        <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none">
           <Link href={recommendation.type === 'curriculum' ? recommendation.url : `/simulations/${recommendation.id}/brief`}>
-            {recommendation.type === 'curriculum' ? 'Engage Target' : 'Deploy to Scenario'}
+            Engage Target
           </Link>
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
-

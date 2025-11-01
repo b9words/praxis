@@ -2,12 +2,13 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
-import { createClient } from '@/lib/supabase/client'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Award, BookOpen, Brain, CheckCircle2, Lock, Target, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -87,9 +88,8 @@ const STEPS = [
 
 export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowProps) {
   const router = useRouter()
-  const supabase = createClient()
+  const queryClient = useQueryClient()
   const [currentStep, setCurrentStep] = useState(0)
-  const [loading, setLoading] = useState(false)
   
   // Form state
   const [goals, setGoals] = useState('')
@@ -110,46 +110,42 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
     }
   }
 
-  const handleComplete = async () => {
-    if (!selectedResidency) {
-      toast.error('Please select a residency path')
-      return
-    }
+  const completeOnboardingMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedResidency) {
+        throw new Error('Please select a residency path')
+      }
 
-    setLoading(true)
-
-    try {
-      // Update profile with goals and role
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
+      // Update profile
+      await fetchJson(`/api/profiles/${userId}`, {
+        method: 'PUT',
+        body: {
           bio: goals || `Aspiring business leader focused on ${RESIDENCIES[selectedResidency - 1].title.toLowerCase()}`,
-          // Store additional onboarding data in a JSON field if needed
-        })
-        .eq('id', userId)
+        },
+      })
 
-      if (profileError) throw profileError
-
-      // Set user residency
-      const { error: residencyError } = await supabase
-        .from('user_residency')
-        .upsert({
-          user_id: userId,
-          current_residency: selectedResidency,
-          updated_at: new Date().toISOString(),
-        })
-
-      if (residencyError) throw residencyError
-
+      // Update residency
+      await fetchJson('/api/residency', {
+        method: 'PUT',
+        body: { currentResidency: selectedResidency },
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profiles.byId(userId) })
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.progress() })
       toast.success('Onboarding complete. Access your dashboard.')
       router.push('/dashboard')
-    } catch (error) {
-      console.error('Failed to complete onboarding:', error)
-      toast.error('Failed to complete setup')
-    } finally {
-      setLoading(false)
-    }
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to complete setup')
+    },
+  })
+
+  const handleComplete = () => {
+    completeOnboardingMutation.mutate()
   }
+
+  const loading = completeOnboardingMutation.isPending
 
   const renderStep = () => {
     switch (currentStep) {
@@ -157,55 +153,55 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
         return (
           <div className="text-center space-y-8">
             <div className="space-y-4">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-gray-900 flex items-center justify-center">
                 <Target className="h-10 w-10 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Access the Proving Ground</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <h2 className="text-2xl font-medium text-gray-900">Access the Proving Ground</h2>
+              <p className="text-sm text-gray-600 max-w-2xl mx-auto">
                 The proving ground for ambitious business leaders. You are about to embark on a systematic journey 
                 to build world-class business acumen through interactive learning.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-                <CardHeader className="text-center">
-                  <BookOpen className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <CardTitle className="text-lg">Learn</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="bg-white border border-gray-200">
+                <div className="border-b border-gray-200 px-6 py-4 text-center">
+                  <BookOpen className="h-6 w-6 text-gray-600 mx-auto mb-2" />
+                  <h3 className="text-base font-medium text-gray-900">Learn</h3>
+                </div>
+                <div className="p-6">
                   <p className="text-sm text-gray-600">
                     Master business frameworks through expert-curated articles with AI-powered study assistance
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
-                <CardHeader className="text-center">
-                  <Brain className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <CardTitle className="text-lg">Practice</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="bg-white border border-gray-200">
+                <div className="border-b border-gray-200 px-6 py-4 text-center">
+                  <Brain className="h-6 w-6 text-gray-600 mx-auto mb-2" />
+                  <h3 className="text-base font-medium text-gray-900">Practice</h3>
+                </div>
+                <div className="p-6">
                   <p className="text-sm text-gray-600">
                     Apply knowledge in realistic business simulations with AI stakeholders and real data
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
-              <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-violet-50">
-                <CardHeader className="text-center">
-                  <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <CardTitle className="text-lg">Connect</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <div className="bg-white border border-gray-200">
+                <div className="border-b border-gray-200 px-6 py-4 text-center">
+                  <Users className="h-6 w-6 text-gray-600 mx-auto mb-2" />
+                  <h3 className="text-base font-medium text-gray-900">Connect</h3>
+                </div>
+                <div className="p-6">
                   <p className="text-sm text-gray-600">
                     Learn from a vetted community of high-performing professionals and build your network
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
-            <Button onClick={handleNext} size="lg" className="px-8">
+            <Button onClick={handleNext} size="lg" className="px-8 rounded-none bg-gray-900 hover:bg-gray-800 text-white">
               Proceed
             </Button>
           </div>
@@ -215,8 +211,8 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
         return (
           <div className="max-w-2xl mx-auto space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-gray-900">Tell Us About Yourself</h2>
-              <p className="text-gray-600">
+              <h2 className="text-2xl font-medium text-gray-900">Tell Us About Yourself</h2>
+              <p className="text-sm text-gray-600">
                 Help us personalize your learning experience
               </p>
             </div>
@@ -229,6 +225,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
                   placeholder="e.g., Software Engineer, Product Manager, Consultant"
                   value={currentRole}
                   onChange={(e) => setCurrentRole(e.target.value)}
+                  className="rounded-none"
                 />
               </div>
 
@@ -240,6 +237,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
                   value={goals}
                   onChange={(e) => setGoals(e.target.value)}
                   rows={4}
+                  className="rounded-none"
                 />
                 <p className="text-xs text-gray-500">
                   This helps us provide more relevant recommendations and examples
@@ -248,10 +246,10 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={handleBack} className="rounded-none border-gray-300 hover:border-gray-400">
                 Back
               </Button>
-              <Button onClick={handleNext}>
+              <Button onClick={handleNext} className="rounded-none bg-gray-900 hover:bg-gray-800 text-white">
                 Continue
               </Button>
             </div>
@@ -262,8 +260,8 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
         return (
           <div className="space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-gray-900">Choose Your Learning Path</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <h2 className="text-2xl font-medium text-gray-900">Choose Your Learning Path</h2>
+              <p className="text-sm text-gray-600 max-w-2xl mx-auto">
                 Each residency is a structured curriculum that builds systematically. 
                 Start with Year 1 to master the fundamentals.
               </p>
@@ -275,20 +273,20 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
                 const isLocked = !residency.unlocked
 
                 return (
-                  <Card
+                  <div
                     key={residency.year}
-                    className={`relative cursor-pointer transition-all ${
+                    className={`relative cursor-pointer transition-colors bg-white border ${
                       isSelected
-                        ? 'border-2 border-blue-500 shadow-lg'
+                        ? 'border-gray-900'
                         : isLocked
-                        ? 'opacity-60 cursor-not-allowed'
-                        : 'hover:shadow-md hover:-translate-y-1'
+                        ? 'border-gray-200 opacity-60 cursor-not-allowed'
+                        : 'border-gray-200 hover:border-gray-300'
                     }`}
                     onClick={() => !isLocked && setSelectedResidency(residency.year)}
                   >
                     {isSelected && (
                       <div className="absolute -top-3 -right-3">
-                        <Badge className="bg-blue-600 gap-1">
+                        <Badge className="bg-gray-900 text-white gap-1">
                           <CheckCircle2 className="h-3 w-3" />
                           Selected
                         </Badge>
@@ -297,66 +295,67 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
 
                     {isLocked && (
                       <div className="absolute -top-3 -right-3">
-                        <Badge variant="secondary" className="gap-1">
+                        <Badge variant="secondary" className="gap-1 bg-gray-100 text-gray-700 border-gray-300">
                           <Lock className="h-3 w-3" />
                           Locked
                         </Badge>
                       </div>
                     )}
 
-                    <CardHeader>
+                    <div className="border-b border-gray-200 px-6 py-4">
                       <div className="flex items-center gap-3 mb-2">
                         <div className={`
-                          h-12 w-12 rounded-full flex items-center justify-center font-bold text-xl
-                          ${isLocked ? 'bg-gray-200 text-gray-400' : 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white'}
+                          h-12 w-12 flex items-center justify-center font-semibold text-xl
+                          ${isLocked ? 'bg-gray-100 border border-gray-200 text-gray-400' : 'bg-gray-900 text-white'}
                         `}>
                           {residency.year}
                         </div>
-                        <Award className={`h-6 w-6 ${isLocked ? 'text-gray-400' : 'text-yellow-500'}`} />
+                        <Award className={`h-6 w-6 ${isLocked ? 'text-gray-400' : 'text-gray-600'}`} />
                       </div>
-                      <CardTitle className="text-xl">{residency.title}</CardTitle>
-                      <CardDescription>{residency.description}</CardDescription>
-                    </CardHeader>
+                      <h3 className="text-xl font-medium text-gray-900">{residency.title}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{residency.description}</p>
+                    </div>
 
-                    <CardContent className="space-y-4">
+                    <div className="p-6 space-y-4">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <div className="text-2xl font-bold text-blue-600">{residency.stats.articles}</div>
+                          <div className="text-2xl font-semibold text-gray-900">{residency.stats.articles}</div>
                           <div className="text-xs text-gray-500">Articles</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-green-600">{residency.stats.cases}</div>
+                          <div className="text-2xl font-semibold text-gray-900">{residency.stats.cases}</div>
                           <div className="text-xs text-gray-500">Cases</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-purple-600">{residency.stats.estimatedHours}h</div>
+                          <div className="text-2xl font-semibold text-gray-900">{residency.stats.estimatedHours}h</div>
                           <div className="text-xs text-gray-500">Est. Time</div>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-sm font-medium text-gray-700 mb-2">Key Domains:</p>
+                        <p className="text-xs font-medium text-gray-700 mb-2 uppercase tracking-wide">Key Domains:</p>
                         <div className="flex flex-wrap gap-2">
                           {residency.domains.map((domain) => (
-                            <Badge key={domain} variant="secondary" className="text-xs">
+                            <Badge key={domain} variant="secondary" className="text-xs bg-gray-100 text-gray-700 border-gray-300">
                               {domain}
                             </Badge>
                           ))}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 )
               })}
             </div>
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={handleBack} className="rounded-none border-gray-300 hover:border-gray-400">
                 Back
               </Button>
               <Button 
                 onClick={handleNext} 
                 disabled={!selectedResidency}
+                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-400"
               >
                 Continue
               </Button>
@@ -369,61 +368,61 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
         return (
           <div className="text-center space-y-8 max-w-2xl mx-auto">
             <div className="space-y-4">
-              <div className="mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+              <div className="mx-auto w-20 h-20 bg-gray-900 flex items-center justify-center">
                 <CheckCircle2 className="h-10 w-10 text-white" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900">Setup Complete</h2>
-              <p className="text-lg text-gray-600">
+              <h2 className="text-2xl font-medium text-gray-900">Setup Complete</h2>
+              <p className="text-sm text-gray-600">
                 Access to {selectedPath?.title} is active. Begin your analytical journey 
                 in business decision-making.
               </p>
             </div>
 
             {selectedPath && (
-              <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 justify-center">
-                    <Target className="h-5 w-5" />
+              <div className="bg-white border border-gray-200">
+                <div className="border-b border-gray-200 px-6 py-4">
+                  <h3 className="text-base font-medium text-gray-900 flex items-center gap-2 justify-center">
+                    <Target className="h-4 w-4 text-gray-600" />
                     Your First Steps
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                  </h3>
+                </div>
+                <div className="p-6 space-y-4">
                   <div className="text-left space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                      <div className="w-6 h-6 bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">1</div>
                       <div>
-                        <p className="font-medium">Read your first article</p>
+                        <p className="font-medium text-gray-900">Read your first article</p>
                         <p className="text-sm text-gray-600">Start with foundational business frameworks</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                      <div className="w-6 h-6 bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">2</div>
                       <div>
-                        <p className="font-medium">Practice in a simulation</p>
+                        <p className="font-medium text-gray-900">Practice in a simulation</p>
                         <p className="text-sm text-gray-600">Apply your knowledge to real business scenarios</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                      <div className="w-6 h-6 bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">3</div>
                       <div>
-                        <p className="font-medium">Get AI-powered feedback</p>
+                        <p className="font-medium text-gray-900">Get AI-powered feedback</p>
                         <p className="text-sm text-gray-600">Receive detailed performance analysis and recommendations</p>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={handleBack} className="rounded-none border-gray-300 hover:border-gray-400">
                 Back
               </Button>
               <Button 
                 onClick={handleComplete} 
                 disabled={loading}
                 size="lg"
-                className="px-8"
+                className="px-8 rounded-none bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-400"
               >
                 {loading ? 'Setting up...' : 'Start Learning'}
               </Button>
@@ -453,7 +452,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
           <Progress value={progress} className="h-2" />
           <div className="flex justify-between mt-2">
             {STEPS.map((step, index) => (
-              <div key={step.id} className={`text-xs ${index <= currentStep ? 'text-blue-600' : 'text-gray-400'}`}>
+              <div key={step.id} className={`text-xs ${index <= currentStep ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
                 {step.title}
               </div>
             ))}

@@ -59,9 +59,13 @@ export async function GET(
     }
 
     return NextResponse.json({ post })
-  } catch (error) {
+  } catch (error: any) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching post:', error)
-    return NextResponse.json({ error: 'Failed to fetch post' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -109,12 +113,22 @@ export async function PUT(
     })
 
     return NextResponse.json({ post: updatedPost })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating post:', error)
-    return NextResponse.json({ error: 'Failed to update post' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -151,12 +165,22 @@ export async function DELETE(
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error deleting post:', error)
-    return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

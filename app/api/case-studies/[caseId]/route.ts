@@ -55,14 +55,15 @@ export async function GET(
       const caseStudyData = JSON.parse(fileContents)
       return NextResponse.json(caseStudyData)
     } catch (parseError) {
+      const { normalizeError } = await import('@/lib/api/route-helpers')
+      const normalized = normalizeError(parseError)
       console.error('Failed to parse case study JSON file:', parseError)
-      return NextResponse.json(
-        { error: 'Invalid case study file format' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: normalized }, { status: 500 })
     }
   } catch (error) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error loading case study:', error)
-    return NextResponse.json({ error: 'Failed to load case study' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }

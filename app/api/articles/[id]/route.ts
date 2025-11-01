@@ -36,8 +36,10 @@ export async function GET(
 
     return NextResponse.json({ article })
   } catch (error) {
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const normalized = normalizeError(error)
     console.error('Error fetching article:', error)
-    return NextResponse.json({ error: 'Failed to fetch article' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -50,6 +52,15 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
+    // Check if article exists before updating
+    const existing = await prisma.article.findUnique({
+      where: { id },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
     const article = await prisma.article.update({
       where: { id },
       data: {
@@ -62,12 +73,22 @@ export async function PUT(
     })
 
     return NextResponse.json({ article })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating article:', error)
-    return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -80,6 +101,15 @@ export async function PATCH(
     const { id } = await params
     const body = await request.json()
 
+    // Check if article exists before updating
+    const existing = await prisma.article.findUnique({
+      where: { id },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
     const article = await prisma.article.update({
       where: { id },
       data: {
@@ -92,12 +122,22 @@ export async function PATCH(
     })
 
     return NextResponse.json({ article })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating article:', error)
-    return NextResponse.json({ error: 'Failed to update article' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 
@@ -109,17 +149,36 @@ export async function DELETE(
     await requireRole(['admin'])
     const { id } = await params
 
+    // Check if article exists before deleting
+    const existing = await prisma.article.findUnique({
+      where: { id },
+    })
+
+    if (!existing) {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
     await prisma.article.delete({
       where: { id },
     })
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
+    
+    // Handle P2025 (record not found) gracefully
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+    
+    const { normalizeError } = await import('@/lib/api/route-helpers')
+    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
+    const normalized = normalizeError(error)
+    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error deleting article:', error)
-    return NextResponse.json({ error: 'Failed to delete article' }, { status: 500 })
+    return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
 

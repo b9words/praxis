@@ -2,8 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { MessageCircle, TrendingUp } from 'lucide-react'
+import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 
 interface Thread {
@@ -26,38 +25,35 @@ interface CommunityFeedProps {
 export default function CommunityFeed({ threads }: CommunityFeedProps) {
   if (!threads || threads.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Network Activity</CardTitle>
-          <CardDescription>Latest discussions from the exchange</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-sm">No recent discussions</p>
-            <Button asChild size="sm" className="mt-4">
-              <Link href="/community">Open a Thread</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="bg-white border border-gray-200">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <h2 className="text-lg font-medium text-gray-900">Network Activity</h2>
+          <p className="text-xs text-gray-500 mt-1">Latest discussions from The Exchange</p>
+        </div>
+        <div className="p-8 text-center">
+          <p className="text-sm text-gray-500 mb-4">No recent discussions</p>
+          <Button asChild size="sm" className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            <Link href="/community">Open a Thread</Link>
+          </Button>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-            <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
-            Network Activity
-          </CardTitle>
-          <CardDescription>Latest discussions from the exchange</CardDescription>
+    <div className="bg-white border border-gray-200">
+      <div className="border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-medium text-gray-900">Network Activity</h2>
+            <p className="text-xs text-gray-500 mt-1">Latest discussions from The Exchange</p>
+          </div>
+          <Button asChild variant="ghost" size="sm" className="text-xs text-gray-600 hover:text-gray-900 rounded-none p-0 h-auto">
+            <Link href="/community">View All</Link>
+          </Button>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href="/community">View All</Link>
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </div>
+      <div className="divide-y divide-gray-100">
         {threads.slice(0, 5).map((thread) => {
           const displayName = thread.author.full_name || thread.author.username
           const initials = displayName
@@ -71,15 +67,15 @@ export default function CommunityFeed({ threads }: CommunityFeedProps) {
             <Link
               key={thread.id}
               href={`/community/${thread.slug}`}
-              className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+              className="flex items-start gap-3 px-6 py-4 hover:bg-gray-50 transition-colors"
             >
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-8 w-8 border border-gray-200">
                 <AvatarImage src={thread.author.avatar_url || undefined} />
-                <AvatarFallback>{initials}</AvatarFallback>
+                <AvatarFallback className="text-xs bg-gray-100 text-gray-700">{initials}</AvatarFallback>
               </Avatar>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                <h4 className="text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-1">
                   {thread.title}
                 </h4>
                 <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
@@ -100,8 +96,8 @@ export default function CommunityFeed({ threads }: CommunityFeedProps) {
             </Link>
           )
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
@@ -115,4 +111,3 @@ function getTimeAgo(date: Date): string {
   if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
   return `${Math.floor(seconds / 604800)}w ago`
 }
-

@@ -2,9 +2,10 @@
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { fetchJson } from '@/lib/api'
 import { createClient } from '@/lib/supabase/client'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -28,53 +29,48 @@ export default function AIPersonaChat({
     }
   ])
   const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
   const supabase = createClient()
 
-  const handleSend = async () => {
-    if (!input.trim()) return
-
-    const userMessage = input
-    setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
-    setLoading(true)
-
-    try {
+  const sendMessageMutation = useMutation({
+    mutationFn: async (userMessage: string) => {
       const session = await supabase.auth.getSession()
-
-      // Call AI persona endpoint
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-persona-chat`, {
+      return fetchJson<{ reply: string }>(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-persona-chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.data.session?.access_token}`,
-        },
-        body: JSON.stringify({
+        body: {
           caseData,
           personaName,
           personaRole,
           chatHistory: messages,
           userMessage,
-        }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.data.session?.access_token}`,
+        },
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to get response')
-      }
-
-      const { reply } = await response.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }])
-    } catch (error) {
+    },
+    onSuccess: (data, userMessage) => {
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+    },
+    onError: (error) => {
       console.error('Error in AI chat:', error)
       toast.error('Failed to get response. Please try again.')
       setMessages(prev => [...prev, { 
         role: 'assistant', 
         content: `I apologize, I'm having trouble responding right now. Could you rephrase your question?`
       }])
-    } finally {
-      setLoading(false)
-    }
+    },
+  })
+
+  const handleSend = () => {
+    if (!input.trim()) return
+
+    const userMessage = input
+    setInput('')
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    sendMessageMutation.mutate(userMessage)
   }
+
+  const loading = sendMessageMutation.isPending
 
   const handleComplete = () => {
     if (onComplete) {
@@ -88,7 +84,7 @@ export default function AIPersonaChat({
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarFallback className="bg-blue-600 text-white">
+            <AvatarFallback className="bg-gray-900 text-white">
               {personaName.split(' ').map(n => n[0]).join('')}
             </AvatarFallback>
           </Avatar>
@@ -106,20 +102,20 @@ export default function AIPersonaChat({
             key={index}
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <Card className={`max-w-[80%] p-3 ${
+            <div className={`max-w-[80%] p-3 border border-gray-200 ${
               message.role === 'user' 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-100'
+                ? 'bg-gray-900 text-white' 
+                : 'bg-white'
             }`}>
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-            </Card>
+            </div>
           </div>
         ))}
         {loading && (
           <div className="flex justify-start">
-            <Card className="max-w-[80%] p-3 bg-gray-100">
+            <div className="max-w-[80%] p-3 bg-white border border-gray-200">
               <p className="text-sm text-gray-500">Typing...</p>
-            </Card>
+            </div>
           </div>
         )}
       </div>
@@ -138,8 +134,9 @@ export default function AIPersonaChat({
               }
             }}
             disabled={loading}
+            className="rounded-none"
           />
-          <Button onClick={handleSend} disabled={loading || !input.trim()}>
+          <Button onClick={handleSend} disabled={loading || !input.trim()} className="rounded-none bg-gray-900 hover:bg-gray-800 text-white">
             Send
           </Button>
         </div>
@@ -148,7 +145,7 @@ export default function AIPersonaChat({
             variant="outline"
             size="sm"
             onClick={handleComplete}
-            className="mt-2 w-full"
+            className="mt-2 w-full rounded-none border-gray-300 hover:border-gray-400"
           >
             End Conversation
           </Button>

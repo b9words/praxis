@@ -1,6 +1,5 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import Link from 'next/link'
@@ -55,59 +54,104 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
         { updatedAt: 'desc' },
       ],
     })
-  } catch (error) {
-    console.error('Error fetching threads:', error)
+  } catch (error: any) {
+    // Handle missing metadata column (P2022) or other schema issues
+    if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
+      try {
+        // Fallback: explicit select without problematic columns
+        threads = await prisma.forumThread.findMany({
+          where: {
+            channelId: channel.id,
+          },
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            isPinned: true,
+            createdAt: true,
+            updatedAt: true,
+            author: {
+              select: {
+                username: true,
+                avatarUrl: true,
+              },
+            },
+            _count: {
+              select: {
+                posts: true,
+              },
+            },
+          },
+          orderBy: [
+            { isPinned: 'desc' },
+            { updatedAt: 'desc' },
+          ],
+        })
+      } catch (fallbackError) {
+        console.error('Error fetching threads (fallback):', fallbackError)
+      }
+    } else {
+      console.error('Error fetching threads:', error)
+    }
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">#{channel.name}</h1>
-          <p className="mt-2 text-gray-600">{channel.description}</p>
+    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-medium text-gray-900 mb-2">#{channel.name}</h1>
+            <p className="text-sm text-gray-600">{channel.description}</p>
+          </div>
+          <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            <Link href={`/community/${slug}/new`}>Open a New Thread</Link>
+          </Button>
         </div>
-        <Button asChild>
-          <Link href={`/community/${slug}/new`}>Open a New Thread</Link>
-        </Button>
       </div>
 
-      <div className="space-y-3">
-        {threads.length > 0 ? (
-          threads.map((thread) => (
-            <Link key={thread.id} href={`/community/${slug}/${thread.id}`}>
-              <Card className="hover:bg-gray-50 transition-colors cursor-pointer">
-                <CardContent className="pt-6">
+      {threads.length > 0 ? (
+        <div className="bg-white border border-gray-200">
+          <div className="divide-y divide-gray-100">
+            {threads.map((thread) => (
+              <Link key={thread.id} href={`/community/${slug}/${thread.id}`}>
+                <div className="px-6 py-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        {thread.isPinned && <Badge variant="secondary">Pinned</Badge>}
-                        <h3 className="font-semibold text-gray-900">{thread.title}</h3>
+                        {thread.isPinned && (
+                          <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
+                            Pinned
+                          </Badge>
+                        )}
+                        <h3 className="text-base font-medium text-gray-900">{thread.title}</h3>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{thread.content}</p>
-                      <div className="flex items-center gap-3 mt-3 text-xs text-gray-500">
+                      {thread.content && (
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-3">{thread.content}</p>
+                      )}
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
                         <span>by {thread.author.username}</span>
                         <span>•</span>
-                        <span>{thread._count.posts} replies</span>
+                        <span>{thread._count.posts} {thread._count.posts === 1 ? 'reply' : 'replies'}</span>
                         <span>•</span>
-                        <span>{new Date(thread.createdAt).toLocaleDateString()}</span>
+                        <span>{new Date(thread.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))
-        ) : (
-          <Card>
-            <CardContent className="py-12 text-center text-gray-500">
-              <p>No threads yet. Be the first to start a discussion!</p>
-              <Button asChild className="mt-4">
-                <Link href={`/community/${slug}/new`}>Create First Thread</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white border border-gray-200 p-12 text-center">
+          <p className="text-sm text-gray-500 mb-6">No threads yet. Be the first to start a discussion.</p>
+          <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            <Link href={`/community/${slug}/new`}>Create First Thread</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
+}
+
 }

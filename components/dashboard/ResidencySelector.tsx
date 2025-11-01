@@ -2,11 +2,11 @@
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { createClient } from '@/lib/supabase/client'
+import { fetchJson } from '@/lib/api'
+import { queryKeys } from '@/lib/queryKeys'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Award, CheckCircle2, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface ResidencyOption {
@@ -62,69 +62,56 @@ interface ResidencySelectorProps {
 
 export default function ResidencySelector({ currentResidency, userId }: ResidencySelectorProps) {
   const router = useRouter()
-  const supabase = createClient()
-  const [selecting, setSelecting] = useState(false)
+  const queryClient = useQueryClient()
 
-  const handleSelect = async (year: number) => {
+  const updateResidencyMutation = useMutation({
+    mutationFn: (year: number) =>
+      fetchJson('/api/residency', {
+        method: 'PUT',
+        body: { currentResidency: year },
+      }),
+    onSuccess: (_, year) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.user.progress() })
+      toast.success(`Welcome to ${RESIDENCIES[year - 1].title}!`)
+      router.push('/dashboard')
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to select residency')
+    },
+  })
+
+  const handleSelect = (year: number) => {
     if (!RESIDENCIES[year - 1].unlocked) {
       toast.error('This residency is locked. Complete the previous year first.')
       return
     }
-
-    setSelecting(true)
-
-    try {
-      const { error } = await supabase
-        .from('user_residency')
-        .upsert({
-          user_id: userId,
-          current_residency: year,
-          updated_at: new Date().toISOString(),
-        })
-
-      if (error) throw error
-
-      toast.success(`Welcome to ${RESIDENCIES[year - 1].title}!`)
-      // Navigate to dashboard instead of refresh to avoid potential loops
-      router.push('/dashboard')
-    } catch (error) {
-      console.error('Failed to select residency:', error)
-      toast.error('Failed to select residency')
-    } finally {
-      setSelecting(false)
-    }
+    updateResidencyMutation.mutate(year)
   }
+
+  const selecting = updateResidencyMutation.isPending
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold text-gray-900">Choose Your Path</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Select a residency to begin your structured learning journey. Each year builds on the previous,
-          taking you from foundational concepts to executive-level decision-making.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {RESIDENCIES.map((residency) => {
           const isSelected = currentResidency === residency.year
           const isLocked = !residency.unlocked
 
           return (
-            <Card
+            <div
               key={residency.year}
-              className={`relative transition-all ${
+              className={`bg-white border transition-colors relative ${
                 isSelected
-                  ? 'border-2 border-blue-500 shadow-lg'
+                  ? 'border-gray-900'
                   : isLocked
-                  ? 'opacity-60'
-                  : 'hover:shadow-md hover:-translate-y-1'
+                  ? 'border-gray-200 opacity-60'
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {isSelected && (
                 <div className="absolute -top-3 -right-3">
-                  <Badge className="bg-blue-600 gap-1">
-                    <CheckCircle2 className="h-3 w-3" />
+                  <Badge className="bg-gray-900 text-white text-xs font-medium">
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
                     Current
                   </Badge>
                 </div>
@@ -132,33 +119,31 @@ export default function ResidencySelector({ currentResidency, userId }: Residenc
 
               {isLocked && (
                 <div className="absolute -top-3 -right-3">
-                  <Badge variant="secondary" className="gap-1">
-                    <Lock className="h-3 w-3" />
+                  <Badge variant="outline" className="text-xs font-medium text-gray-600 border-gray-300">
+                    <Lock className="h-3 w-3 mr-1" />
                     Locked
                   </Badge>
                 </div>
               )}
 
-              <CardHeader>
-                <div className="flex items-center gap-3 mb-2">
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-4">
                   <div className={`
-                    h-12 w-12 rounded-full flex items-center justify-center font-bold text-xl
-                    ${isLocked ? 'bg-gray-200 text-gray-400' : 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white'}
+                    h-12 w-12 border flex items-center justify-center font-semibold text-lg
+                    ${isLocked ? 'bg-gray-50 border-gray-200 text-gray-400' : 'bg-white border-gray-300 text-gray-900'}
                   `}>
                     {residency.year}
                   </div>
-                  <Award className={`h-6 w-6 ${isLocked ? 'text-gray-400' : 'text-yellow-500'}`} />
+                  <Award className={`h-5 w-5 ${isLocked ? 'text-gray-400' : 'text-gray-600'}`} />
                 </div>
-                <CardTitle className="text-xl">{residency.title}</CardTitle>
-                <CardDescription>{residency.description}</CardDescription>
-              </CardHeader>
+                <h3 className="text-base font-medium text-gray-900 mb-1">{residency.title}</h3>
+                <p className="text-xs text-gray-500 mb-4">{residency.description}</p>
 
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Domains:</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-gray-700 mb-2">Domains:</p>
+                  <div className="flex flex-wrap gap-1">
                     {residency.domains.map((domain) => (
-                      <Badge key={domain} variant="secondary" className="text-xs">
+                      <Badge key={domain} variant="outline" className="text-xs font-medium text-gray-600 border-gray-300">
                         {domain}
                       </Badge>
                     ))}
@@ -168,17 +153,22 @@ export default function ResidencySelector({ currentResidency, userId }: Residenc
                 <Button
                   onClick={() => handleSelect(residency.year)}
                   disabled={isLocked || selecting || isSelected}
-                  className="w-full"
+                  className={`w-full rounded-none ${
+                    isSelected 
+                      ? 'border-gray-300 hover:border-gray-400' 
+                      : isLocked
+                      ? 'bg-gray-400 text-white'
+                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                  }`}
                   variant={isSelected ? 'outline' : 'default'}
                 >
                   {isLocked ? 'Locked' : isSelected ? 'Current Path' : 'Select Path'}
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )
         })}
       </div>
     </div>
   )
 }
-

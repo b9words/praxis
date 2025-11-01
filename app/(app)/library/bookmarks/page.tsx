@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getAllUserProgress } from '@/lib/progress-tracking'
@@ -100,20 +99,18 @@ export default async function BookmarksPage() {
           </div>
 
           {bookmarkedLessons.length === 0 ? (
-            <Card className="bg-neutral-50 border border-neutral-200 rounded-lg">
-              <CardContent className="p-8">
-                <div className="text-center">
-                  <Star className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
-                  <h3 className="text-base font-medium text-neutral-900 mb-2">No bookmarks yet</h3>
-                  <p className="text-sm text-neutral-500 mb-4">
-                    Start bookmarking lessons to save them for later
-                  </p>
-                  <Button asChild size="sm" className="bg-blue-700 text-white hover:bg-blue-800">
-                    <Link href="/library/curriculum">Browse Curriculum</Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="bg-neutral-50 border border-neutral-200 p-12">
+              <div className="text-center">
+                <Star className="mx-auto h-10 w-10 text-gray-400 mb-4" />
+                <h3 className="text-base font-medium text-neutral-900 mb-2">No bookmarks yet</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Start bookmarking lessons to save them for later
+                </p>
+                <Button asChild size="sm" className="bg-gray-900 text-white hover:bg-gray-800 rounded-none">
+                  <Link href="/library/curriculum">Browse Curriculum</Link>
+                </Button>
+              </div>
+            </div>
           ) : (
             <div className="space-y-6">
               {Object.entries(groupedByDomain).map(([domainTitle, lessons]) => {
@@ -148,11 +145,11 @@ export default async function BookmarksPage() {
                           key={`${lesson.domainId}:${lesson.moduleId}:${lesson.lessonId}`}
                           href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}
                         >
-                          <Card className="bg-neutral-50 border border-neutral-200 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer h-full">
-                            <CardContent className="p-4">
+                          <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer h-full">
+                            <div className="p-4">
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                  <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                                  <Star className="h-4 w-4 text-gray-600" />
                                   <span className="text-xs text-neutral-500 font-medium">
                                     {lesson.moduleTitle}
                                   </span>
@@ -163,22 +160,20 @@ export default async function BookmarksPage() {
                                 </div>
                               </div>
 
-                              <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
+                              <h3 className="text-base font-medium leading-tight text-neutral-900 mb-2 break-words">
                                 {lesson.title}
                               </h3>
 
-                             接力 <p className="text-sm text-neutral-500 leading-snug mb-3 break-words line-clamp-2">
+                              <p className="text-sm text-neutral-500 leading-snug mb-3 break-words line-clamp-2">
                                 {lesson.description}
                               </p>
 
                               {/* Progress Bar */}
                               {lesson.progressPercentage > 0 && (
                                 <div className="mb-3">
-                                  <div className="w-full bg-neutral-200 rounded-full h-1.5">
+                                  <div className="w-full bg-neutral-200 h-1.5">
                                     <div
-                                      className={`h-1.5 rounded-full transition-all ${
-                                        isCompleted ? 'bg-green-600' : 'bg-blue-600'
-                                      }`}
+                                      className="h-1.5 bg-gray-900 transition-all"
                                       style={{ width: `${lesson.progressPercentage}%` }}
                                     />
                                   </div>
@@ -191,15 +186,15 @@ export default async function BookmarksPage() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                   {isCompleted ? (
-                                    <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-gray-900 flex items-center justify-center">
                                       <CheckCircle className="h-3 w-3 text-white" />
                                     </div>
                                   ) : lesson.progressPercentage > 0 ? (
-                                    <div className="w-4 h-4 border-2 border-blue-600 rounded-full flex items-center justify-center">
-                                      <div className="w-2 h-2 bg-blue-600 rounded-full" />
+                                    <div className="w-4 h-4 border-2 border-gray-600 flex items-center justify-center">
+                                      <div className="w-2 h-2 bg-gray-600" />
                                     </div>
                                   ) : (
-                                    <div className="w-4 h-4 border-2 border-neutral-300 rounded-full"></div>
+                                    <div className="w-4 h-4 border-2 border-neutral-300"></div>
                                   )}
                                   <span className="text-xs text-neutral-500">
                                     {isCompleted
@@ -210,12 +205,12 @@ export default async function BookmarksPage() {
                                   </span>
                                 </div>
 
-                                <Button size="sm" className="h-6 px-2 text-xs bg-blue-700 text-white hover:bg-blue-800 rounded">
+                                <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
                                   {lesson.progressPercentage > 0 ? 'CONTINUE' : 'START'}
                                 </Button>
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                         </Link>
                       )
                     })}
