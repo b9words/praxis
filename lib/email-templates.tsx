@@ -33,6 +33,9 @@ interface EmailTemplateProps {
     simulationsCompleted?: number
     lessonsCompleted?: number
     dashboardUrl?: string
+    strongestCompetency?: string
+    simulatorTimeMinutes?: number
+    simulatorTimeChangePct?: number
   }
   general?: {
     title: string
@@ -86,6 +89,9 @@ export function renderEmailTemplate(
           simulationsCompleted: props.weekly_summary?.simulationsCompleted,
           lessonsCompleted: props.weekly_summary?.lessonsCompleted,
           dashboardUrl: props.weekly_summary?.dashboardUrl || `${baseUrl}/dashboard`,
+          strongestCompetency: props.weekly_summary?.strongestCompetency,
+          simulatorTimeMinutes: props.weekly_summary?.simulatorTimeMinutes,
+          simulatorTimeChangePct: props.weekly_summary?.simulatorTimeChangePct,
         })
       )
 
@@ -126,13 +132,13 @@ export function renderEmailTemplate(
 export function getEmailSubject(templateType: EmailTemplateType, props: EmailTemplateProps): string {
   switch (templateType) {
     case 'welcome':
-      return 'Welcome to Execemy Platform'
+      return 'Access Granted — Welcome to Execemy'
     
     case 'simulation_complete':
-      return `Simulation Complete: ${props.simulation_complete?.caseTitle || 'Your Simulation'}`
+      return `Debrief Ready: ${props.simulation_complete?.caseTitle || 'Your Simulation'}`
     
     case 'weekly_summary':
-      return 'Your Weekly Execemy Summary'
+      return 'Your Weekly Briefing'
     
     case 'general':
       return props.general?.title || 'Notification from Execemy Platform'

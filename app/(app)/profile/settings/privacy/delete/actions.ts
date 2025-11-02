@@ -13,41 +13,20 @@ export async function deleteAccount() {
   }
 
   try {
-    // Soft delete: blank out PII in profile
-    // Note: emailNotificationsEnabled may not exist in all database instances
+    // Delete the Profile record first - this will CASCADE delete all associated data
+    // (simulations, debriefs, progress, subscriptions, notifications, etc.)
+    // per the ON DELETE CASCADE constraints in schema.prisma
     try {
-      await prisma.profile.update({
+      await prisma.profile.delete({
         where: { id: user.id },
-        data: {
-          fullName: null,
-          bio: null,
-          avatarUrl: null,
-          isPublic: false,
-          // emailNotificationsEnabled: false, // Commented out - may not exist in all DB instances
-        },
       })
     } catch (error: any) {
-      // Handle missing columns (P2022) or other schema issues
-      if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-        // Fallback: try update with explicit select to avoid accessing missing columns
-        await prisma.profile.update({
-          where: { id: user.id },
-          data: {
-            fullName: null,
-            bio: null,
-            avatarUrl: null,
-            isPublic: false,
-          },
-          select: {
-            id: true,
-          },
-        })
-      } else {
-        throw error
-      }
+      // If profile doesn't exist or deletion fails, log but continue to delete auth user
+      console.error('Error deleting profile (may already be deleted):', error)
     }
 
     // Delete auth user via Supabase Admin API
+    // This must happen after profile deletion since auth.user.id is the foreign key
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -59,7 +38,13 @@ export async function deleteAccount() {
       }
     )
 
-    await supabaseAdmin.auth.admin.deleteUser(user.id)
+    try {
+      await supabaseAdmin.auth.admin.deleteUser(user.id)
+    } catch (error: any) {
+      // If auth user deletion fails, log the error but don't throw
+      // The profile and all associated data have already been deleted
+      console.error('Error deleting auth user (may already be deleted):', error)
+    }
 
     revalidatePath('/')
     // All redirects removed

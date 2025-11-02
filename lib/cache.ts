@@ -25,11 +25,14 @@ export function cache<T>(
   const cacheKey = keyParts.join(':')
   const { tags = [], revalidate = 3600 } = options // Default 1 hour revalidation
 
+  // Filter out undefined/null tag values to prevent warnings
+  const validTags = tags.filter((tag): tag is string => typeof tag === 'string' && tag !== undefined && tag !== null)
+
   return unstable_cache(
     async () => fn(),
     [cacheKey],
     {
-      tags,
+      tags: validTags,
       revalidate: revalidate === false ? false : revalidate,
     }
   )
@@ -49,6 +52,9 @@ export const CacheTags = {
   DASHBOARD: 'dashboard',
   ADMIN: 'admin',
   SYSTEM: 'system',
+  FORUM: 'forum',
+  COMMUNITY: 'community',
+  APPLICATIONS: 'applications',
 } as const
 
 /**

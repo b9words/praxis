@@ -1,6 +1,9 @@
 import { logOnce } from '@/lib/monitoring';
 import { prisma } from '@/lib/prisma/server';
 import { getCurrentUser } from './get-user';
+import { getCurrentBriefing } from '@/lib/briefing';
+import { checkSubscription } from './require-subscription';
+import { getModuleById } from '@/lib/curriculum-data';
 
 export type UserRole = 'member' | 'editor' | 'admin'
 
@@ -250,5 +253,91 @@ export async function requireAuth(): Promise<{ id: string; role: UserRole }> {
   }
 
   return { id: profile.id, role: profile.role as UserRole }
+}
+
+export interface PublicAccessStatus {
+  access: boolean
+  isPublic?: boolean
+  requiresLogin?: boolean
+}
+
+/**
+ * Check if content is publicly accessible (weekly briefing)
+ * Returns access status for lessons or cases based on weekly briefing schedule
+ */
+export async function getPublicAccessStatus(
+  userId: string | null,
+  target: {
+    type: 'lesson'
+    domainId: string
+    moduleId: string
+    lessonId: string
+  } | {
+    type: 'case'
+    caseId: string
+  }
+): Promise<PublicAccessStatus> {
+  // Check if user has active subscription
+  if (userId) {
+    const subscriptionStatus = await checkSubscription()
+    if (subscriptionStatus.isActive) {
+      return { access: true }
+    }
+  }
+
+  // Get current briefing
+  const briefing = await getCurrentBriefing()
+  if (!briefing) {
+    return { access: false }
+  }
+
+  // Check lesson access
+  if (target.type === 'lesson') {
+    // Must match current briefing module
+    if (target.domainId !== briefing.domainId || target.moduleId !== briefing.moduleId) {
+      return { access: false }
+    }
+
+    // Get module to find first lesson
+    const module = getModuleById(target.domainId, target.moduleId)
+    if (!module || !module.lessons || module.lessons.length === 0) {
+      // Defensive: module doesn't exist or has no lessons
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[getPublicAccessStatus] Module ${target.moduleId} not found or has no lessons`)
+      }
+      return { access: false }
+    }
+
+    const firstLessonId = module.lessons[0]?.id
+
+    // Anonymous users: only first lesson
+    if (!userId) {
+      if (target.lessonId === firstLessonId) {
+        return { access: true, isPublic: true }
+      }
+      return { access: false, requiresLogin: true }
+    }
+
+    // Logged-in non-subscribers: all lessons in module
+    return { access: true, isPublic: true }
+  }
+
+  // Check case access
+  if (target.type === 'case') {
+    // Must match current briefing case
+    if (target.caseId !== briefing.caseId) {
+      return { access: false }
+    }
+
+    // Anonymous users: require login
+    if (!userId) {
+      return { access: false, requiresLogin: true }
+    }
+
+    // Logged-in non-subscribers: allow access
+    return { access: true, isPublic: true }
+  }
+
+  return { access: false }
 }
 

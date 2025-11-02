@@ -3,11 +3,23 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Execemy',
-  description: 'Terms of Service for Execemy Platform',
+  title: 'Terms of Service',
+  description: 'Terms of Service for Execemy Platform. Review our terms, conditions, and user agreement.',
   robots: {
     index: true,
     follow: true,
+  },
+  openGraph: {
+    title: 'Terms of Service | Execemy',
+    description: 'Terms of Service for Execemy Platform. Review our terms, conditions, and user agreement.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/legal/terms`,
+    siteName: 'Execemy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Terms of Service | Execemy',
+    description: 'Terms of Service for Execemy Platform.',
   },
 }
 
@@ -60,6 +72,15 @@ export default function TermsOfServicePage() {
             If you purchase a subscription, you agree to pay all fees associated with your subscription.
             Subscriptions automatically renew unless cancelled. We reserve the right to change our pricing
             with 30 days notice to existing subscribers.
+          </p>
+          <p className="mt-4">
+            <strong>30-Day Evaluation Period:</strong> We offer a 30-day evaluation and refund period from the 
+            date of your initial subscription. If you are not satisfied with the Service during this period, 
+            you may request a full refund by contacting us at{' '}
+            <a href="mailto:support@execemy.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
+              support@execemy.com
+            </a>
+            . After the 30-day period, all subscription fees are non-refundable.
           </p>
         </section>
 

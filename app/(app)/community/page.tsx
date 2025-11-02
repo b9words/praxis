@@ -15,18 +15,35 @@ export default async function CommunityPage() {
     async () => {
       let channels: any[] = []
       try {
+        // Check if prisma is available and forumChannel exists
+        if (!prisma || !prisma.forumChannel) {
+          console.warn('Prisma or forumChannel model not available')
+          return []
+        }
+
         channels = await prisma.forumChannel.findMany({
           orderBy: {
             createdAt: 'asc',
           },
         })
-      } catch (error) {
+      } catch (error: any) {
+        // Handle missing table (P2021) or other schema issues
+        if (error?.code === 'P2021' || error?.message?.includes('does not exist') || error?.message?.includes('Cannot read properties of undefined')) {
+          console.warn('Forum channels table not available')
+          return []
+        }
         console.error('Error fetching channels:', error)
+        return []
       }
 
       // For each channel, get thread count with error handling (parallelize)
       let channelsWithCounts: any[] = []
       try {
+        if (!prisma || !prisma.forumThread) {
+          // Return channels without counts if forumThread is not available
+          return channels.map((channel: any) => ({ ...channel, threadCount: 0 }))
+        }
+
         channelsWithCounts = await Promise.all(
           channels.map(async (channel: any) => {
             try {
@@ -44,6 +61,8 @@ export default async function CommunityPage() {
         )
       } catch (error) {
         console.error('Error processing channels:', error)
+        // Return channels without counts on error
+        return channels.map((channel: any) => ({ ...channel, threadCount: 0 }))
       }
 
       return channelsWithCounts
@@ -60,6 +79,12 @@ export default async function CommunityPage() {
     async () => {
       let recentThreads: any[] = []
       try {
+        // Check if prisma is available and forumThread exists
+        if (!prisma || !prisma.forumThread) {
+          console.warn('Prisma or forumThread model not available')
+          return []
+        }
+
         recentThreads = await prisma.forumThread.findMany({
           include: {
             author: {
@@ -81,9 +106,14 @@ export default async function CommunityPage() {
           take: 10,
         })
       } catch (error: any) {
-        // Handle missing metadata column (P2022) or other schema issues
-        if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
+        // Handle missing table (P2021), missing metadata column (P2022) or other schema issues
+        if (error?.code === 'P2021' || error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist') || error?.message?.includes('Cannot read properties of undefined')) {
           try {
+            // Check if prisma is still available before fallback
+            if (!prisma || !prisma.forumThread) {
+              console.warn('Prisma or forumThread model not available in fallback')
+              return []
+            }
             // Fallback: explicit select without problematic columns
             recentThreads = await prisma.forumThread.findMany({
               select: {
@@ -112,9 +142,11 @@ export default async function CommunityPage() {
             })
           } catch (fallbackError) {
             console.error('Error fetching recent threads (fallback):', fallbackError)
+            return []
           }
         } else {
           console.error('Error fetching recent threads:', error)
+          return []
         }
       }
       return recentThreads

@@ -31,23 +31,94 @@ class PostHogAnalyticsService implements AnalyticsService {
 
   constructor() {
     // Only initialize on client side
+    // Note: PostHog initialization for marketing pages is handled by CookieConsentBanner
+    // This service is kept for backwards compatibility and authenticated app analytics
     if (typeof window !== 'undefined') {
       this.apiKey = process.env.NEXT_PUBLIC_POSTHOG_KEY || null
       this.host = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com'
       
-      if (this.apiKey) {
+      // Check if we're on a marketing page (should check consent)
+      // For authenticated app pages, we can initialize without consent (legitimate interest)
+      const isMarketingPage = this.isMarketingPage()
+      
+      if (this.apiKey && !isMarketingPage) {
+        // Authenticated app - initialize without consent (legitimate interest)
         this.initialize()
+      } else if (this.apiKey && isMarketingPage) {
+        // Marketing page - only initialize if consent given
+        // CookieConsentBanner will handle initialization via cookie event
+        this.checkConsentAndInitialize()
       }
     }
+  }
+
+  private isMarketingPage(): boolean {
+    if (typeof window === 'undefined') return false
+    const pathname = window.location.pathname
+    // Marketing pages don't start with /dashboard, /library, /simulations, /profile, /admin
+    const marketingPaths = ['/', '/pricing', '/about', '/contact', '/legal', '/signup', '/login']
+    const appPaths = ['/dashboard', '/library', '/simulations', '/profile', '/admin', '/onboarding']
+    
+    if (appPaths.some(path => pathname.startsWith(path))) return false
+    if (marketingPaths.some(path => pathname.startsWith(path))) return true
+    // Default: assume marketing if not clearly an app page
+    return !pathname.startsWith('/api')
+  }
+
+  private checkConsentAndInitialize() {
+    if (this.initialized || typeof window === 'undefined') return
+    
+    // Check if analytics consent cookie exists
+    const hasConsent = this.hasAnalyticsConsent()
+    if (hasConsent) {
+      this.initialize()
+    }
+    
+    // Listen for consent changes
+    window.addEventListener('cc:onConsent', () => {
+      if (this.hasAnalyticsConsent() && !this.initialized) {
+        this.initialize()
+      }
+    })
+  }
+
+  private hasAnalyticsConsent(): boolean {
+    if (typeof window === 'undefined') return false
+    
+    // Check cookie
+    const cookies = document.cookie.split(';')
+    const analyticsCookie = cookies.find(c => c.trim().startsWith('cc_analytics='))
+    if (analyticsCookie) {
+      return analyticsCookie.includes('cc_analytics=1')
+    }
+    
+    // Check localStorage (our custom implementation uses this)
+    try {
+      const consent = localStorage.getItem('cookie_consent')
+      if (consent) {
+        const parsed = JSON.parse(consent)
+        return parsed.analytics === true
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    
+    return false
   }
 
   private initialize() {
     if (this.initialized || typeof window === 'undefined') return
 
+    // Don't initialize if PostHog is already initialized (e.g., by CookieConsentBanner)
+    if ((window as any).posthog) {
+      this.initialized = true
+      return
+    }
+
     try {
       // Dynamically import PostHog (client-side only)
       import('posthog-js').then(({ default: posthog }) => {
-        if (posthog && this.apiKey) {
+        if (posthog && this.apiKey && !this.initialized) {
           const isProduction = process.env.NODE_ENV === 'production'
           
           posthog.init(this.apiKey, {
@@ -80,38 +151,44 @@ class PostHogAnalyticsService implements AnalyticsService {
   }
 
   identify(userId: string, traits?: Record<string, any>): void {
-    if (typeof window === 'undefined' || !this.initialized) return
+    if (typeof window === 'undefined') return
+    
+    // Check if PostHog is available (either initialized here or by CookieConsentBanner)
+    const posthog = (window as any).posthog
+    if (!posthog) return
 
     try {
-      import('posthog-js').then(({ default: posthog }) => {
-        posthog?.identify(userId, traits)
-      })
+      posthog.identify(userId, traits)
     } catch (error) {
       console.error('PostHog identify error:', error)
     }
   }
 
   track(event: AnalyticsEvent, properties?: AnalyticsProperties): void {
-    if (typeof window === 'undefined' || !this.initialized) return
+    if (typeof window === 'undefined') return
+    
+    // Check if PostHog is available (either initialized here or by CookieConsentBanner)
+    const posthog = (window as any).posthog
+    if (!posthog) return
 
     try {
-      import('posthog-js').then(({ default: posthog }) => {
-        posthog?.capture(event, properties)
-      })
+      posthog.capture(event, properties)
     } catch (error) {
       console.error('PostHog track error:', error)
     }
   }
 
   page(name: string, properties?: AnalyticsProperties): void {
-    if (typeof window === 'undefined' || !this.initialized) return
+    if (typeof window === 'undefined') return
+    
+    // Check if PostHog is available (either initialized here or by CookieConsentBanner)
+    const posthog = (window as any).posthog
+    if (!posthog) return
 
     try {
-      import('posthog-js').then(({ default: posthog }) => {
-        posthog?.capture('$pageview', {
-          page_name: name,
-          ...properties,
-        })
+      posthog.capture('$pageview', {
+        page_name: name,
+        ...properties,
       })
     } catch (error) {
       console.error('PostHog page error:', error)

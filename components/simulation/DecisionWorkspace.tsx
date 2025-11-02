@@ -4,9 +4,11 @@ import AIPersonaChat from '@/components/simulation/AIPersonaChat'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DecisionPoint, Persona, UserDecision } from '@/types/simulation.types'
-import { CheckCircle2, MessageSquare } from 'lucide-react'
+import { CheckCircle2, MessageSquare, Lock } from 'lucide-react'
 import { useState } from 'react'
+import Link from 'next/link'
 
 interface DecisionWorkspaceProps {
   decisionPoints: DecisionPoint[]
@@ -15,6 +17,7 @@ interface DecisionWorkspaceProps {
   decisions: UserDecision[]
   onDecisionComplete: (decision: UserDecision) => void
   onComplete: () => void
+  softPaywallEnabled?: boolean
 }
 
 export default function DecisionWorkspace({
@@ -24,12 +27,14 @@ export default function DecisionWorkspace({
   decisions,
   onDecisionComplete,
   onComplete,
+  softPaywallEnabled = false,
 }: DecisionWorkspaceProps) {
   const currentDecision = decisionPoints[currentIndex]
   const [justification, setJustification] = useState('')
   const [selectedOption, setSelectedOption] = useState('')
   const [showPersonaChat, setShowPersonaChat] = useState(false)
   const [chatTranscript, setChatTranscript] = useState<Array<{ role: 'user' | 'ai'; message: string; timestamp: string }>>([])
+  const [showPaywallModal, setShowPaywallModal] = useState(false)
 
   if (!currentDecision) {
     return (
@@ -51,6 +56,12 @@ export default function DecisionWorkspace({
 
   const handleSubmit = () => {
     if (!justification.trim()) return
+
+    // Check if soft paywall should trigger (on Stage 1 submission)
+    if (softPaywallEnabled && currentIndex === 0 && decisions.length === 0) {
+      setShowPaywallModal(true)
+      return
+    }
 
     const decision: UserDecision = {
       decisionPointId: currentDecision.id,
@@ -209,9 +220,65 @@ export default function DecisionWorkspace({
           size="lg"
           className="w-full rounded-none bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-400 disabled:text-white"
         >
-          {currentIndex < decisionPoints.length - 1 ? 'Submit & Continue' : 'Submit Final Decision'}
+          {softPaywallEnabled && currentIndex === 0 && decisions.length === 0
+            ? 'Submit & View Analysis'
+            : currentIndex < decisionPoints.length - 1
+            ? 'Submit & Continue'
+            : 'Submit Final Decision'}
         </Button>
       </div>
+
+      {/* Soft Paywall Modal */}
+      <Dialog open={showPaywallModal} onOpenChange={setShowPaywallModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-medium text-gray-900">
+              The Analyst&apos;s Debrief is a Classified Asset
+            </DialogTitle>
+            <DialogDescription className="text-gray-700 mt-2">
+              You have successfully completed the first stage. Your decisions have been logged. To receive your full performance debrief—including your competency scores and a breakdown of your strategic errors—you must be an active operative.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {/* Blurred Radar Chart Preview */}
+          <div className="relative bg-gray-100 border border-gray-200 rounded p-8 my-4">
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50/80 backdrop-blur-sm">
+              <Lock className="h-8 w-8 text-gray-400" />
+            </div>
+            <div className="relative opacity-20">
+              {/* Placeholder radar chart visual */}
+              <div className="w-full h-48 flex items-center justify-center text-gray-400 text-sm">
+                Performance Debrief Preview
+              </div>
+            </div>
+            <div className="absolute top-2 right-2">
+              <span className="text-xs bg-red-500 text-white px-2 py-1 rounded uppercase tracking-wide">
+                Classified
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white rounded-none"
+            >
+              <Link href="/pricing">
+                Authorize Plan & Reveal Debrief
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowPaywallModal(false)}
+              size="lg"
+              className="w-full sm:w-auto border-gray-300 hover:border-gray-400 rounded-none"
+            >
+              Continue without analysis
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

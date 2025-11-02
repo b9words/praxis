@@ -63,6 +63,7 @@ const navigation = [
       { name: 'Notifications', href: '/admin/system/notifications' },
       { name: 'Send Emails', href: '/admin/system/notifications/manage' },
       { name: 'Token Usage', href: '/admin/system/token-usage' },
+      { name: 'Briefing Schedule', href: '/admin/briefing' },
     ],
   },
 ]

@@ -16,9 +16,18 @@ interface ShareButtonsProps {
 export default function ShareButtons({ simulationTitle, scores, profileUrl }: ShareButtonsProps) {
   const [copiedLink, setCopiedLink] = useState(false)
 
-  const averageScore = Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length
+  // Find top competency by score
+  const topCompetency = Object.entries(scores).reduce((max, [name, score]) => {
+    return score > max[1] ? [name, score] : max
+  }, ['', 0] as [string, number])
 
-  const shareText = `I just completed "${simulationTitle}" on Execemy and scored ${averageScore.toFixed(1)}/5! Building real business acumen through simulation. #ExecemyProgram`
+  const [topCompetencyName, topScore] = topCompetency
+  
+  // Fallback to average if no scores
+  const displayScore = topScore > 0 ? topScore : Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length || 0
+  const displayCompetency = topCompetencyName || 'Decision-Making'
+
+  const shareText = `Just completed the "${simulationTitle}" simulation on Praxis and scored ${displayScore.toFixed(1)}/5 on ${displayCompetency}. Honing my decision-making skills. #PraxisProgram`
 
   const handleCopyLink = () => {
     const url = profileUrl || window.location.origin + '/profile'
@@ -57,7 +66,7 @@ export default function ShareButtons({ simulationTitle, scores, profileUrl }: Sh
           <CardTitle>Share Your Achievement</CardTitle>
         </div>
         <CardDescription>
-          Let others know about your progress on the Execemy journey
+          Let others know about your progress on the Praxis journey
         </CardDescription>
       </CardHeader>
       <CardContent>

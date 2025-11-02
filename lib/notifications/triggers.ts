@@ -106,3 +106,46 @@ export async function createWeeklySummaryNotifications(userIds: string[]) {
   return notifications
 }
 
+/**
+ * Create notification when application status changes
+ */
+export async function notifyApplicationStatus(
+  userId: string,
+  userEmail: string,
+  status: 'approved' | 'rejected' | 'pending',
+  applicationId: string
+) {
+  const statusMessages = {
+    approved: {
+      title: 'Application Approved',
+      message: 'Congratulations! Your application has been approved. Welcome to Execemy!',
+      link: '/dashboard',
+    },
+    rejected: {
+      title: 'Application Update',
+      message: 'Your application status has been updated. Please check your application for details.',
+      link: '/dashboard',
+    },
+    pending: {
+      title: 'Application Received',
+      message: 'Your application has been received and is under review.',
+      link: '/dashboard',
+    },
+  }
+
+  const message = statusMessages[status]
+
+  return createNotification({
+    userId,
+    type: 'general',
+    title: message.title,
+    message: message.message,
+    link: message.link,
+    metadata: {
+      applicationId,
+      status,
+      userEmail,
+    },
+  })
+}
+

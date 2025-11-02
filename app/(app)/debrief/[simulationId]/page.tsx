@@ -2,6 +2,7 @@
 
 import RecommendedReading from '@/components/debrief/RecommendedReading'
 import ScoreReveal from '@/components/debrief/ScoreReveal'
+import ShareButtons from '@/components/debrief/ShareButtons'
 import { Button } from '@/components/ui/button'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
@@ -41,6 +42,14 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
     queryFn: ({ signal }) => fetchJson<{ articles: any[] }>('/api/articles?status=published', { signal }),
     enabled: !!simulationId && !!debriefData,
     retry: 2,
+  })
+
+  // Fetch current user profile for share URL
+  const { data: profileData } = useQuery({
+    queryKey: ['profile', 'current'],
+    queryFn: ({ signal }) => fetchJson<{ profile: { username: string | null } }>('/api/auth/profile', { signal }),
+    enabled: !!simulationId,
+    retry: 1,
   })
 
   // Process data
@@ -337,6 +346,26 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
               )
             })}
           </div>
+        </div>
+      )}
+
+      {/* Share Buttons */}
+      {showScores && scores.length > 0 && (
+        <div className="mb-12">
+          <ShareButtons
+            simulationTitle={simulation.case?.title || 'Simulation'}
+            scores={Object.fromEntries(
+              scores.map((s: any) => [
+                s.competencyName || s.competency || 'Unknown',
+                s.score || s || 0,
+              ])
+            )}
+            profileUrl={
+              profileData?.profile?.username
+                ? `${window.location.origin}/profile/${profileData.profile.username}`
+                : undefined
+            }
+          />
         </div>
       )}
 

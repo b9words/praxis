@@ -14,14 +14,14 @@ export function SimulationCompleteEmail({
   userName,
 }: SimulationCompleteEmailProps) {
   return (
-    <EmailLayout preview={`Simulation Complete: ${caseTitle}`}>
+    <EmailLayout preview={`Debrief Ready: ${caseTitle}`}>
       <Section style={content}>
         <Text style={heading}>Simulation Complete{userName ? `, ${userName}` : ''}</Text>
         <Text style={paragraph}>
           You've completed the <strong>{caseTitle}</strong> simulation.
         </Text>
         <Text style={paragraph}>
-          Review your after-action report to see detailed feedback on your strategic decision-making and insights for improvement.
+          Debrief is ready. Review performance by dimension.
         </Text>
         <Section style={buttonContainer}>
           <Button style={button} href={debriefUrl}>

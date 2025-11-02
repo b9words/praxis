@@ -9,17 +9,18 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Pricing - Execemy',
-  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
+  title: 'Pricing',
+  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions. All plans include AI-powered coaching, interactive simulations, and community access.',
   openGraph: {
-    title: 'Pricing - Execemy',
+    title: 'Pricing | Execemy',
     description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
     type: 'website',
     url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/pricing`,
+    siteName: 'Execemy',
   },
   twitter: {
     card: 'summary',
-    title: 'Pricing - Execemy',
+    title: 'Pricing | Execemy',
     description: 'Choose the perfect plan for your business acumen journey.',
   },
 }

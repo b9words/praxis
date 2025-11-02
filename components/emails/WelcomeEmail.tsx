@@ -8,11 +8,11 @@ interface WelcomeEmailProps {
 
 export function WelcomeEmail({ userName, loginUrl = 'https://execemy.com/dashboard' }: WelcomeEmailProps) {
   return (
-    <EmailLayout preview="Access Granted - Welcome to Execemy Platform">
+    <EmailLayout preview="Access Granted — Welcome to Execemy">
       <Section style={content}>
         <Text style={heading}>Access Granted{userName ? `, ${userName}` : ''}</Text>
         <Text style={paragraph}>
-          Your account is now active. Access the proving ground to begin building analytical acumen.
+          Your account is active. Access the proving ground to begin building analytical acumen.
         </Text>
         <Text style={paragraph}>
           Navigate to the Intelligence Library or deploy to your first scenario.

@@ -48,7 +48,7 @@ export async function GET() {
       }
     }
 
-    const [profile, simulations, forumThreads, forumPosts, lessonProgress, articleProgress] =
+    const [profile, simulations, lessonProgress, articleProgress, residency, subscription, notifications, domainCompletions] =
       await Promise.all([
         prisma.profile.findUnique({
           where: { id: user.id },
@@ -57,6 +57,10 @@ export async function GET() {
             username: true,
             fullName: true,
             bio: true,
+            avatarUrl: true,
+            isPublic: true,
+            role: true,
+            emailNotificationsEnabled: true,
             createdAt: true,
             updatedAt: true,
           },
@@ -71,27 +75,22 @@ export async function GET() {
             },
           },
         }),
-        prisma.forumThread.findMany({
-          where: { authorId: user.id },
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            createdAt: true,
-          },
-        }),
-        prisma.forumPost.findMany({
-          where: { authorId: user.id },
-          select: {
-            id: true,
-            content: true,
-            createdAt: true,
-          },
-        }),
         prisma.userLessonProgress.findMany({
           where: { userId: user.id },
         }),
         prisma.userArticleProgress.findMany({
+          where: { userId: user.id },
+        }),
+        prisma.userResidency.findUnique({
+          where: { userId: user.id },
+        }),
+        prisma.subscription.findUnique({
+          where: { userId: user.id },
+        }),
+        prisma.notification.findMany({
+          where: { userId: user.id },
+        }),
+        prisma.domainCompletion.findMany({
           where: { userId: user.id },
         }),
       ])
@@ -100,10 +99,12 @@ export async function GET() {
       profile,
       simulations,
       debriefs,
-      forumThreads,
-      forumPosts,
       lessonProgress,
       articleProgress,
+      residency,
+      subscription,
+      notifications,
+      domainCompletions,
       exportedAt: new Date().toISOString(),
     }
 

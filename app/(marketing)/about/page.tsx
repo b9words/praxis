@@ -5,8 +5,20 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'About - Execemy',
-  description: 'Learn about Execemy Platform and our mission to build the next generation of business leaders.',
+  title: 'About Execemy',
+  description: 'Learn about Execemy Platform and our mission to build the next generation of business leaders through systematic training, interactive simulations, and rigorous assessment.',
+  openGraph: {
+    title: 'About Execemy',
+    description: 'Learn about Execemy Platform and our mission to build the next generation of business leaders through systematic training, interactive simulations, and rigorous assessment.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/about`,
+    siteName: 'Execemy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'About Execemy',
+    description: 'Learn about Execemy Platform and our mission to build the next generation of business leaders.',
+  },
 }
 
 export default function AboutPage() {

@@ -368,3 +368,17 @@ model Job {
   @@index([createdAt])
   @@map("jobs")
 }
+
+model BriefingSchedule {
+  id        String   @id @default(uuid())
+  weekOf    DateTime @unique @map("week_of") @db.Date
+  domainId  String   @map("domain_id")
+  moduleId  String   @map("module_id")
+  caseId    String   @map("case_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([weekOf(sort: Desc)])
+  @@index([domainId, moduleId])
+  @@map("briefing_schedule")
+}

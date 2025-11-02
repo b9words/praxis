@@ -3,16 +3,18 @@ import CaseStudyCard from '@/components/library/CaseStudyCard'
 import LessonViewTracker from '@/components/library/LessonViewTracker'
 import ProgressTracker from '@/components/library/ProgressTracker'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { loadLessonByPath } from '@/lib/content-loader'
-import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById } from '@/lib/curriculum-data'
+import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById, getCurriculumStats } from '@/lib/curriculum-data'
 import { prisma } from '@/lib/prisma/server'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
-import { ChevronLeft, ChevronRight, Clock, Target } from 'lucide-react'
+import { getPublicAccessStatus } from '@/lib/auth/authorize'
+import { ChevronLeft, ChevronRight, Clock, Target, Info } from 'lucide-react'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 interface LessonPageProps {
   params: Promise<{
@@ -297,6 +299,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
   // Get user info for progress tracking
   const { getCurrentUser } = await import('@/lib/auth/get-user')
   const user = await getCurrentUser()
+
+  // Check public access status
+  const accessStatus = await getPublicAccessStatus(user?.id || null, {
+    type: 'lesson',
+    domainId,
+    moduleId,
+    lessonId,
+  })
+
+  // Handle access denial
+  if (!accessStatus.access) {
+    if (accessStatus.requiresLogin) {
+      // Redirect to login with return URL
+      const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+      loginUrl.searchParams.set('redirectTo', `/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
+      redirect(loginUrl.toString())
+    } else {
+      // Redirect to pricing
+      redirect('/pricing')
+    }
+  }
   
   // Cache cases with prerequisites (15 minutes revalidate)
   const getCachedCasesWithPrerequisites = cache(
@@ -487,8 +510,24 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const displayModuleTitle = module ? module.title : 'Module'
   const displayDomainTitle = domain ? domain.title : 'Domain'
 
+  const stats = getCurriculumStats()
+
   return (
     <div className="h-full flex flex-col bg-white">
+      {/* Public Access Banner */}
+      {accessStatus.isPublic && (
+        <Alert className="border-gray-300 bg-gray-50 m-0 rounded-none">
+          <Info className="h-4 w-4 text-gray-600" />
+          <AlertDescription className="text-gray-700">
+            You are viewing content from this week&apos;s Intelligence Briefing.{' '}
+            <Link href="/pricing" className="underline font-medium hover:text-gray-900">
+              Unlock all {stats.totalLessons} lessons
+            </Link>
+            {' '}with a Praxis subscription.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {/* Desktop Header */}
       <div className="border-b border-neutral-200 bg-white sticky top-0 z-10">
           <div className="px-6 py-4 pb-0">

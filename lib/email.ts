@@ -187,6 +187,9 @@ export async function sendWeeklySummaryEmail(
     articlesCompleted?: number
     simulationsCompleted?: number
     lessonsCompleted?: number
+    strongestCompetency?: string
+    simulatorTimeMinutes?: number
+    simulatorTimeChangePct?: number
   }
 ) {
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
@@ -228,6 +231,40 @@ export async function sendGeneralNotificationEmail(
   return sendEmail({
     to: userEmail,
     subject: getEmailSubject('general', { general: options }),
+    html,
+  })
+}
+
+/**
+ * Send application status email
+ */
+export async function sendApplicationStatusEmail(
+  userEmail: string,
+  status: 'approved' | 'rejected',
+  userName?: string
+) {
+  const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
+  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
+  const html = renderEmailTemplate('general', {
+    general: {
+      title: status === 'approved' ? 'Application Approved' : 'Application Update',
+      message: status === 'approved' 
+        ? `Congratulations! Your application has been approved. You can now access the full platform.`
+        : `We regret to inform you that your application was not approved at this time.`,
+      actionUrl: status === 'approved' ? `${baseUrl}/dashboard` : `${baseUrl}/dashboard`,
+      actionText: status === 'approved' ? 'Go to Dashboard' : 'Learn More',
+      userName,
+    },
+  })
+
+  return sendEmail({
+    to: userEmail,
+    subject: getEmailSubject('general', { 
+      general: {
+        title: status === 'approved' ? 'Application Approved' : 'Application Update',
+      }
+    }),
     html,
   })
 }

@@ -17,8 +17,10 @@ export function GeneralNotificationEmail({
   actionText = 'View Details',
   userName,
 }: GeneralNotificationEmailProps) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
+  
   return (
-    <EmailLayout preview={title}>
+    <EmailLayout preview={title} showUnsubscribe unsubscribeUrl={`${baseUrl}/profile/settings/notifications`}>
       <Section style={content}>
         <Text style={heading}>{title}{userName ? `, ${userName}` : ''}</Text>
         <Text style={paragraph}>{message}</Text>

@@ -11,6 +11,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // If middleware allows request, user should exist, but handle null defensively
   // Cache profile (5 minutes revalidate, userId in key) - this runs on every page!
   let profile = null
+  let subscription = null
   if (user) {
     const getCachedProfile = getCachedUserData(
       user.id,
@@ -44,6 +45,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       }
     )
     profile = await getCachedProfile()
+
+    // Fetch subscription status for past-due banner
+    try {
+      subscription = await prisma.subscription.findUnique({
+        where: { userId: user.id },
+        select: { status: true },
+      })
+    } catch (error) {
+      // Log error but don't crash - subscription lookup is optional
+      console.error('Error fetching subscription in layout:', error)
+    }
   }
 
   return (
@@ -57,6 +69,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         />
       )}
       {user && <Navbar user={{ id: user.id, email: user.email } as any} profile={profile as any} />}
+      {user && subscription?.status === 'past_due' && (
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm px-4 py-3">
+          Your subscription is past due. Update your payment method to avoid interruption.{' '}
+          <a href="/profile/billing" className="underline font-medium">Manage billing</a>
+        </div>
+      )}
       <main className="lg:pb-0 pb-16">{children}</main>
     </div>
   )

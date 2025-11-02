@@ -14,10 +14,13 @@ import * as React from 'react'
 interface EmailLayoutProps {
   preview?: string
   children: React.ReactNode
+  showUnsubscribe?: boolean
+  unsubscribeUrl?: string
 }
 
-export function EmailLayout({ preview, children }: EmailLayoutProps) {
+export function EmailLayout({ preview, children, showUnsubscribe = false, unsubscribeUrl }: EmailLayoutProps) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
+  const defaultUnsubscribeUrl = `${baseUrl}/profile/settings/notifications`
 
   return (
     <Html>
@@ -41,6 +44,20 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
               <Link href={`${baseUrl}/legal/terms`} style={link}>
                 Terms of Service
               </Link>
+              {' • '}
+              <Link href={`mailto:hello@execemy.com`} style={link}>
+                Contact Support
+              </Link>
+            </Text>
+            {showUnsubscribe && (
+              <Text style={footerText}>
+                <Link href={unsubscribeUrl || defaultUnsubscribeUrl} style={link}>
+                  Unsubscribe / Manage notifications
+                </Link>
+              </Text>
+            )}
+            <Text style={footerText}>
+              27, Seogyeong-ro 13-gil, Seongbuk-gu, Seoul, Republic of Korea
             </Text>
           </Section>
         </Container>

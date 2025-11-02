@@ -166,7 +166,7 @@ export default function ProfileEditPage() {
 
           {/* Username */}
           <div>
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Handle (@username)</Label>
             <Input
               id="username"
               type="text"
@@ -175,7 +175,7 @@ export default function ProfileEditPage() {
               className="mt-1 rounded-none"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">Your unique username (used in profile URLs)</p>
+            <p className="text-xs text-gray-500 mt-1">This is your unique identifier and part of your public profile URL.</p>
           </div>
 
           {/* Full Name */}
@@ -190,18 +190,18 @@ export default function ProfileEditPage() {
             />
           </div>
 
-          {/* Bio */}
+          {/* Executive Summary */}
           <div>
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">Executive Summary</Label>
             <Textarea
               id="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="Brief professional description..."
-              rows={4}
+              placeholder="A brief, one-line professional summary for your public dossier..."
+              rows={3}
               className="mt-1 rounded-none"
             />
-            <p className="text-xs text-gray-500 mt-1">A brief description about you (max 500 characters)</p>
+            <p className="text-xs text-gray-500 mt-1">A brief, one-line professional summary for your public dossier.</p>
           </div>
 
           {/* Public/Private Toggle */}

@@ -22,11 +22,18 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [emailSent, setEmailSent] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
+    if (!acceptedTerms) {
+      setError('You must accept the Terms of Service and Privacy Policy to create an account.')
+      setLoading(false)
+      return
+    }
 
     const supabase = createClient()
 
@@ -154,6 +161,29 @@ export default function SignupPage() {
                           minLength={6}
                           className="rounded-none"
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-start space-x-2">
+                          <input
+                            type="checkbox"
+                            id="acceptTerms"
+                            checked={acceptedTerms}
+                            onChange={(e) => setAcceptedTerms(e.target.checked)}
+                            required
+                            className="mt-1 h-4 w-4 border-neutral-300 rounded text-neutral-900 focus:ring-neutral-900"
+                          />
+                          <Label htmlFor="acceptTerms" className="text-sm text-neutral-600 leading-relaxed cursor-pointer">
+                            I have read and agree to the{' '}
+                            <Link href="/legal/terms" className="text-neutral-700 hover:text-neutral-900 transition-colors underline" target="_blank">
+                              Terms of Service
+                            </Link>
+                            {' '}and{' '}
+                            <Link href="/legal/privacy" className="text-neutral-700 hover:text-neutral-900 transition-colors underline" target="_blank">
+                              Privacy Policy
+                            </Link>
+                            .
+                          </Label>
+                        </div>
                       </div>
                     </>
                   )}

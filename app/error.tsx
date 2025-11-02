@@ -44,6 +44,9 @@ export default function Error({
                 <Button variant="outline" onClick={() => window.location.href = '/'} className="border-neutral-300 hover:border-neutral-400 rounded-none">
                   Return to Dashboard
                 </Button>
+                <Button variant="outline" onClick={() => (window.location.href = 'mailto:hello@execemy.com')} className="border-neutral-300 hover:border-neutral-400 rounded-none">
+                  Contact Support
+                </Button>
               </div>
             </div>
           </div>

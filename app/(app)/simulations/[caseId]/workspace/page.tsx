@@ -1,6 +1,8 @@
 import SimulationWorkspace from '@/components/simulation/SimulationWorkspace'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { checkSubscription } from '@/lib/auth/require-subscription'
+import { getCurrentBriefing } from '@/lib/briefing'
 import { notFound, redirect } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -227,6 +229,12 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
     })
   }
 
+  // Check if soft paywall should be enabled
+  // Enabled when: user is logged-in non-subscriber AND case is current weekly case
+  const { isActive } = await checkSubscription()
+  const briefing = await getCurrentBriefing()
+  const softPaywallEnabled = !isActive && briefing?.caseId === caseId
+
   return (
     <div className="h-[calc(100vh-8rem)]">
       <SimulationWorkspace
@@ -236,6 +244,7 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
         }}
         simulation={simulation}
         userId={user.id}
+        softPaywallEnabled={softPaywallEnabled}
       />
     </div>
   )

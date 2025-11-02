@@ -20,6 +20,7 @@ interface SimulationWorkspaceProps {
   caseItem: any
   simulation: any
   userId: string
+  softPaywallEnabled?: boolean
 }
 
 interface CaseData {
@@ -43,6 +44,7 @@ export default function SimulationWorkspace({
   caseItem,
   simulation,
   userId,
+  softPaywallEnabled = false,
 }: SimulationWorkspaceProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -343,6 +345,7 @@ export default function SimulationWorkspace({
           decisions={state.decisions}
           onDecisionComplete={handleDecisionComplete}
           onComplete={handleComplete}
+          softPaywallEnabled={softPaywallEnabled}
         />
       </ResizablePanel>
     </ResizablePanelGroup>

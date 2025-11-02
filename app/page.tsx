@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { BookOpen, DollarSign, Shield, Target, TrendingUp, Users } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import ChannelIOSupport from '@/components/ui/ChannelIOSupport'
+import Footer from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
   title: 'Execemy - The Proving Ground for Business Leaders',
@@ -475,6 +477,8 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      <Footer />
+      <ChannelIOSupport />
     </div>
   )
 }

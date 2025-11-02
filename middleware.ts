@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getUserRole, hasRequiredRole, checkSubscription } from './lib/auth/middleware-helpers'
 import { getRedirectUrlForLegacyContent } from './lib/content-mapping'
+import { getCurrentBriefing } from './lib/briefing'
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -105,7 +106,31 @@ export async function middleware(request: NextRequest) {
         const subscriptionStatus = await checkSubscription(user.id)
         
         if (!subscriptionStatus.isActive) {
-          // Redirect to billing with return URL
+          // Check if this is weekly briefing content before redirecting
+          const briefing = await getCurrentBriefing()
+          
+          if (briefing) {
+            // Check if path matches weekly briefing module lessons
+            const lessonMatch = pathname.match(/^\/library\/curriculum\/([^\/]+)\/([^\/]+)\/([^\/]+)$/)
+            if (lessonMatch) {
+              const [, domainId, moduleId] = lessonMatch
+              if (domainId === briefing.domainId && moduleId === briefing.moduleId) {
+                // Allow access - page-level checks will handle first lesson vs all lessons
+                return supabaseResponse
+              }
+            }
+            
+            // Check if path matches weekly briefing case
+            const caseBriefMatch = pathname.match(/^\/simulations\/([^\/]+)\/brief$/)
+            const caseWorkspaceMatch = pathname.match(/^\/simulations\/([^\/]+)\/workspace$/)
+            if ((caseBriefMatch && caseBriefMatch[1] === briefing.caseId) ||
+                (caseWorkspaceMatch && caseWorkspaceMatch[1] === briefing.caseId)) {
+              // Allow access - page-level checks will handle soft paywall
+              return supabaseResponse
+            }
+          }
+          
+          // Not weekly briefing content - redirect to billing
           const url = request.nextUrl.clone()
           url.pathname = '/profile/billing'
           url.searchParams.set('returnUrl', pathname)

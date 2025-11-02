@@ -4,18 +4,41 @@ import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { getCachedUserData, getCachedCase, CacheTags } from '@/lib/cache'
+import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { AlertCircle, CheckCircle2, BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 
 export default async function CaseBriefPage({ params }: { params: Promise<{ caseId: string }> }) {
   const user = await getCurrentUser()
+  const { caseId } = await params
 
-  if (!user) {
-    return null
+  // Check public access status (allows null userId for anonymous users)
+  const accessStatus = await getPublicAccessStatus(user?.id || null, {
+    type: 'case',
+    caseId,
+  })
+
+  // Handle access denial
+  if (!accessStatus.access) {
+    if (accessStatus.requiresLogin) {
+      // Redirect to login with return URL
+      const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+      loginUrl.searchParams.set('redirectTo', `/simulations/${caseId}/brief`)
+      redirect(loginUrl.toString())
+    } else {
+      // Redirect to pricing
+      redirect('/pricing')
+    }
   }
 
-  const { caseId } = await params
+  // If user is null but access is granted, we'll continue but some features won't work
+  if (!user) {
+    // This should not happen for cases (they require login), but defensive check
+    const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+    loginUrl.searchParams.set('redirectTo', `/simulations/${caseId}/brief`)
+    redirect(loginUrl.toString())
+  }
 
   // Cache case lookup (1 hour revalidate) - use existing helper
   let caseItem = null

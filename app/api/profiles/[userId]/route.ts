@@ -93,17 +93,19 @@ export async function PUT(
     const body = await request.json()
     const { username, fullName, avatarUrl, bio, isPublic } = body
 
+    // Build update data object with only provided fields
+    const updateData: any = {}
+    if (username !== undefined) updateData.username = username
+    if (fullName !== undefined) updateData.fullName = fullName
+    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl
+    if (bio !== undefined) updateData.bio = bio
+    if (isPublic !== undefined) updateData.isPublic = isPublic
+
     let profile
     try {
       profile = await prisma.profile.update({
         where: { id: userId },
-        data: {
-          username,
-          fullName,
-          avatarUrl,
-          bio,
-          isPublic,
-        },
+        data: updateData,
         select: {
           id: true,
           username: true,

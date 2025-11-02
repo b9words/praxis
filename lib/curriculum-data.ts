@@ -28,6 +28,10 @@ export const getCurriculumStats = () => {
   }
 }
 
+export const getAllDomains = () => {
+  return completeCurriculumData
+}
+
 export const getDomainById = (domainId: string) => {
   return completeCurriculumData.find(domain => domain.id === domainId)
 }

@@ -3,11 +3,23 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy - Execemy',
-  description: 'Cookie Policy for Execemy Platform',
+  title: 'Cookie Policy',
+  description: 'Cookie Policy for Execemy Platform. Learn about how we use cookies and tracking technologies.',
   robots: {
     index: true,
     follow: true,
+  },
+  openGraph: {
+    title: 'Cookie Policy | Execemy',
+    description: 'Cookie Policy for Execemy Platform. Learn about how we use cookies and tracking technologies.',
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/legal/cookies`,
+    siteName: 'Execemy',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Cookie Policy | Execemy',
+    description: 'Cookie Policy for Execemy Platform.',
   },
 }
 
