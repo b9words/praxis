@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma/server'
 import { MetadataRoute } from 'next'
+import { getAllLearningPaths } from '@/lib/learning-paths'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
 
   // Static marketing pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -36,6 +37,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
+    {
+      url: `${baseUrl}/library/paths`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 
   // Public user profiles
@@ -53,7 +60,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
 
-    return [...staticPages, ...profilePages]
+    // Learning paths pages
+    const learningPaths = await getAllLearningPaths()
+    const learningPathPages: MetadataRoute.Sitemap = learningPaths.map((path) => ({
+      url: `${baseUrl}/library/paths/${path.id}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    }))
+
+    return [...staticPages, ...profilePages, ...learningPathPages]
   } catch (error) {
     console.error('Error generating sitemap:', error)
     // Return static pages only if database query fails

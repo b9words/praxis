@@ -1,6 +1,6 @@
 'use client'
 
-import PraxisRadarChart from '@/components/profile/PraxisRadarChart'
+import ExecemyRadarChart from '@/components/profile/ExecemyRadarChart'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 import { ArrowRight, TrendingUp } from 'lucide-react'
@@ -35,7 +35,7 @@ export default function RadarComparison({ beforeData, afterData }: RadarComparis
           </CardHeader>
           <CardContent>
             {beforeData ? (
-              <PraxisRadarChart data={beforeData} />
+              <ExecemyRadarChart data={beforeData} />
             ) : (
               <div className="flex items-center justify-center h-64 text-gray-400">
                 <p>No previous data</p>
@@ -55,7 +55,7 @@ export default function RadarComparison({ beforeData, afterData }: RadarComparis
               <CardTitle className="text-center text-blue-600">After This Simulation</CardTitle>
             </CardHeader>
             <CardContent>
-              <PraxisRadarChart data={afterData} />
+              <ExecemyRadarChart data={afterData} />
             </CardContent>
           </Card>
         </motion.div>

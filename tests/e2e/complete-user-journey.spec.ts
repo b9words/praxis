@@ -25,7 +25,7 @@ test.describe('Complete User Journey - 30+ Actions', () => {
 
     // ACTION 1: Navigate to homepage
     await page.goto('/')
-    await expect(page).toHaveTitle(/Praxis/)
+    await expect(page).toHaveTitle(/Execemy/)
     await expect(page.getByRole('heading', { name: /The Proving Ground for/i })).toBeVisible()
 
     // ACTION 2: Click signup button
@@ -182,7 +182,7 @@ test.describe('Complete User Journey - 30+ Actions', () => {
     // ACTION 29: Check updated radar chart on profile
     await page.click('text=Profile')
     await expect(page).toHaveURL(/\/profile\/\w+/)
-    await expect(page.locator('text=Praxis Profile')).toBeVisible()
+    await expect(page.locator('text=Execemy Profile')).toBeVisible()
     // Note: Radar chart may not be visible if no scores yet
 
     // ACTION 30: Navigate to community forum
@@ -206,7 +206,7 @@ test.describe('Complete User Journey - 30+ Actions', () => {
     // ACTION 33: Edit profile information
     await page.click('text=Profile')
     await page.click('text=Edit Profile')
-    await page.fill('input[name="bio"]', 'E2E Test User - Learning business fundamentals through Praxis Platform')
+    await page.fill('input[name="bio"]', 'E2E Test User - Learning business fundamentals through Execemy Platform')
     await page.click('text=Save Changes')
     await expect(page.locator('text=Profile updated successfully')).toBeVisible()
 

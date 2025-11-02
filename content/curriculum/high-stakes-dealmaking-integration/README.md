@@ -101,4 +101,4 @@ Advanced dealmaking scenarios and alternative transaction structures.
 **Total Lessons:** 27  
 **Estimated Completion Time:** 324 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

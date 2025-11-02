@@ -80,4 +80,4 @@ Maintaining personal effectiveness and well-being during extended crisis periods
 **Total Lessons:** 20  
 **Estimated Completion Time:** 240 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

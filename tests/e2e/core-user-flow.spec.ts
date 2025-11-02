@@ -39,7 +39,7 @@ test.describe('Complete User Journey - Sign Up to Debrief', () => {
     
     if (page.url().includes('/apply')) {
       await page.fill('textarea[name="motivation"], textarea[placeholder*="motivation"]', 
-        'I am passionate about business leadership and want to develop my skills through Praxis.')
+        'I am passionate about business leadership and want to develop my skills through Execemy.')
       
       await page.click('button:has-text("Submit"), button[type="submit"]')
       

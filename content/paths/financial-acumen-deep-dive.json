@@ -1,0 +1,37 @@
+{
+  "id": "financial-acumen-deep-dive",
+  "title": "Financial Acumen Deep Dive",
+  "description": "Comprehensive mastery of financial analysis and capital allocation",
+  "duration": "3-4 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "ceo-as-investor-foundational-mindset",
+      "lesson": "five-choices"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "intrinsic-value-calculation",
+      "lesson": "owners-earnings-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "unit-economics-mastery",
+      "lesson": "cac-ltv-fundamentals"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "unit-economics-mastery",
+      "lesson": "unit-economics-optimization"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_unit_economics_crisis"
+    }
+  ]
+}
+

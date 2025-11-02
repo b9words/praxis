@@ -1,12 +1,10 @@
 import { prisma } from '@/lib/prisma/server'
 
 export type NotificationType = 
-  | 'application_approved'
-  | 'application_rejected'
-  | 'forum_reply'
   | 'simulation_complete'
   | 'weekly_summary'
   | 'general'
+  | 'domain_complete'
 
 /**
  * Create a notification for a user
@@ -86,60 +84,6 @@ export async function notifyDebriefGenerationFailure(userId: string, simulationI
   return null
 }
 
-/**
- * Create notification when forum reply is received
- */
-export async function notifyForumReply(
-  userId: string,
-  threadTitle: string,
-  threadId: string,
-  authorName: string
-) {
-  return createNotification({
-    userId,
-    type: 'forum_reply',
-    title: 'New Reply',
-    message: `${authorName} replied to "${threadTitle}"`,
-    link: `/community/thread/${threadId}`,
-    metadata: {
-      threadId,
-      threadTitle,
-      authorName,
-    },
-  })
-}
-
-/**
- * Create notification when application is approved/rejected
- */
-export async function notifyApplicationStatus(
-  userId: string | null,
-  email: string,
-  status: 'approved' | 'rejected',
-  applicationId: string
-) {
-  if (!userId) {
-    // If no user ID, we can't create in-app notification
-    // Email will be sent via email service
-    return null
-  }
-
-  return createNotification({
-    userId,
-    type: status === 'approved' ? 'application_approved' : 'application_rejected',
-    title: status === 'approved' 
-      ? 'Application Approved!' 
-      : 'Application Update',
-    message: status === 'approved'
-      ? 'Your application to Praxis Platform has been approved. Welcome!'
-      : 'Your application to Praxis Platform has been reviewed. Check your email for details.',
-    link: status === 'approved' ? '/dashboard' : undefined,
-    metadata: {
-      applicationId,
-      status,
-    },
-  })
-}
 
 /**
  * Batch create notifications for weekly summary

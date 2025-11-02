@@ -17,6 +17,7 @@ import {
     countWords,
     extractCalculations,
     extractTables,
+    generateAndUploadThumbnail,
     generateWithAI,
     getCoreValuesPrompt,
     isSupabaseAvailable,
@@ -544,6 +545,22 @@ async function generateLesson(options: GenerateOptions = {}) {
     console.warn(`⚠️  Metadata sync failed (file is in storage): ${syncError.message}`)
     console.warn(`   You can manually sync via /api/storage/sync or the admin UI\n`)
     // Don't throw - file is uploaded successfully
+  }
+  
+  // Generate thumbnail if metadata sync succeeded
+  if (syncResult?.article_id && isSupabaseAvailable()) {
+    try {
+      await generateAndUploadThumbnail(
+        syncResult.article_id,
+        'lesson',
+        frontmatter.title,
+        lesson.domainTitle, // Domain display name
+        undefined // competencyName - will be fetched from DB
+      )
+    } catch (thumbError: any) {
+      console.warn(`⚠️  Thumbnail generation failed: ${thumbError.message}`)
+      console.warn(`   Thumbnail can be generated later via the admin UI\n`)
+    }
   }
   
   // Output review links

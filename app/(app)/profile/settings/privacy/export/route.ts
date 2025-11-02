@@ -1,13 +1,54 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const user = await requireAuth()
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
 
     // Fetch all user data
-    const [profile, simulations, debriefs, forumThreads, forumPosts, lessonProgress, articleProgress] =
+    let debriefs: any[] = []
+    try {
+      debriefs = await prisma.debrief.findMany({
+        where: {
+          simulation: {
+            userId: user.id,
+          },
+        },
+      })
+    } catch (error: any) {
+      // Handle missing rubric_version column (P2022) or other schema issues
+      if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+        try {
+          // Fallback: explicit select without problematic columns
+          debriefs = await prisma.debrief.findMany({
+            where: {
+              simulation: {
+                userId: user.id,
+              },
+            },
+            select: {
+              id: true,
+              simulationId: true,
+              scores: true,
+              summaryText: true,
+              radarChartData: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          })
+        } catch (fallbackError) {
+          console.error('Error fetching debriefs (fallback):', fallbackError)
+        }
+      } else {
+        throw error
+      }
+    }
+
+    const [profile, simulations, forumThreads, forumPosts, lessonProgress, articleProgress] =
       await Promise.all([
         prisma.profile.findUnique({
           where: { id: user.id },
@@ -27,13 +68,6 @@ export async function GET() {
               select: {
                 title: true,
               },
-            },
-          },
-        }),
-        prisma.debrief.findMany({
-          where: {
-            simulation: {
-              userId: user.id,
             },
           },
         }),

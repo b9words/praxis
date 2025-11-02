@@ -11,34 +11,29 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id
-  username  String   @unique
-  fullName  String?  @map("full_name")
-  avatarUrl String?  @map("avatar_url")
-  bio       String?
-  isPublic                 Boolean  @default(false) @map("is_public")
-  role                     String   @default("member")
+  id                        String   @id
+  username                  String   @unique
+  fullName                  String?  @map("full_name")
+  avatarUrl                 String?  @map("avatar_url")
+  bio                       String?
+  isPublic                  Boolean  @default(false) @map("is_public")
+  role                      String   @default("member")
   emailNotificationsEnabled Boolean  @default(true) @map("email_notifications_enabled")
-  createdAt                DateTime @default(now()) @map("created_at")
-  updatedAt                DateTime @updatedAt @map("updated_at")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
 
   // Relations
-  articlesCreated   Article[]              @relation("ArticleCreator")
-  articlesUpdated   Article[]              @relation("ArticleUpdater")
-  casesCreated      Case[]                 @relation("CaseCreator")
-  casesUpdated      Case[]                 @relation("CaseUpdater")
-  simulations       Simulation[]
-  forumThreads      ForumThread[]
-  forumPosts        ForumPost[]
-  lessonProgress    UserLessonProgress[]
-  articleProgress   UserArticleProgress[] @relation("UserArticleProgress")
-  residency         UserResidency?
-  subscription      Subscription?
-  applications      UserApplication[]
-  notifications     Notification[]
-  reviewedApplications UserApplication[] @relation("ApplicationReviewer")
-  reportsCreated    Report[]             @relation("ReportCreator")
-  reportsReviewed   Report[]             @relation("ReportReviewer")
+  articlesCreated    Article[]             @relation("ArticleCreator")
+  articlesUpdated    Article[]             @relation("ArticleUpdater")
+  casesCreated       Case[]                @relation("CaseCreator")
+  casesUpdated       Case[]                @relation("CaseUpdater")
+  simulations        Simulation[]
+  lessonProgress     UserLessonProgress[]
+  articleProgress    UserArticleProgress[] @relation("UserArticleProgress")
+  residency          UserResidency?
+  subscription       Subscription?
+  notifications      Notification[]
+  domainCompletions  DomainCompletion[]
 
   @@index([username])
   @@index([isPublic])
@@ -46,20 +41,20 @@ model Profile {
 }
 
 model Competency {
-  id           String          @id @default(uuid())
-  name         String
-  description  String?
-  parentId     String?          @map("parent_id")
-  level        String
-  residencyYear Int?            @map("residency_year")
-  displayOrder Int              @default(0) @map("display_order")
-  createdAt    DateTime         @default(now()) @map("created_at")
-  updatedAt    DateTime         @updatedAt @map("updated_at")
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  parentId      String?  @map("parent_id")
+  level         String
+  residencyYear Int?     @map("residency_year")
+  displayOrder  Int      @default(0) @map("display_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   // Relations
-  parent       Competency?      @relation("CompetencyHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children     Competency[]     @relation("CompetencyHierarchy")
-  articles     Article[]
+  parent           Competency?      @relation("CompetencyHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children         Competency[]     @relation("CompetencyHierarchy")
+  articles         Article[]
   caseCompetencies CaseCompetency[]
 
   @@index([parentId])
@@ -68,71 +63,71 @@ model Competency {
 }
 
 model Article {
-  id          String        @id @default(uuid())
-  competencyId String        @map("competency_id")
-  title       String
-  content     String?
-  description String?
-  status      String  @default("draft")
-  storagePath String?       @map("storage_path")
-  metadata    Json?         @default("{}")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  createdBy   String?       @map("created_by")
-  updatedBy   String?        @map("updated_by")
+  id           String   @id @default(uuid())
+  competencyId String   @map("competency_id")
+  title        String
+  content      String?
+  description  String?
+  status       String   @default("draft")
+  storagePath  String?  @map("storage_path")
+  metadata     Json?    @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdBy    String?  @map("created_by")
+  updatedBy    String?  @map("updated_by")
 
   // Relations
-  competency  Competency    @relation(fields: [competencyId], references: [id], onDelete: Cascade)
-  creator     Profile?      @relation("ArticleCreator", fields: [createdBy], references: [id])
-  updater     Profile?      @relation("ArticleUpdater", fields: [updatedBy], references: [id])
-  progress    UserArticleProgress[]
+  competency Competency            @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  creator    Profile?              @relation("ArticleCreator", fields: [createdBy], references: [id])
+  updater    Profile?              @relation("ArticleUpdater", fields: [updatedBy], references: [id])
+  progress   UserArticleProgress[]
 
+  @@unique([storagePath])
   @@index([competencyId])
   @@index([status])
   @@index([createdBy])
   @@index([storagePath])
-  @@unique([storagePath])
   @@map("articles")
 }
 
 model Case {
-  id           String        @id @default(uuid())
-  title        String
-  briefingDoc  String?       @map("briefing_doc")
-  description  String?
-  datasets     Json?
-  rubric       Json
-  status       String  @default("draft")
-  difficulty   String?
-  estimatedMinutes Int?      @map("estimated_minutes")
-  prerequisites Json?        @default("[]")
-  storagePath  String?       @map("storage_path")
-  metadata     Json?         @default("{}")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  createdBy    String?       @map("created_by")
-  updatedBy    String?       @map("updated_by")
+  id               String   @id @default(uuid())
+  title            String
+  briefingDoc      String?  @map("briefing_doc")
+  description      String?
+  datasets         Json?
+  rubric           Json
+  status           String   @default("draft")
+  difficulty       String?
+  estimatedMinutes Int?     @map("estimated_minutes")
+  prerequisites    Json?    @default("[]")
+  storagePath      String?  @map("storage_path")
+  metadata         Json?    @default("{}")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdBy        String?  @map("created_by")
+  updatedBy        String?  @map("updated_by")
 
   // Relations
-  creator      Profile?      @relation("CaseCreator", fields: [createdBy], references: [id])
-  updater      Profile?      @relation("CaseUpdater", fields: [updatedBy], references: [id])
+  creator      Profile?         @relation("CaseCreator", fields: [createdBy], references: [id])
+  updater      Profile?         @relation("CaseUpdater", fields: [updatedBy], references: [id])
   simulations  Simulation[]
   competencies CaseCompetency[]
 
+  @@unique([storagePath])
   @@index([status])
   @@index([createdBy])
   @@index([storagePath])
-  @@unique([storagePath])
   @@map("cases")
 }
 
 model CaseCompetency {
-  caseId        String    @map("case_id")
-  competencyId  String    @map("competency_id")
+  caseId       String @map("case_id")
+  competencyId String @map("competency_id")
 
   // Relations
-  case          Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  competency    Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
+  case       Case       @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  competency Competency @relation(fields: [competencyId], references: [id], onDelete: Cascade)
 
   @@id([caseId, competencyId])
   @@index([caseId])
@@ -141,20 +136,20 @@ model CaseCompetency {
 }
 
 model Simulation {
-  id         String           @id @default(uuid())
-  userId     String           @map("user_id")
-  caseId     String           @map("case_id")
-  status     String           @default("in_progress")
-  userInputs Json             @default("{}") @map("user_inputs")
-  startedAt  DateTime         @default(now()) @map("started_at")
-  completedAt DateTime?       @map("completed_at")
-  createdAt  DateTime         @default(now()) @map("created_at")
-  updatedAt  DateTime         @updatedAt @map("updated_at")
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  caseId      String    @map("case_id")
+  status      String    @default("in_progress")
+  userInputs  Json      @default("{}") @map("user_inputs")
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  user       Profile          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  case       Case             @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  debrief    Debrief?
+  user    Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  case    Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  debrief Debrief?
 
   @@index([userId])
   @@index([caseId])
@@ -164,96 +159,39 @@ model Simulation {
 }
 
 model Debrief {
-  id              String   @id @default(uuid())
-  simulationId    String   @unique @map("simulation_id")
-  scores          Json
-  summaryText     String   @map("summary_text")
-  radarChartData  Json     @map("radar_chart_data")
-  rubricVersion   String?  @map("rubric_version")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  simulationId   String   @unique @map("simulation_id")
+  scores         Json
+  summaryText    String   @map("summary_text")
+  radarChartData Json     @map("radar_chart_data")
+  rubricVersion  String?  @map("rubric_version")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   // Relations
-  simulation      Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+  simulation Simulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
 
   @@index([simulationId])
   @@map("debriefs")
 }
 
-model ForumChannel {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  slug        String   @unique
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  threads     ForumThread[]
-
-  @@index([slug])
-  @@map("forum_channels")
-}
-
-model ForumThread {
-  id        String   @id @default(uuid())
-  channelId String   @map("channel_id")
-  authorId  String   @map("author_id")
-  title     String
-  content   String
-  isPinned  Boolean  @default(false) @map("is_pinned")
-  metadata  Json?    @default("{}")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  channel   ForumChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  author    Profile      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  posts     ForumPost[]
-
-  @@index([channelId])
-  @@index([authorId])
-  @@map("forum_threads")
-}
-
-model ForumPost {
-  id           String    @id @default(uuid())
-  threadId     String     @map("thread_id")
-  authorId     String     @map("author_id")
-  content      String
-  parentPostId String?    @map("parent_post_id")
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-
-  // Relations
-  thread       ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  author       Profile     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  parentPost   ForumPost?  @relation("PostReplies", fields: [parentPostId], references: [id], onDelete: Cascade)
-  replies      ForumPost[] @relation("PostReplies")
-
-  @@index([threadId])
-  @@index([authorId])
-  @@index([parentPostId])
-  @@map("forum_posts")
-}
-
 model UserLessonProgress {
-  id                String              @id @default(uuid())
-  userId            String              @map("user_id")
-  domainId          String              @map("domain_id")
-  moduleId          String              @map("module_id")
-  lessonId          String              @map("lesson_id")
-  status            String              @default("not_started")
-  progressPercentage Int                @default(0) @map("progress_percentage")
-  timeSpentSeconds  Int                 @default(0) @map("time_spent_seconds")
-  lastReadPosition  Json                @default("{}") @map("last_read_position")
-  completedAt       DateTime?           @map("completed_at")
-  bookmarked        Boolean             @default(false)
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  userId             String    @map("user_id")
+  domainId           String    @map("domain_id")
+  moduleId           String    @map("module_id")
+  lessonId           String    @map("lesson_id")
+  status             String    @default("not_started")
+  progressPercentage Int       @default(0) @map("progress_percentage")
+  timeSpentSeconds   Int       @default(0) @map("time_spent_seconds")
+  lastReadPosition   Json      @default("{}") @map("last_read_position")
+  completedAt        DateTime? @map("completed_at")
+  bookmarked         Boolean   @default(false)
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  user              Profile             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, domainId, moduleId, lessonId])
   @@index([userId])
@@ -265,17 +203,17 @@ model UserLessonProgress {
 }
 
 model UserArticleProgress {
-  id         String    @id @default(uuid())
-  userId     String    @map("user_id")
-  articleId  String    @map("article_id")
-  status     String    @default("in_progress")
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  articleId   String    @map("article_id")
+  status      String    @default("in_progress")
   completedAt DateTime? @map("completed_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  user       Profile   @relation("UserArticleProgress", fields: [userId], references: [id], onDelete: Cascade)
-  article    Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    Profile @relation("UserArticleProgress", fields: [userId], references: [id], onDelete: Cascade)
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, articleId])
   @@index([userId])
@@ -285,28 +223,28 @@ model UserArticleProgress {
 }
 
 model UserResidency {
-  id              String   @id @default(uuid())
-  userId          String   @unique @map("user_id")
+  id               String   @id @default(uuid())
+  userId           String   @unique @map("user_id")
   currentResidency Int      @default(1) @map("current_residency")
-  startedAt       DateTime  @default(now()) @map("started_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  startedAt        DateTime @default(now()) @map("started_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user            Profile  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("user_residency")
 }
 
 model TokenUsage {
-  id              String   @id @default(uuid())
-  date            DateTime @db.Date
-  model           String
-  promptTokens    Int      @default(0) @map("prompt_tokens")
+  id               String   @id @default(uuid())
+  date             DateTime @db.Date
+  model            String
+  promptTokens     Int      @default(0) @map("prompt_tokens")
   completionTokens Int      @default(0) @map("completion_tokens")
-  totalTokens     Int      @default(0) @map("total_tokens")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  totalTokens      Int      @default(0) @map("total_tokens")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   @@index([date, model])
   @@index([createdAt])
@@ -314,18 +252,18 @@ model TokenUsage {
 }
 
 model Subscription {
-  id                  String             @id @default(uuid())
-  userId              String             @unique @map("user_id")
-  paddleSubscriptionId String            @unique @map("paddle_subscription_id")
-  paddlePlanId        String             @map("paddle_plan_id")
-  status              String
-  currentPeriodStart  DateTime           @map("current_period_start")
-  currentPeriodEnd    DateTime           @map("current_period_end")
-  createdAt           DateTime           @default(now()) @map("created_at")
-  updatedAt           DateTime           @updatedAt @map("updated_at")
+  id                   String   @id @default(uuid())
+  userId               String   @unique @map("user_id")
+  paddleSubscriptionId String   @unique @map("paddle_subscription_id")
+  paddlePlanId         String   @map("paddle_plan_id")
+  status               String
+  currentPeriodStart   DateTime @map("current_period_start")
+  currentPeriodEnd     DateTime @map("current_period_end")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user                Profile            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([paddleSubscriptionId])
@@ -333,45 +271,20 @@ model Subscription {
   @@map("subscriptions")
 }
 
-model UserApplication {
-  id          String            @id @default(uuid())
-  userId      String?           @map("user_id")
-  email       String
-  fullName    String?           @map("full_name")
-  motivation  String
-  background  String?
-  status      String            @default("pending")
-  reviewedBy  String?           @map("reviewed_by")
-  reviewedAt  DateTime?         @map("reviewed_at")
-  notes       String?
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-
-  // Relations
-  user        Profile?          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviewer    Profile?          @relation("ApplicationReviewer", fields: [reviewedBy], references: [id])
-
-  @@index([email])
-  @@index([status])
-  @@index([createdAt])
-  @@index([userId])
-  @@map("user_applications")
-}
-
 model Notification {
-  id        String          @id @default(uuid())
-  userId    String          @map("user_id")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   type      String
   title     String
   message   String
-  read      Boolean         @default(false)
+  read      Boolean  @default(false)
   link      String?
-  metadata  Json?           @default("{}")
-  createdAt DateTime        @default(now()) @map("created_at")
-  updatedAt DateTime        @updatedAt @map("updated_at")
+  metadata  Json?    @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  user      Profile         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([read])
@@ -380,27 +293,78 @@ model Notification {
   @@map("notifications")
 }
 
-model Report {
-  id            String        @id @default(uuid())
-  reportedType  String        @map("reported_type")
-  reportedId    String        @map("reported_id") // UUID but stored as String for flexibility
-  reason        String
-  createdById   String        @map("created_by")
-  status        String        @default("pending")
-  reviewedById  String?       @map("reviewed_by")
-  reviewedAt    DateTime?     @map("reviewed_at")
-  notes         String?
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
+model LearningPath {
+  id          String            @id @default(uuid())
+  slug        String            @unique
+  title       String
+  description String?
+  duration    String
+  status      String            @default("draft") // draft | published
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
 
   // Relations
-  createdBy     Profile       @relation("ReportCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  reviewedBy    Profile?      @relation("ReportReviewer", fields: [reviewedById], references: [id])
+  items LearningPathItem[]
 
-  @@index([reportedType, reportedId])
-  @@index([createdById])
+  @@index([slug])
   @@index([status])
   @@index([createdAt])
-  @@map("reports")
+  @@map("learning_paths")
 }
 
+model LearningPathItem {
+  id          String       @id @default(uuid())
+  pathId      String       @map("path_id")
+  order       Int
+  type        String       // lesson | case
+  domain      String?
+  module      String?
+  lesson      String?
+  caseId      String?      @map("case_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  path LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+
+  @@index([pathId])
+  @@index([pathId, order])
+  @@map("learning_path_items")
+}
+
+model DomainCompletion {
+  id                    String    @id @default(uuid())
+  userId                String    @map("user_id")
+  domainId              String    @map("domain_id")
+  completedAt           DateTime  @default(now()) @map("completed_at")
+  certificateGeneratedAt DateTime? @map("certificate_generated_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, domainId])
+  @@index([userId])
+  @@index([domainId])
+  @@index([completedAt])
+  @@map("domain_completions")
+}
+
+model Job {
+  id          String   @id @default(uuid())
+  type        String   // debrief_generation, thumbnail_generation, etc.
+  status      String   @default("pending") // pending | processing | completed | failed
+  payload     Json     @default("{}")
+  result      Json?
+  error       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  processedAt DateTime? @map("processed_at")
+
+  @@index([status])
+  @@index([type])
+  @@index([status, type])
+  @@index([createdAt])
+  @@map("jobs")
+}

@@ -1,39 +1,21 @@
 import { Button } from '@/components/ui/button'
 import { completeCurriculumData, getCurriculumStats } from '@/lib/curriculum-data'
 import { prisma } from '@/lib/prisma/server'
+import { cache, CacheTags } from '@/lib/cache'
 import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CurriculumLibraryPage() {
-  // Try to load curriculum structure from database with error handling
-  let articlesFromDb: any[] = []
-  try {
-    // First try with enum value (if enum exists in DB)
-    articlesFromDb = await prisma.article.findMany({
-      where: {
-        status: 'published',
-        storagePath: {
-          not: null,
-        },
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        storagePath: true,
-        metadata: true,
-        status: true,
-      },
-    })
-  } catch (error: any) {
-    // If enum doesn't exist in DB, try querying without status filter
-    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-      // Import error suppression helper
-      const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
-      logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+  // Cache curriculum structure (24h revalidate)
+  const getCachedCurriculumData = cache(
+    async () => {
+      // Try to load curriculum structure from database with error handling
+      let articlesFromDb: any[] = []
       try {
+        // First try with enum value (if enum exists in DB)
         articlesFromDb = await prisma.article.findMany({
           where: {
+            status: 'published',
             storagePath: {
               not: null,
             },
@@ -47,19 +29,41 @@ export default async function CurriculumLibraryPage() {
             status: true,
           },
         })
-      } catch (fallbackError) {
-        console.error('Error fetching articles from database:', fallbackError)
+      } catch (error: any) {
+        // If enum doesn't exist in DB, try querying without status filter
+        if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+          // Import error suppression helper
+          const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
+          logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+          try {
+            articlesFromDb = await prisma.article.findMany({
+              where: {
+                storagePath: {
+                  not: null,
+                },
+              },
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                storagePath: true,
+                metadata: true,
+                status: true,
+              },
+            })
+          } catch (fallbackError) {
+            console.error('Error fetching articles from database:', fallbackError)
+          }
+        } else {
+          console.error('Error fetching articles from database:', error)
+        }
       }
-    } else {
-      console.error('Error fetching articles from database:', error)
-    }
-  }
 
-  // Build curriculum structure from database articles if available
-  let curriculumData = completeCurriculumData
-  let useDbData = false
+      // Build curriculum structure from database articles if available
+      let curriculumData = completeCurriculumData
+      let useDbData = false
 
-  if (articlesFromDb.length > 0) {
+      if (articlesFromDb.length > 0) {
     // Group articles by domain from metadata
     const domainMap = new Map()
 
@@ -96,26 +100,37 @@ export default async function CurriculumLibraryPage() {
       })
     })
 
-    // Convert to array and sort
-    if (domainMap.size > 0) {
-      curriculumData = Array.from(domainMap.values()).map((domain) => ({
-        ...domain,
-        modules: Array.from(domain.modules.values()).sort((a: any, b: any) => a.number - b.number),
-      }))
-      useDbData = true
-    }
-  }
-
-  const stats = useDbData
-    ? {
-        totalDomains: curriculumData.length,
-        totalModules: curriculumData.reduce((sum, d) => sum + d.modules.length, 0),
-        totalLessons: curriculumData.reduce(
-          (sum, d) => sum + d.modules.reduce((mSum: number, m: any) => mSum + m.lessons.length, 0),
-          0
-        ),
+        // Convert to array and sort
+        if (domainMap.size > 0) {
+          curriculumData = Array.from(domainMap.values()).map((domain) => ({
+            ...domain,
+            modules: Array.from(domain.modules.values()).sort((a: any, b: any) => a.number - b.number),
+          }))
+          useDbData = true
+        }
       }
-    : getCurriculumStats()
+
+      const stats = useDbData
+        ? {
+            totalDomains: curriculumData.length,
+            totalModules: curriculumData.reduce((sum, d) => sum + d.modules.length, 0),
+            totalLessons: curriculumData.reduce(
+              (sum, d) => sum + d.modules.reduce((mSum: number, m: any) => mSum + m.lessons.length, 0),
+              0
+            ),
+          }
+        : getCurriculumStats()
+
+      return { curriculumData, stats }
+    },
+    ['library', 'curriculum', 'structure'],
+    {
+      tags: [CacheTags.CURRICULUM],
+      revalidate: 86400, // 24 hours
+    }
+  )
+
+  const { curriculumData, stats } = await getCachedCurriculumData()
 
   return (
     <div className="h-full flex flex-col bg-white">

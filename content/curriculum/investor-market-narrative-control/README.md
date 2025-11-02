@@ -88,4 +88,4 @@ Leveraging the CEO's personal reputation to enhance company narrative.
 **Total Lessons:** 21  
 **Estimated Completion Time:** 252 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

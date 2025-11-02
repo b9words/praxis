@@ -76,6 +76,9 @@ export default function DevTools() {
         },
       }),
     onSuccess: async (_, variables) => {
+      // Wait a bit for profile to be synced after creation/update
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: variables.email,
         password: variables.password,
@@ -88,7 +91,11 @@ export default function DevTools() {
 
       queryClient.invalidateQueries({ queryKey: ['dev', 'user'] })
       toast.success(`Logged in as ${variables.username}`)
-      router.push('/dashboard')
+      
+      // If admin role, redirect to admin panel, otherwise stay on current page
+      if (variables.role === 'admin') {
+        router.push('/admin')
+      }
       router.refresh()
     },
     onError: (error: any) => {
@@ -108,7 +115,14 @@ export default function DevTools() {
     }
     devToolsMutation.mutate({ action: 'updateRole', role: newRole }, {
       onSuccess: () => {
-        toast.success(`Role changed to ${newRole}`)
+        toast.success(`Role changed to ${newRole}. Refreshing...`)
+        // Wait a moment for database to sync, then hard refresh
+        setTimeout(() => {
+          window.location.href = '/admin'
+        }, 500)
+      },
+      onError: (error) => {
+        toast.error(error instanceof Error ? error.message : 'Failed to update role')
       },
     })
   }
@@ -447,7 +461,7 @@ export default function DevTools() {
                               Admin Panel
                             </Button>
                             <Button
-                              onClick={() => router.push('/community')}
+                              onClick={() => router.push('/dashboard')}
                               variant="outline"
                               size="sm"
                             >

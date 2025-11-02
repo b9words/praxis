@@ -2,6 +2,10 @@ import SimulationWorkspace from '@/components/simulation/SimulationWorkspace'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { notFound, redirect } from 'next/navigation'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, CheckCircle2, BookOpen } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function SimulationWorkspacePage({ params }: { params: Promise<{ caseId: string }> }) {
   const user = await getCurrentUser()
@@ -20,6 +24,18 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
         id: caseId,
         status: 'published',
       },
+      include: {
+        competencies: {
+          include: {
+            competency: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
     })
   } catch (error: any) {
     // If enum doesn't exist, fall back to querying without status filter
@@ -28,6 +44,18 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
         caseItem = await prisma.case.findFirst({
           where: {
             id: caseId,
+          },
+          include: {
+            competencies: {
+              include: {
+                competency: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
           },
         })
       } catch (fallbackError) {
@@ -44,6 +72,46 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
     notFound()
   }
 
+  // Check prerequisites
+  let prerequisites: Array<{ domain: string; module: string; lesson: string; title?: string }> = []
+  let prerequisiteProgress: Array<{ completed: boolean; title?: string }> = []
+  let allPrerequisitesMet = true
+  
+  if (caseItem.prerequisites && typeof caseItem.prerequisites === 'object') {
+    const prereqs = caseItem.prerequisites as any
+    if (Array.isArray(prereqs)) {
+      prerequisites = prereqs.filter((p: any) => p.domain && p.module && p.lesson)
+      
+      if (prerequisites.length > 0) {
+        // Check user's progress on prerequisites
+        const lessonProgress = await prisma.userLessonProgress.findMany({
+          where: {
+            userId: user.id,
+            OR: prerequisites.map((prereq: any) => ({
+              domainId: prereq.domain,
+              moduleId: prereq.module,
+              lessonId: prereq.lesson,
+            })),
+          },
+        })
+        
+        prerequisiteProgress = prerequisites.map((prereq: any) => {
+          const progress = lessonProgress.find(
+            p => p.domainId === prereq.domain &&
+                 p.moduleId === prereq.module &&
+                 p.lessonId === prereq.lesson
+          )
+          return {
+            completed: progress?.status === 'completed' || false,
+            title: prereq.title,
+          }
+        })
+        
+        allPrerequisitesMet = prerequisiteProgress.every(p => p.completed)
+      }
+    }
+  }
+
   // Check for existing simulation with error handling
   let simulation = null
   try {
@@ -57,10 +125,7 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
     console.error('Error fetching simulation:', error)
   }
 
-  // If simulation is completed, redirect to debrief
-  if (simulation?.status === 'completed') {
-    redirect(`/debrief/${simulation.id}`)
-  }
+  // All redirects removed
 
   // Create new simulation if none exists with error handling
   if (!simulation) {
@@ -87,10 +152,88 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
     }
   }
 
+  // Get recommended lessons for NeedARefresher based on case competencies
+  const { getDomainById, getAllLessonsFlat } = await import('@/lib/curriculum-data')
+  
+  const competencyToDomainMapping: Record<string, string> = {
+    financialAcumen: 'second-order-decision-making',
+    strategicThinking: 'competitive-moat-architecture',
+    marketAwareness: 'technological-market-foresight',
+    riskManagement: 'crisis-leadership-public-composure',
+    leadershipJudgment: 'organizational-design-talent-density',
+  }
+
+  const getFoundationalLessonForDomain = (domainId: string) => {
+    const domain = getDomainById(domainId)
+    if (!domain || domain.modules.length === 0) return null
+
+    const firstModule = domain.modules[0]
+    if (!firstModule || firstModule.lessons.length === 0) return null
+
+    const firstLesson = firstModule.lessons[0]
+    return {
+      domain: domainId,
+      module: firstModule.id,
+      lesson: firstLesson.id,
+      url: `/library/curriculum/${domainId}/${firstModule.id}/${firstLesson.id}`,
+      title: firstLesson.title,
+    }
+  }
+
+  const recommendedLessons: Array<{ domain: string; module: string; lesson: string; url: string; title: string }> = []
+  const seenLessons = new Set<string>()
+  const allLessons = getAllLessonsFlat()
+
+  if (caseItem.competencies) {
+    caseItem.competencies.forEach((cc: any) => {
+      const competencyName = cc.competency?.name || 'Unknown'
+      const domainId = competencyToDomainMapping[competencyName] || 
+                       competencyToDomainMapping[competencyName.toLowerCase().replace(/\s+/g, '')]
+      
+      if (domainId) {
+        const lesson = getFoundationalLessonForDomain(domainId)
+        if (lesson) {
+          const lessonKey = `${lesson.domain}-${lesson.module}-${lesson.lesson}`
+          if (!seenLessons.has(lessonKey) && recommendedLessons.length < 5) {
+            seenLessons.add(lessonKey)
+            recommendedLessons.push(lesson)
+          }
+        }
+      }
+      
+      // Also find lessons by keyword
+      const keyword = competencyName.toLowerCase()
+      const matchingLessons = allLessons
+        .filter(l => 
+          l.lessonTitle.toLowerCase().includes(keyword) ||
+          l.domainTitle.toLowerCase().includes(keyword) ||
+          l.moduleTitle.toLowerCase().includes(keyword)
+        )
+        .slice(0, 2)
+      
+      matchingLessons.forEach(lesson => {
+        const lessonKey = `${lesson.domain}-${lesson.moduleId}-${lesson.lessonId}`
+        if (!seenLessons.has(lessonKey) && recommendedLessons.length < 5) {
+          seenLessons.add(lessonKey)
+          recommendedLessons.push({
+            domain: lesson.domain,
+            module: lesson.moduleId,
+            lesson: lesson.lessonId,
+            url: `/library/curriculum/${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`,
+            title: lesson.lessonTitle,
+          })
+        }
+      })
+    })
+  }
+
   return (
     <div className="h-[calc(100vh-8rem)]">
       <SimulationWorkspace
-        caseItem={caseItem}
+        caseItem={{
+          ...caseItem,
+          recommendedLessons,
+        }}
         simulation={simulation}
         userId={user.id}
       />

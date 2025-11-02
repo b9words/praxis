@@ -405,32 +405,45 @@ export async function updateLessonProgress(
  * Get all progress for a user
  */
 export async function getAllUserProgress(userId: string): Promise<Map<string, LessonProgress>> {
-  const progressItems = await prisma.userLessonProgress.findMany({
-    where: { userId },
-  })
-
-  // Create a map keyed by "domain:module:lesson"
-  const progressMap = new Map<string, LessonProgress>()
-  progressItems.forEach((progress) => {
-    const key = `${progress.domainId}:${progress.moduleId}:${progress.lessonId}`
-    progressMap.set(key, {
-      id: progress.id,
-      user_id: progress.userId,
-      domain_id: progress.domainId,
-      module_id: progress.moduleId,
-      lesson_id: progress.lessonId,
-      status: progress.status,
-      progress_percentage: progress.progressPercentage,
-      time_spent_seconds: progress.timeSpentSeconds,
-      last_read_position: progress.lastReadPosition as Record<string, any>,
-      completed_at: progress.completedAt?.toISOString() || null,
-      bookmarked: progress.bookmarked,
-      created_at: progress.createdAt.toISOString(),
-      updated_at: progress.updatedAt.toISOString(),
+  try {
+    const progressItems = await prisma.userLessonProgress.findMany({
+      where: { userId },
     })
-  })
 
-  return progressMap
+    // Create a map keyed by "domain:module:lesson"
+    const progressMap = new Map<string, LessonProgress>()
+    progressItems.forEach((progress) => {
+      const key = `${progress.domainId}:${progress.moduleId}:${progress.lessonId}`
+      progressMap.set(key, {
+        id: progress.id,
+        user_id: progress.userId,
+        domain_id: progress.domainId,
+        module_id: progress.moduleId,
+        lesson_id: progress.lessonId,
+        status: progress.status,
+        progress_percentage: progress.progressPercentage,
+        time_spent_seconds: progress.timeSpentSeconds,
+        last_read_position: progress.lastReadPosition as Record<string, any>,
+        completed_at: progress.completedAt?.toISOString() || null,
+        bookmarked: progress.bookmarked,
+        created_at: progress.createdAt.toISOString(),
+        updated_at: progress.updatedAt.toISOString(),
+      })
+    })
+
+    return progressMap
+  } catch (error: any) {
+    // Handle missing table gracefully (P2021) - expected if migrations haven't run
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return new Map()
+    }
+    
+    // Log other errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching all user progress:', error)
+    }
+    return new Map()
+  }
 }
 
 /**
@@ -441,31 +454,192 @@ export async function getDomainProgress(
   domainId: string,
   totalLessonsInDomain: number
 ): Promise<DomainProgress> {
-  const progressItems = await prisma.userLessonProgress.findMany({
-    where: {
-      userId,
+  try {
+    const progressItems = await prisma.userLessonProgress.findMany({
+      where: {
+        userId,
+        domainId,
+      },
+      select: {
+        status: true,
+        timeSpentSeconds: true,
+      },
+    })
+
+    const completedLessons = progressItems.filter((p) => p.status === 'completed').length
+    const inProgressLessons = progressItems.filter((p) => p.status === 'in_progress').length
+    const notStartedLessons = Math.max(0, totalLessonsInDomain - progressItems.length)
+    const totalTimeSpentSeconds = progressItems.reduce((sum, p) => sum + p.timeSpentSeconds, 0)
+
+    return {
       domainId,
-    },
-    select: {
-      status: true,
-      timeSpentSeconds: true,
-    },
-  })
+      totalLessons: totalLessonsInDomain,
+      completedLessons,
+      inProgressLessons,
+      notStartedLessons,
+      completionPercentage:
+        totalLessonsInDomain > 0 ? Math.round((completedLessons / totalLessonsInDomain) * 100) : 0,
+      totalTimeSpentSeconds,
+    }
+  } catch (error: any) {
+    // Handle missing table gracefully (P2021) - expected if migrations haven't run
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return {
+        domainId,
+        totalLessons: totalLessonsInDomain,
+        completedLessons: 0,
+        inProgressLessons: 0,
+        notStartedLessons: totalLessonsInDomain,
+        completionPercentage: 0,
+        totalTimeSpentSeconds: 0,
+      }
+    }
+    
+    // Log other errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching domain progress:', error)
+    }
+    return {
+      domainId,
+      totalLessons: totalLessonsInDomain,
+      completedLessons: 0,
+      inProgressLessons: 0,
+      notStartedLessons: totalLessonsInDomain,
+      completionPercentage: 0,
+      totalTimeSpentSeconds: 0,
+    }
+  }
+}
 
-  const completedLessons = progressItems.filter((p) => p.status === 'completed').length
-  const inProgressLessons = progressItems.filter((p) => p.status === 'in_progress').length
-  const notStartedLessons = Math.max(0, totalLessonsInDomain - progressItems.length)
-  const totalTimeSpentSeconds = progressItems.reduce((sum, p) => sum + p.timeSpentSeconds, 0)
+/**
+ * Check if a domain is completed (all lessons and cases)
+ * Returns the domain completion record if completed, null otherwise
+ */
+export async function checkDomainCompletion(
+  userId: string,
+  domainId: string
+): Promise<{ id: string; userId: string; domainId: string; completedAt: Date } | null> {
+  try {
+    const { getAllLessonsFlat } = await import('./curriculum-data')
+    const { getAllInteractiveSimulations } = await import('./case-study-loader')
+    const { getEnhancedCurriculum } = await import('./enhanced-curriculum-integration')
 
-  return {
-    domainId,
-    totalLessons: totalLessonsInDomain,
-    completedLessons,
-    inProgressLessons,
-    notStartedLessons,
-    completionPercentage:
-      totalLessonsInDomain > 0 ? Math.round((completedLessons / totalLessonsInDomain) * 100) : 0,
-    totalTimeSpentSeconds,
+    // Get all lessons and simulations for this domain
+    const allLessons = getAllLessonsFlat()
+    const allSimulations = getAllInteractiveSimulations()
+    const enhancedCurriculum = getEnhancedCurriculum()
+    
+    const domain = enhancedCurriculum.find(d => d.domainId === domainId)
+    if (!domain) {
+      return null
+    }
+
+    // Get all lessons and simulations in this domain
+    const domainLessons = allLessons.filter(l => l.domain === domainId)
+    const domainSimulations = domain.learningPath.filter(item => item.type === 'simulation')
+
+    // Check if all lessons are completed
+    const lessonProgress = await prisma.userLessonProgress.findMany({
+      where: {
+        userId,
+        domainId,
+        status: 'completed',
+      },
+    })
+
+    const completedLessonIds = new Set(
+      lessonProgress.map(p => `${p.domainId}-${p.moduleId}-${p.lessonId}`)
+    )
+    const requiredLessonIds = new Set(
+      domainLessons.map(l => `${l.domain}-${l.moduleId}-${l.lessonId}`)
+    )
+
+    const allLessonsCompleted = requiredLessonIds.size > 0 && 
+      Array.from(requiredLessonIds).every(id => completedLessonIds.has(id))
+
+    // Check if all simulations are completed
+    let allSimulationsCompleted = true
+    if (domainSimulations.length > 0) {
+      const simulationIds = domainSimulations.map(s => s.simulationId || s.lesson)
+      const completedSimulations = await prisma.simulation.findMany({
+        where: {
+          userId,
+          status: 'completed',
+          caseId: { in: simulationIds },
+        },
+        select: { caseId: true },
+      })
+
+      const completedCaseIds = new Set(completedSimulations.map(s => s.caseId))
+      allSimulationsCompleted = simulationIds.every(id => completedCaseIds.has(id))
+    } else {
+      // No simulations required for this domain
+      allSimulationsCompleted = true
+    }
+
+    // Domain is completed if all lessons and simulations are done
+    if (allLessonsCompleted && allSimulationsCompleted) {
+      // Upsert domain completion
+      const completion = await prisma.domainCompletion.upsert({
+        where: {
+          userId_domainId: {
+            userId,
+            domainId,
+          },
+        },
+        update: {
+          completedAt: new Date(),
+        },
+        create: {
+          userId,
+          domainId,
+          completedAt: new Date(),
+        },
+      })
+
+      return {
+        id: completion.id,
+        userId: completion.userId,
+        domainId: completion.domainId,
+        completedAt: completion.completedAt,
+      }
+    }
+
+    return null
+  } catch (error: any) {
+    // Handle missing table gracefully (P2021) - expected if migrations haven't run
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return null
+    }
+    
+    // Log other errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error checking domain completion:', error)
+    }
+    return null
+  }
+}
+
+/**
+ * Get all domain completions for a user
+ */
+export async function getUserDomainCompletions(userId: string) {
+  try {
+    return await prisma.domainCompletion.findMany({
+      where: { userId },
+      orderBy: { completedAt: 'desc' },
+    })
+  } catch (error: any) {
+    // Handle missing table gracefully (P2021) - expected if migrations haven't run
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return []
+    }
+    
+    // Log other errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching domain completions:', error)
+    }
+    return []
   }
 }
 
@@ -473,28 +647,53 @@ export async function getDomainProgress(
  * Get user reading statistics
  */
 export async function getUserReadingStats(userId: string): Promise<UserReadingStats> {
-  const progressItems = await prisma.userLessonProgress.findMany({
-    where: { userId },
-    select: {
-      status: true,
-      timeSpentSeconds: true,
-      bookmarked: true,
-    },
-  })
+  try {
+    const progressItems = await prisma.userLessonProgress.findMany({
+      where: { userId },
+      select: {
+        status: true,
+        timeSpentSeconds: true,
+        bookmarked: true,
+      },
+    })
 
-  const totalLessonsCompleted = progressItems.filter((p) => p.status === 'completed').length
-  const lessonsInProgress = progressItems.filter((p) => p.status === 'in_progress').length
-  const totalTimeSpentSeconds = progressItems.reduce((sum, p) => sum + p.timeSpentSeconds, 0)
-  const totalBookmarks = progressItems.filter((p) => p.bookmarked).length
-  const averageTimePerLesson =
-    totalLessonsCompleted > 0 ? Math.round(totalTimeSpentSeconds / totalLessonsCompleted) : 0
+    const totalLessonsCompleted = progressItems.filter((p) => p.status === 'completed').length
+    const lessonsInProgress = progressItems.filter((p) => p.status === 'in_progress').length
+    const totalTimeSpentSeconds = progressItems.reduce((sum, p) => sum + p.timeSpentSeconds, 0)
+    const totalBookmarks = progressItems.filter((p) => p.bookmarked).length
+    const averageTimePerLesson =
+      totalLessonsCompleted > 0 ? Math.round(totalTimeSpentSeconds / totalLessonsCompleted) : 0
 
-  return {
-    totalLessonsCompleted,
-    totalTimeSpentSeconds,
-    totalBookmarks,
-    lessonsInProgress,
-    averageTimePerLesson,
+    return {
+      totalLessonsCompleted,
+      totalTimeSpentSeconds,
+      totalBookmarks,
+      lessonsInProgress,
+      averageTimePerLesson,
+    }
+  } catch (error: any) {
+    // Handle missing table gracefully (P2021) - expected if migrations haven't run
+    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      return {
+        totalLessonsCompleted: 0,
+        totalTimeSpentSeconds: 0,
+        totalBookmarks: 0,
+        lessonsInProgress: 0,
+        averageTimePerLesson: 0,
+      }
+    }
+    
+    // Log other errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching user reading stats:', error)
+    }
+    return {
+      totalLessonsCompleted: 0,
+      totalTimeSpentSeconds: 0,
+      totalBookmarks: 0,
+      lessonsInProgress: 0,
+      averageTimePerLesson: 0,
+    }
   }
 }
 

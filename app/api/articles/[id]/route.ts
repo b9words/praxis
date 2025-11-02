@@ -1,5 +1,7 @@
-import { requireRole } from '@/lib/auth/authorize'
+
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { getCachedArticle } from '@/lib/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -9,26 +11,8 @@ export async function GET(
   try {
     const { id } = await params
 
-    const article = await prisma.article.findUnique({
-      where: { id },
-      include: {
-        competency: true,
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-          },
-        },
-        updater: {
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-          },
-        },
-      },
-    })
+    // Use cached article helper (1 hour revalidate)
+    const article = await getCachedArticle(id)
 
     if (!article) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
@@ -48,7 +32,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireRole(['editor', 'admin'])
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { id } = await params
     const body = await request.json()
 
@@ -97,7 +84,10 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireRole(['editor', 'admin'])
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { id } = await params
     const body = await request.json()
 
@@ -146,7 +136,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole(['admin'])
+    
     const { id } = await params
 
     // Check if article exists before deleting

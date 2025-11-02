@@ -30,8 +30,9 @@ export interface CaseFile {
   fileName: string
   fileType: 'FINANCIAL_DATA' | 'MEMO' | 'REPORT' | 'PRESENTATION_DECK'
   source: {
-    type: 'STATIC'
-    content: string
+    type: 'STATIC' | 'REFERENCE'
+    content?: string
+    path?: string // For REFERENCE type
   }
 }
 

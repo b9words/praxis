@@ -51,7 +51,7 @@ export default function LearningFlow({ currentStep, nextAction, className = '' }
     <Card className={`border-l-4 border-blue-500 ${className}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-gray-900">The Praxis Method</h3>
+          <h3 className="font-semibold text-gray-900">The Execemy Method</h3>
           <Badge variant="outline" className="text-xs">
             Step {currentIndex + 1} of 4
           </Badge>
@@ -100,7 +100,7 @@ export default function LearningFlow({ currentStep, nextAction, className = '' }
           })}
         </div>
 
-        {nextAction && (
+        {nextAction && nextAction.href && (
           <div className="pt-3 border-t border-gray-100">
             <div className="flex items-center justify-between">
               <div>
@@ -147,7 +147,7 @@ export function LearningFlowBanner({ currentStep, context, nextAction }: Learnin
             <p className="text-sm text-blue-700">{step.description}</p>
           </div>
         </div>
-        {nextAction && (
+        {nextAction && nextAction.href && (
           <Button asChild variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
             <Link href={nextAction.href}>
               {nextAction.label}

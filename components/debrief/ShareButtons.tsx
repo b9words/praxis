@@ -18,7 +18,7 @@ export default function ShareButtons({ simulationTitle, scores, profileUrl }: Sh
 
   const averageScore = Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length
 
-  const shareText = `I just completed "${simulationTitle}" on Praxis and scored ${averageScore.toFixed(1)}/5! Building real business acumen through simulation. #PraxisProgram`
+  const shareText = `I just completed "${simulationTitle}" on Execemy and scored ${averageScore.toFixed(1)}/5! Building real business acumen through simulation. #ExecemyProgram`
 
   const handleCopyLink = () => {
     const url = profileUrl || window.location.origin + '/profile'
@@ -57,7 +57,7 @@ export default function ShareButtons({ simulationTitle, scores, profileUrl }: Sh
           <CardTitle>Share Your Achievement</CardTitle>
         </div>
         <CardDescription>
-          Let others know about your progress on the Praxis journey
+          Let others know about your progress on the Execemy journey
         </CardDescription>
       </CardHeader>
       <CardContent>

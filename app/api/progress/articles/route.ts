@@ -1,12 +1,16 @@
 import { isMissingTable } from '@/lib/api/route-helpers'
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { ensureUserArticleProgressTable } from '@/lib/db/schemaGuard'
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const searchParams = request.nextUrl.searchParams
     const articleId = searchParams.get('articleId')
     const status = searchParams.get('status')
@@ -102,7 +106,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const body = await request.json()
 
     const { articleId, status = 'in_progress' } = body
@@ -162,7 +170,11 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const body = await request.json()
 
     const { articleId, status } = body
@@ -216,7 +228,11 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const searchParams = request.nextUrl.searchParams
     const articleId = searchParams.get('articleId')
 

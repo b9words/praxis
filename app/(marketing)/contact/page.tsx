@@ -42,7 +42,7 @@ export default function ContactPage() {
               <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight">Contact Us</h1>
             </div>
             <p className="text-lg text-neutral-700 leading-relaxed">
-              Have questions about Praxis? We're here to help. Reach out via the form below or email us directly.
+              Have questions about Execemy? We're here to help. Reach out via the form below or email us directly.
             </p>
           </div>
         </div>
@@ -133,15 +133,15 @@ export default function ContactPage() {
               <div className="bg-white border border-neutral-200 p-6">
                 <Mail className="h-5 w-5 text-neutral-700 mb-3" />
                 <h3 className="text-sm font-medium text-neutral-900 mb-2">Email</h3>
-                <a href="mailto:support@praxisplatform.com" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
-                  support@praxisplatform.com
+                <a href="mailto:support@execemy.com" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
+                  support@execemy.com
                 </a>
               </div>
               <div className="bg-white border border-neutral-200 p-6">
                 <MessageSquare className="h-5 w-5 text-neutral-700 mb-3" />
                 <h3 className="text-sm font-medium text-neutral-900 mb-2">General Inquiries</h3>
-                <a href="mailto:info@praxisplatform.com" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
-                  info@praxisplatform.com
+                <a href="mailto:info@execemy.com" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
+                  info@execemy.com
                 </a>
               </div>
             </div>

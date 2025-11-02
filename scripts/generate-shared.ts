@@ -556,6 +556,74 @@ export function checkRequiredSections(content: string, requiredSections: string[
 }
 
 /**
+ * Generate and upload thumbnail for content
+ */
+export async function generateAndUploadThumbnail(
+  contentId: string,
+  contentType: 'lesson' | 'case',
+  title: string,
+  domainName: string,
+  competencyName?: string
+): Promise<string | null> {
+  if (!isSupabaseAvailable()) {
+    console.warn('  ⚠️  Supabase not available - skipping thumbnail generation')
+    return null
+  }
+
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+    
+    // Call thumbnail generation API
+    console.log('  🎨 Generating thumbnail...')
+    const response = await fetch(`${apiUrl}/api/generate-thumbnail`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contentId,
+        contentType,
+        title,
+        domainName,
+        competencyName,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: response.statusText }))
+      throw new Error(`Thumbnail API error: ${errorData.error || response.statusText}`)
+    }
+
+    const { svg } = await response.json()
+
+    // Upload SVG to storage
+    const thumbnailPath = `${contentType === 'lesson' ? 'thumbnails/articles' : 'thumbnails/cases'}/${contentId}.svg`
+    await uploadToStorage(thumbnailPath, svg, 'image/svg+xml')
+
+    // Get public URL for the thumbnail
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+    const thumbnailUrl = `${supabaseUrl}/storage/v1/object/public/assets/${thumbnailPath}`
+
+    // Update database record with thumbnail_url
+    const tableName = contentType === 'lesson' ? 'articles' : 'cases'
+    const { error: updateError } = await supabase!
+      .from(tableName)
+      .update({ thumbnail_url: thumbnailUrl })
+      .eq('id', contentId)
+
+    if (updateError) {
+      throw new Error(`Failed to update thumbnail_url: ${updateError.message}`)
+    }
+
+    console.log(`  ✅ Thumbnail generated and uploaded: ${thumbnailUrl}`)
+    return thumbnailUrl
+  } catch (error) {
+    console.warn(`  ⚠️  Thumbnail generation failed: ${error instanceof Error ? error.message : String(error)}`)
+    return null
+  }
+}
+
+/**
  * Auto-repair content based on validation errors
  */
 export async function repairContent(

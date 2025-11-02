@@ -64,7 +64,7 @@ function ResetPasswordForm() {
     } else {
       setSuccess(true)
       setTimeout(() => {
-        router.push('/login')
+        // All redirects removed
       }, 2000)
     }
   }

@@ -3,20 +3,19 @@ import { createClient } from '@/lib/supabase/server'
 import { BookOpen, DollarSign, Shield, Target, TrendingUp, Users } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Praxis - The Proving Ground for Business Leaders',
+  title: 'Execemy - The Proving Ground for Business Leaders',
   description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment. A curated platform for analytical professionals.',
   openGraph: {
-    title: 'Praxis - The Proving Ground for Business Leaders',
+    title: 'Execemy - The Proving Ground for Business Leaders',
     description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment. A curated platform for analytical professionals.',
     type: 'website',
-    url: process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com',
+    url: process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Praxis - The Proving Ground for Business Leaders',
+    title: 'Execemy - The Proving Ground for Business Leaders',
     description: 'Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment.',
   },
 }
@@ -58,9 +57,7 @@ export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (user) {
-    redirect('/dashboard')
-  }
+  // Don't redirect authenticated users
 
   return (
     <div className="min-h-screen bg-white">
@@ -70,7 +67,7 @@ export default async function Home() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-12">
               <Link href="/" className="text-lg font-semibold text-neutral-900 tracking-tight relative">
-                Praxis
+                Execemy
                 <div className="absolute -bottom-1 left-0 w-full h-[0.5px] bg-neutral-900"></div>
               </Link>
               <div className="hidden md:flex gap-8">
@@ -170,7 +167,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
           <div className="mb-20 relative">
             <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
-            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">The Praxis Method</h2>
+            <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">The Execemy Method</h2>
             <p className="text-base text-neutral-700 max-w-2xl">
               A systematic approach to developing analytical business decision-making capabilities
             </p>
@@ -403,7 +400,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "Praxis provided the analytical framework necessary for my transition from engineering to product management. The simulation scenarios are realistic; I apply the mental models daily in strategic decisions.",
+                quote: "Execemy provided the analytical framework necessary for my transition from engineering to product management. The simulation scenarios are realistic; I apply the mental models daily in strategic decisions.",
                 author: "Sarah Chen",
                 role: "Senior Product Manager",
                 company: "Meta"

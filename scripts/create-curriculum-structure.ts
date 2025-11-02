@@ -195,7 +195,7 @@ flowchart TD
 
 ---
 
-*This lesson is part of the **${domain.title}** domain in the Praxis Executive Education curriculum.*
+*This lesson is part of the **${domain.title}** domain in the Execemy Executive Education curriculum.*
 `
 
     try {
@@ -250,7 +250,7 @@ ${module.lessons.map(lesson => `- [${module.number}.${lesson.number}: ${lesson.t
 **Total Lessons:** ${domain.modules.reduce((sum, m) => sum + m.lessons.length, 0)}  
 **Estimated Completion Time:** ${domain.modules.reduce((sum, m) => sum + m.lessons.length, 0) * 12} minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*
 `
 
     try {
@@ -263,7 +263,7 @@ ${module.lessons.map(lesson => `- [${module.number}.${lesson.number}: ${lesson.t
 
   // Create master curriculum index
   const masterIndexPath = join(baseDir, 'content/curriculum/README.md')
-  const masterIndexContent = `# Praxis Executive Education Curriculum
+  const masterIndexContent = `# Execemy Executive Education Curriculum
 
 A comprehensive curriculum for developing world-class CEOs and senior executives.
 

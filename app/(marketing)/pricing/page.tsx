@@ -9,17 +9,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Pricing - Praxis',
+  title: 'Pricing - Execemy',
   description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
   openGraph: {
-    title: 'Pricing - Praxis',
+    title: 'Pricing - Execemy',
     description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
     type: 'website',
-    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com'}/pricing`,
+    url: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/pricing`,
   },
   twitter: {
     card: 'summary',
-    title: 'Pricing - Praxis',
+    title: 'Pricing - Execemy',
     description: 'Choose the perfect plan for your business acumen journey.',
   },
 }
@@ -38,7 +38,7 @@ export default function PricingPage() {
         'Unlimited simulation attempts',
         'AI-powered performance debriefs',
         'Community forum access',
-        'Personal Praxis Profile'
+        'Personal Execemy Profile'
       ],
       cta: 'Start Explorer',
       popular: false
@@ -54,7 +54,7 @@ export default function PricingPage() {
         'Access to Years 1-3 curriculum (39 articles, 10 cases)',
         'Priority AI coaching with detailed feedback',
         'Advanced simulations with AI role-play',
-        'Verified Praxis credential',
+        'Verified Execemy credential',
         'Career coaching sessions (2/month)',
         'Exclusive networking events'
       ],
@@ -201,8 +201,8 @@ export default function PricingPage() {
             <div className="space-y-6">
               {[
                 {
-                  q: 'What makes Praxis different from online courses?',
-                  a: 'Praxis is not a course—it\'s a systematic training program. You don\'t just watch videos; you make real business decisions in simulated environments and receive AI-powered feedback on your performance. Our focus is on demonstrable skills, not passive learning.'
+                  q: 'What makes Execemy different from online courses?',
+                  a: 'Execemy is not a course—it\'s a systematic training program. You don\'t just watch videos; you make real business decisions in simulated environments and receive AI-powered feedback on your performance. Our focus is on demonstrable skills, not passive learning.'
                 },
                 {
                   q: 'How much time does it require?',
@@ -213,8 +213,8 @@ export default function PricingPage() {
                   a: 'No. Our Year 1 curriculum assumes no prior business knowledge. We start with fundamentals and build systematically to executive-level topics.'
                 },
                 {
-                  q: 'Is the Praxis credential recognized?',
-                  a: 'Your Praxis Profile is a verified, skills-based credential that demonstrates competency through performance, not just completion. Many members share it on LinkedIn and with employers to demonstrate their business acumen.'
+                  q: 'Is the Execemy credential recognized?',
+                  a: 'Your Execemy Profile is a verified, skills-based credential that demonstrates competency through performance, not just completion. Many members share it on LinkedIn and with employers to demonstrate their business acumen.'
                 },
                 {
                   q: 'Can I switch plans later?',
@@ -259,7 +259,7 @@ export default function PricingPage() {
             <SectionAccent variant="center" />
             <h2 className="text-3xl font-light mb-6 tracking-tight">Ready to Start</h2>
             <p className="text-base text-neutral-300 mb-10 leading-relaxed max-w-2xl mx-auto">
-              Join the Praxis community today and start building world-class business acumen
+              Join the Execemy community today and start building world-class business acumen
             </p>
             <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
               <Link href="/signup">

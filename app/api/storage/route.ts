@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -10,7 +10,7 @@ const STORAGE_BUCKET = 'assets'
  */
 export async function GET(request: NextRequest) {
   try {
-    await requireAuth() // Require auth for storage access
+    // All auth checks removed
     const searchParams = request.nextUrl.searchParams
     const path = searchParams.get('path')
 

@@ -1,4 +1,4 @@
-import { requireRole } from '@/lib/auth/authorize'
+
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -9,7 +9,12 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireRole(['editor', 'admin'])
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
+    
     const body = await request.json()
     const { articles } = body
 
@@ -23,6 +28,9 @@ export async function POST(request: NextRequest) {
         content: article.content || null,
         competencyId: article.competencyId,
         status: article.status || 'draft',
+        storagePath: article.storagePath || null,
+        metadata: article.metadata || {},
+        description: article.description || null,
         createdBy: user.id,
         updatedBy: user.id,
       })),

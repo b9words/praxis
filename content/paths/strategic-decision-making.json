@@ -1,0 +1,31 @@
+{
+  "id": "strategic-decision-making",
+  "title": "Strategic Decision-Making",
+  "description": "Build frameworks for high-stakes executive decisions",
+  "duration": "10 days",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "foundational-theory",
+      "lesson": "defining-moat"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "foundational-theory",
+      "lesson": "source-all-moats"
+    },
+    {
+      "type": "lesson",
+      "domain": "technological-market-foresight",
+      "module": "market-timing",
+      "lesson": "early-mover-advantages"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_01_tesla_production_crisis_2018"
+    }
+  ]
+}
+

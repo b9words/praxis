@@ -437,7 +437,7 @@ async function importCases() {
 }
 
 async function main() {
-  console.log('🚀 Praxis Content Import System\n')
+  console.log('🚀 Execemy Content Import System\n')
   console.log('================================\n')
   
   await importArticles()

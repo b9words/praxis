@@ -40,7 +40,7 @@
       - generic [ref=e29]:
         - generic [ref=e30]:
           - generic [ref=e31]:
-            - heading "Praxis" [level=3] [ref=e32]
+            - heading "Execemy" [level=3] [ref=e32]
             - paragraph [ref=e33]: Building the next generation of business leaders through practical, hands-on education.
           - generic [ref=e34]:
             - heading "Product" [level=4] [ref=e35]
@@ -80,8 +80,8 @@
                   - /url: /legal/cookies
               - listitem [ref=e61]:
                 - link "Support" [ref=e62] [cursor=pointer]:
-                  - /url: mailto:support@praxisplatform.com
-        - paragraph [ref=e64]: © 2025 Praxis Platform. All rights reserved.
+                  - /url: mailto:support@execemy.com
+        - paragraph [ref=e64]: © 2025 Execemy Platform. All rights reserved.
   - region "Notifications alt+T"
   - generic [ref=e66]:
     - generic [ref=e68]:

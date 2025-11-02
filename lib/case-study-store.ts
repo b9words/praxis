@@ -6,9 +6,10 @@ export interface CaseStudyFile {
   fileName: string
   fileType: 'MEMO' | 'FINANCIAL_DATA' | 'REPORT' | 'PRESENTATION_DECK' | 'LEGAL_DOCUMENT'
   source: {
-    type: 'STATIC' | 'REMOTE_CSV' | 'REMOTE_PDF' | 'REMOTE_API'
+    type: 'STATIC' | 'REMOTE_CSV' | 'REMOTE_PDF' | 'REMOTE_API' | 'REFERENCE'
     content?: string
     url?: string
+    path?: string // For REFERENCE type
   }
 }
 

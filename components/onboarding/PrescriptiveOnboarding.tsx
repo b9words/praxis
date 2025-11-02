@@ -8,7 +8,6 @@ import { queryKeys } from '@/lib/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, BookOpen, CheckCircle2, Target, Trophy, Users } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -19,21 +18,32 @@ interface PrescriptiveOnboardingProps {
 export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedResidency, setSelectedResidency] = useState<number | null>(null)
-  const router = useRouter()
   const queryClient = useQueryClient()
   
   const totalSteps = 3
   const progress = (currentStep / totalSteps) * 100
 
   const updateResidencyMutation = useMutation({
-    mutationFn: (year: number) =>
-      fetchJson('/api/residency', {
+    mutationFn: async (year: number) => {
+      const response = await fetchJson<{ residency: { currentResidency: number } }>('/api/residency', {
         method: 'PUT',
         body: { currentResidency: year },
-      }),
+      })
+      // Verify the residency was actually saved
+      if (!response?.residency || response.residency.currentResidency !== year) {
+        throw new Error('Failed to verify residency was saved')
+      }
+      return response
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.progress() })
-      router.push('/dashboard')
+      
+      // Cookie is already set by API route in response headers
+      // Set client-side cookie as backup in case API cookie isn't received
+      document.cookie = `onboarding_complete=1; path=/; max-age=30; SameSite=Lax`
+      
+      // Redirect with query param - API route set cookie in response, this ensures it's available
+      window.location.reload()
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to complete onboarding')
@@ -174,7 +184,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
                 </div>
                 <h3 className="text-sm font-medium text-gray-900 mb-2">3. Debrief</h3>
                 <p className="text-xs text-gray-600">
-                  Analyze performance and build your Praxis Profile
+                  Analyze performance and build your Execemy Profile
                 </p>
               </div>
             </div>
@@ -182,7 +192,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
             {/* What You'll Build */}
             <div className="bg-gray-50 border border-gray-200 p-6">
               <h3 className="text-base font-medium text-gray-900 mb-4 text-center">
-                You'll Build Your Praxis Profile
+                You'll Build Your Execemy Profile
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div>
@@ -280,7 +290,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
                 </Button>
                 
                 <Button variant="outline" asChild className="border-gray-300 hover:border-gray-400 rounded-none">
-                  <Link href="/community">
+                  <Link href="/dashboard">
                     <Users className="mr-2 h-4 w-4" />
                     Meet Your Cohort
                   </Link>

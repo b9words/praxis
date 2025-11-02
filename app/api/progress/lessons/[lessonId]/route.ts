@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { getLessonProgress, updateLessonProgress } from '@/lib/progress-tracking'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -7,7 +7,11 @@ export async function GET(
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { lessonId } = await params
     const searchParams = request.nextUrl.searchParams
     const domainId = searchParams.get('domainId')
@@ -38,7 +42,11 @@ export async function PUT(
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { lessonId } = await params
     const body = await request.json()
 

@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold text-white mb-4 tracking-tight">Praxis</h3>
+            <h3 className="text-lg font-semibold text-white mb-4 tracking-tight">Execemy</h3>
             <p className="text-sm text-neutral-400 leading-relaxed">
               Building demonstrable business acumen through systematic analysis and rigorous assessment.
             </p>
@@ -82,7 +82,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@praxisplatform.com" className="text-sm text-neutral-400 hover:text-white transition-colors">
+                <a href="mailto:support@execemy.com" className="text-sm text-neutral-400 hover:text-white transition-colors">
                   Support
                 </a>
               </li>
@@ -93,7 +93,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-neutral-800">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-neutral-500 text-center md:text-left">
-              &copy; {new Date().getFullYear()} Praxis Platform. All rights reserved.
+              &copy; {new Date().getFullYear()} Execemy Platform. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-neutral-500">
               <span>Assessment-based access</span>

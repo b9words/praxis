@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -14,24 +14,158 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not available in production' }, { status: 403 })
     }
 
-    const user = await requireAuth()
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const body = await request.json()
     const { action, ...params } = body
+    
+    // Import getCurrentUser once for use in multiple cases
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
 
     switch (action) {
       case 'updateRole':
-        await prisma.profile.update({
+        // Get full user for profile creation if needed
+        const fullUser = await getCurrentUser()
+        
+        // Check if profile exists
+        const existingProfile = await prisma.profile.findUnique({
           where: { id: user.id },
-          data: { role: params.role },
+          select: { id: true, role: true },
         })
-        return NextResponse.json({ success: true })
+        
+        let updatedProfile
+        if (!existingProfile) {
+          // Profile doesn't exist - create it using Supabase (handles schema correctly)
+          const { createClient } = await import('@supabase/supabase-js')
+          const supabaseAdmin = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            { auth: { autoRefreshToken: false, persistSession: false } }
+          )
+          
+          const username = fullUser?.user_metadata?.username || fullUser?.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
+          const uniqueUsername = `${username}_${user.id.substring(0, 8)}`
+          
+          const { error: createError } = await supabaseAdmin
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              username: uniqueUsername,
+              full_name: fullUser?.user_metadata?.full_name || username,
+              role: params.role,
+              is_public: false,
+            }, { onConflict: 'id' })
+          
+          if (createError) {
+            console.error(`[dev-tools] Failed to create profile: ${createError.message}`)
+            return NextResponse.json({ error: `Failed to create profile: ${createError.message}` }, { status: 500 })
+          }
+          
+          // Wait a bit for the profile to be available
+          await new Promise(resolve => setTimeout(resolve, 300))
+          
+          updatedProfile = await prisma.profile.findUnique({
+            where: { id: user.id },
+            select: { id: true, role: true },
+          })
+          
+          if (!updatedProfile) {
+            return NextResponse.json({ error: 'Profile creation failed' }, { status: 500 })
+          }
+          
+          console.log(`[dev-tools] Created profile for user ${user.id} with role: ${updatedProfile.role}`)
+        } else {
+          // Profile exists - update the role
+          try {
+            updatedProfile = await prisma.profile.update({
+              where: { id: user.id },
+              data: { role: params.role as any },
+              select: { id: true, role: true },
+            })
+            console.log(`[dev-tools] Updated role for user ${user.id} from ${existingProfile.role} to: ${updatedProfile.role}`)
+          } catch (error: any) {
+            // Handle missing columns (P2022) or other schema issues
+            if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+              try {
+                updatedProfile = await prisma.profile.update({
+                  where: { id: user.id },
+                  data: { role: params.role as any },
+                  select: { id: true, role: true },
+                })
+                console.log(`[dev-tools] Updated role for user ${user.id} from ${existingProfile.role} to: ${updatedProfile.role}`)
+              } catch (fallbackError) {
+                console.error('Error updating role (fallback):', fallbackError)
+                return NextResponse.json({ error: 'Failed to update role' }, { status: 500 })
+              }
+            } else {
+              throw error
+            }
+          }
+        }
+        
+        // Verify the update persisted
+        const verifiedProfile = await prisma.profile.findUnique({
+          where: { id: user.id },
+          select: { role: true },
+        })
+        
+        if (verifiedProfile?.role !== params.role) {
+          console.error(`[dev-tools] Role update verification failed: expected ${params.role}, got ${verifiedProfile?.role}`)
+          return NextResponse.json({ 
+            error: `Role update verification failed. Expected ${params.role} but got ${verifiedProfile?.role}` 
+          }, { status: 500 })
+        }
+        
+        return NextResponse.json({ success: true, role: updatedProfile.role })
 
       case 'toggleProfileVisibility':
-        const profile = await prisma.profile.findUnique({ where: { id: user.id } })
-        await prisma.profile.update({
-          where: { id: user.id },
-          data: { isPublic: !profile?.isPublic },
-        })
+        let profile = null
+        try {
+          profile = await prisma.profile.findUnique({
+            where: { id: user.id },
+            select: { id: true, isPublic: true },
+          })
+        } catch (error: any) {
+          // Handle missing columns (P2022) or other schema issues
+          if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+            try {
+              profile = await prisma.profile.findUnique({
+                where: { id: user.id },
+                select: { id: true, isPublic: true },
+              })
+            } catch (fallbackError) {
+              console.error('Error fetching profile (fallback):', fallbackError)
+              return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
+            }
+          } else {
+            throw error
+          }
+        }
+        try {
+          await prisma.profile.update({
+            where: { id: user.id },
+            data: { isPublic: !profile?.isPublic },
+            select: { id: true },
+          })
+        } catch (error: any) {
+          // Handle missing columns (P2022) or other schema issues
+          if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+            try {
+              await prisma.profile.update({
+                where: { id: user.id },
+                data: { isPublic: !profile?.isPublic },
+                select: { id: true },
+              })
+            } catch (fallbackError) {
+              console.error('Error updating profile visibility (fallback):', fallbackError)
+              return NextResponse.json({ error: 'Failed to update profile visibility' }, { status: 500 })
+            }
+          } else {
+            throw error
+          }
+        }
         return NextResponse.json({ success: true, isPublic: !profile?.isPublic })
 
       case 'clearSimulations':
@@ -71,7 +205,6 @@ export async function POST(request: NextRequest) {
 
       case 'seedComprehensive':
         // Get email from current user
-        const { getCurrentUser } = await import('@/lib/auth/get-user')
         const currentUser = await getCurrentUser()
         
         // Use the shared seed function

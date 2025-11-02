@@ -1,5 +1,6 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { notifyDebriefGenerationFailure } from '@/lib/notifications/triggers'
+import { createJob } from '@/lib/job-processor'
 import { prisma } from '@/lib/prisma/server'
 import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
@@ -48,7 +49,11 @@ function checkRateLimit(userId: string, ip: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const body = await request.json()
 
     const { simulationId } = body
@@ -93,81 +98,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Call the Supabase Edge Function
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    if (!supabaseUrl) {
-      return NextResponse.json({ error: 'Supabase URL not configured' }, { status: 500 })
-    }
-
-    // Get session token for authenticated request
-    const sessionHeader = request.headers.get('authorization')
-    
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-debrief`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': sessionHeader || '',
-      },
-      body: JSON.stringify({
-        simulationId,
-      }),
+    // Create background job for debrief generation
+    const job = await createJob('debrief_generation', {
+      simulationId,
+      userId: user.id,
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('Edge function error:', errorText)
-      
-      // Track failure count (using simulationId as key for persistence tracking)
-      const failureKey = `debrief_fail_${simulationId}`
-      const existingFailures = rateLimitStore.get(failureKey)
-      const failureCount = existingFailures ? existingFailures.count + 1 : 1
-      rateLimitStore.set(failureKey, { count: failureCount, refusedAt: Date.now() })
-      
-      Sentry.addBreadcrumb({
-        category: 'debrief',
-        level: 'error',
-        message: 'Debrief generation failed',
-        data: { simulationId, status: response.status, error: errorText, failureCount },
-      })
-      Sentry.captureException(new Error(`Debrief generation failed: ${errorText}`))
-      
-      // Notify user if this is the 3rd+ failure
-      if (failureCount >= 3) {
-        try {
-          await notifyDebriefGenerationFailure(user.id, simulationId, failureCount)
-        } catch (notifError) {
-          console.error('Failed to send debrief failure notification:', notifError)
-          // Don't fail the request if notification fails
-        }
-      }
-      
-      return NextResponse.json(
-        { error: 'Failed to generate debrief' },
-        { status: response.status }
-      )
-    }
-    
-    // Clear failure count on success
-    const failureKey = `debrief_fail_${simulationId}`
-    rateLimitStore.delete(failureKey)
-
-    const data = await response.json()
-    return NextResponse.json(data)
+    // Return job ID immediately
+    return NextResponse.json({
+      jobId: job.id,
+      status: job.status,
+      message: 'Debrief generation started. Poll /api/jobs/[jobId] for status.',
+    })
   } catch (error) {
-    if (error instanceof Error && error.message === 'Unauthorized') {
-      return NextResponse.json({ error: error.message }, { status: 401 })
-    }
-    const { normalizeError } = await import('@/lib/api/route-helpers')
-    const normalized = normalizeError(error)
-    console.error('Error in generate debrief API:', error)
-    Sentry.addBreadcrumb({
-      category: 'debrief',
-      level: 'error',
-      message: 'Debrief API error',
-      data: { error: error instanceof Error ? error.message : String(error), normalized },
+    const { createErrorResponse } = await import('@/lib/api/error-wrapper')
+    return createErrorResponse(error, {
+      defaultMessage: 'Failed to generate debrief',
+      statusCode: 500,
     })
-    Sentry.captureException(error)
-    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

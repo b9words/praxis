@@ -1,8 +1,9 @@
-import PraxisRadarChart from '@/components/profile/PraxisRadarChart'
+import ExecemyRadarChart from '@/components/profile/ExecemyRadarChart'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/lib/auth/get-user'
+import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getUserAggregateScores } from '@/lib/database-functions'
 import { isEnumError } from '@/lib/prisma-enum-fallback'
 import { prisma } from '@/lib/prisma/server'
@@ -17,15 +18,29 @@ export async function generateMetadata({
   params: Promise<{ username: string }>
 }): Promise<Metadata> {
   const { username } = await params
-  const profile = await prisma.profile.findUnique({
-    where: { username },
-    select: {
-      fullName: true,
-      username: true,
-      bio: true,
-      isPublic: true,
+  
+  // Cache profile metadata
+  const getCachedProfileMetadata = cache(
+    async () => {
+      const profile = await prisma.profile.findUnique({
+        where: { username },
+        select: {
+          fullName: true,
+          username: true,
+          bio: true,
+          isPublic: true,
+        },
+      })
+      return profile
     },
-  })
+    ['profile', 'metadata', username],
+    {
+      tags: [CacheTags.USERS, `user-${username}`],
+      revalidate: 300, // 5 minutes
+    }
+  )
+  
+  const profile = await getCachedProfileMetadata()
 
   if (!profile || !profile.isPublic) {
     return {
@@ -34,11 +49,11 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${profile.fullName || profile.username} | Praxis Profile`,
-    description: profile.bio || `View ${profile.fullName || profile.username}'s Praxis profile and competency scores.`,
+    title: `${profile.fullName || profile.username} | Execemy Profile`,
+    description: profile.bio || `View ${profile.fullName || profile.username}'s Execemy profile and competency scores.`,
     openGraph: {
-      title: `${profile.fullName || profile.username} | Praxis Profile`,
-      description: profile.bio || `View ${profile.fullName || profile.username}'s Praxis profile.`,
+      title: `${profile.fullName || profile.username} | Execemy Profile`,
+      description: profile.bio || `View ${profile.fullName || profile.username}'s Execemy profile.`,
       type: 'profile',
     },
   }
@@ -49,22 +64,33 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
 
   const { username } = await params
 
-  // Fetch profile by username
-  // Exclude email_notifications_enabled as it may not exist in all database instances
-  const profile = await prisma.profile.findUnique({
-    where: { username },
-    select: {
-      id: true,
-      username: true,
-      fullName: true,
-      avatarUrl: true,
-      bio: true,
-      isPublic: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
+  // Cache profile data (5 minutes revalidate, userId in key)
+  const getCachedProfile = cache(
+    async () => {
+      const profile = await prisma.profile.findUnique({
+        where: { username },
+        select: {
+          id: true,
+          username: true,
+          fullName: true,
+          avatarUrl: true,
+          bio: true,
+          isPublic: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      })
+      return profile
     },
-  })
+    ['profile', username],
+    {
+      tags: [CacheTags.USERS],
+      revalidate: 300, // 5 minutes
+    }
+  )
+
+  const profile = await getCachedProfile()
 
   if (!profile) {
     notFound()
@@ -85,37 +111,27 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     )
   }
 
-  // Get aggregate scores
-  const aggregateScores = await getUserAggregateScores(profile.id)
+  // Cache aggregate scores (10 minutes revalidate, userId in key)
+  const getCachedAggregateScores = getCachedUserData(
+    profile.id,
+    () => getUserAggregateScores(profile.id),
+    ['aggregate', 'scores'],
+    {
+      tags: [CacheTags.USER_PROGRESS],
+      revalidate: 600, // 10 minutes
+    }
+  )
 
-  // Get completed simulations with enum fallback
-  let simulations: any[] = []
-  try {
-    simulations = await prisma.simulation.findMany({
-      where: {
-        userId: profile.id,
-        status: 'completed',
-      },
-      include: {
-        case: {
-          select: {
-            title: true,
-          },
-        },
-        debrief: true,
-      },
-      orderBy: {
-        completedAt: 'desc',
-      },
-      take: 10,
-    })
-  } catch (error: any) {
-    if (isEnumError(error)) {
-      // Fallback: query without status filter, filter by completedAt
+  // Cache simulations list (5 minutes revalidate, userId in key)
+  const getCachedSimulations = getCachedUserData(
+    profile.id,
+    async () => {
+      let simulations: any[] = []
       try {
-        const allSimulations = await prisma.simulation.findMany({
+        simulations = await prisma.simulation.findMany({
           where: {
             userId: profile.id,
+            status: 'completed',
           },
           include: {
             case: {
@@ -130,14 +146,48 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
           },
           take: 10,
         })
-        simulations = allSimulations.filter((s: any) => s.completedAt !== null)
-      } catch (fallbackError) {
-        console.error('Error fetching simulations (fallback):', fallbackError)
+      } catch (error: any) {
+        if (isEnumError(error)) {
+          // Fallback: query without status filter, filter by completedAt
+          try {
+            const allSimulations = await prisma.simulation.findMany({
+              where: {
+                userId: profile.id,
+              },
+              include: {
+                case: {
+                  select: {
+                    title: true,
+                  },
+                },
+                debrief: true,
+              },
+              orderBy: {
+                completedAt: 'desc',
+              },
+              take: 10,
+            })
+            simulations = allSimulations.filter((s: any) => s.completedAt !== null)
+          } catch (fallbackError) {
+            console.error('Error fetching simulations (fallback):', fallbackError)
+          }
+        } else {
+          console.error('Error fetching simulations:', error)
+        }
       }
-    } else {
-      console.error('Error fetching simulations:', error)
+      return simulations
+    },
+    ['simulations', 'completed'],
+    {
+      tags: [CacheTags.SIMULATIONS],
+      revalidate: 300, // 5 minutes
     }
-  }
+  )
+
+  const [aggregateScores, simulations] = await Promise.all([
+    getCachedAggregateScores(),
+    getCachedSimulations(),
+  ])
 
   // Calculate statistics
   const totalSimulations = simulations.length
@@ -219,7 +269,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
             <p className="text-xs text-gray-500 mt-1">Competency scores across all completed engagements</p>
           </div>
           <div className="p-6">
-            <PraxisRadarChart data={aggregateScores} />
+            <ExecemyRadarChart data={aggregateScores} />
           </div>
         </div>
       )}
@@ -255,7 +305,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-500">
-                      Completed {sim.completedAt?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      Completed {sim.completedAt ? new Date(sim.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
                     </p>
                   </div>
                   <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">

@@ -10,11 +10,11 @@ interface RadarChartData {
   leadershipJudgment: number
 }
 
-interface PraxisRadarChartProps {
+interface ExecemyRadarChartProps {
   data: RadarChartData
 }
 
-export default function PraxisRadarChart({ data }: PraxisRadarChartProps) {
+export default function ExecemyRadarChart({ data }: ExecemyRadarChartProps) {
   const chartData = [
     { competency: 'Financial Acumen', score: data.financialAcumen || 0 },
     { competency: 'Strategic Thinking', score: data.strategicThinking || 0 },

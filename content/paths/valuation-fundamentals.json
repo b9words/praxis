@@ -1,0 +1,27 @@
+{
+  "id": "valuation-fundamentals",
+  "title": "Valuation Fundamentals",
+  "description": "Master core valuation methodologies for business decisions",
+  "duration": "4 hours",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "intrinsic-value-calculation",
+      "lesson": "owners-earnings-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "intrinsic-value-calculation",
+      "lesson": "dcf-for-ceo"
+    },
+    {
+      "type": "lesson",
+      "domain": "high-stakes-dealmaking-integration",
+      "module": "valuation-price-value",
+      "lesson": "valuation-methods"
+    }
+  ]
+}
+

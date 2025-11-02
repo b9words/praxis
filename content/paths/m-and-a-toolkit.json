@@ -1,0 +1,31 @@
+{
+  "id": "m-and-a-toolkit",
+  "title": "The M&A Toolkit (7-Day Sprint)",
+  "description": "Master the fundamentals of mergers and acquisitions in one intensive week",
+  "duration": "7 days",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "high-stakes-dealmaking-integration",
+      "module": "target-identification-thesis",
+      "lesson": "strategic-rationale"
+    },
+    {
+      "type": "lesson",
+      "domain": "high-stakes-dealmaking-integration",
+      "module": "valuation-price-value",
+      "lesson": "valuation-methods"
+    },
+    {
+      "type": "lesson",
+      "domain": "high-stakes-dealmaking-integration",
+      "module": "negotiation-playbook",
+      "lesson": "negotiation-fundamentals"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_04_netflix_content_strategy_2019"
+    }
+  ]
+}
+

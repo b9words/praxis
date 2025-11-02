@@ -1,4 +1,4 @@
-# Praxis Platform MVP
+# Execemy Platform MVP
 
 The proving ground for the next generation of ambitious leaders. A full-stack application combining interactive business simulations, AI-powered coaching, and a private learning community.
 
@@ -14,7 +14,7 @@ The proving ground for the next generation of ambitious leaders. A full-stack ap
 
 ### Core Features (100% Complete)
 - ✅ User authentication with Supabase Auth
-- ✅ Dynamic Praxis Profile with radar chart visualization
+- ✅ Dynamic Execemy Profile with radar chart visualization
 - ✅ **Profile editing with public/private toggle**
 - ✅ Competency Library with Smart Study Assistant (AI Q&A)
 - ✅ Interactive Case Simulations with two-panel workspace
@@ -47,7 +47,7 @@ The proving ground for the next generation of ambitious leaders. A full-stack ap
 
 1. **Clone and install dependencies:**
 ```bash
-cd praxis-platform
+cd execemy
 npm install
 ```
 
@@ -97,7 +97,7 @@ Access Supabase Studio: `http://127.0.0.1:54333`
 ## Project Structure
 
 ```
-praxis-platform/
+execemy/
 ├── app/
 │   ├── (auth)/              # Authentication pages
 │   │   ├── login/
@@ -340,7 +340,7 @@ If a migration causes issues:
 
 ## License
 
-Proprietary - Praxis Platform
+Proprietary - Execemy Platform
 
 ## Support
 

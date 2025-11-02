@@ -5,6 +5,7 @@
  */
 
 import { getPrismaErrorInfo, normalizePrismaError, getPrismaErrorStatusCode } from './prisma-error-handler'
+import { isMissingTable } from './api/route-helpers'
 import { prisma } from './prisma/server'
 
 /**
@@ -21,8 +22,8 @@ export async function safePrisma<T>(
   } catch (error: any) {
     const normalized = normalizePrismaError(error)
     
-    // Log error for debugging
-    if (process.env.NODE_ENV === 'development') {
+    // Log error for debugging (but suppress P2021 - missing table errors since they're handled gracefully)
+    if (process.env.NODE_ENV === 'development' && !isMissingTable(error)) {
       console.error('[Prisma Error]', normalized.code, normalized.message, error)
     }
     

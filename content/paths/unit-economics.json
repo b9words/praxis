@@ -1,0 +1,25 @@
+{
+  "id": "unit-economics",
+  "title": "Mastering Unit Economics in 3 Hours",
+  "description": "Deep dive into unit economics fundamentals and optimization strategies",
+  "duration": "3 hours",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "unit-economics-mastery",
+      "lesson": "cac-ltv-fundamentals"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "unit-economics-mastery",
+      "lesson": "unit-economics-optimization"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_unit_economics_crisis"
+    }
+  ]
+}
+

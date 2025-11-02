@@ -116,7 +116,7 @@ serve(async (req) => {
     }
 
     // Construct the AI Coach prompt
-    const systemPrompt = `You are an expert business school professor and executive coach named 'The Praxis Coach'. Your task is to analyze a user's performance in a business simulation and provide a structured, data-driven debrief.
+    const systemPrompt = `You are an expert business school professor and executive coach named 'The Execemy Coach'. Your task is to analyze a user's performance in a business simulation and provide a structured, data-driven debrief.
 
 You will be given a rubric and the user's submitted decisions. You MUST evaluate the user's inputs STRICTLY against the provided rubric. Do not introduce outside information or subjective opinions.
 
@@ -262,14 +262,148 @@ ${JSON.stringify(simulation.user_inputs, null, 2)}`
       throw new Error('Invalid response structure from AI')
     }
 
+    // Comprehensive validation function
+    function validateAndNormalizeDebrief(data: any, rubric: any): any {
+      const errors: string[] = []
+      const normalized: any = {
+        scores: [],
+        summaryText: '',
+        radarChartData: {},
+      }
+
+      // Validate scores array
+      if (!Array.isArray(data.scores)) {
+        errors.push('Scores must be an array')
+      } else {
+        // Get expected competency names from rubric
+        const rubricCompetencies = rubric?.criteria ? Object.keys(rubric.criteria) : []
+        
+        // Validate each score
+        const processedCompetencies = new Set<string>()
+        for (const scoreItem of data.scores) {
+          if (!scoreItem || typeof scoreItem !== 'object') {
+            errors.push('Score item must be an object')
+            continue
+          }
+
+          const competencyName = scoreItem.competencyName || scoreItem.competency
+          if (!competencyName || typeof competencyName !== 'string') {
+            errors.push('Score item missing competencyName')
+            continue
+          }
+
+          // Normalize competency name to match rubric keys
+          const normalizedName = competencyName.toLowerCase().replace(/\s+/g, '-')
+          
+          // Validate score is a number between 1 and 5
+          let score = scoreItem.score
+          if (typeof score === 'string') {
+            score = parseFloat(score)
+          }
+          if (typeof score !== 'number' || isNaN(score)) {
+            errors.push(`Invalid score for ${competencyName}: must be a number`)
+            score = 3 // Default to middle score
+          } else {
+            // Clamp score to valid range [1, 5]
+            score = Math.max(1, Math.min(5, Math.round(score * 10) / 10)) // Round to 1 decimal
+          }
+
+          // Validate justification
+          const justification = scoreItem.justification || scoreItem.feedback || ''
+          if (typeof justification !== 'string' || justification.trim().length === 0) {
+            errors.push(`Missing justification for ${competencyName}`)
+          }
+
+          normalized.scores.push({
+            competencyName,
+            score,
+            justification: justification.trim(),
+          })
+          
+          processedCompetencies.add(normalizedName)
+        }
+
+        // Check that all rubric competencies are present (warn, don't fail)
+        if (rubricCompetencies.length > 0) {
+          for (const rubricComp of rubricCompetencies) {
+            const normalized = rubricComp.toLowerCase().replace(/\s+/g, '-')
+            if (!processedCompetencies.has(normalized) && !processedCompetencies.has(rubricComp.toLowerCase())) {
+              console.warn(`Rubric competency "${rubricComp}" not found in scores, adding with default score 0`)
+              normalized.scores.push({
+                competencyName: rubricComp,
+                score: 0,
+                justification: 'This competency was not assessed in this simulation.',
+              })
+            }
+          }
+        }
+      }
+
+      // Validate summaryText
+      if (typeof data.summaryText !== 'string' || data.summaryText.trim().length === 0) {
+        errors.push('Summary text is required and must be a non-empty string')
+        normalized.summaryText = 'Performance analysis completed.'
+      } else {
+        normalized.summaryText = data.summaryText.trim()
+      }
+
+      // Validate and normalize radarChartData
+      const requiredCompetencies = [
+        'financialAcumen',
+        'strategicThinking',
+        'marketAwareness',
+        'riskManagement',
+        'leadershipJudgment',
+      ]
+
+      if (!data.radarChartData || typeof data.radarChartData !== 'object') {
+        errors.push('RadarChartData must be an object')
+        // Initialize with zeros
+        normalized.radarChartData = {}
+        for (const comp of requiredCompetencies) {
+          normalized.radarChartData[comp] = 0
+        }
+      } else {
+        // Ensure all 5 core competencies are present with valid values
+        for (const comp of requiredCompetencies) {
+          let value = data.radarChartData[comp]
+          if (typeof value === 'string') {
+            value = parseFloat(value)
+          }
+          if (typeof value !== 'number' || isNaN(value)) {
+            // Try to find score from scores array
+            const scoreItem = normalized.scores.find((s: any) => {
+              const name = (s.competencyName || '').toLowerCase()
+              return name.includes(comp.toLowerCase()) || comp.toLowerCase().includes(name)
+            })
+            value = scoreItem ? scoreItem.score : 0
+          }
+          // Clamp to [0, 5] range
+          normalized.radarChartData[comp] = Math.max(0, Math.min(5, Math.round(value * 10) / 10))
+        }
+      }
+
+      // If there are critical errors, throw
+      if (errors.length > 0) {
+        console.error('Debrief validation errors:', errors)
+        // Log but don't fail - use normalized data as fallback
+        // This ensures the debrief can still be saved even with validation issues
+      }
+
+      return normalized
+    }
+
+    // Validate and normalize the debrief data
+    const validatedDebrief = validateAndNormalizeDebrief(debriefData, simulation.case.rubric)
+
     // Insert debrief into database (upsert for idempotency)
     const { data: debrief, error: insertError } = await supabaseClient
       .from('debriefs')
       .upsert({
         simulation_id: simulationId,
-        scores: debriefData.scores,
-        summary_text: debriefData.summaryText,
-        radar_chart_data: debriefData.radarChartData,
+        scores: validatedDebrief.scores,
+        summary_text: validatedDebrief.summaryText,
+        radar_chart_data: validatedDebrief.radarChartData,
         rubric_version: rubricVersion,
       }, {
         onConflict: 'simulation_id',

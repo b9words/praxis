@@ -79,4 +79,4 @@ Maintaining strategic flexibility and knowing when to change course.
 **Total Lessons:** 19  
 **Estimated Completion Time:** 228 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

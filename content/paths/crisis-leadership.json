@@ -1,0 +1,29 @@
+{
+  "id": "crisis-leadership",
+  "title": "The Crisis Leadership Playbook",
+  "description": "Learn to lead effectively during organizational crises",
+  "duration": "5 days",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "golden-hour-first-60-minutes",
+      "lesson": "first-response-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "first-communication-narrative-control",
+      "lesson": "narrative-framing"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_01_tesla_production_crisis_2018"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_03_airbnb_covid_crisis_2020"
+    }
+  ]
+}
+

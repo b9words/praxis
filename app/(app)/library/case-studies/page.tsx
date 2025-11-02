@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { cache, CacheTags } from '@/lib/cache'
 import fs from 'fs'
 import { ArrowRight, BookOpen, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
@@ -52,7 +53,16 @@ async function getAllCaseStudies(): Promise<CaseStudyMeta[]> {
 }
 
 export default async function CaseStudiesPage() {
-  const caseStudies = await getAllCaseStudies()
+  // Cache cases list (15 minutes revalidate)
+  const getCachedCaseStudies = cache(
+    () => getAllCaseStudies(),
+    ['library', 'case-studies', 'all'],
+    {
+      tags: [CacheTags.CASES],
+      revalidate: 900, // 15 minutes
+    }
+  )
+  const caseStudies = await getCachedCaseStudies()
 
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty) {

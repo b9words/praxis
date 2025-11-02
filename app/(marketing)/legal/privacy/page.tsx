@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy - Praxis',
-  description: 'Privacy Policy for Praxis Platform',
+  title: 'Privacy Policy - Execemy',
+  description: 'Privacy Policy for Execemy Platform',
   robots: {
     index: true,
     follow: true,
@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
           <p>
-            Praxis Platform ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy
+            Execemy Platform ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy
             explains how we collect, use, disclose, and safeguard your information when you use our Service.
           </p>
         </section>
@@ -101,8 +101,8 @@ export default function PrivacyPolicyPage() {
           </ul>
           <p className="mt-4">
             To exercise these rights, please contact us at{' '}
-            <a href="mailto:privacy@praxisplatform.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
-              privacy@praxisplatform.com
+            <a href="mailto:privacy@execemy.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
+              privacy@execemy.com
             </a>
           </p>
         </section>
@@ -157,8 +157,8 @@ export default function PrivacyPolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">12. Contact Us</h2>
           <p>
             If you have questions about this Privacy Policy, please contact us at{' '}
-            <a href="mailto:privacy@praxisplatform.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
-              privacy@praxisplatform.com
+            <a href="mailto:privacy@execemy.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
+              privacy@execemy.com
             </a>
           </p>
         </section>

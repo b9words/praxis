@@ -7,6 +7,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LoadingState } from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import RichMarkdownEditor from '@/components/admin/RichMarkdownEditor'
+import StructuredRubricEditor from '@/components/admin/StructuredRubricEditor'
+import StructuredJsonEditor from '@/components/admin/StructuredJsonEditor'
+import FieldError from '@/components/admin/FieldError'
+import HelpTooltip from '@/components/admin/HelpTooltip'
+import { validateArticle, validateCase, getFieldError, hasFieldError } from '@/lib/admin/validation'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
@@ -42,6 +48,10 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
   const [datasets, setDatasets] = useState('')
   const [rubric, setRubric] = useState('')
 
+  // Validation errors
+  const [validationErrors, setValidationErrors] = useState<Array<{ field: string; message: string }>>([])
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+
   // Fetch competencies
   const { data: competenciesData } = useQuery({
     queryKey: queryKeys.competencies.all(),
@@ -51,7 +61,7 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
   const competencies = competenciesData?.competencies || []
 
   // Fetch content in edit mode
-  const { data: contentData, isLoading: loading } = useQuery({
+  const { data: contentData, isLoading: loading, error } = useQuery({
     queryKey: contentType === 'article' 
       ? queryKeys.articles.all()
       : ['cases', contentId],
@@ -82,13 +92,28 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
     },
   })
 
+  // Validate before save
+  const validate = () => {
+    if (contentType === 'article') {
+      const result = validateArticle({ title, competencyId, content, status })
+      setValidationErrors(result.errors)
+      return result.valid
+    } else {
+      const result = validateCase({ title, briefingDoc, rubric, datasets, status })
+      setValidationErrors(result.errors)
+      return result.valid
+    }
+  }
+
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
+      // Validate before save
+      if (!validate()) {
+        throw new Error('Please fix validation errors before saving')
+      }
+
       if (contentType === 'article') {
-        if (!title || !competencyId || !content) {
-          throw new Error('Please fill in all required fields')
-        }
 
         const articleData = {
           competencyId,
@@ -152,11 +177,12 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
         }
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
       queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(`${contentType === 'article' ? 'Article' : 'Case'} ${mode === 'create' ? 'created' : 'updated'} successfully`)
-      router.push('/admin/content')
+      const { safeRedirectAfterMutation } = await import('@/lib/utils/redirect-helpers')
+      await safeRedirectAfterMutation(router, '/admin/content')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save content')
@@ -211,15 +237,25 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="title">Title *</Label>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="title">Title *</Label>
+              <HelpTooltip content="A descriptive title that clearly indicates what this content is about. Should be at least 3 characters long." />
+            </div>
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value)
+                setTouchedFields(new Set(touchedFields).add('title'))
+              }}
+              onBlur={() => {
+                validate()
+              }}
               placeholder="Enter a descriptive title"
-              className="mt-1"
+              className={`mt-1 ${hasFieldError(validationErrors, 'title') ? 'border-red-500' : ''}`}
               required
             />
+            {touchedFields.has('title') && <FieldError error={getFieldError(validationErrors, 'title')} />}
           </div>
 
           <div>
@@ -239,9 +275,19 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
 
           {contentType === 'article' && (
             <div>
-              <Label htmlFor="competency">Competency *</Label>
-              <Select value={competencyId} onValueChange={setCompetencyId}>
-                <SelectTrigger className="mt-1">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="competency">Competency *</Label>
+                <HelpTooltip content="Select the competency this article teaches. This determines where it appears in the library." />
+              </div>
+              <Select
+                value={competencyId}
+                onValueChange={(val) => {
+                  setCompetencyId(val)
+                  setTouchedFields(new Set(touchedFields).add('competencyId'))
+                  validate()
+                }}
+              >
+                <SelectTrigger className={`mt-1 ${hasFieldError(validationErrors, 'competencyId') ? 'border-red-500' : ''}`}>
                   <SelectValue placeholder="Select a competency" />
                 </SelectTrigger>
                 <SelectContent>
@@ -252,6 +298,7 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
                   ))}
                 </SelectContent>
               </Select>
+              {touchedFields.has('competencyId') && <FieldError error={getFieldError(validationErrors, 'competencyId')} />}
             </div>
           )}
         </CardContent>
@@ -261,30 +308,26 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
       {contentType === 'article' ? (
         <Card>
           <CardHeader>
-            <CardTitle>Article Content</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Article Content</CardTitle>
+              <HelpTooltip content="Write your article content in Markdown. Must be at least 100 characters. Use the toolbar for formatting help." />
+            </div>
             <CardDescription>Write your article in Markdown format</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="edit" className="w-full">
-              <TabsList>
-                <TabsTrigger value="edit">Edit</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
-              <TabsContent value="edit" className="mt-4">
-                <Textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="# Your Article Title&#10;&#10;Write your content here..."
-                  rows={20}
-                  className="font-mono text-sm"
-                />
-              </TabsContent>
-              <TabsContent value="preview" className="mt-4">
-                <div className="border border-neutral-200 rounded-lg p-6 bg-white">
-                  <MarkdownRenderer content={content} />
-                </div>
-              </TabsContent>
-            </Tabs>
+            <RichMarkdownEditor
+              value={content}
+              onChange={(val) => {
+                setContent(val)
+                setTouchedFields(new Set(touchedFields).add('content'))
+              }}
+              placeholder="# Your Article Title\n\nWrite your content here..."
+              minHeight="500px"
+              onSave={handleSave}
+              showPreview={true}
+              autoSave={false}
+            />
+            {touchedFields.has('content') && <FieldError error={getFieldError(validationErrors, 'content')} />}
           </CardContent>
         </Card>
       ) : (
@@ -295,26 +338,13 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
               <CardDescription>The main narrative of the case in Markdown</CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="edit" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="edit">Edit</TabsTrigger>
-                  <TabsTrigger value="preview">Preview</TabsTrigger>
-                </TabsList>
-                <TabsContent value="edit" className="mt-4">
-                  <Textarea
-                    value={briefingDoc}
-                    onChange={(e) => setBriefingDoc(e.target.value)}
-                    placeholder="#### The Scenario&#10;&#10;Describe the business situation..."
-                    rows={15}
-                    className="font-mono text-sm"
-                  />
-                </TabsContent>
-                <TabsContent value="preview" className="mt-4">
-                  <div className="border border-neutral-200 rounded-lg p-6 bg-white">
-                    <MarkdownRenderer content={briefingDoc} />
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <RichMarkdownEditor
+                value={briefingDoc}
+                onChange={setBriefingDoc}
+                placeholder="#### The Scenario\n\nDescribe the business situation..."
+                minHeight="400px"
+                showPreview={true}
+              />
             </CardContent>
           </Card>
 
@@ -324,12 +354,11 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
               <CardDescription>Financial data, metrics, and other structured information</CardDescription>
             </CardHeader>
             <CardContent>
-              <Textarea
+              <StructuredJsonEditor
                 value={datasets}
-                onChange={(e) => setDatasets(e.target.value)}
-                placeholder='{ "financials": { "revenue": 10000000 } }'
-                rows={10}
-                className="font-mono text-sm"
+                onChange={setDatasets}
+                placeholder='{\n  "financials": {\n    "revenue": 10000000,\n    "cogs": 4000000\n  }\n}'
+                minHeight="250px"
               />
             </CardContent>
           </Card>
@@ -340,16 +369,30 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
               <CardDescription>The evaluation criteria for the AI Coach</CardDescription>
             </CardHeader>
             <CardContent>
-              <Textarea
+              <StructuredRubricEditor
                 value={rubric}
-                onChange={(e) => setRubric(e.target.value)}
-                placeholder='{ "criteria": [{ "competencyName": "Financial Acumen", "description": "...", "scoringGuide": { "1": "...", "3": "...", "5": "..." } }] }'
-                rows={15}
-                className="font-mono text-sm"
+                onChange={setRubric}
+                competencies={competencies}
               />
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* Validation Summary */}
+      {validationErrors.length > 0 && (
+        <Card className="border-red-200 bg-red-50">
+          <CardHeader>
+            <CardTitle className="text-base text-red-900">Please fix the following errors:</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc list-inside space-y-1 text-sm text-red-800">
+              {validationErrors.map((error, index) => (
+                <li key={index}>{error.message}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
       )}
 
       {/* Actions */}
@@ -360,7 +403,7 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
         >
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={saving}>
+        <Button onClick={handleSave} disabled={saving || validationErrors.length > 0}>
           {saving ? 'Saving...' : mode === 'create' ? 'Create' : 'Save Changes'}
         </Button>
       </div>

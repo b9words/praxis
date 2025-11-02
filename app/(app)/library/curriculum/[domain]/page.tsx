@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getDomainById } from '@/lib/curriculum-data'
 import { getAllUserProgress } from '@/lib/progress-tracking'
+import { getCachedUserData, CacheTags } from '@/lib/cache'
 import { ArrowLeft, BookOpen, CheckCircle, ChevronRight, Clock, Play, Target } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -25,12 +26,21 @@ export default async function DomainPage({ params }: DomainPageProps) {
   const totalLessons = domain.modules.reduce((sum, module) => sum + module.lessons.length, 0)
   const estimatedTime = totalLessons * 12 // 12 minutes per lesson
 
-  // Get user progress if logged in
+  // Get user progress if logged in (2 minutes revalidate, userId in key)
   const user = await getCurrentUser()
   let userProgress: Map<string, any> = new Map()
 
   if (user) {
-    userProgress = await getAllUserProgress(user.id)
+    const getCachedUserProgress = getCachedUserData(
+      user.id,
+      () => getAllUserProgress(user.id),
+      ['progress', 'all'],
+      {
+        tags: [CacheTags.USER_PROGRESS],
+        revalidate: 120, // 2 minutes
+      }
+    )
+    userProgress = await getCachedUserProgress()
   }
 
   // Calculate progress per module

@@ -63,6 +63,19 @@ export default function DocumentViewerBlock({
       )
     }
 
+    // Handle images (blob URLs from REFERENCE sources)
+    if (typeof file.content === 'string' && file.content.startsWith('blob:')) {
+      return (
+        <div className="flex items-center justify-center py-4">
+          <img
+            src={file.content}
+            alt={file.fileName}
+            className="max-w-full h-auto rounded-lg border border-neutral-200"
+          />
+        </div>
+      )
+    }
+
     // Handle CSV data (financial data)
     if (file.fileType === 'FINANCIAL_DATA') {
       let data: any[] = []
@@ -133,9 +146,27 @@ export default function DocumentViewerBlock({
 
     // Handle text content (memos, reports, presentations)
     if (typeof file.content === 'string') {
+      // Check if it's markdown (ends with .md or contains markdown syntax)
+      const isMarkdown = file.fileName.endsWith('.md') || 
+                        file.content.includes('\n##') || 
+                        file.content.includes('\n###') ||
+                        file.content.includes('**') ||
+                        file.content.includes('*')
+      
+      if (isMarkdown) {
+        return (
+          <div className="prose prose-neutral max-w-none">
+            <MarkdownRenderer content={file.content} />
+          </div>
+        )
+      }
+      
+      // Plain text - render in pre tag
       return (
-        <div className="prose prose-neutral max-w-none">
-          <MarkdownRenderer content={file.content} />
+        <div className="overflow-x-auto">
+          <pre className="whitespace-pre-wrap font-mono text-sm bg-neutral-50 p-4 rounded-lg border border-neutral-200">
+            {file.content}
+          </pre>
         </div>
       )
     }

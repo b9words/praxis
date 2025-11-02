@@ -1,46 +1,56 @@
-import { LoadingState } from '@/components/ui/loading-skeleton'
 import LoadingSkeleton from '@/components/ui/loading-skeleton'
 
 export default function CurriculumLoading() {
   return (
     <div className="h-full flex flex-col bg-white">
-      {/* Desktop Header */}
-      <div className="hidden md:block border-b border-neutral-200 bg-white flex-shrink-0">
-        <div className="px-0 py-4">
-          <LoadingSkeleton className="h-7 w-64 mb-1" />
-          <LoadingSkeleton className="h-4 w-96" />
-        </div>
-      </div>
-
-      {/* Content */}
       <div className="flex-1 overflow-auto">
-        <div className="p-0 space-y-6 w-full">
-          {/* Stats section skeleton */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border-b border-neutral-200">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-neutral-50 border border-neutral-200 p-3">
-                <LoadingSkeleton className="h-6 w-16 mb-2" />
-                <LoadingSkeleton className="h-3 w-20" />
-              </div>
-            ))}
+        <div className="px-4 py-4 md:px-6 md:py-6 space-y-6">
+          {/* Header */}
+          <div className="space-y-3">
+            <LoadingSkeleton className="h-7 w-80" />
+            <LoadingSkeleton className="h-4 w-full max-w-3xl" />
+
+            {/* Stats - 4 badges in a row */}
+            <div className="flex gap-6 mt-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="text-center">
+                  <LoadingSkeleton className="h-6 w-12 mx-auto mb-1" />
+                  <LoadingSkeleton className="h-3 w-16 mx-auto" />
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Curriculum tree skeleton */}
-          <div className="p-4 space-y-6">
-            {Array.from({ length: 3 }).map((_, domainIdx) => (
-              <div key={domainIdx} className="bg-neutral-50 border border-neutral-200 p-4">
-                <LoadingSkeleton className="h-6 w-48 mb-4" />
-                <div className="space-y-3 ml-4">
-                  {Array.from({ length: 2 }).map((_, moduleIdx) => (
-                    <div key={moduleIdx} className="space-y-2">
-                      <LoadingSkeleton className="h-5 w-40" />
-                      <div className="ml-4 space-y-1">
-                        {Array.from({ length: 3 }).map((_, lessonIdx) => (
-                          <LoadingSkeleton key={lessonIdx} className="h-4 w-full max-w-md" />
-                        ))}
-                      </div>
+          {/* Domain Cards - 2 column grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-neutral-50 border border-neutral-200">
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <LoadingSkeleton className="h-5 w-3/4 mb-2" />
+                      <LoadingSkeleton className="h-4 w-full mb-2" />
+                      <LoadingSkeleton className="h-4 w-5/6" />
                     </div>
-                  ))}
+                    <LoadingSkeleton className="h-3 w-8" />
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-center gap-6 mb-4">
+                    <LoadingSkeleton className="h-3 w-20" />
+                    <LoadingSkeleton className="h-3 w-20" />
+                    <LoadingSkeleton className="h-3 w-16" />
+                  </div>
+
+                  {/* Sample Modules */}
+                  <div className="space-y-2">
+                    <LoadingSkeleton className="h-3 w-24" />
+                    <div className="space-y-1">
+                      {Array.from({ length: 3 }).map((_, j) => (
+                        <LoadingSkeleton key={j} className="h-3 w-full max-w-sm" />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

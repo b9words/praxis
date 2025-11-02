@@ -1,6 +1,6 @@
-# Praxis Platform E2E Testing Suite
+# Execemy Platform E2E Testing Suite
 
-This directory contains comprehensive End-to-End (E2E) tests for the Praxis Platform, designed to systematically test all user flows and catch breaking changes.
+This directory contains comprehensive End-to-End (E2E) tests for the Execemy Platform, designed to systematically test all user flows and catch breaking changes.
 
 ## 🎯 Overview
 
@@ -358,7 +358,7 @@ jobs:
 
 - [Playwright Documentation](https://playwright.dev/)
 - [Gemini API Documentation](https://ai.google.dev/docs)
-- [Praxis Platform Documentation](../README.md)
+- [Execemy Platform Documentation](../README.md)
 - [Test Data Schema](../prisma/schema.prisma)
 
 ---

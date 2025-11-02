@@ -2,6 +2,7 @@
 
 import CaseFileViewer from '@/components/simulation/CaseFileViewer'
 import DecisionWorkspace from '@/components/simulation/DecisionWorkspace'
+import NeedARefresher from '@/components/simulation/NeedARefresher'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
@@ -168,12 +169,65 @@ export default function SimulationWorkspace({
 
   // Mutation for generating debrief
   const generateDebriefMutation = useMutation({
-    mutationFn: () =>
-      fetchJson<{ debriefId?: string }>('/api/generate-debrief', {
+    mutationFn: async () => {
+      const response = await fetchJson<{ 
+        debriefId?: string
+        jobId?: string
+        status?: string
+        fromCache?: boolean
+        debrief?: any
+      }>('/api/generate-debrief', {
         method: 'POST',
         body: { simulationId: simulation.id },
-      }),
-    onSuccess: () => {
+      })
+
+      // If debrief already exists (from cache), return immediately
+      if (response.debriefId || response.fromCache) {
+        return { debriefId: response.debriefId || response.debrief?.id }
+      }
+
+      // If job was created, poll for completion
+      if (response.jobId) {
+        const jobId = response.jobId
+        const maxAttempts = 60 // Poll for up to 60 seconds (1 minute)
+        const pollInterval = 1000 // Poll every 1 second
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, pollInterval))
+          
+          const jobStatus = await fetchJson<{
+            id: string
+            type: string
+            status: string
+            result?: { debriefId?: string; debrief?: any }
+            error?: string
+          }>(`/api/jobs/${jobId}`)
+
+          if (jobStatus.status === 'completed') {
+            if (jobStatus.error) {
+              throw new Error(jobStatus.error)
+            }
+            // Extract debriefId from result
+            const debriefId = jobStatus.result?.debriefId || jobStatus.result?.debrief?.id
+            if (debriefId) {
+              return { debriefId }
+            }
+            // Fallback: use simulationId to fetch debrief
+            return { debriefId: simulation.id }
+          } else if (jobStatus.status === 'failed') {
+            throw new Error(jobStatus.error || 'Debrief generation failed')
+          }
+          // Continue polling if status is 'pending' or 'processing'
+        }
+
+        // If we've exhausted all attempts, throw an error
+        throw new Error('Debrief generation timed out. Please check back later.')
+      }
+
+      // Fallback: if no jobId or debriefId, something went wrong
+      throw new Error('Unexpected response from debrief generation')
+    },
+    onSuccess: (data) => {
       // Track simulation completion
       trackEvents.simulationCompleted(simulation.id, caseItem.id, userId)
       
@@ -186,8 +240,7 @@ export default function SimulationWorkspace({
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to generate debrief')
     },
-    retry: 3,
-    retryDelay: 1000,
+    retry: 0, // Don't retry - we handle polling ourselves
   })
 
   // Mutation for completing simulation
@@ -244,14 +297,39 @@ export default function SimulationWorkspace({
     )
   }
 
+  // Extract competencies from case item
+  const competencies = caseItem.competencies?.map((cc: any) => ({
+    id: cc.competency?.id || cc.competencyId,
+    name: cc.competency?.name || 'Unknown',
+  })) || []
+
+  // Get recommended lessons from caseItem (passed from server)
+  const recommendedLessons = (caseItem as any).recommendedLessons || []
+  const showNeedARefresher = competencies.length > 0 && recommendedLessons.length > 0
+
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full">
       {/* LEFT PANEL: Case Files & Data */}
       <ResizablePanel defaultSize={40} minSize={30} maxSize={60}>
-        <CaseFileViewer
-          briefingDoc={caseItem.briefing_doc}
-          datasets={caseItem.datasets}
-        />
+        <div className="h-full flex flex-col overflow-auto">
+          {/* Need a Refresher? component */}
+          {showNeedARefresher && (
+            <div className="p-4 border-b border-neutral-200">
+              <NeedARefresher 
+                competencies={competencies}
+                caseId={caseItem.id}
+                recommendedLessons={recommendedLessons}
+              />
+            </div>
+          )}
+          {/* Case Files */}
+          <div className="flex-1 overflow-auto">
+            <CaseFileViewer
+              briefingDoc={caseItem.briefing_doc}
+              datasets={caseItem.datasets}
+            />
+          </div>
+        </div>
       </ResizablePanel>
 
       <ResizableHandle withHandle />

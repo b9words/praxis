@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import RichMarkdownEditor from '@/components/admin/RichMarkdownEditor'
+import StructuredJsonEditor from '@/components/admin/StructuredJsonEditor'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { fetchJson } from '@/lib/api'
@@ -212,39 +214,22 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
         </CardHeader>
         <CardContent>
           {isMarkdown ? (
-            <Tabs defaultValue="edit" className="w-full">
-              <TabsList>
-                <TabsTrigger value="edit">Edit Markdown</TabsTrigger>
-                <TabsTrigger value="preview">Preview</TabsTrigger>
-              </TabsList>
-              <TabsContent value="edit" className="mt-4">
-                <Textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="# Your Article Title&#10;&#10;Write your content here..."
-                  rows={25}
-                  className="font-mono text-sm"
-                />
-              </TabsContent>
-              <TabsContent value="preview" className="mt-4">
-                <div className="border border-neutral-200 rounded-lg p-6 bg-white max-h-[600px] overflow-y-auto">
-                  <MarkdownRenderer content={content} />
-                </div>
-              </TabsContent>
-            </Tabs>
+            <RichMarkdownEditor
+              value={content}
+              onChange={setContent}
+              placeholder="# Your Article Title\n\nWrite your content here..."
+              minHeight="600px"
+              onSave={handleSave}
+              showPreview={true}
+              autoSave={false}
+            />
           ) : (
-            <div>
-              <Textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder='{ "title": "...", "description": "...", ... }'
-                rows={30}
-                className="font-mono text-sm"
-              />
-              <div className="mt-2 text-xs text-gray-500">
-                Tip: Use a JSON formatter to validate your syntax before saving
-              </div>
-            </div>
+            <StructuredJsonEditor
+              value={content}
+              onChange={setContent}
+              placeholder='{\n  "title": "...",\n  "description": "...",\n  ...\n}'
+              minHeight="500px"
+            />
           )}
         </CardContent>
       </Card>

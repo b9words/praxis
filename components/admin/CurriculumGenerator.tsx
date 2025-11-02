@@ -11,18 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { fetchJson } from '@/lib/api'
-import { ContentGenerator, DEFAULT_MODELS, GeneratedLesson, GenerationOptions, LessonStructure } from '@/lib/content-generator'
-import { getAllLessonsFlat } from '@/lib/curriculum-data'
+import { DEFAULT_MODELS, GeneratedLesson, GenerationOptions, LessonStructure } from '@/lib/content-generator'
+import { getAllLessonsFlat, completeCurriculumData } from '@/lib/curriculum-data'
 import { queryKeys } from '@/lib/queryKeys'
-import { createClient } from '@/lib/supabase/client'
-import { TokenTracker } from '@/lib/token-tracker'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { CheckCircle, Circle, Download, Eye, Play, Settings, Sparkles, X } from 'lucide-react'
+import { CheckCircle, Circle, Download, Eye, Play, RefreshCw, Settings, Sparkles, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 interface CurriculumGeneratorProps {
-  competencies: any[]
+  competencies?: any[] // No longer required, kept for backward compatibility
 }
 
 interface GenerationProgress {
@@ -36,13 +34,6 @@ interface GenerationProgress {
 
 export default function CurriculumGenerator({ competencies }: CurriculumGeneratorProps) {
   const queryClient = useQueryClient()
-  const supabase = createClient()
-  
-  // Generator instance
-  const [generator, setGenerator] = useState<ContentGenerator | null>(null)
-  const [curriculum, setCurriculum] = useState<LessonStructure[]>([])
-  const [tokenTracker, setTokenTracker] = useState<TokenTracker | null>(null)
-  const [dailyUsage, setDailyUsage] = useState<any[]>([])
   
   // Configuration
   const [config, setConfig] = useState<GenerationOptions>({
@@ -54,13 +45,56 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     tone: 'professional'
   })
 
-  // Get all lessons from the new curriculum structure
+  // Get all lessons from the platform (all 219 lessons across 10 domains)
   const allLessons = getAllLessonsFlat()
   
-  // API Keys
-  const [openaiKey, setOpenaiKey] = useState('')
-  const [geminiKey, setGeminiKey] = useState('')
-  const [selectedCompetency, setSelectedCompetency] = useState('')
+  // API Keys - fetched from server
+  const [apiKeysConfigured, setApiKeysConfigured] = useState<{
+    openai: boolean
+    gemini: boolean
+  } | null>(null)
+  
+  // Lesson existence check
+  const [existingArticles, setExistingArticles] = useState<Set<string>>(new Set())
+  const [loadingArticles, setLoadingArticles] = useState(true)
+  
+  // Filter lessons by domain/search
+  const [lessonDomainFilter, setLessonDomainFilter] = useState<string>('all')
+  const [lessonSearchFilter, setLessonSearchFilter] = useState<string>('')
+  const [showOnlyMissing, setShowOnlyMissing] = useState<boolean>(false)
+  
+  const filteredLessons = allLessons.filter(lesson => {
+    // Domain filter
+    if (lessonDomainFilter !== 'all' && lesson.domain !== lessonDomainFilter) {
+      return false
+    }
+    // Search filter
+    if (lessonSearchFilter && !lesson.lessonTitle.toLowerCase().includes(lessonSearchFilter.toLowerCase()) &&
+        !lesson.moduleTitle.toLowerCase().includes(lessonSearchFilter.toLowerCase()) &&
+        !lesson.domainTitle.toLowerCase().includes(lessonSearchFilter.toLowerCase())) {
+      return false
+    }
+    // Show only missing filter
+    if (showOnlyMissing) {
+      const lessonPath = `${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`
+      if (existingArticles.has(lessonPath)) {
+        return false
+      }
+    }
+    return true
+  })
+  
+  // Group lessons by domain for better organization
+  const lessonsByDomain = filteredLessons.reduce((acc, lesson, index) => {
+    if (!acc[lesson.domain]) {
+      acc[lesson.domain] = {
+        domainTitle: lesson.domainTitle,
+        lessons: []
+      }
+    }
+    acc[lesson.domain].lessons.push({ ...lesson, originalIndex: index })
+    return acc
+  }, {} as Record<string, { domainTitle: string; lessons: Array<typeof allLessons[0] & { originalIndex: number }> }>)
   
   // Generation state
   const [progress, setProgress] = useState<GenerationProgress>({
@@ -72,8 +106,8 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     errors: []
   })
   
-  // UI state
-  const [selectedLessons, setSelectedLessons] = useState<Set<number>>(new Set())
+  // UI state - track by lesson path instead of index
+  const [selectedLessons, setSelectedLessons] = useState<Set<string>>(new Set())
   const [previewLesson, setPreviewLesson] = useState<GeneratedLesson | null>(null)
 
   // Bulk save mutation
@@ -87,6 +121,8 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
       toast.success(`Saved ${variables.length} lessons to database!`)
       setProgress(prev => ({ ...prev, results: [] }))
+      // Reload existing articles to update status
+      loadExistingArticles()
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save to database')
@@ -94,46 +130,129 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
   })
 
   useEffect(() => {
-    // Initialize generator and curriculum
-    const gen = new ContentGenerator()
-    setGenerator(gen)
-    setCurriculum(gen.getCurriculum())
-    
-    // Initialize token tracker
-    const tracker = new TokenTracker()
-    setTokenTracker(tracker)
-    
-    // Load today's usage
-    const loadUsage = async () => {
-      const today = new Date().toISOString().split('T')[0]
-      const usage = await tracker.getAllDailyUsage(today)
-      setDailyUsage(usage)
+    // Check API key configuration
+    const checkApiKeys = async () => {
+      try {
+        const response = await fetch('/api/content-generation/config')
+        if (response.ok) {
+          const data = await response.json()
+          setApiKeysConfigured({
+            openai: data.providers.openai.available,
+            gemini: data.providers.gemini.available,
+          })
+        }
+      } catch (error) {
+        console.error('Error checking API keys:', error)
+      }
     }
-    loadUsage()
+    checkApiKeys()
     
-    // Select all lessons by default
-    const allIndices = gen.getCurriculum().map((_, index) => index)
-    setSelectedLessons(new Set(allIndices))
+    // Load existing articles to show which lessons are already created
+    const loadExistingArticles = async () => {
+      setLoadingArticles(true)
+      try {
+        const response = await fetch('/api/articles?status=all')
+        if (response.ok) {
+          const data = await response.json()
+          const existing = new Set<string>()
+          if (data.articles) {
+            data.articles.forEach((article: any) => {
+              if (article.storagePath) {
+                // Extract domain/module/lesson from storagePath
+                // Format: articles/{domain}/{module}/{lesson}.md or content/curriculum/{domain}/{module}/{lesson}.md
+                const match = article.storagePath.match(/(?:articles|content\/curriculum)\/([^\/]+)\/([^\/]+)\/([^\/]+)\.md/)
+                if (match) {
+                  const [, domain, module, lesson] = match
+                  existing.add(`${domain}/${module}/${lesson}`)
+                }
+              }
+            })
+          }
+          setExistingArticles(existing)
+        }
+      } catch (error) {
+        console.error('Error loading existing articles:', error)
+      } finally {
+        setLoadingArticles(false)
+      }
+    }
+    loadExistingArticles()
+    
   }, [])
 
+  // Helper to resolve competency for a lesson
+  const resolveCompetencyForLesson = async (domainId: string, moduleId: string, lessonTitle: string): Promise<string | null> => {
+    try {
+      const response = await fetch('/api/content-generation/resolve-competency', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domainId, moduleId, lessonTitle }),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error(`[resolve-competency] API error (${response.status}):`, errorData)
+        // Try GET as fallback if POST doesn't work (some Next.js routing issues)
+        if (response.status === 404) {
+          console.warn('[resolve-competency] 404 error - route may not be registered yet')
+        }
+        return null
+      }
+      
+      const data = await response.json()
+      if (data.competencyId) {
+        console.log(`[resolve-competency] Resolved competency for ${lessonTitle}:`, data.competencyId)
+        return data.competencyId
+      }
+      
+      console.warn(`[resolve-competency] No competencyId in response for ${lessonTitle}`)
+      return null
+    } catch (error) {
+      console.error('[resolve-competency] Error resolving competency:', error)
+      return null
+    }
+  }
+
   const handleGenerateSelected = async () => {
-    if (!generator || !openaiKey || !selectedCompetency) {
-      toast.error('Please provide API key and select competency')
+    // Check if selected provider has API key configured
+    if (config.provider === 'openai' && !apiKeysConfigured?.openai) {
+      toast.error('OpenAI API key is not configured. Please set OPENAI_API_KEY in environment variables.')
+      return
+    }
+    if (config.provider === 'gemini' && !apiKeysConfigured?.gemini) {
+      toast.error('Gemini API key is not configured. Please set GEMINI_API_KEY in environment variables.')
       return
     }
 
-    const selectedLessonStructures = curriculum.filter((_, index) => selectedLessons.has(index))
+    // Convert selected lesson paths to LessonStructure format with competency resolution
+    const selectedLessonStructures: Array<LessonStructure & { lessonPath: string; competencyId: string | null }> = []
+    for (const lessonPath of selectedLessons) {
+      const lesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lessonPath)
+      if (lesson) {
+        // Resolve competency for this lesson
+        const competencyId = await resolveCompetencyForLesson(lesson.domain, lesson.moduleId, lesson.lessonTitle)
+        
+        if (!competencyId) {
+          toast.warning(`Could not resolve competency for lesson: ${lesson.lessonTitle}. Skipping.`)
+          continue
+        }
+
+        selectedLessonStructures.push({
+          moduleNumber: lesson.moduleNumber,
+          moduleName: lesson.moduleTitle,
+          lessonNumber: lesson.lessonNumber,
+          lessonName: lesson.lessonTitle,
+          description: lesson.description,
+          lessonPath,
+          competencyId
+        })
+      }
+    }
     
     if (selectedLessonStructures.length === 0) {
-      toast.error('Please select at least one lesson to generate')
+      toast.error('No lessons with valid competencies to generate')
       return
     }
-
-    // Initialize generator with API keys
-    const gen = new ContentGenerator(
-      config.provider === 'openai' ? openaiKey : undefined,
-      config.provider === 'gemini' ? geminiKey : undefined
-    )
 
     setProgress({
       isGenerating: true,
@@ -145,25 +264,71 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     })
 
     try {
-      const results = await gen.generateBatchLessons(
-        selectedLessonStructures,
-        config,
-        selectedCompetency,
-        (completed, total, currentLesson) => {
-          setProgress(prev => ({
-            ...prev,
-            completed,
-            total,
-            currentLesson
-          }))
+      // Generate lessons one by one via API route (server-side)
+      const results: GeneratedLesson[] = []
+      for (let i = 0; i < selectedLessonStructures.length; i++) {
+        const lessonStruct = selectedLessonStructures[i]
+        const { lessonPath, competencyId, ...structure } = lessonStruct
+        
+        // Get domain information from original lesson data
+        const originalLesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lessonPath)
+        const domainTitle = originalLesson?.domainTitle || structure.moduleName
+        
+        setProgress(prev => ({
+          ...prev,
+          completed: i,
+          total: selectedLessonStructures.length,
+          currentLesson: structure.lessonName
+        }))
+
+        try {
+          // Call server-side API route for generation
+          const response = await fetch('/api/content-generation/generate-lesson', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lesson: structure,
+              options: config,
+              competencyId: competencyId!,
+              domainTitle: domainTitle,
+            }),
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.error || `HTTP ${response.status}`)
+          }
+
+          const data = await response.json()
+          results.push({
+            ...data.lesson,
+            lessonPath
+          } as any)
+          
+          // Add delay between requests to avoid rate limiting
+          if (i < selectedLessonStructures.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000))
+          }
+        } catch (error) {
+          console.error(`Failed to generate lesson ${structure.lessonName}:`, error)
+          results.push({
+            title: structure.lessonName,
+            content: '',
+            competencyId: competencyId!,
+            status: 'draft',
+            metadata: {},
+            lessonPath,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          } as any)
         }
-      )
+      }
 
       setProgress(prev => ({
         ...prev,
         isGenerating: false,
         results,
-        currentLesson: 'Complete'
+        currentLesson: 'Complete',
+        completed: selectedLessonStructures.length
       }))
 
       toast.success(`Generated ${results.length} lessons successfully!`)
@@ -184,32 +349,76 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       return
     }
 
-    const articlesToInsert = progress.results.map(lesson => ({
-      title: lesson.title,
-      content: lesson.content,
-      competencyId: lesson.competencyId,
-      status: lesson.status || 'draft',
-    }))
+    // Map results to articles with proper storage paths and metadata
+    const articlesToInsert = progress.results.map((lesson: any) => {
+      const lessonPath = lesson.lessonPath || null
+      
+      // Extract domain, module, lesson from path: domain/module/lesson
+      let storagePath = null
+      let metadata: any = {}
+      
+      if (lessonPath) {
+        const [domain, module, lessonId] = lessonPath.split('/')
+        storagePath = `content/curriculum/${domain}/${module}/${lessonId}.md`
+        
+        // Find the lesson data for metadata
+        const lessonData = allLessons.find(l => 
+          l.domain === domain && l.moduleId === module && l.lessonId === lessonId
+        )
+        
+        if (lessonData) {
+          metadata = {
+            domain,
+            module,
+            lesson_number: lessonData.lessonNumber,
+            module_number: lessonData.moduleNumber,
+            domain_title: lessonData.domainTitle,
+            module_title: lessonData.moduleTitle,
+          }
+        }
+      }
+
+      return {
+        title: lesson.title,
+        content: lesson.content,
+        competencyId: lesson.competencyId,
+        status: lesson.status || 'draft',
+        storagePath,
+        metadata,
+        description: lesson.metadata?.keyTakeaways?.join(' ') || lesson.title,
+      }
+    })
 
     bulkSaveMutation.mutate(articlesToInsert)
   }
 
-  const toggleLessonSelection = (index: number) => {
+  const toggleLessonSelection = (lessonPath: string) => {
     const newSelection = new Set(selectedLessons)
-    if (newSelection.has(index)) {
-      newSelection.delete(index)
+    if (newSelection.has(lessonPath)) {
+      newSelection.delete(lessonPath)
     } else {
-      newSelection.add(index)
+      newSelection.add(lessonPath)
     }
     setSelectedLessons(newSelection)
   }
 
-  const selectAllLessons = () => {
-    setSelectedLessons(new Set(curriculum.map((_, index) => index)))
+  const selectAllFilteredLessons = () => {
+    const paths = new Set(filteredLessons.map(l => `${l.domain}/${l.moduleId}/${l.lessonId}`))
+    setSelectedLessons(paths)
   }
 
   const deselectAllLessons = () => {
     setSelectedLessons(new Set())
+  }
+
+  const selectOnlyMissing = () => {
+    const missingPaths = filteredLessons
+      .filter(l => {
+        const path = `${l.domain}/${l.moduleId}/${l.lessonId}`
+        return !existingArticles.has(path)
+      })
+      .map(l => `${l.domain}/${l.moduleId}/${l.lessonId}`)
+    setSelectedLessons(new Set(missingPaths))
   }
 
   const exportResults = () => {
@@ -230,6 +439,59 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const regenerateThumbnail = async (lesson: any, index: number) => {
+    try {
+      // Get domain information from original lesson data
+      const originalLesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lesson.lessonPath)
+      const domainTitle = originalLesson?.domainTitle || lesson.metadata?.domain_title || 'Business Strategy'
+
+      const response = await fetch('/api/generate-thumbnail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: lesson.title,
+          domainName: domainTitle,
+          contentType: 'lesson',
+          description: lesson.metadata?.keyTakeaways?.join(' ') || undefined,
+          useImagen: true, // Use Imagen generation
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate thumbnail')
+      }
+
+      const thumbnailData = await response.json()
+
+      // Update the lesson in results
+      const updatedResults = [...progress.results]
+      if (!updatedResults[index].metadata) {
+        updatedResults[index].metadata = {}
+      }
+
+      // Handle both PNG (Imagen) and SVG (fallback) responses
+      if (thumbnailData.type === 'png') {
+        updatedResults[index].metadata.thumbnailUrl = thumbnailData.imageBuffer || thumbnailData.url
+        updatedResults[index].metadata.thumbnailType = 'png'
+      } else {
+        const svg = thumbnailData.svg
+        updatedResults[index].metadata.thumbnailSvg = svg
+        updatedResults[index].metadata.thumbnailUrl = `data:image/svg+xml;base64,${btoa(svg)}`
+        updatedResults[index].metadata.thumbnailType = 'svg'
+      }
+
+      setProgress(prev => ({
+        ...prev,
+        results: updatedResults
+      }))
+
+      toast.success('Thumbnail regenerated successfully!')
+    } catch (error) {
+      console.error('Error regenerating thumbnail:', error)
+      toast.error('Failed to regenerate thumbnail')
+    }
   }
 
   return (
@@ -300,37 +562,53 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
                 </div>
               </div>
 
+              {/* API Key Status */}
               <div>
-                <Label htmlFor="apikey">
-                  {config.provider === 'openai' ? 'OpenAI API Key' : 'Gemini API Key'}
-                </Label>
-                <Input
-                  id="apikey"
-                  type="password"
-                  value={config.provider === 'openai' ? openaiKey : geminiKey}
-                  onChange={(e) => config.provider === 'openai' 
-                    ? setOpenaiKey(e.target.value) 
-                    : setGeminiKey(e.target.value)
-                  }
-                  placeholder={`Enter your ${config.provider === 'openai' ? 'OpenAI' : 'Gemini'} API key`}
-                  className="mt-1"
-                />
+                <Label>API Key Configuration</Label>
+                <div className="mt-1 space-y-2">
+                  <div className="flex items-center justify-between p-3 rounded-lg border bg-gray-50">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${apiKeysConfigured?.openai ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <span className="text-sm font-medium">OpenAI</span>
+                    </div>
+                    {apiKeysConfigured?.openai ? (
+                      <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                        Configured
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs text-red-700 border-red-300">
+                        Not Configured
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border bg-gray-50">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${apiKeysConfigured?.gemini ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                      <span className="text-sm font-medium">Google Gemini</span>
+                    </div>
+                    {apiKeysConfigured?.gemini ? (
+                      <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                        Configured
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-xs text-red-700 border-red-300">
+                        Not Configured
+                      </Badge>
+                    )}
+                  </div>
+                  {(!apiKeysConfigured?.openai && !apiKeysConfigured?.gemini) && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      API keys should be set in environment variables: <code className="bg-gray-100 px-1 rounded">OPENAI_API_KEY</code> or <code className="bg-gray-100 px-1 rounded">GEMINI_API_KEY</code>
+                    </p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="competency">Target Competency</Label>
-                <Select value={selectedCompetency} onValueChange={setSelectedCompetency}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select competency for generated content" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {competencies.map((comp) => (
-                      <SelectItem key={comp.id} value={comp.id}>
-                        {comp.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-900">
+                  <strong>Note:</strong> Competencies are automatically resolved from lesson metadata (domain, module, lesson). 
+                  Each lesson will be assigned to its corresponding competency based on the curriculum structure.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -413,88 +691,192 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
         <TabsContent value="select" className="space-y-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <CardTitle>Select Lessons to Generate</CardTitle>
-                  <CardDescription>Choose which lessons from the Capital Allocation curriculum to generate</CardDescription>
+                  <CardDescription>
+                    Choose from all {allLessons.length} lessons across {completeCurriculumData.length} domains
+                  </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={selectAllLessons}>
-                    Select All
+                  <Button variant="outline" size="sm" onClick={selectAllFilteredLessons}>
+                    Select All ({filteredLessons.length})
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={selectOnlyMissing}>
+                    Select Missing Only
                   </Button>
                   <Button variant="outline" size="sm" onClick={deselectAllLessons}>
                     Deselect All
                   </Button>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {curriculum.reduce((acc, lesson, index) => {
-                  const moduleIndex = acc.findIndex(m => m.moduleNumber === lesson.moduleNumber)
-                  if (moduleIndex === -1) {
-                    acc.push({
-                      moduleNumber: lesson.moduleNumber,
-                      moduleName: lesson.moduleName,
-                      lessons: [{ ...lesson, index }]
-                    })
-                  } else {
-                    acc[moduleIndex].lessons.push({ ...lesson, index })
-                  }
-                  return acc
-                }, [] as Array<{ moduleNumber: number; moduleName: string; lessons: Array<LessonStructure & { index: number }> }>).map((module) => (
-                  <Card key={module.moduleNumber} className="border-l-4 border-l-blue-500">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">
-                        Module {module.moduleNumber}: {module.moduleName}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {module.lessons.map((lesson) => (
-                          <div
-                            key={lesson.index}
-                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedLessons.has(lesson.index)
-                                ? 'bg-blue-50 border-blue-200'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                            }`}
-                            onClick={() => toggleLessonSelection(lesson.index)}
-                          >
-                            {selectedLessons.has(lesson.index) ? (
-                              <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                            ) : (
-                              <Circle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                            )}
-                            <div className="flex-1">
-                              <h4 className="font-medium text-sm">
-                                Lesson {lesson.moduleNumber}.{lesson.lessonNumber}: {lesson.lessonName}
-                              </h4>
-                              <p className="text-xs text-gray-600 mt-1">{lesson.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
               
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-blue-900">
-                      {selectedLessons.size} lessons selected
-                    </p>
-                    <p className="text-sm text-blue-700">
-                      Estimated generation time: {Math.ceil(selectedLessons.size * 2)} minutes
-                    </p>
+              {/* Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <Label htmlFor="domain-filter">Filter by Domain</Label>
+                  <Select value={lessonDomainFilter} onValueChange={setLessonDomainFilter}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Domains</SelectItem>
+                      {completeCurriculumData.map((domain) => (
+                        <SelectItem key={domain.id} value={domain.id}>
+                          {domain.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="lesson-search">Search Lessons</Label>
+                  <Input
+                    id="lesson-search"
+                    type="text"
+                    value={lessonSearchFilter}
+                    onChange={(e) => setLessonSearchFilter(e.target.value)}
+                    placeholder="Search by title, module, or domain..."
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <div className="flex items-center gap-2 w-full">
+                    <Switch
+                      id="show-missing"
+                      checked={showOnlyMissing}
+                      onCheckedChange={setShowOnlyMissing}
+                    />
+                    <Label htmlFor="show-missing" className="cursor-pointer">
+                      Show only missing lessons
+                    </Label>
                   </div>
-                  <Badge variant="secondary">
-                    ~{selectedLessons.size * config.targetWordCount} words
-                  </Badge>
                 </div>
               </div>
+            </CardHeader>
+            <CardContent>
+              {loadingArticles ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-600">Loading lesson status...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-6">
+                    {Object.entries(lessonsByDomain).map(([domainId, { domainTitle, lessons }]) => {
+                      // Group lessons by module within domain
+                      const lessonsByModule = lessons.reduce((acc, lesson) => {
+                        if (!acc[lesson.moduleId]) {
+                          acc[lesson.moduleId] = {
+                            moduleTitle: lesson.moduleTitle,
+                            moduleNumber: lesson.moduleNumber,
+                            lessons: []
+                          }
+                        }
+                        acc[lesson.moduleId].lessons.push(lesson)
+                        return acc
+                      }, {} as Record<string, { moduleTitle: string; moduleNumber: number; lessons: typeof lessons }>)
+
+                      return (
+                        <div key={domainId} className="border-l-4 border-l-blue-500 pl-4">
+                          <h3 className="text-lg font-medium text-gray-900 mb-4">
+                            {domainTitle}
+                            <span className="text-sm font-normal text-gray-500 ml-2">
+                              ({lessons.length} lesson{lessons.length !== 1 ? 's' : ''})
+                            </span>
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            {Object.entries(lessonsByModule)
+                              .sort(([, a], [, b]) => a.moduleNumber - b.moduleNumber)
+                              .map(([moduleId, { moduleTitle, moduleNumber, lessons: moduleLessons }]) => (
+                                <Card key={moduleId} className="border border-gray-200">
+                                  <CardHeader className="pb-3">
+                                    <CardTitle className="text-base">
+                                      Module {moduleNumber}: {moduleTitle}
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="space-y-2">
+                                      {moduleLessons.map((lesson) => {
+                                        const lessonPath = `${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`
+                                        const exists = existingArticles.has(lessonPath)
+                                        const isSelected = selectedLessons.has(lessonPath)
+                                        
+                                        return (
+                                          <div
+                                            key={lessonPath}
+                                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                                              isSelected
+                                                ? 'bg-blue-50 border-blue-200'
+                                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                            onClick={() => toggleLessonSelection(lessonPath)}
+                                          >
+                                            {isSelected ? (
+                                              <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                                            ) : (
+                                              <Circle className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-start justify-between gap-2">
+                                                <div className="flex-1 min-w-0">
+                                                  <h4 className="font-medium text-sm">
+                                                    Lesson {lesson.moduleNumber}.{lesson.lessonNumber}: {lesson.lessonTitle}
+                                                  </h4>
+                                                  <p className="text-xs text-gray-600 mt-1 line-clamp-2">{lesson.description}</p>
+                                                </div>
+                                                {exists ? (
+                                                  <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-300 flex-shrink-0">
+                                                    ✓ Created
+                                                  </Badge>
+                                                ) : (
+                                                  <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-300 flex-shrink-0">
+                                                    Missing
+                                                  </Badge>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )
+                                      })}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  
+                  {filteredLessons.length === 0 && (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-gray-600">No lessons match your filters</p>
+                    </div>
+                  )}
+                  
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-blue-900">
+                          {selectedLessons.size} lesson{selectedLessons.size !== 1 ? 's' : ''} selected
+                          {filteredLessons.length < allLessons.length && (
+                            <span className="text-sm font-normal text-blue-700 ml-2">
+                              ({filteredLessons.length} shown)
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-sm text-blue-700">
+                          Estimated generation time: {Math.ceil(selectedLessons.size * 2)} minutes
+                        </p>
+                      </div>
+                      <Badge variant="secondary">
+                        ~{(selectedLessons.size * config.targetWordCount).toLocaleString()} words
+                      </Badge>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -514,15 +896,35 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
                   <p className="text-gray-600 mb-4">
                     {selectedLessons.size} lessons selected for generation
                   </p>
-                  <Button 
-                    onClick={handleGenerateSelected}
-                    disabled={!openaiKey && !geminiKey || !selectedCompetency || selectedLessons.size === 0}
-                    size="lg"
-                    className="flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4" />
-                    Start Generation
-                  </Button>
+                  <div className="space-y-3">
+                    {(!apiKeysConfigured?.openai && config.provider === 'openai') && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p className="text-sm text-yellow-800">
+                          ⚠️ OpenAI API key is not configured. Please set <code className="bg-yellow-100 px-1 rounded">OPENAI_API_KEY</code> in your environment variables.
+                        </p>
+                      </div>
+                    )}
+                    {(!apiKeysConfigured?.gemini && config.provider === 'gemini') && (
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p className="text-sm text-yellow-800">
+                          ⚠️ Gemini API key is not configured. Please set <code className="bg-yellow-100 px-1 rounded">GEMINI_API_KEY</code> in your environment variables.
+                        </p>
+                      </div>
+                    )}
+                    <Button 
+                      onClick={handleGenerateSelected}
+                      disabled={
+                        (config.provider === 'openai' && !apiKeysConfigured?.openai) ||
+                        (config.provider === 'gemini' && !apiKeysConfigured?.gemini) ||
+                        selectedLessons.size === 0
+                      }
+                      size="lg"
+                      className="flex items-center gap-2 w-full"
+                    >
+                      <Play className="w-4 h-4" />
+                      Start Generation
+                    </Button>
+                  </div>
                 </div>
               )}
 
@@ -607,25 +1009,61 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
                   <CardTitle>Generated Lessons ({progress.results.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {progress.results.map((lesson, index) => (
                       <div
                         key={index}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        className={`p-3 rounded-lg border transition-colors ${
                           previewLesson === lesson
                             ? 'bg-blue-50 border-blue-200'
                             : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                         }`}
-                        onClick={() => setPreviewLesson(lesson)}
                       >
-                        <h4 className="font-medium text-sm">{lesson.title}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {lesson.metadata.estimatedReadingTime} min read
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            Module {lesson.metadata.moduleNumber}
-                          </Badge>
+                        <div className="flex gap-3">
+                          {/* Thumbnail */}
+                          <div className="flex-shrink-0">
+                            {lesson.metadata?.thumbnailUrl ? (
+                              <img
+                                src={lesson.metadata.thumbnailUrl}
+                                alt={lesson.title}
+                                className="w-[75px] h-[100px] object-cover border border-gray-300 rounded"
+                              />
+                            ) : (
+                              <div className="w-[75px] h-[100px] bg-gray-200 border border-gray-300 rounded flex items-center justify-center">
+                                <span className="text-xs text-gray-400">No thumbnail</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <h4 
+                              className="font-medium text-sm cursor-pointer"
+                              onClick={() => setPreviewLesson(lesson)}
+                            >
+                              {lesson.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                {lesson.metadata?.estimatedReadingTime || 'N/A'} min read
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                Module {lesson.metadata?.moduleNumber || 'N/A'}
+                              </Badge>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="mt-2 h-7 text-xs"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                regenerateThumbnail(lesson, index)
+                              }}
+                            >
+                              <RefreshCw className="w-3 h-3 mr-1" />
+                              Regenerate Thumbnail
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ))}

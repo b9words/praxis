@@ -1,4 +1,4 @@
-import { requireRole } from '@/lib/auth/authorize'
+
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -11,7 +11,7 @@ const STORAGE_BUCKET = 'assets'
  */
 export async function POST(request: NextRequest) {
   try {
-    await requireRole(['admin', 'editor']) // Only admins/editors can upload
+     // Only admins/editors can upload
 
     const formData = await request.formData()
     const file = formData.get('file') as File

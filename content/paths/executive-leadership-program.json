@@ -1,0 +1,35 @@
+{
+  "id": "executive-leadership-program",
+  "title": "Executive Leadership Program",
+  "description": "Complete leadership curriculum for modern executives",
+  "duration": "4-5 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "talent-density-principles",
+      "lesson": "defining-talent-density"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "golden-hour-first-60-minutes",
+      "lesson": "first-response-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "first-communication-narrative-control",
+      "lesson": "narrative-framing"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_01_tesla_production_crisis_2018"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_03_airbnb_covid_crisis_2020"
+    }
+  ]
+}
+

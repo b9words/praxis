@@ -126,19 +126,22 @@ REQUIREMENTS:
 - Include actionable frameworks and tools
 
 ${options.includeVisualizations ? `
-VISUALIZATION REQUIREMENTS:
-- Include at least 2-3 tables with real data
-- Add calculation examples with step-by-step breakdowns
-- Include comparison matrices or decision frameworks
+VISUALIZATION GUIDELINES (evaluate if needed):
+- Consider including tables ONLY if the lesson deals with quantitative data, comparisons, metrics, or frameworks that genuinely benefit from tabular presentation
+- If tables would enhance understanding of data relationships, comparisons, or structured information, include 1-3 well-designed tables
+- Evaluate whether each table genuinely enhances understanding - if not needed, omit it
+- Add calculation examples with step-by-step breakdowns where they add value
 ` : ''}
 
 ${options.includeMermaidDiagrams ? `
-MERMAID DIAGRAM REQUIREMENTS:
-- Include 1-2 Mermaid diagrams to illustrate key concepts
-- Use flowcharts for decision processes
-- Use graphs for data relationships
+MERMAID DIAGRAM GUIDELINES (evaluate if needed):
+- Consider including Mermaid diagrams ONLY if the lesson involves processes, workflows, decision trees, relationships, or systems that genuinely benefit from visual representation
+- Use flowcharts for multi-step decision processes or workflows
+- Use graphs/charts for showing relationships between concepts or entities
+- Use timelines for chronological processes
 - Wrap Mermaid code in \`\`\`mermaid blocks
-- Examples: decision trees, process flows, organizational charts, timelines
+- Evaluate whether each diagram genuinely enhances understanding - if not needed, omit it
+- If the lesson is primarily conceptual or narrative without complex processes, diagrams may not be necessary
 ` : ''}
 
 CONTENT STRUCTURE:
@@ -156,7 +159,7 @@ CONTENT STRUCTURE:
    - Step-by-step methodology
    - Decision criteria
    - Implementation process
-   - Include tables and calculations
+   - Include tables and calculations only if they enhance understanding
 
 4. **Real-World Examples** (500-700 words)
    - 2-3 detailed company case studies

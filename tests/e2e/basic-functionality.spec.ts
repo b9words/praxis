@@ -8,7 +8,7 @@ test.describe('Basic Functionality', () => {
   test('homepage loads and navigation works', async ({ page }) => {
     // Test homepage
     await page.goto('/')
-    await expect(page).toHaveTitle(/Praxis/)
+    await expect(page).toHaveTitle(/Execemy/)
     await expect(page.getByRole('heading', { name: 'The Proving Ground for' })).toBeVisible()
 
     // Test navigation links

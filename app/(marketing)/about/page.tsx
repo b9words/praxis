@@ -5,8 +5,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'About - Praxis',
-  description: 'Learn about Praxis Platform and our mission to build the next generation of business leaders.',
+  title: 'About - Execemy',
+  description: 'Learn about Execemy Platform and our mission to build the next generation of business leaders.',
 }
 
 export default function AboutPage() {
@@ -21,10 +21,10 @@ export default function AboutPage() {
           <div className="max-w-4xl space-y-8">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
-              <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight">About Praxis</h1>
+              <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight">About Execemy</h1>
             </div>
             <p className="text-lg text-neutral-700 leading-relaxed">
-              Praxis is a systematic training program designed to build demonstrable business acumen through interactive simulations, rigorous assessment, and a curated community of analytical professionals.
+              Execemy is a systematic training program designed to build demonstrable business acumen through interactive simulations, rigorous assessment, and a curated community of analytical professionals.
             </p>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function AboutPage() {
               <h2 className="text-3xl font-light text-neutral-900 mb-4 tracking-tight">Our Mission</h2>
             </div>
             <p className="text-base text-neutral-700 leading-relaxed">
-              Traditional business education fails because it emphasizes passive learning over demonstrable skills. Praxis addresses this gap by placing you in realistic business scenarios where you make actual decisions and receive systematic feedback on your performance.
+              Traditional business education fails because it emphasizes passive learning over demonstrable skills. Execemy addresses this gap by placing you in realistic business scenarios where you make actual decisions and receive systematic feedback on your performance.
             </p>
             <p className="text-base text-neutral-700 leading-relaxed">
               Our curriculum is built around five years of progressive complexity, from foundational operational decisions to executive-level strategic thinking. Each simulation is designed to test specific competencies, and your performance is measured against objective rubrics—not subjective grading.
@@ -68,7 +68,7 @@ export default function AboutPage() {
               <div>
                 <h3 className="text-xl font-medium text-neutral-900 mb-3">Performance-Based Assessment</h3>
                 <p className="text-base text-neutral-700 leading-relaxed">
-                  Every simulation outcome is evaluated against objective rubrics. You receive detailed feedback on what worked, what didn't, and why. Your Praxis Profile serves as a verifiable credential based on demonstrated competency.
+                  Every simulation outcome is evaluated against objective rubrics. You receive detailed feedback on what worked, what didn't, and why. Your Execemy Profile serves as a verifiable credential based on demonstrated competency.
                 </p>
               </div>
               <div>
@@ -98,7 +98,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
           <div className="max-w-4xl mx-auto text-center relative">
             <SectionAccent variant="center" />
-            <h2 className="text-3xl font-light mb-6 tracking-tight">Join the Praxis Community</h2>
+            <h2 className="text-3xl font-light mb-6 tracking-tight">Join the Execemy Community</h2>
             <p className="text-base text-neutral-300 mb-10 leading-relaxed max-w-2xl mx-auto">
               Start building demonstrable business acumen through systematic analysis and rigorous assessment
             </p>

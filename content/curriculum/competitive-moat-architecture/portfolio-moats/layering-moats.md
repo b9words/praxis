@@ -151,4 +151,4 @@ flowchart TD
 
 ---
 
-*This lesson is part of the **Competitive Moat Architecture** domain in the Praxis Executive Education curriculum.*
+*This lesson is part of the **Competitive Moat Architecture** domain in the Execemy Executive Education curriculum.*

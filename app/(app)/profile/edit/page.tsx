@@ -43,7 +43,7 @@ export default function ProfileEditPage() {
     async function getUserId() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        router.push('/login')
+        // All redirects removed
         return
       }
       setUserId(user.id)
@@ -84,10 +84,11 @@ export default function ProfileEditPage() {
         method: 'PUT',
         body: updates,
       }),
-    onSuccess: (_, variables) => {
+    onSuccess: async (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profiles.byId(userId!) })
       toast.success('Profile updated successfully')
-      router.push(`/profile/${variables.username}`)
+      const { safeRedirectAfterMutation } = await import('@/lib/utils/redirect-helpers')
+      await safeRedirectAfterMutation(router, `/profile/${variables.username}`)
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save profile')
@@ -214,14 +215,15 @@ export default function ProfileEditPage() {
           </div>
         </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-3 mt-6">
-        <Button variant="outline" onClick={() => router.push(`/profile/${profile?.username}`)} className="border-gray-300 hover:border-gray-400 rounded-none">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} disabled={updateMutation.isPending || !username} className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
-          {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
-        </Button>
+        {/* Actions */}
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={() => router.push(`/profile/${profile?.username}`)} className="border-gray-300 hover:border-gray-400 rounded-none">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={updateMutation.isPending || !username} className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+            {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
       </div>
     </div>
   )

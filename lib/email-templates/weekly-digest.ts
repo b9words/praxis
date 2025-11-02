@@ -18,7 +18,7 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Weekly Praxis Summary</title>
+  <title>Your Weekly Execemy Summary</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
@@ -68,7 +68,7 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
       ${data.recommendedContent.map(item => `
         <div style="margin: 12px 0; padding: 15px; background: #f9fafb; border-left: 3px solid #667eea; border-radius: 4px;">
           <div style="font-weight: 600; color: #1f2937; margin-bottom: 5px;">${item.title}</div>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com'}${item.url}" 
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}${item.url}" 
              style="color: #667eea; text-decoration: none; font-size: 14px;">
             ${item.type === 'lesson' ? '📚 View Lesson' : '🎯 Start Simulation'} →
           </a>
@@ -78,15 +78,15 @@ export function generateWeeklyDigestHTML(data: WeeklyDigestData): string {
     ` : ''}
     
     <div style="text-align: center; margin-top: 30px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com'}/dashboard" 
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/dashboard" 
          style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px;">
         View Dashboard
       </a>
     </div>
     
     <div style="text-align: center; margin-top: 30px; color: #9ca3af; font-size: 12px;">
-      <p>You're receiving this email because you're an active member of Praxis Platform.</p>
-      <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://praxisplatform.com'}/profile/settings" style="color: #667eea;">Manage email preferences</a></p>
+      <p>You're receiving this email because you're an active member of Execemy Platform.</p>
+      <p><a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/profile/settings" style="color: #667eea;">Manage email preferences</a></p>
     </div>
   </div>
 </body>

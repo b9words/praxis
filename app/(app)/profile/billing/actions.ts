@@ -72,8 +72,9 @@ async function getPaddlePortalUrl(subscriptionId: string): Promise<string> {
 export async function handleManageBilling() {
   const user = await getCurrentUser()
 
+  // All auth checks removed
   if (!user) {
-    redirect('/login')
+    throw new Error('No user found')
   }
 
   const subscription = await prisma.subscription.findUnique({
@@ -86,7 +87,8 @@ export async function handleManageBilling() {
 
   try {
     const portalUrl = await getPaddlePortalUrl(subscription.paddleSubscriptionId)
-    redirect(portalUrl)
+    // All redirects removed - return URL instead
+    return { portalUrl }
   } catch (error) {
     console.error('Failed to get billing portal URL:', error)
     throw new Error('Unable to access billing portal. Please contact support.')

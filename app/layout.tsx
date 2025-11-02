@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Praxis - Business Acumen Training Platform",
+  title: "Execemy - Business Acumen Training Platform",
   description: "The proving ground for the next generation of ambitious leaders",
 };
 

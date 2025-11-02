@@ -29,13 +29,13 @@ interface WeeklyDigestData {
 
 // Inline email template generator (edge functions can't import lib files)
 function generateDigestHTML(data: WeeklyDigestData): string {
-  const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://praxisplatform.com'
+  const appUrl = Deno.env.get('NEXT_PUBLIC_APP_URL') || 'https://execemy.com'
   return `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Your Weekly Praxis Summary</title>
+  <title>Your Weekly Execemy Summary</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center;">
@@ -226,9 +226,9 @@ serve(async (req) => {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@praxisplatform.com',
+            from: Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@execemy.com',
             to: user.email,
-            subject: `Your Weekly Praxis Summary - ${lessonsCompleted} lessons, ${simulationsCompleted} simulations`,
+            subject: `Your Weekly Execemy Summary - ${lessonsCompleted} lessons, ${simulationsCompleted} simulations`,
             html: htmlContent,
           }),
         })

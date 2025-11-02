@@ -1,8 +1,11 @@
 import BookmarkButton from '@/components/library/BookmarkButton'
+import CaseStudyCard from '@/components/library/CaseStudyCard'
 import LessonViewTracker from '@/components/library/LessonViewTracker'
 import ProgressTracker from '@/components/library/ProgressTracker'
 import { Button } from '@/components/ui/button'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
+import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { loadLessonByPath } from '@/lib/content-loader'
 import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById } from '@/lib/curriculum-data'
 import { prisma } from '@/lib/prisma/server'
@@ -143,7 +146,7 @@ flowchart TD
 
 ---
 
-*This lesson is part of **${domainTitle}** → **${moduleTitle}** in the Praxis Executive Education curriculum.*
+*This lesson is part of **${domainTitle}** → **${moduleTitle}** in the Execemy Executive Education curriculum.*
 
 > **Note**: This lesson content is being prepared. The full content will be available soon.`
 }
@@ -151,35 +154,15 @@ flowchart TD
 export default async function LessonPage({ params }: LessonPageProps) {
   const { domain: domainId, module: moduleId, lesson: lessonId } = await params
   
-  // Try to load from database first with error handling
-  let articleFromDb = null
-  try {
-    // First try with enum value (if enum exists in DB)
-    articleFromDb = await prisma.article.findFirst({
-      where: {
-        status: 'published',
-        storagePath: {
-          contains: `${domainId}/${moduleId}/${lessonId}.md`,
-        },
-      },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        storagePath: true,
-        metadata: true,
-        status: true,
-      },
-    })
-  } catch (error: any) {
-    // If enum doesn't exist in DB, try querying without status filter
-    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-      // Import error suppression helper
-      const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
-      logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+  // Cache article lookup (1 hour revalidate)
+  const getCachedArticle = cache(
+    async () => {
+      let articleFromDb = null
       try {
+        // First try with enum value (if enum exists in DB)
         articleFromDb = await prisma.article.findFirst({
           where: {
+            status: 'published',
             storagePath: {
               contains: `${domainId}/${moduleId}/${lessonId}.md`,
             },
@@ -193,13 +176,45 @@ export default async function LessonPage({ params }: LessonPageProps) {
             status: true,
           },
         })
-      } catch (fallbackError) {
-        console.error('Error fetching article from database:', fallbackError)
+      } catch (error: any) {
+        // If enum doesn't exist in DB, try querying without status filter
+        if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
+          // Import error suppression helper
+          const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
+          logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
+          try {
+            articleFromDb = await prisma.article.findFirst({
+              where: {
+                storagePath: {
+                  contains: `${domainId}/${moduleId}/${lessonId}.md`,
+                },
+              },
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                storagePath: true,
+                metadata: true,
+                status: true,
+              },
+            })
+          } catch (fallbackError) {
+            console.error('Error fetching article from database:', fallbackError)
+          }
+        } else {
+          console.error('Error fetching article from database:', error)
+        }
       }
-    } else {
-      console.error('Error fetching article from database:', error)
+      return articleFromDb
+    },
+    ['lesson', 'article', domainId, moduleId, lessonId],
+    {
+      tags: [CacheTags.ARTICLES, `lesson-${domainId}-${moduleId}-${lessonId}`],
+      revalidate: 3600, // 1 hour
     }
-  }
+  )
+
+  const articleFromDb = await getCachedArticle()
 
   let lessonContent: string
   let lessonDuration = 12
@@ -283,36 +298,185 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const { getCurrentUser } = await import('@/lib/auth/get-user')
   const user = await getCurrentUser()
   
-  // Get current progress if user is logged in
+  // Cache cases with prerequisites (15 minutes revalidate)
+  const getCachedCasesWithPrerequisites = cache(
+    async () => {
+      try {
+        const casesWithPrerequisites = await prisma.case.findMany({
+          where: {
+            prerequisites: {
+              not: null,
+            },
+          },
+          include: {
+            competencies: {
+              include: {
+                competency: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        })
+        return casesWithPrerequisites
+      } catch (error) {
+        console.error('Error checking case prerequisites:', error)
+        return []
+      }
+    },
+    ['cases', 'prerequisites'],
+    {
+      tags: [CacheTags.CASES],
+      revalidate: 900, // 15 minutes
+    }
+  )
+
+  // Get current progress if user is logged in (2 minutes revalidate, userId in key)
   let currentProgress = null
+  let initialReflections: Record<string, string> = {}
   if (user) {
-    const progress = await prisma.userLessonProgress.findUnique({
-      where: {
-        userId_domainId_moduleId_lessonId: {
-          userId: user.id,
-          domainId,
-          moduleId,
-          lessonId,
-        },
+    const getCachedProgress = getCachedUserData(
+      user.id,
+      async () => {
+        const progress = await prisma.userLessonProgress.findUnique({
+          where: {
+            userId_domainId_moduleId_lessonId: {
+              userId: user.id,
+              domainId,
+              moduleId,
+              lessonId,
+            },
+          },
+        })
+        
+        if (progress) {
+          // Extract reflections from lastReadPosition
+          const lastReadPos = progress.lastReadPosition as Record<string, any>
+          let reflections: Record<string, string> = {}
+          if (lastReadPos?.reflections && typeof lastReadPos.reflections === 'object') {
+            reflections = lastReadPos.reflections
+          }
+
+          return {
+            progress: {
+              id: progress.id,
+              user_id: progress.userId,
+              domain_id: progress.domainId,
+              module_id: progress.moduleId,
+              lesson_id: progress.lessonId,
+              status: progress.status,
+              progress_percentage: progress.progressPercentage,
+              time_spent_seconds: progress.timeSpentSeconds,
+              last_read_position: progress.lastReadPosition as Record<string, any>,
+              completed_at: progress.completedAt?.toISOString() || null,
+              bookmarked: progress.bookmarked,
+              created_at: progress.createdAt.toISOString(),
+              updated_at: progress.updatedAt.toISOString(),
+            },
+            reflections,
+          }
+        }
+        return { progress: null, reflections: {} }
       },
-    })
+      ['lesson', 'progress', domainId, moduleId, lessonId],
+      {
+        tags: [CacheTags.USER_PROGRESS],
+        revalidate: 120, // 2 minutes
+      }
+    )
+
+    const { progress, reflections } = await getCachedProgress()
+    currentProgress = progress
+    initialReflections = reflections
+  }
+  
+  // Find associated case study for this lesson
+  let associatedCaseStudy: { 
+    id: string
+    title: string
+    url: string
+    description?: string
+    competencies?: string[]
+    difficulty?: string
+    estimatedMinutes?: number
+  } | null = null
+  
+  // Check if any cases have this lesson in prerequisites
+  const casesWithPrerequisites = await getCachedCasesWithPrerequisites()
+  
+  for (const caseItem of casesWithPrerequisites) {
+    if (caseItem.prerequisites && typeof caseItem.prerequisites === 'object') {
+      const prereqs = caseItem.prerequisites as any
+      if (Array.isArray(prereqs)) {
+        const hasThisLesson = prereqs.some((prereq: any) => 
+          prereq.domain === domainId && 
+          prereq.module === moduleId && 
+          prereq.lesson === lessonId
+        )
+        
+        if (hasThisLesson) {
+          associatedCaseStudy = {
+            id: caseItem.id,
+            title: caseItem.title,
+            url: `/simulations/${caseItem.id}/brief`,
+            description: caseItem.description || undefined,
+            competencies: caseItem.competencies.map(cc => cc.competency.name),
+            difficulty: caseItem.difficulty || undefined,
+            estimatedMinutes: caseItem.estimatedMinutes || undefined,
+          }
+          break
+        }
+      }
+    }
+  }
+  
+  // Fallback: use module-based matching (similar to getCaseStudyForModule)
+  if (!associatedCaseStudy) {
+    const allSimulations = getAllInteractiveSimulations()
+    const caseMapping: Record<string, string> = {
+      'capital-allocation-ceo-as-investor': 'cs_unit_economics_crisis',
+      'second-order-decision-making-unit-economics-mastery': 'cs_unit_economics_crisis',
+    }
     
-    if (progress) {
-      // Convert to expected format
-      currentProgress = {
-        id: progress.id,
-        user_id: progress.userId,
-        domain_id: progress.domainId,
-        module_id: progress.moduleId,
-        lesson_id: progress.lessonId,
-        status: progress.status,
-        progress_percentage: progress.progressPercentage,
-        time_spent_seconds: progress.timeSpentSeconds,
-        last_read_position: progress.lastReadPosition as Record<string, any>,
-        completed_at: progress.completedAt?.toISOString() || null,
-        bookmarked: progress.bookmarked,
-        created_at: progress.createdAt.toISOString(),
-        updated_at: progress.updatedAt.toISOString(),
+    const caseKey = `${domainId}-${moduleId}`
+    const caseId = caseMapping[caseKey]
+    
+    if (caseId) {
+      const simulation = allSimulations.find(s => s.caseId === caseId)
+      if (simulation) {
+        associatedCaseStudy = {
+          id: caseId,
+          title: simulation.title,
+          url: `/simulations/${caseId}/brief`,
+          description: simulation.description,
+          competencies: simulation.competencies,
+          difficulty: simulation.difficulty,
+          estimatedMinutes: simulation.estimatedDuration,
+        }
+      }
+    }
+    
+    // Final fallback: find first case study in domain
+    if (!associatedCaseStudy) {
+      const domainCases = allSimulations.filter(s => {
+        if (domainId.includes('second-order') && s.caseId.includes('unit_economics')) return true
+        if (domainId.includes('competitive') && s.caseId.includes('asymmetric')) return true
+        return false
+      })
+      
+      if (domainCases.length > 0) {
+        const caseStudy = domainCases[0]
+        associatedCaseStudy = {
+          id: caseStudy.caseId,
+          title: caseStudy.title,
+          url: `/simulations/${caseStudy.caseId}/brief`,
+          description: caseStudy.description,
+          competencies: caseStudy.competencies,
+          difficulty: caseStudy.difficulty,
+          estimatedMinutes: caseStudy.estimatedDuration,
+        }
       }
     }
   }
@@ -383,8 +547,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
         <div className="flex-1 overflow-auto">
           <div className="px-4 py-4 md:px-6 md:py-6 max-w-4xl">
             <div className="prose prose-neutral max-w-none">
-              <MarkdownRenderer content={lessonContent} />
+              <MarkdownRenderer 
+                content={lessonContent}
+                lessonId={lessonId}
+                domainId={domainId}
+                moduleId={moduleId}
+                initialReflections={initialReflections}
+              />
             </div>
+            
+            {/* Associated Case Study Card */}
+            {associatedCaseStudy && (
+              <CaseStudyCard
+                caseId={associatedCaseStudy.id}
+                title={associatedCaseStudy.title}
+                url={associatedCaseStudy.url}
+                description={associatedCaseStudy.description}
+                competencies={associatedCaseStudy.competencies}
+                difficulty={associatedCaseStudy.difficulty}
+                duration={associatedCaseStudy.estimatedMinutes}
+              />
+            )}
             
             {/* Analytics Tracking */}
             {user && (

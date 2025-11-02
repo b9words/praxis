@@ -68,7 +68,27 @@ export async function seedComprehensiveData(userId: string, email?: string) {
         } as any)
 
         await new Promise(resolve => setTimeout(resolve, 300))
-        profileExists = !!await prisma.profile.findUnique({ where: { id: userId } })
+        try {
+          profileExists = !!await prisma.profile.findUnique({
+            where: { id: userId },
+            select: { id: true },
+          })
+        } catch (error: any) {
+          // Handle missing columns (P2022) or other schema issues
+          if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+            try {
+              profileExists = !!await prisma.profile.findUnique({
+                where: { id: userId },
+                select: { id: true },
+              })
+            } catch (fallbackError) {
+              console.error('Error checking profile existence (fallback):', fallbackError)
+              profileExists = false
+            }
+          } else {
+            throw error
+          }
+        }
       }
     }
 
@@ -600,12 +620,6 @@ export async function seedComprehensiveData(userId: string, email?: string) {
         link: completedSimulation ? `/debrief/${completedSimulation.id}` : undefined,
       },
       {
-        type: 'forum_reply',
-        title: 'New Reply in Discussion',
-        message: 'Someone replied to your thread in Strategy & Execution. Continue the conversation!',
-        link: '/community',
-      },
-      {
         type: 'weekly_summary',
         title: 'Weekly Progress Summary',
         message: `You completed ${results.articleProgress} articles and ${results.simulations} simulations this week. Keep up the momentum!`,
@@ -613,7 +627,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
       },
       {
         type: 'general',
-        title: 'Welcome to Praxis',
+        title: 'Welcome to Execemy',
         message: 'Your account is ready. Start exploring the curriculum and case simulations to build your executive skills.',
         link: '/library',
       },
@@ -621,7 +635,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
         type: 'general',
         title: 'Community Activity',
         message: 'New discussions are starting in the community. Join the conversation and share your insights!',
-        link: '/community',
+        link: '/dashboard',
       },
     ]
 

@@ -1,51 +1,88 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { requireRole } from '@/lib/auth/authorize'
 import { prisma } from '@/lib/prisma/server'
+import { cache, CacheTags } from '@/lib/cache'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export default async function AdminPage() {
-  try {
-    await requireRole(['admin', 'editor'])
-  } catch {
-    redirect('/dashboard')
-  }
+  // Cache statistics queries (5 minutes revalidate)
+  const getCachedStats = cache(
+    async () => {
+      const [articleCount, caseCount, userCount, simulationCount] = await Promise.all([
+        prisma.article.count(),
+        prisma.case.count(),
+        prisma.profile.count(),
+        prisma.simulation.count({
+          where: {
+            status: 'completed',
+          },
+        }),
+      ])
+      return { articleCount, caseCount, userCount, simulationCount }
+    },
+    ['admin', 'dashboard', 'stats'],
+    {
+      tags: [CacheTags.ADMIN, CacheTags.ARTICLES, CacheTags.CASES, CacheTags.USERS, CacheTags.SIMULATIONS],
+      revalidate: 300, // 5 minutes
+    }
+  )
 
-  // Fetch content statistics
-  const [articleCount, caseCount, userCount, simulationCount] = await Promise.all([
-    prisma.article.count(),
-    prisma.case.count(),
-    prisma.profile.count(),
-    prisma.simulation.count({
-      where: {
-        status: 'completed',
-      },
-    }),
+  // Cache recent articles/cases lists (2 minutes revalidate)
+  const getCachedRecentContent = cache(
+    async () => {
+      const [articles, cases] = await Promise.all([
+        prisma.article.findMany({
+          include: {
+            competency: {
+              select: {
+                name: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          take: 10,
+        }),
+        prisma.case.findMany({
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          take: 10,
+        }),
+      ])
+      return { articles, cases }
+    },
+    ['admin', 'dashboard', 'recent', 'content'],
+    {
+      tags: [CacheTags.ADMIN, CacheTags.ARTICLES, CacheTags.CASES],
+      revalidate: 120, // 2 minutes
+    }
+  )
+
+  // Cache pending counts (1 minute revalidate)
+  const getCachedPendingCounts = cache(
+    async () => {
+      // Fetch pending content reviews
+      const pendingContentCount = await Promise.all([
+        prisma.article.count({ where: { status: 'in_review' } }),
+        prisma.case.count({ where: { status: 'in_review' } }),
+      ]).then(([articles, cases]) => articles + cases)
+
+      return { pendingContentCount }
+    },
+    ['admin', 'dashboard', 'pending'],
+    {
+      tags: [CacheTags.ADMIN, CacheTags.ARTICLES, CacheTags.CASES],
+      revalidate: 60, // 1 minute
+    }
+  )
+
+  const [{ articleCount, caseCount, userCount, simulationCount }, { articles, cases }, { pendingContentCount }] = await Promise.all([
+    getCachedStats(),
+    getCachedRecentContent(),
+    getCachedPendingCounts(),
   ])
-
-  // Fetch articles by status
-  const articles = await prisma.article.findMany({
-    include: {
-      competency: {
-        select: {
-          name: true,
-        },
-      },
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-    take: 10,
-  })
-
-  // Fetch cases by status
-  const cases = await prisma.case.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-    take: 10,
-  })
 
   return (
     <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
@@ -66,32 +103,46 @@ export default async function AdminPage() {
         </div>
       </div>
 
+      {/* Pending Actions */}
+      {pendingContentCount > 0 && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <h3 className="text-sm font-medium text-amber-900 mb-2">Pending Actions</h3>
+          <div className="flex gap-4 text-sm text-amber-800">
+            {pendingContentCount > 0 && (
+              <Link href="/admin/content" className="hover:underline">
+                {pendingContentCount} content in review
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Statistics KPI */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div className="bg-white border border-gray-200 p-6">
+        <Link href="/admin/content" className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
             Total Articles
           </div>
           <div className="text-3xl font-semibold text-gray-900">{articleCount}</div>
-        </div>
-        <div className="bg-white border border-gray-200 p-6">
+        </Link>
+        <Link href="/admin/content" className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
             Total Cases
           </div>
           <div className="text-3xl font-semibold text-gray-900">{caseCount}</div>
-        </div>
-        <div className="bg-white border border-gray-200 p-6">
+        </Link>
+        <Link href="/admin/users" className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
             Total Users
           </div>
           <div className="text-3xl font-semibold text-gray-900">{userCount}</div>
-        </div>
-        <div className="bg-white border border-gray-200 p-6">
+        </Link>
+        <Link href="/admin/simulations" className="bg-white border border-gray-200 p-6 hover:border-gray-300 transition-colors">
           <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
             Completed Simulations
           </div>
           <div className="text-3xl font-semibold text-gray-900">{simulationCount}</div>
-        </div>
+        </Link>
       </div>
 
       {/* Recent Articles */}

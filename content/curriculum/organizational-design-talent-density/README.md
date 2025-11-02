@@ -88,4 +88,4 @@ Managing organizational change and evolution over time.
 **Total Lessons:** 21  
 **Estimated Completion Time:** 252 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

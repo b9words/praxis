@@ -10,7 +10,6 @@ import { fetchJson } from '@/lib/api'
 import { queryKeys } from '@/lib/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Award, BookOpen, Brain, CheckCircle2, Lock, Target, Users } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -80,14 +79,13 @@ const RESIDENCIES: ResidencyOption[] = [
 ]
 
 const STEPS = [
-  { id: 'welcome', title: 'Welcome', description: 'Learn about the Praxis method' },
+  { id: 'welcome', title: 'Welcome', description: 'Learn about the Execemy method' },
   { id: 'goals', title: 'Your Goals', description: 'Tell us about your aspirations' },
   { id: 'residency', title: 'Choose Path', description: 'Select your learning journey' },
   { id: 'complete', title: 'Ready', description: 'Start your first lesson' }
 ]
 
 export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowProps) {
-  const router = useRouter()
   const queryClient = useQueryClient()
   const [currentStep, setCurrentStep] = useState(0)
   
@@ -134,7 +132,13 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
       queryClient.invalidateQueries({ queryKey: queryKeys.profiles.byId(userId) })
       queryClient.invalidateQueries({ queryKey: queryKeys.user.progress() })
       toast.success('Onboarding complete. Access your dashboard.')
-      router.push('/dashboard')
+      
+      // Cookie is already set by API route in response headers
+      // Set client-side cookie as backup in case API cookie isn't received
+      document.cookie = `onboarding_complete=1; path=/; max-age=30; SameSite=Lax`
+      
+      // Redirect with query param - API route set cookie in response, this ensures it's available
+      window.location.reload()
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to complete setup')
@@ -442,7 +446,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <span className="text-2xl font-bold text-gray-900">Praxis</span>
+              <span className="text-2xl font-bold text-gray-900">Execemy</span>
               <Badge variant="secondary">Setup</Badge>
             </div>
             <div className="text-sm text-gray-500">

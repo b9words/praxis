@@ -12,6 +12,7 @@ type AnalyticsEvent =
   | 'application_submitted'
   | 'subscription_started'
   | 'user_signed_up'
+  | 'dashboard_card_clicked'
 
 interface AnalyticsProperties {
   [key: string]: string | number | boolean | undefined
@@ -47,8 +48,21 @@ class PostHogAnalyticsService implements AnalyticsService {
       // Dynamically import PostHog (client-side only)
       import('posthog-js').then(({ default: posthog }) => {
         if (posthog && this.apiKey) {
+          const isProduction = process.env.NODE_ENV === 'production'
+          
           posthog.init(this.apiKey, {
             api_host: this.host,
+            // Balanced privacy: Limit autocapture and mask sensitive data
+            autocapture: {
+              // Disable automatic form captures in production
+              capture_forms: !isProduction,
+            },
+            // Balanced privacy: Enable session recording with text masking in production
+            mask_all_text: isProduction,
+            // Don't capture console logs or performance metrics
+            capture_performance: false,
+            // Session recording enabled with masking for balanced privacy approach
+            disable_session_recording: false,
             loaded: (posthog) => {
               if (process.env.NODE_ENV === 'development') {
                 posthog.debug()
@@ -154,7 +168,7 @@ class ServerAnalyticsService implements AnalyticsService {
           distinct_id: properties?.userId as string || 'anonymous',
           properties: {
             ...properties,
-            $lib: 'praxis-platform',
+            $lib: 'execemy',
           },
         }),
       })
@@ -245,8 +259,19 @@ export const trackEvents = {
   },
   
   userSignedUp: (userId: string, email: string) => {
-    analytics.track('user_signed_up', { userId, email })
-    analytics.identify(userId, { email })
+    // Balanced privacy: Track event with userId only, don't send email in properties
+    analytics.track('user_signed_up', { userId })
+    // Identify user but don't pass email in traits (PostHog can hash it separately if needed)
+    analytics.identify(userId, {})
+  },
+
+  dashboardCardClicked: (cardType: string, cardId: string, shelfName?: string, userId?: string) => {
+    analytics.track('dashboard_card_clicked', {
+      cardType,
+      cardId,
+      shelfName,
+      ...(userId ? { userId } : {}),
+    })
   },
 }
 

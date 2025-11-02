@@ -1,0 +1,31 @@
+{
+  "id": "competitive-advantage",
+  "title": "Building Competitive Advantage",
+  "description": "Understand and architect durable competitive moats",
+  "duration": "5 days",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "foundational-theory",
+      "lesson": "defining-moat"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "foundational-theory",
+      "lesson": "source-all-moats"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "network-effects",
+      "lesson": "network-effects-moats"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_04_netflix_content_strategy_2019"
+    }
+  ]
+}
+

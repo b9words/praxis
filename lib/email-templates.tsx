@@ -1,0 +1,147 @@
+/**
+ * Email template renderer using React Email
+ * Converts React Email components to HTML strings for Resend
+ */
+
+import { GeneralNotificationEmail } from '@/components/emails/GeneralNotificationEmail'
+import { SimulationCompleteEmail } from '@/components/emails/SimulationCompleteEmail'
+import { SubscriptionConfirmationEmail } from '@/components/emails/SubscriptionConfirmationEmail'
+import { WeeklySummaryEmail } from '@/components/emails/WeeklySummaryEmail'
+import { WelcomeEmail } from '@/components/emails/WelcomeEmail'
+import { render } from '@react-email/render'
+
+export type EmailTemplateType = 
+  | 'welcome'
+  | 'simulation_complete'
+  | 'weekly_summary'
+  | 'general'
+  | 'subscription_confirmation'
+
+interface EmailTemplateProps {
+  welcome?: {
+    userName?: string
+    loginUrl?: string
+  }
+  simulation_complete?: {
+    caseTitle: string
+    debriefUrl?: string
+    userName?: string
+  }
+  weekly_summary?: {
+    userName?: string
+    articlesCompleted?: number
+    simulationsCompleted?: number
+    lessonsCompleted?: number
+    dashboardUrl?: string
+  }
+  general?: {
+    title: string
+    message: string
+    actionUrl?: string
+    actionText?: string
+    userName?: string
+  }
+  subscription_confirmation?: {
+    planName: string
+    userName?: string
+    dashboardUrl?: string
+  }
+}
+
+/**
+ * Render email template to HTML string
+ */
+export function renderEmailTemplate(
+  templateType: EmailTemplateType,
+  props: EmailTemplateProps
+): string {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
+
+  switch (templateType) {
+    case 'welcome':
+      return render(
+        WelcomeEmail({
+          userName: props.welcome?.userName,
+          loginUrl: props.welcome?.loginUrl || `${baseUrl}/dashboard`,
+        })
+      )
+
+    case 'simulation_complete':
+      if (!props.simulation_complete?.caseTitle) {
+        throw new Error('caseTitle is required for simulation_complete template')
+      }
+      return render(
+        SimulationCompleteEmail({
+          caseTitle: props.simulation_complete.caseTitle,
+          debriefUrl: props.simulation_complete.debriefUrl || `${baseUrl}/dashboard`,
+          userName: props.simulation_complete.userName,
+        })
+      )
+
+    case 'weekly_summary':
+      return render(
+        WeeklySummaryEmail({
+          userName: props.weekly_summary?.userName,
+          articlesCompleted: props.weekly_summary?.articlesCompleted,
+          simulationsCompleted: props.weekly_summary?.simulationsCompleted,
+          lessonsCompleted: props.weekly_summary?.lessonsCompleted,
+          dashboardUrl: props.weekly_summary?.dashboardUrl || `${baseUrl}/dashboard`,
+        })
+      )
+
+    case 'general':
+      if (!props.general?.title || !props.general?.message) {
+        throw new Error('title and message are required for general template')
+      }
+      return render(
+        GeneralNotificationEmail({
+          title: props.general.title,
+          message: props.general.message,
+          actionUrl: props.general.actionUrl,
+          actionText: props.general.actionText,
+          userName: props.general.userName,
+        })
+      )
+
+    case 'subscription_confirmation':
+      if (!props.subscription_confirmation?.planName) {
+        throw new Error('planName is required for subscription_confirmation template')
+      }
+      return render(
+        SubscriptionConfirmationEmail({
+          planName: props.subscription_confirmation.planName,
+          userName: props.subscription_confirmation.userName,
+          dashboardUrl: props.subscription_confirmation.dashboardUrl || `${baseUrl}/dashboard`,
+        })
+      )
+
+    default:
+      throw new Error(`Unknown template type: ${templateType}`)
+  }
+}
+
+/**
+ * Get email subject for template type
+ */
+export function getEmailSubject(templateType: EmailTemplateType, props: EmailTemplateProps): string {
+  switch (templateType) {
+    case 'welcome':
+      return 'Welcome to Execemy Platform'
+    
+    case 'simulation_complete':
+      return `Simulation Complete: ${props.simulation_complete?.caseTitle || 'Your Simulation'}`
+    
+    case 'weekly_summary':
+      return 'Your Weekly Execemy Summary'
+    
+    case 'general':
+      return props.general?.title || 'Notification from Execemy Platform'
+    
+    case 'subscription_confirmation':
+      return 'Subscription Confirmed - Execemy Platform'
+    
+    default:
+      return 'Notification from Execemy Platform'
+  }
+}
+

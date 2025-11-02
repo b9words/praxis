@@ -27,6 +27,34 @@ export function useCaseFile(fileId: string): CaseFileData {
         case 'STATIC':
           return caseFile.source.content || ''
 
+        case 'REFERENCE':
+          if (!caseFile.source.path) {
+            throw new Error('No path provided for REFERENCE source')
+          }
+          
+          // Remove 'content/sources/' prefix if present, then split into segments
+          const relativePath = caseFile.source.path.replace(/^content\/sources\//, '')
+          // Encode each segment separately for Next.js [...path] route
+          const pathSegments = relativePath.split('/').map(segment => encodeURIComponent(segment))
+          const apiUrl = `/api/case-content/${pathSegments.join('/')}`
+          
+          const response = await fetch(apiUrl)
+          if (!response.ok) {
+            throw new Error(`Failed to fetch REFERENCE file: ${response.statusText}`)
+          }
+          
+          // Determine content type from response
+          const contentType = response.headers.get('content-type') || ''
+          
+          // For images, return blob URL
+          if (contentType.startsWith('image/')) {
+            const blob = await response.blob()
+            return URL.createObjectURL(blob)
+          }
+          
+          // For text-based files, return text content
+          return await response.text()
+
         case 'REMOTE_CSV':
           if (!caseFile.source.url) {
             throw new Error('No URL provided for remote CSV')

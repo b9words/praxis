@@ -96,10 +96,10 @@ class GeminiTestAnalyzer {
    */
   private buildAnalysisPrompt(testResults: TestResults): string {
     return `
-You are an expert QA engineer and product analyst. Analyze the following Playwright E2E test results for a business education platform called "Praxis Platform" and provide a comprehensive analysis.
+You are an expert QA engineer and product analyst. Analyze the following Playwright E2E test results for a business education platform called "Execemy Platform" and provide a comprehensive analysis.
 
 ## Application Context
-Praxis Platform is a business education platform with these key features:
+Execemy Platform is a business education platform with these key features:
 - User authentication and onboarding
 - Curriculum library with articles and lessons
 - Case study simulations with AI interactions
@@ -192,7 +192,7 @@ Be thorough and specific in your analysis.
     const riskAssessment = analysis.productionReadiness?.riskAssessment || 'Unknown'
     const confidenceLevel = analysis.productionReadiness?.confidenceLevel || 'Unknown'
     
-    return `# Praxis Platform E2E Test Analysis Report
+    return `# Execemy Platform E2E Test Analysis Report
 Generated: ${timestamp}
 
 ## Executive Summary

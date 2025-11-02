@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getUserRole, hasRequiredRole } from './lib/auth/middleware-helpers'
+import { getUserRole, hasRequiredRole, checkSubscription } from './lib/auth/middleware-helpers'
 import { getRedirectUrlForLegacyContent } from './lib/content-mapping'
 
 export async function middleware(request: NextRequest) {
@@ -70,85 +70,52 @@ export async function middleware(request: NextRequest) {
 
   // Refresh session if expired
   const { data: { user } } = await supabase.auth.getUser()
-
-  // Protected routes
-  const protectedPaths = ['/dashboard', '/library', '/simulations', '/debrief', '/community', '/admin', '/profile']
-  const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
-
-  if (isProtectedPath && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    url.searchParams.set('redirectTo', request.nextUrl.pathname)
-    return NextResponse.redirect(url)
-  }
-
-  // Check application status for protected routes (except /apply and /application-pending)
-  if (isProtectedPath && user && !request.nextUrl.pathname.startsWith('/apply') && !request.nextUrl.pathname.startsWith('/application-pending')) {
+  
+  // Set Sentry user context in middleware (server-side)
+  if (user) {
     try {
-      // Use service role client to query database
-      const { createClient: createServiceClient } = await import('@supabase/supabase-js')
-      const supabaseAdmin = createServiceClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        {
-          auth: {
-            autoRefreshToken: false,
-            persistSession: false,
-          },
-        }
-      )
-
-      const { data: application } = await supabaseAdmin
-        .from('user_applications')
-        .select('status')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-
-      // If application exists and status is pending or rejected, redirect
-      if (application) {
-        if (application.status === 'pending') {
-          const url = request.nextUrl.clone()
-          url.pathname = '/application-pending'
-          return NextResponse.redirect(url)
-        }
-        if (application.status === 'rejected') {
-          const url = request.nextUrl.clone()
-          url.pathname = '/apply'
-          return NextResponse.redirect(url)
-        }
-        // If approved, allow access
-      } else {
-        // No application found - allow access if user has subscription
-        // This handles legacy users who signed up before application system
-        // Subscription check happens at route level
-      }
+      const { setUser } = await import('@/lib/monitoring')
+      setUser({
+        id: user.id,
+        email: user.email || undefined,
+        username: user.user_metadata?.username || user.user_metadata?.preferred_username || undefined,
+      })
     } catch (error) {
-      // If check fails, allow access (fail open to avoid blocking legitimate users)
-      console.error('Error checking application status:', error)
+      // Sentry not available - ignore silently
     }
   }
 
-  // Role-based route protection
-  if (user && request.nextUrl.pathname.startsWith('/admin')) {
-    const userRole = await getUserRole(user.id)
+  // Subscription gating for premium routes
+  if (user) {
+    const protectedPaths = ['/library', '/simulations', '/case-studies']
+    const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
     
-    if (!userRole || !hasRequiredRole(userRole, ['admin', 'editor'])) {
-      const url = request.nextUrl.clone()
-      url.pathname = '/dashboard'
-      return NextResponse.redirect(url)
+    // Allow access to these paths regardless of subscription
+    const publicPaths = [
+      '/library/curriculum', // Overview page is public
+      '/profile/billing',
+      '/dashboard',
+      '/residency',
+      '/library/paths', // Learning paths listing
+    ]
+    const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
+    
+    if (isProtectedPath && !isPublicPath) {
+      try {
+        const subscriptionStatus = await checkSubscription(user.id)
+        
+        if (!subscriptionStatus.isActive) {
+          // Redirect to billing with return URL
+          const url = request.nextUrl.clone()
+          url.pathname = '/profile/billing'
+          url.searchParams.set('returnUrl', pathname)
+          return NextResponse.redirect(url)
+        }
+      } catch (error) {
+        // If subscription check fails, log but allow access (fail open)
+        console.error('Error checking subscription in middleware:', error)
+      }
     }
-  }
-
-  // Redirect authenticated users from auth pages to dashboard
-  const authPaths = ['/login', '/signup']
-  const isAuthPath = authPaths.some(path => request.nextUrl.pathname === path)
-
-  if (isAuthPath && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
   }
 
   return supabaseResponse

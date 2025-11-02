@@ -72,7 +72,7 @@ serve(async (req) => {
     }
 
     // Construct the prompt for the Smart Study Assistant
-    const systemPrompt = `You are the Praxis Study Assistant, an expert educator helping students understand business concepts. Your role is to answer questions about the article content provided to you.
+    const systemPrompt = `You are the Execemy Study Assistant, an expert educator helping students understand business concepts. Your role is to answer questions about the article content provided to you.
 
 CRITICAL CONSTRAINTS:
 - You MUST ONLY use information from the article provided below. Do not introduce outside information.

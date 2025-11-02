@@ -125,4 +125,4 @@ Applying capital allocation principles through a comprehensive case study.
 **Total Lessons:** 30  
 **Estimated Completion Time:** 360 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

@@ -109,7 +109,7 @@ export default function PaddleCheckout({
           planName,
           userId: customerId,
         }),
-        successUrl: `${window.location.origin}/dashboard?checkout=success`,
+        successUrl: `${window.location.origin}?checkout=success`,
         settings: {
           displayMode: 'overlay',
           theme: 'light',

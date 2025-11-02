@@ -1,4 +1,4 @@
--- Seed data for Praxis Platform MVP
+-- Seed data for Execemy Platform MVP
 -- This file contains the core competency framework, 3 articles, 3 case simulations, and default forum channels
 
 -- Insert core competency domains and competencies

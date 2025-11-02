@@ -5,6 +5,7 @@ import ScoreReveal from '@/components/debrief/ScoreReveal'
 import { Button } from '@/components/ui/button'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
+import { getAllLessonsFlat, getDomainById } from '@/lib/curriculum-data'
 import { fetchJson } from '@/lib/api'
 import { queryKeys } from '@/lib/queryKeys'
 import { useQuery } from '@tanstack/react-query'
@@ -46,26 +47,137 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
   const debrief = debriefData?.debrief
   const simulation = debrief?.simulation
   const scores = (debrief?.scores as any[]) || []
+  const rubric = simulation?.case?.rubric as any
+  
+  // Helper to match competency name to rubric criteria
+  const getRubricCriteriaForCompetency = (competencyName: string) => {
+    if (!rubric?.criteria) return undefined
+    
+    // Try exact match first
+    let criteriaKey = Object.keys(rubric.criteria).find(
+      key => key.toLowerCase() === competencyName.toLowerCase() || 
+             key.toLowerCase().replace(/[^a-z0-9]/g, '-') === competencyName.toLowerCase().replace(/[^a-z0-9]/g, '-')
+    )
+    
+    // Try partial match
+    if (!criteriaKey) {
+      criteriaKey = Object.keys(rubric.criteria).find(
+        key => key.toLowerCase().includes(competencyName.toLowerCase()) ||
+               competencyName.toLowerCase().includes(key.toLowerCase())
+      )
+    }
+    
+    if (!criteriaKey) return undefined
+    
+    const criteria = rubric.criteria[criteriaKey]
+    return {
+      description: criteria.description,
+      scoring: criteria.scoring,
+      weight: criteria.weight,
+    }
+  }
 
-  // Compute recommended articles
+  // Compute recommended lessons based on weak competencies
   const weakCompetencies = scores
-    .filter((s: any) => (s.score || s) < 3)
-    .map((s: any) => s.competencyName || s.competency)
+    .filter((s: any) => {
+      const score = typeof s === 'number' ? s : (s.score || s || 0)
+      return score > 0 && score < 3.0
+    })
+    .map((s: any) => {
+      if (typeof s === 'object' && s.competencyName) {
+        return s.competencyName
+      }
+      if (typeof s === 'object' && s.competency) {
+        return s.competency
+      }
+      return String(s)
+    })
     .filter(Boolean)
 
-  const recommendedArticles =
-    articlesData?.articles
-      ?.filter((article: any) => {
-        const competencyName = article.competency?.name?.toLowerCase() || ''
-        return weakCompetencies.some((wc: string) => competencyName.includes(wc.toLowerCase()))
+  // Map competencies to domains and get foundational lessons
+  const competencyToDomainMapping: Record<string, string> = {
+    financialAcumen: 'second-order-decision-making',
+    strategicThinking: 'competitive-moat-architecture',
+    marketAwareness: 'technological-market-foresight',
+    riskManagement: 'crisis-leadership-public-composure',
+    leadershipJudgment: 'organizational-design-talent-density',
+  }
+
+  const getFoundationalLessonForDomain = (domainId: string) => {
+    const domain = getDomainById(domainId)
+    if (!domain || domain.modules.length === 0) return null
+
+    const firstModule = domain.modules[0]
+    if (!firstModule || firstModule.lessons.length === 0) return null
+
+    const firstLesson = firstModule.lessons[0]
+    return {
+      domain: domainId,
+      module: firstModule.id,
+      lesson: firstLesson.id,
+      url: `/library/curriculum/${domainId}/${firstModule.id}/${firstLesson.id}`,
+      title: firstLesson.title,
+    }
+  }
+
+  const allLessons = getAllLessonsFlat()
+  const recommendedLessons: Array<{
+    id: string
+    title: string
+    url: string
+    competencyName: string
+    reason: string
+  }> = []
+
+  weakCompetencies.slice(0, 5).forEach((competencyName: string) => {
+    // Try exact match first
+    let domainId = competencyToDomainMapping[competencyName]
+    
+    // Try normalized match
+    if (!domainId) {
+      const normalized = competencyName.toLowerCase().replace(/\s+/g, '')
+      domainId = competencyToDomainMapping[normalized]
+    }
+
+    if (domainId) {
+      const lesson = getFoundationalLessonForDomain(domainId)
+      if (lesson) {
+        const lessonId = `${lesson.domain}-${lesson.module}-${lesson.lesson}`
+        if (!recommendedLessons.some(r => r.id === lessonId)) {
+          recommendedLessons.push({
+            id: lessonId,
+            title: lesson.title,
+            url: lesson.url,
+            competencyName,
+            reason: `Build foundational knowledge in ${competencyName} to improve your performance`,
+          })
+        }
+      }
+    } else {
+      // Fallback: find lessons by keyword match
+      const matchingLessons = allLessons
+        .filter(l => 
+          l.lessonTitle.toLowerCase().includes(competencyName.toLowerCase()) ||
+          l.domainTitle.toLowerCase().includes(competencyName.toLowerCase())
+        )
+        .slice(0, 1)
+
+      matchingLessons.forEach(lesson => {
+        const lessonId = `${lesson.domain}-${lesson.moduleId}-${lesson.lessonId}`
+        if (!recommendedLessons.some(r => r.id === lessonId) && recommendedLessons.length < 5) {
+          recommendedLessons.push({
+            id: lessonId,
+            title: lesson.lessonTitle,
+            url: `/library/curriculum/${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`,
+            competencyName,
+            reason: `Strengthen your ${competencyName} skills`,
+          })
+        }
       })
-      .slice(0, 3)
-      .map((article: any) => ({
-        id: article.id,
-        title: article.title,
-        competencyName: article.competency?.name || 'Unknown',
-        reason: `Strengthen your ${article.competency?.name || 'this'} knowledge based on your simulation performance`,
-      })) || []
+    }
+  })
+
+  const recommendedItems = recommendedLessons.slice(0, 5)
 
   // Start score reveal animation
   useEffect(() => {
@@ -183,6 +295,24 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
         </div>
       )}
 
+      {/* Action Plan - Recommended Reading for Low Scores (Prominent, moved up) */}
+      {showScores && recommendedItems.length > 0 && (
+        <div className="bg-blue-50 border border-blue-200 mb-12">
+          <div className="border-b border-blue-200 px-6 py-4 bg-blue-100">
+            <h2 className="text-lg font-medium text-gray-900">Action Plan</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Strengthen your weak competencies with these foundational lessons
+            </p>
+          </div>
+          <div className="p-6">
+            <RecommendedReading
+              recommendations={recommendedItems}
+              delay={0}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Competency Analysis */}
       {showScores && scores.length > 0 && (
         <div className="mb-12">
@@ -190,27 +320,23 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
             <h2 className="text-lg font-medium text-gray-900">Competency Analysis</h2>
           </div>
           <div className="space-y-4">
-            {scores.map((score: any, index: number) => (
-              <ScoreReveal
-                key={score.competencyName || score.competency || index}
-                competencyName={score.competencyName || score.competency || 'Unknown'}
-                score={score.score || score || 0}
-                maxScore={5}
-                justification={score.justification || score.feedback || ''}
-                delay={0}
-              />
-            ))}
+            {scores.map((score: any, index: number) => {
+              const competencyName = score.competencyName || score.competency || 'Unknown'
+              const rubricCriteria = getRubricCriteriaForCompetency(competencyName)
+              
+              return (
+                <ScoreReveal
+                  key={competencyName || index}
+                  competencyName={competencyName}
+                  score={score.score || score || 0}
+                  maxScore={5}
+                  justification={score.justification || score.feedback || ''}
+                  delay={0}
+                  rubricCriteria={rubricCriteria}
+                />
+              )
+            })}
           </div>
-        </div>
-      )}
-
-      {/* Recommended Reading */}
-      {showScores && recommendedArticles.length > 0 && (
-        <div className="mb-12">
-          <RecommendedReading
-            recommendations={recommendedArticles}
-            delay={0}
-          />
         </div>
       )}
 

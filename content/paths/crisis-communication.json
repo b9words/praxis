@@ -1,0 +1,25 @@
+{
+  "id": "crisis-communication",
+  "title": "Crisis Communication Essentials",
+  "description": "Master the art of communication during organizational crises",
+  "duration": "3 hours",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "golden-hour-first-60-minutes",
+      "lesson": "first-response-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "first-communication-narrative-control",
+      "lesson": "narrative-framing"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_03_airbnb_covid_crisis_2020"
+    }
+  ]
+}
+

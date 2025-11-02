@@ -76,13 +76,39 @@ export async function markLessonAsCompleted(
       return { success: false, error: 'Failed to mark lesson as completed' }
     }
 
+    // Check if domain is now completed
+    const { checkDomainCompletion } = await import('@/lib/progress-tracking')
+    const { getDomainById } = await import('@/lib/curriculum-data')
+    const completion = await checkDomainCompletion(user.id, domainId)
+    
+    if (completion) {
+      // Domain completed - create notification with certificate link
+      const { createNotification } = await import('@/lib/notifications/triggers')
+      const domain = getDomainById(domainId)
+      
+      await createNotification({
+        userId: user.id,
+        type: 'domain_complete',
+        title: 'Domain Completed!',
+        message: `Congratulations! You've completed "${domain?.title || domainId}". View your certificate to celebrate your achievement.`,
+        link: `/certificates/${domainId}`,
+        metadata: {
+          domainId,
+          completedAt: completion.completedAt.toISOString(),
+        },
+      }).catch(err => console.error('Failed to create completion notification:', err))
+      
+      revalidatePath('/dashboard')
+    }
+
     // Revalidate relevant paths
     revalidatePath(`/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
     revalidatePath(`/library/curriculum/${domainId}/${moduleId}`)
     revalidatePath(`/library/curriculum/${domainId}`)
     revalidatePath('/library')
+    revalidatePath('/dashboard')
 
-    return { success: true }
+    return { success: true, domainCompleted: !!completion }
   } catch (error) {
     console.error('Error marking lesson as completed:', error)
     return { success: false, error: 'Internal server error' }

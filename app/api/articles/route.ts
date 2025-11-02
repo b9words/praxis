@@ -1,5 +1,7 @@
-import { requireRole } from '@/lib/auth/authorize'
+
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { cache, CacheTags } from '@/lib/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -8,30 +10,44 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const competencyId = searchParams.get('competencyId')
 
-    const where: any = {}
-    if (status && status !== 'all') {
-      where.status = status
-    }
-    if (competencyId) {
-      where.competencyId = competencyId
-    }
+    // Cache articles list (15 minutes revalidate)
+    const getCachedArticles = cache(
+      async () => {
+        const where: any = {}
+        if (status && status !== 'all') {
+          where.status = status
+        }
+        if (competencyId) {
+          where.competencyId = competencyId
+        }
 
-    const articles = await prisma.article.findMany({
-      where,
-      include: {
-        competency: true,
-        creator: {
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
+        const articles = await prisma.article.findMany({
+          where,
+          include: {
+            competency: true,
+            creator: {
+              select: {
+                id: true,
+                username: true,
+                fullName: true,
+              },
+            },
           },
-        },
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+
+        return articles
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+      ['api', 'articles', status || 'all', competencyId || 'all'],
+      {
+        tags: [CacheTags.ARTICLES],
+        revalidate: 900, // 15 minutes
+      }
+    )
+
+    const articles = await getCachedArticles()
 
     return NextResponse.json({ articles })
   } catch (error: any) {
@@ -46,7 +62,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireRole(['editor', 'admin'])
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const body = await request.json()
 
     const {

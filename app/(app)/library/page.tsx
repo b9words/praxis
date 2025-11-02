@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getAllUserProgress, getUserReadingStats } from '@/lib/progress-tracking'
+import { getCachedUserData, cache, CacheTags } from '@/lib/cache'
 import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
@@ -30,8 +31,48 @@ export default async function LibraryPage() {
   }> = []
 
   if (user) {
-    userProgress = await getAllUserProgress(user.id)
-    readingStats = await getUserReadingStats(user.id)
+    // Cache user progress (2 minutes revalidate)
+    // Wrap in a function that ensures Map is preserved
+    const getCachedUserProgress = getCachedUserData(
+      user.id,
+      async () => {
+        const progress = await getAllUserProgress(user.id)
+        // Convert Map to array of entries for caching, then reconstruct Map
+        // This ensures the cache can serialize/deserialize properly
+        return Array.from(progress.entries())
+      },
+      ['progress', 'all'],
+      {
+        tags: [CacheTags.USER_PROGRESS],
+        revalidate: 120, // 2 minutes
+      }
+    )
+    
+    // Cache reading stats (2 minutes revalidate)
+    const getCachedReadingStats = getCachedUserData(
+      user.id,
+      () => getUserReadingStats(user.id),
+      ['reading', 'stats'],
+      {
+        tags: [CacheTags.USER_PROGRESS],
+        revalidate: 120, // 2 minutes
+      }
+    )
+    
+    const [cachedProgressEntries, cachedStats] = await Promise.all([
+      getCachedUserProgress(),
+      getCachedReadingStats(),
+    ])
+    
+    // Reconstruct Map from cached entries
+    if (Array.isArray(cachedProgressEntries)) {
+      userProgress = new Map(cachedProgressEntries)
+    } else {
+      // Fallback: ensure it's at least an empty Map
+      userProgress = new Map()
+    }
+    
+    readingStats = cachedStats
 
     // Get in-progress lessons
     const allLessons = getAllLessonsFlat()
@@ -84,9 +125,19 @@ export default async function LibraryPage() {
     })
   }
 
-  // Get recommended lessons (next lesson after completed ones, or first lesson of popular domains)
-  const allLessons = getAllLessonsFlat()
-  const recommendedLessons = allLessons.slice(0, 6) // For now, just show first 6 lessons
+  // Cache recommended lessons (15 minutes revalidate)
+  const getCachedRecommendedLessons = cache(
+    () => {
+      const allLessons = getAllLessonsFlat()
+      return allLessons.slice(0, 6) // For now, just show first 6 lessons
+    },
+    ['library', 'recommended', 'lessons'],
+    {
+      tags: [CacheTags.CURRICULUM],
+      revalidate: 900, // 15 minutes
+    }
+  )
+  const recommendedLessons = await getCachedRecommendedLessons()
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -365,7 +416,7 @@ export default async function LibraryPage() {
                             <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-neutral-600">
                               Review
                             </Button>
-                </div>
+                          </div>
                         </div>
                       </div>
                     </Link>
@@ -375,14 +426,13 @@ export default async function LibraryPage() {
             ) : (
               <div className="bg-neutral-50 border border-neutral-200 p-4">
                 <div className="text-center py-8">
-                    <BookOpen className="mx-auto h-8 w-8 text-neutral-400 mb-3" />
-                    <h3 className="text-sm font-medium text-neutral-900 mb-1">No recent activity</h3>
-                    <p className="text-sm text-neutral-500">
-                      Start a lesson to see your progress here
-                    </p>
+                  <BookOpen className="mx-auto h-8 w-8 text-neutral-400 mb-3" />
+                  <h3 className="text-sm font-medium text-neutral-900 mb-1">No recent activity</h3>
+                  <p className="text-sm text-neutral-500">
+                    Start a lesson to see your progress here
+                  </p>
+                </div>
               </div>
-                      </div>
-                    </div>
             )}
           </div>
         </div>

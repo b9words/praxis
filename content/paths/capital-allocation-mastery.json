@@ -1,0 +1,43 @@
+{
+  "id": "capital-allocation-mastery",
+  "title": "Capital Allocation Mastery",
+  "description": "The CEO's core discipline: allocating capital for maximum per-share value",
+  "duration": "2 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "ceo-as-investor-foundational-mindset",
+      "lesson": "five-choices"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "ceo-as-investor-foundational-mindset",
+      "lesson": "primacy-per-share-value"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "intrinsic-value-calculation",
+      "lesson": "owners-earnings-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "reinvestment-decision-framework",
+      "lesson": "organic-growth-capital-allocation"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "acquisition-strategy",
+      "lesson": "m-a-strategic-rationale"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_04_netflix_content_strategy_2019"
+    }
+  ]
+}
+

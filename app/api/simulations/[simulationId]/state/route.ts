@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/auth/authorize'
+import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -7,7 +7,11 @@ export async function PUT(
   { params }: { params: Promise<{ simulationId: string }> }
 ) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { simulationId } = await params
     const body = await request.json()
 
@@ -75,7 +79,11 @@ export async function GET(
   { params }: { params: Promise<{ simulationId: string }> }
 ) {
   try {
-    const user = await requireAuth()
+    const { getCurrentUser } = await import('@/lib/auth/get-user')
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+    }
     const { simulationId } = await params
 
     // Verify simulation ownership

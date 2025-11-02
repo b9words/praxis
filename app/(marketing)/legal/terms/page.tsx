@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service - Praxis',
-  description: 'Terms of Service for Praxis Platform',
+  title: 'Terms of Service - Execemy',
+  description: 'Terms of Service for Execemy Platform',
   robots: {
     index: true,
     follow: true,
@@ -27,7 +27,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
           <p>
-            By accessing and using Praxis Platform ("Service"), you accept and agree to be bound by the terms
+            By accessing and using Execemy Platform ("Service"), you accept and agree to be bound by the terms
             and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
         </section>
@@ -35,7 +35,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">2. Description of Service</h2>
           <p>
-            Praxis Platform provides executive education and business simulation services. We reserve the right
+            Execemy Platform provides executive education and business simulation services. We reserve the right
             to modify, suspend, or discontinue any part of the Service at any time with or without notice.
           </p>
         </section>
@@ -67,7 +67,7 @@ export default function TermsOfServicePage() {
           <h2 className="text-2xl font-semibold mb-4">5. Intellectual Property</h2>
           <p>
             All content, features, and functionality of the Service, including but not limited to text, graphics,
-            logos, and software, are the exclusive property of Praxis Platform and are protected by international
+            logos, and software, are the exclusive property of Execemy Platform and are protected by international
             copyright, trademark, and other intellectual property laws.
           </p>
         </section>
@@ -104,7 +104,7 @@ export default function TermsOfServicePage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">9. Limitation of Liability</h2>
           <p>
-            To the fullest extent permitted by law, Praxis Platform shall not be liable for any indirect,
+            To the fullest extent permitted by law, Execemy Platform shall not be liable for any indirect,
             incidental, special, consequential, or punitive damages resulting from your use of the Service.
           </p>
         </section>
@@ -131,8 +131,8 @@ export default function TermsOfServicePage() {
           <h2 className="text-2xl font-semibold mb-4">12. Contact Information</h2>
           <p>
             If you have any questions about these Terms of Service, please contact us at{' '}
-            <a href="mailto:legal@praxisplatform.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
-              legal@praxisplatform.com
+            <a href="mailto:legal@execemy.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
+              legal@execemy.com
             </a>
           </p>
         </section>

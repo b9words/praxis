@@ -73,7 +73,13 @@ export default function ResidencySelector({ currentResidency, userId }: Residenc
     onSuccess: (_, year) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user.progress() })
       toast.success(`Welcome to ${RESIDENCIES[year - 1].title}!`)
-      router.push('/dashboard')
+      
+      // Cookie is already set by API route in response headers
+      // Set client-side cookie as backup
+      document.cookie = `onboarding_complete=1; path=/; max-age=30; SameSite=Lax`
+      
+      // Redirect - API route set cookie in response, this ensures it's available
+      window.location.reload()
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to select residency')

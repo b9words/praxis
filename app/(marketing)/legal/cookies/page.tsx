@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy - Praxis',
-  description: 'Cookie Policy for Praxis Platform',
+  title: 'Cookie Policy - Execemy',
+  description: 'Cookie Policy for Execemy Platform',
   robots: {
     index: true,
     follow: true,
@@ -99,8 +99,8 @@ export default function CookiePolicyPage() {
           <h2 className="text-2xl font-semibold mb-4">7. Contact Us</h2>
           <p>
             If you have questions about our use of cookies, please contact us at{' '}
-            <a href="mailto:privacy@praxisplatform.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
-              privacy@praxisplatform.com
+            <a href="mailto:privacy@execemy.com" className="text-neutral-700 hover:text-neutral-900 transition-colors">
+              privacy@execemy.com
             </a>
           </p>
         </section>

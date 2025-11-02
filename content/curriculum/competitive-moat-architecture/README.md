@@ -98,4 +98,4 @@ Managing multiple moats and complex business portfolios.
 **Total Lessons:** 24  
 **Estimated Completion Time:** 288 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

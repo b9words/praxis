@@ -309,7 +309,7 @@ INSERT INTO forum_channels (id, name, description, slug, created_at, updated_at)
 
 -- Insert forum threads
 INSERT INTO forum_threads (id, channel_id, author_id, title, content, is_pinned, metadata, created_at, updated_at) VALUES
-  ('thread-1', 'channel-1', 'test-user-1', 'Welcome to the Praxis Community!', 
+  ('thread-1', 'channel-1', 'test-user-1', 'Welcome to the Execemy Community!', 
    'Welcome everyone! I''m excited to be part of this community of ambitious professionals. Looking forward to learning and growing together.', 
    true, '{"type": "welcome"}', NOW(), NOW()),
   
@@ -364,7 +364,7 @@ INSERT INTO debriefs (id, simulation_id, scores, summary_text, radar_chart_data,
 INSERT INTO notifications (id, user_id, type, title, message, read, link, metadata, created_at, updated_at) VALUES
   ('notif-1', 'test-user-1', 'simulation_complete', 'Simulation Complete!', 'Your Market Positioning Dilemma simulation has been completed. View your debrief to see your performance analysis.', false, '/debrief/sim-1', '{"simulation_id": "sim-1"}', NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
   ('notif-2', 'test-user-1', 'forum_reply', 'New Reply', 'testadmin replied to your thread "Unit Economics Case - Key Insights"', false, '/community/case-studies/thread-2', '{"thread_id": "thread-2", "post_id": "post-3"}', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day'),
-  ('notif-3', 'test-user-1', 'general', 'Welcome to Praxis!', 'Welcome to the Praxis Platform! Complete your first lesson to get started.', true, '/library', '{}', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days');
+  ('notif-3', 'test-user-1', 'general', 'Welcome to Execemy!', 'Welcome to the Execemy Platform! Complete your first lesson to get started.', true, '/library', '{}', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days');
 
 -- Insert subscription (for test-user-1)
 INSERT INTO subscriptions (id, user_id, paddle_subscription_id, paddle_plan_id, status, current_period_start, current_period_end, created_at, updated_at) VALUES

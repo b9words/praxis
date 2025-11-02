@@ -79,4 +79,4 @@ Embedding second-order thinking into organizational processes and culture.
 **Total Lessons:** 19  
 **Estimated Completion Time:** 228 minutes reading
 
-*Part of the Praxis Executive Education Curriculum*
+*Part of the Execemy Executive Education Curriculum*

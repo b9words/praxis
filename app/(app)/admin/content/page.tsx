@@ -1,37 +1,71 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { requireRole } from '@/lib/auth/authorize'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import ContentManagementEnhanced from '@/components/admin/ContentManagementEnhanced'
 import { prisma } from '@/lib/prisma/server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 
 export default async function AdminContentPage() {
-  try {
-    await requireRole(['admin', 'editor'])
-  } catch {
-    redirect('/dashboard')
-  }
+  // Cache content queries for better performance
+  const { cache, CacheTags } = await import('@/lib/cache')
+  
+  const getCachedContent = cache(
+    async () => {
+      const [articles, cases] = await Promise.all([
+        // Fetch articles grouped by status (with content for preview)
+        prisma.article.findMany({
+          include: {
+            competency: {
+              select: {
+                name: true,
+              },
+            },
+            creator: {
+              select: {
+                username: true,
+              },
+            },
+            updater: {
+              select: {
+                username: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        }),
 
-  // Fetch articles grouped by status
-  const articles = await prisma.article.findMany({
-    include: {
-      competency: {
-        select: {
-          name: true,
-        },
-      },
+        // Fetch cases grouped by status (with content for preview)
+        prisma.case.findMany({
+          include: {
+            creator: {
+              select: {
+                username: true,
+              },
+            },
+            updater: {
+              select: {
+                username: true,
+              },
+            },
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+        }),
+      ])
+      
+      return { articles, cases }
     },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
-
-  // Fetch cases grouped by status
-  const cases = await prisma.case.findMany({
-    orderBy: {
-      updatedAt: 'desc',
-    },
-  })
+    ['admin', 'content'],
+    {
+      tags: [CacheTags.ARTICLES, CacheTags.CASES],
+      revalidate: 60, // 1 minute - content changes more frequently
+    }
+  )
+  
+  const { articles, cases } = await getCachedContent()
 
   const statusGroups = ['draft', 'in_review', 'approved', 'published']
 
@@ -61,96 +95,131 @@ export default async function AdminContentPage() {
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {statusGroups.map((status) => (
-          <div key={status} className="space-y-4">
-            <div className="border-b border-gray-200 pb-3">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-medium text-gray-900 capitalize">
-                  {status.replace('_', ' ')}
-                </h2>
-                <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
-                  {groupArticlesByStatus(status).length + groupCasesByStatus(status).length}
-                </Badge>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              {/* Articles */}
-              {groupArticlesByStatus(status).map((article) => (
-                <div key={article.id} className="space-y-2">
-                  <Link href={`/admin/content/edit/${article.id}?type=article`}>
-                    <div className="bg-white border border-gray-200 p-4 hover:border-gray-300 transition-colors cursor-pointer">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <Badge variant="outline" className="text-xs font-medium text-gray-600 border-gray-300 mb-2">
-                            Article
-                          </Badge>
-                          <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">{article.title}</h3>
-                          <p className="text-xs text-gray-500">{article.competency.name}</p>
-                          {article.storagePath && (
-                            <p className="text-xs text-gray-400 mt-1 font-mono">
-                              {article.storagePath}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                  {article.storagePath && (
-                    <Button asChild variant="outline" size="sm" className="w-full border-gray-300 rounded-none text-xs">
-                      <Link href={`/admin/edit?path=${article.storagePath}&type=article`}>
-                        Edit File in Storage
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              ))}
-
-              {/* Cases */}
-              {groupCasesByStatus(status).map((caseItem) => (
-                <div key={caseItem.id} className="space-y-2">
-                  <Link href={`/admin/content/edit/${caseItem.id}?type=case`}>
-                    <div className="bg-white border border-gray-200 p-4 hover:border-gray-300 transition-colors cursor-pointer">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <Badge variant="outline" className="text-xs font-medium text-gray-600 border-gray-300 mb-2">
-                            Case
-                          </Badge>
-                          <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">{caseItem.title}</h3>
-                          <p className="text-xs text-gray-500">
-                            {new Date(caseItem.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </p>
-                          {caseItem.storagePath && (
-                            <p className="text-xs text-gray-400 mt-1 font-mono">
-                              {caseItem.storagePath}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                  {caseItem.storagePath && (
-                    <Button asChild variant="outline" size="sm" className="w-full border-gray-300 rounded-none text-xs">
-                      <Link href={`/admin/edit?path=${caseItem.storagePath}&type=case`}>
-                        Edit File in Storage
-                      </Link>
-                    </Button>
-                  )}
-                </div>
-              ))}
-
-              {groupArticlesByStatus(status).length === 0 &&
-                groupCasesByStatus(status).length === 0 && (
-                  <div className="bg-white border border-dashed border-gray-200 p-8 text-center">
-                    <p className="text-xs text-gray-400">No content</p>
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList>
+          <TabsTrigger value="list">List View</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
+        </TabsList>
+        <TabsContent value="list" className="mt-6">
+          <ContentManagementEnhanced
+            articles={articles.map((a) => ({
+              id: a.id,
+              type: 'article' as const,
+              title: a.title,
+              status: a.status,
+              updatedAt: a.updatedAt,
+              competency: a.competency,
+              storagePath: a.storagePath,
+              content: a.content || undefined,
+              creator: a.creator,
+              updater: a.updater,
+            }))}
+            cases={cases.map((c) => ({
+              id: c.id,
+              type: 'case' as const,
+              title: c.title,
+              status: c.status,
+              updatedAt: c.updatedAt,
+              storagePath: c.storagePath,
+              briefingDoc: c.briefingDoc || undefined,
+              creator: c.creator,
+              updater: c.updater,
+            }))}
+          />
+        </TabsContent>
+        <TabsContent value="kanban" className="mt-6">
+          {/* Original Kanban Board */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {statusGroups.map((status) => (
+              <div key={status} className="space-y-4">
+                <div className="border-b border-gray-200 pb-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-base font-medium text-gray-900 capitalize">
+                      {status.replace('_', ' ')}
+                    </h2>
+                    <Badge variant="outline" className="text-xs font-medium text-gray-700 border-gray-300">
+                      {groupArticlesByStatus(status).length + groupCasesByStatus(status).length}
+                    </Badge>
                   </div>
-                )}
-            </div>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Articles */}
+                  {groupArticlesByStatus(status).map((article) => (
+                    <div key={article.id} className="space-y-2">
+                      <Link href={`/admin/content/edit/${article.id}?type=article`}>
+                        <div className="bg-white border border-gray-200 p-4 hover:border-gray-300 transition-colors cursor-pointer">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <Badge variant="outline" className="text-xs font-medium text-gray-600 border-gray-300 mb-2">
+                                Article
+                              </Badge>
+                              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">{article.title}</h3>
+                              <p className="text-xs text-gray-500">{article.competency.name}</p>
+                              {article.storagePath && (
+                                <p className="text-xs text-gray-400 mt-1 font-mono">
+                                  {article.storagePath}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                      {article.storagePath && (
+                        <Button asChild variant="outline" size="sm" className="w-full border-gray-300 rounded-none text-xs">
+                          <Link href={`/admin/edit?path=${article.storagePath}&type=article`}>
+                            Edit File in Storage
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Cases */}
+                  {groupCasesByStatus(status).map((caseItem) => (
+                    <div key={caseItem.id} className="space-y-2">
+                      <Link href={`/admin/content/edit/${caseItem.id}?type=case`}>
+                        <div className="bg-white border border-gray-200 p-4 hover:border-gray-300 transition-colors cursor-pointer">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <Badge variant="outline" className="text-xs font-medium text-gray-600 border-gray-300 mb-2">
+                                Case
+                              </Badge>
+                              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">{caseItem.title}</h3>
+                              <p className="text-xs text-gray-500">
+                                {new Date(caseItem.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </p>
+                              {caseItem.storagePath && (
+                                <p className="text-xs text-gray-400 mt-1 font-mono">
+                                  {caseItem.storagePath}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                      {caseItem.storagePath && (
+                        <Button asChild variant="outline" size="sm" className="w-full border-gray-300 rounded-none text-xs">
+                          <Link href={`/admin/edit?path=${caseItem.storagePath}&type=case`}>
+                            Edit File in Storage
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+
+                  {groupArticlesByStatus(status).length === 0 &&
+                    groupCasesByStatus(status).length === 0 && (
+                      <div className="bg-white border border-dashed border-gray-200 p-8 text-center">
+                        <p className="text-xs text-gray-400">No content</p>
+                      </div>
+                    )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useState } from 'react'
 
 interface ScoreRevealProps {
   competencyName: string
@@ -7,6 +9,11 @@ interface ScoreRevealProps {
   maxScore: number
   justification: string
   delay: number
+  rubricCriteria?: {
+    description?: string
+    scoring?: Record<string, string>
+    weight?: number
+  }
 }
 
 export default function ScoreReveal({ 
@@ -14,8 +21,10 @@ export default function ScoreReveal({
   score, 
   maxScore, 
   justification, 
-  delay 
+  delay,
+  rubricCriteria
 }: ScoreRevealProps) {
+  const [showRubric, setShowRubric] = useState(false)
   const percentage = (score / maxScore) * 100
 
   const getPerformanceLabel = () => {
@@ -25,6 +34,16 @@ export default function ScoreReveal({
     if (percentage >= 20) return 'Needs Work'
     return 'Critical Gap'
   }
+
+  // Get the rubric description for the score level
+  const getScoreLevelCriteria = () => {
+    if (!rubricCriteria?.scoring) return null
+    
+    const scoreKey = Math.round(score).toString()
+    return rubricCriteria.scoring[scoreKey] || null
+  }
+
+  const scoreLevelCriteria = getScoreLevelCriteria()
 
   return (
     <div className="bg-white border border-gray-200">
@@ -57,7 +76,80 @@ export default function ScoreReveal({
         </div>
         
         {/* Justification */}
-        <p className="text-sm text-gray-600 leading-relaxed">{justification}</p>
+        <p className="text-sm text-gray-600 leading-relaxed mb-4">{justification}</p>
+
+        {/* Rubric Criteria Section */}
+        {rubricCriteria && (
+          <div className="border-t border-gray-200 pt-4">
+            <button
+              onClick={() => setShowRubric(!showRubric)}
+              className="flex items-center justify-between w-full text-left text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              <span>View Rubric Criteria</span>
+              {showRubric ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+            
+            {showRubric && (
+              <div className="mt-4 space-y-4">
+                {rubricCriteria.description && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-2">
+                      Competency Description
+                    </h4>
+                    <p className="text-sm text-gray-600">{rubricCriteria.description}</p>
+                  </div>
+                )}
+                
+                {rubricCriteria.scoring && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">
+                      Scoring Criteria
+                    </h4>
+                    <div className="space-y-2">
+                      {Object.entries(rubricCriteria.scoring)
+                        .sort(([a], [b]) => parseInt(b) - parseInt(a)) // Sort 5 to 1
+                        .map(([level, criteria]) => {
+                          const isCurrentLevel = Math.round(score).toString() === level
+                          return (
+                            <div
+                              key={level}
+                              className={`p-3 border rounded ${
+                                isCurrentLevel
+                                  ? 'border-gray-900 bg-gray-50'
+                                  : 'border-gray-200 bg-white'
+                              }`}
+                            >
+                              <div className="flex items-start justify-between mb-1">
+                                <span className="text-xs font-semibold text-gray-900">
+                                  Score {level}/5
+                                </span>
+                                {isCurrentLevel && (
+                                  <span className="text-xs font-medium text-gray-600 bg-gray-200 px-2 py-0.5 rounded">
+                                    Your Score
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{criteria}</p>
+                            </div>
+                          )
+                        })}
+                    </div>
+                  </div>
+                )}
+                
+                {rubricCriteria.weight !== undefined && (
+                  <div className="text-xs text-gray-500">
+                    <span className="font-medium">Weight:</span> {(rubricCriteria.weight * 100).toFixed(0)}%
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

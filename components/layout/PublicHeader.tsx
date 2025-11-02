@@ -7,7 +7,7 @@ export default function PublicHeader() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="text-lg font-semibold text-neutral-900 tracking-tight relative">
-            Praxis
+            Execemy
             <div className="absolute -bottom-1 left-0 w-full h-[0.5px] bg-neutral-900"></div>
           </Link>
           <div className="flex gap-4">

@@ -1,4 +1,4 @@
-# Praxis Executive Education Curriculum
+# Execemy Executive Education Curriculum
 
 A comprehensive curriculum for developing world-class CEOs and senior executives.
 

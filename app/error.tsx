@@ -41,7 +41,7 @@ export default function Error({
               )}
               <div className="flex gap-3 justify-center">
                 <Button onClick={reset} className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">Retry</Button>
-                <Button variant="outline" onClick={() => window.location.href = '/dashboard'} className="border-neutral-300 hover:border-neutral-400 rounded-none">
+                <Button variant="outline" onClick={() => window.location.href = '/'} className="border-neutral-300 hover:border-neutral-400 rounded-none">
                   Return to Dashboard
                 </Button>
               </div>

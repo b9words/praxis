@@ -44,7 +44,11 @@ export const CacheTags = {
   ARTICLES: 'articles',
   CASES: 'cases',
   USER_PROGRESS: 'user-progress',
-  FORUM: 'forum',
+  USERS: 'users',
+  SIMULATIONS: 'simulations',
+  DASHBOARD: 'dashboard',
+  ADMIN: 'admin',
+  SYSTEM: 'system',
 } as const
 
 /**
@@ -165,5 +169,24 @@ export async function revalidateCaseCache(caseId: string) {
  */
 export async function revalidateCurriculumCache() {
   await revalidateCache(CacheTags.CURRICULUM)
+}
+
+/**
+ * Cache user-specific data with userId in cache key
+ * @param userId - User ID to include in cache key
+ * @param fn - The function to cache
+ * @param keyParts - Array of strings to form the cache key (userId will be prepended)
+ * @param options - Cache options (tags for invalidation, revalidate time)
+ */
+export function getCachedUserData<T>(
+  userId: string,
+  fn: () => Promise<T> | T,
+  keyParts: string[],
+  options: CacheOptions = {}
+): () => Promise<T> {
+  return cache(fn, ['user', userId, ...keyParts], {
+    ...options,
+    tags: [...(options.tags || []), `user-${userId}`],
+  })
 }
 

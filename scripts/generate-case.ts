@@ -1,22 +1,30 @@
 #!/usr/bin/env tsx
 
 /**
- * Generate next missing case study from curriculum
+ * Generate case studies - supports two modes:
  * 
- * Usage:
+ * 1. Curriculum-based generation (original):
  *   tsx scripts/generate-case.ts
  *   tsx scripts/generate-case.ts --domain domain-id --module module-id --lesson lesson-id
  *   tsx scripts/generate-case.ts --year 1
+ * 
+ * 2. Manifest-based generation (Phase 1 - new "Cyborg" workflow):
+ *   tsx scripts/generate-case.ts --topic "Disney's 2017 Streaming Pivot" --case-id cs_disney_streaming_pivot
  */
 
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { getAllLessonsFlat } from '../lib/curriculum-data'
-import { articleExists, caseExists, generateWithAI, getCoreValuesPrompt, syncFileMetadata, uploadToStorage } from './generate-shared'
+import { articleExists, caseExists, generateAndUploadThumbnail, generateWithAI, getCoreValuesPrompt, isSupabaseAvailable, syncFileMetadata, uploadToStorage } from './generate-shared'
 
 interface GenerateOptions {
   domain?: string
   module?: string
   lesson?: string
   year?: number
+  topic?: string
+  caseId?: string
 }
 
 /**
@@ -283,9 +291,125 @@ function validateCaseJSON(data: any): { valid: boolean; errors: string[] } {
 }
 
 /**
+ * Phase 1: Generate manifest for AI-assisted case study
+ */
+async function generateManifest(topic: string, caseId: string) {
+  console.log('🔍 Case Study Manifest Generation (Phase 1)\n')
+  console.log('===========================================\n')
+  
+  console.log(`📝 Topic: ${topic}`)
+  console.log(`🆔 Case ID: ${caseId}\n`)
+  
+  const coreValues = getCoreValuesPrompt()
+  
+  const prompt = `You are a senior analyst at a top-tier consulting firm preparing a case study for an executive education program. For the topic **'${topic}'**, generate a **'Case File Manifest'**. This manifest must be a JSON object listing 5-7 specific, real-world documents that are essential for understanding this business decision.
+
+For each document, provide:
+1. A unique \`fileId\` (e.g., 'financials_2017').
+2. A descriptive \`fileName\` (e.g., 'Disney_Media_Networks_Financials_2017.csv').
+3. A \`fileType\` ('SEC_FILING_TABLE', 'ANALYST_REPORT_SNAPSHOT', 'INTERNAL_MEMO_SYNTHESIS', 'MARKET_DATA_CHART').
+4. A detailed \`sourcingGuide\` with keywords, potential URLs (like sec.gov/edgar), and instructions on what specific data to look for.
+5. A \`synthesisInstruction\` explaining how this piece of evidence should be used in the final case narrative.
+
+OUTPUT FORMAT (valid JSON only):
+{
+  "caseId": "${caseId}",
+  "topic": "${topic}",
+  "files": [
+    {
+      "fileId": "financials_2017",
+      "fileName": "Company_Financials_2017.csv",
+      "fileType": "SEC_FILING_TABLE",
+      "sourcingGuide": "Go to SEC EDGAR database (sec.gov/edgar). Search for the company's 10-K filing for 2017. Locate the 'Segment Information' table in the financial statements. Extract the table and save as CSV with these specific columns: [list columns].",
+      "synthesisInstruction": "Use this data to quantify the revenue streams that would be impacted by the decision. Highlight the margin differences between segments."
+    }
+  ]
+}
+
+REQUIREMENTS:
+- Include 5-7 files total
+- Mix of file types: at least 2 financial data sources, 1-2 analyst reports or market data, 1-2 internal memos or communications
+- Each sourcingGuide must be actionable and specific (with URLs, exact table names, section references)
+- Each synthesisInstruction should explain the strategic importance of this evidence
+
+${coreValues}
+
+CRITICAL: Output ONLY valid JSON, no markdown formatting, no explanations. The JSON must be parseable.`
+
+  const systemPrompt = 'You are a senior analyst at a top-tier consulting firm. Create detailed, actionable research manifests for executive education case studies.'
+  
+  console.log('🤖 Generating manifest with AI...')
+  const result = await generateWithAI(prompt, systemPrompt)
+  let manifestStr = result.content
+  console.log(`✅ Manifest generated (${result.model})\n`)
+  
+  // Clean JSON
+  manifestStr = manifestStr.trim()
+  if (manifestStr.startsWith('```json')) {
+    manifestStr = manifestStr.replace(/^```json\n?/, '').replace(/\n?```$/, '')
+  } else if (manifestStr.startsWith('```')) {
+    manifestStr = manifestStr.replace(/^```\n?/, '').replace(/\n?```$/, '')
+  }
+  
+  // Parse JSON
+  let manifest: any
+  try {
+    manifest = JSON.parse(manifestStr)
+  } catch (error) {
+    console.error('❌ Failed to parse manifest JSON:', error)
+    console.error('Raw output (first 500 chars):', manifestStr.substring(0, 500))
+    throw new Error('Invalid manifest JSON generated')
+  }
+  
+  // Ensure caseId matches
+  manifest.caseId = caseId
+  manifest.topic = topic
+  
+  // Validate
+  if (!manifest.files || !Array.isArray(manifest.files) || manifest.files.length < 5) {
+    throw new Error(`Invalid manifest: need at least 5 files, got ${manifest.files?.length || 0}`)
+  }
+  
+  // Save manifest
+  const __filename = fileURLToPath(import.meta.url)
+  const __dirname = path.dirname(__filename)
+  const sourcesDir = path.join(__dirname, '..', 'content', 'sources')
+  
+  if (!fs.existsSync(sourcesDir)) {
+    fs.mkdirSync(sourcesDir, { recursive: true })
+  }
+  
+  const manifestPath = path.join(sourcesDir, `${caseId}-manifest.json`)
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf-8')
+  
+  console.log('✅ Manifest saved!')
+  console.log(`📁 Location: ${manifestPath}\n`)
+  console.log('📋 Next Steps (Phase 2 - Manual Evidence Gathering):')
+  console.log(`\n1. Create source directory:`)
+  console.log(`   mkdir -p content/sources/${caseId}`)
+  console.log(`\n2. Source each file listed in the manifest:`)
+  manifest.files.forEach((file: any, index: number) => {
+    console.log(`\n   File ${index + 1}: ${file.fileName}`)
+    console.log(`   Type: ${file.fileType}`)
+    console.log(`   Guide: ${file.sourcingGuide.substring(0, 100)}...`)
+    console.log(`   Save to: content/sources/${caseId}/${file.fileName}`)
+  })
+  console.log(`\n3. After sourcing all files, run Phase 3:`)
+  console.log(`   tsx scripts/assemble-case.ts --case-id ${caseId}`)
+}
+
+/**
  * Main generation function
  */
 async function generateCase(options: GenerateOptions = {}) {
+  // Check if this is manifest generation (Phase 1)
+  if (options.topic) {
+    const caseId = options.caseId || `cs_${options.topic.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`
+    await generateManifest(options.topic, caseId)
+    return
+  }
+  
+  // Otherwise, proceed with curriculum-based generation
   const { domain: domainId, module: moduleId, lesson: lessonId, year = 1 } = options
   
   console.log('🎯 Case Study Generation Script\n')
@@ -381,6 +505,39 @@ async function generateCase(options: GenerateOptions = {}) {
     // Don't throw - file is uploaded successfully
   }
   
+  // Generate thumbnail if metadata sync succeeded
+  const caseId = syncResult?.case_id
+  if (caseId && isSupabaseAvailable()) {
+    try {
+      // Get domain name from lesson data
+      const domainMapping: Record<string, string> = {
+        'financial': 'Financial Acumen',
+        'strategic': 'Strategic Thinking',
+        'market': 'Market Awareness',
+        'risk': 'Risk Management',
+        'leadership': 'Leadership Judgment',
+      }
+      
+      // Try to infer domain from competencies or lesson
+      const competencies = caseData.competencies || []
+      const competencyName = competencies[0] || ''
+      const domainName = Object.entries(domainMapping).find(([key]) => 
+        competencyName.toLowerCase().includes(key) || lesson.domainTitle.toLowerCase().includes(key)
+      )?.[1] || lesson.domainTitle || 'Business Strategy'
+      
+      await generateAndUploadThumbnail(
+        caseId,
+        'case',
+        caseData.title,
+        domainName,
+        competencyName
+      )
+    } catch (thumbError: any) {
+      console.warn(`⚠️  Thumbnail generation failed: ${thumbError.message}`)
+      console.warn(`   Thumbnail can be generated later via the admin UI\n`)
+    }
+  }
+  
   // Output review links
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
   console.log('✅ Generation complete!\n')
@@ -396,7 +553,13 @@ const args = process.argv.slice(2)
 const options: GenerateOptions = {}
 
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--domain' && args[i + 1]) {
+  if (args[i] === '--topic' && args[i + 1]) {
+    options.topic = args[i + 1]
+    i++
+  } else if (args[i] === '--case-id' && args[i + 1]) {
+    options.caseId = args[i + 1]
+    i++
+  } else if (args[i] === '--domain' && args[i + 1]) {
     options.domain = args[i + 1]
     i++
   } else if (args[i] === '--module' && args[i + 1]) {

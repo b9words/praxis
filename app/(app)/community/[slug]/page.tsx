@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { cache, CacheTags } from '@/lib/cache'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -14,62 +15,43 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
 
   const { slug } = await params
 
-  // Fetch channel with error handling
-  let channel = null
-  try {
-    channel = await prisma.forumChannel.findUnique({
-      where: { slug },
-    })
-  } catch (error) {
-    console.error('Error fetching channel:', error)
-    notFound()
-  }
+  // Cache channel lookup (15 minutes revalidate)
+  const getCachedChannel = cache(
+    async () => {
+      let channel = null
+      try {
+        channel = await prisma.forumChannel.findUnique({
+          where: { slug },
+        })
+      } catch (error) {
+        console.error('Error fetching channel:', error)
+        return null
+      }
+      return channel
+    },
+    ['forum', 'channel', slug],
+    {
+      tags: [CacheTags.FORUM],
+      revalidate: 900, // 15 minutes
+    }
+  )
+
+  const channel = await getCachedChannel()
 
   if (!channel) {
     notFound()
   }
 
-  // Fetch threads in this channel with error handling
-  let threads: any[] = []
-  try {
-    threads = await prisma.forumThread.findMany({
-      where: {
-        channelId: channel.id,
-      },
-      include: {
-        author: {
-          select: {
-            username: true,
-            avatarUrl: true,
-          },
-        },
-        _count: {
-          select: {
-            posts: true,
-          },
-        },
-      },
-      orderBy: [
-        { isPinned: 'desc' },
-        { updatedAt: 'desc' },
-      ],
-    })
-  } catch (error: any) {
-    // Handle missing metadata column (P2022) or other schema issues
-    if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
+  // Cache threads in this channel (2 minutes revalidate)
+  const getCachedThreads = cache(
+    async () => {
+      let threads: any[] = []
       try {
-        // Fallback: explicit select without problematic columns
         threads = await prisma.forumThread.findMany({
           where: {
             channelId: channel.id,
           },
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            isPinned: true,
-            createdAt: true,
-            updatedAt: true,
+          include: {
             author: {
               select: {
                 username: true,
@@ -87,13 +69,56 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
             { updatedAt: 'desc' },
           ],
         })
-      } catch (fallbackError) {
-        console.error('Error fetching threads (fallback):', fallbackError)
+      } catch (error: any) {
+        // Handle missing metadata column (P2022) or other schema issues
+        if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
+          try {
+            // Fallback: explicit select without problematic columns
+            threads = await prisma.forumThread.findMany({
+              where: {
+                channelId: channel.id,
+              },
+              select: {
+                id: true,
+                title: true,
+                content: true,
+                isPinned: true,
+                createdAt: true,
+                updatedAt: true,
+                author: {
+                  select: {
+                    username: true,
+                    avatarUrl: true,
+                  },
+                },
+                _count: {
+                  select: {
+                    posts: true,
+                  },
+                },
+              },
+              orderBy: [
+                { isPinned: 'desc' },
+                { updatedAt: 'desc' },
+              ],
+            })
+          } catch (fallbackError) {
+            console.error('Error fetching threads (fallback):', fallbackError)
+          }
+        } else {
+          console.error('Error fetching threads:', error)
+        }
       }
-    } else {
-      console.error('Error fetching threads:', error)
+      return threads
+    },
+    ['forum', 'threads', 'channel', channel.id],
+    {
+      tags: [CacheTags.FORUM, CacheTags.COMMUNITY],
+      revalidate: 120, // 2 minutes
     }
-  }
+  )
+
+  const threads = await getCachedThreads()
 
   return (
     <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
@@ -152,6 +177,4 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
       )}
     </div>
   )
-}
-
 }

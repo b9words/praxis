@@ -111,6 +111,9 @@ export async function ensureProfileExists(
           avatarUrl: avatarUrlValue,
           role: roleValue,
         },
+        select: {
+          id: true,
+        },
       })
       
       profile = await prisma.profile.findUnique({
@@ -122,8 +125,46 @@ export async function ensureProfileExists(
         return { id: profile.id, role: profile.role as UserRole }
       }
     } catch (prismaError: any) {
-      // Ignore FK errors - profile might exist
-      if (prismaError.code !== 'P2002' && prismaError.code !== 'P2010') {
+      // Handle missing columns (P2022) or FK errors
+      if (prismaError.code === 'P2022' || prismaError.message?.includes('does not exist')) {
+        // Column doesn't exist - try with minimal data
+        try {
+          await prisma.profile.create({
+            data: {
+              id: userId,
+              username: uniqueUsername,
+              role: roleValue,
+            },
+            select: {
+              id: true,
+            },
+          })
+          
+          profile = await prisma.profile.findUnique({
+            where: { id: userId },
+            select: { id: true, role: true },
+          })
+          
+          if (profile) {
+            return { id: profile.id, role: profile.role as UserRole }
+          }
+        } catch (fallbackError: any) {
+          // Ignore if profile already exists
+          if (fallbackError.code === 'P2002') {
+            profile = await prisma.profile.findUnique({
+              where: { id: userId },
+              select: { id: true, role: true },
+            })
+            if (profile) {
+              return { id: profile.id, role: profile.role as UserRole }
+            }
+          }
+          logOnce(`profile_creation_prisma_fallback_${userId}`, 'error', 'Prisma profile creation fallback failed', {
+            code: fallbackError.code,
+            userId,
+          })
+        }
+      } else if (prismaError.code !== 'P2002' && prismaError.code !== 'P2010') {
         logOnce(`profile_creation_prisma_${userId}`, 'error', 'Prisma profile creation failed', {
           code: prismaError.code,
           userId,

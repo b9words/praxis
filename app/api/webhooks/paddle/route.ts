@@ -352,6 +352,59 @@ export async function POST(request: NextRequest) {
             },
           })
           break
+
+        case 'subscription.paused':
+          await prisma.subscription.updateMany({
+            where: { paddleSubscriptionId },
+            data: {
+              status: 'paused',
+              updatedAt: new Date(),
+            },
+          })
+          break
+
+        case 'subscription.past_due':
+          await prisma.subscription.updateMany({
+            where: { paddleSubscriptionId },
+            data: {
+              status: 'past_due',
+              updatedAt: new Date(),
+            },
+          })
+          
+          // Optionally send notification email for past due
+          try {
+            const supabaseAdmin = createClient(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!,
+              {
+                auth: {
+                  autoRefreshToken: false,
+                  persistSession: false,
+                },
+              }
+            )
+            
+            const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(profile!.id)
+            
+            if (authUser?.user?.email) {
+              const { sendGeneralNotificationEmail } = await import('@/lib/email')
+              await sendGeneralNotificationEmail(
+                authUser.user.email,
+                {
+                  title: 'Payment Past Due',
+                  message: 'Your subscription payment is past due. Please update your payment method to continue your access to Execemy.',
+                  actionUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'}/profile/billing`,
+                  actionText: 'Update Payment Method',
+                  userName: profile!.fullName || undefined,
+                }
+              )
+            }
+          } catch (emailError) {
+            console.error('Failed to send past due notification email:', emailError)
+            // Don't fail webhook if email fails
+          }
+          break
       }
     }
 
