@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/server'
-import { safeFindUnique } from '@/lib/prisma-safe'
+import { prisma } from '@/lib/prisma/server'
 import { notFound } from 'next/navigation'
 
 export const runtime = 'nodejs'
@@ -14,23 +14,24 @@ export default async function Image({ params }: { params: Promise<{ username: st
   try {
     const { username } = await params
 
-    const profileResult = await safeFindUnique<{
-      fullName: string | null
-      username: string
-      bio: string | null
-      isPublic: boolean
-    }>('profile', {
-      username,
-    }, {
-      select: {
-        fullName: true,
-        username: true,
-        bio: true,
-        isPublic: true,
-      },
-    })
-
-    const profile = profileResult.data
+    let profile
+    try {
+      profile = await prisma.profile.findUnique({
+        where: { username },
+        select: {
+          fullName: true,
+          username: true,
+          bio: true,
+          isPublic: true,
+        },
+      })
+    } catch (error: any) {
+      // Handle missing table gracefully
+      if (error?.code === 'P2021') {
+        notFound()
+      }
+      throw error
+    }
 
     if (!profile || !profile.isPublic) {
       notFound()

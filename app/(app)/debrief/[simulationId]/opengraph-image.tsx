@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/server'
-import { safeFindUnique } from '@/lib/prisma-safe'
+import { prisma } from '@/lib/prisma/server'
 import { notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/get-user'
 
@@ -21,33 +21,31 @@ export default async function Image({ params }: { params: Promise<{ simulationId
       notFound()
     }
 
-    const simulationResult = await safeFindUnique<{
-      userId: string
-      case: {
-        title: string
-      } | null
-      debrief: {
-        scores: any
-      } | null
-    }>('simulation', {
-      id: simulationId,
-    }, {
-      select: {
-        userId: true,
-        case: {
-          select: {
-            title: true,
+    let simulation
+    try {
+      simulation = await prisma.simulation.findUnique({
+        where: { id: simulationId },
+        select: {
+          userId: true,
+          case: {
+            select: {
+              title: true,
+            },
+          },
+          debrief: {
+            select: {
+              scores: true,
+            },
           },
         },
-        debrief: {
-          select: {
-            scores: true,
-          },
-        },
-      },
-    })
-
-    const simulation = simulationResult.data
+      })
+    } catch (error: any) {
+      // Handle missing table gracefully
+      if (error?.code === 'P2021') {
+        notFound()
+      }
+      throw error
+    }
 
     if (!simulation || simulation.userId !== user.id) {
       notFound()
