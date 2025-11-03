@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { safeFindUnique } from '@/lib/prisma-safe'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
 import ManageBillingButton from './ManageBillingButton'
 
@@ -42,14 +42,11 @@ export default async function BillingPage() {
     return null
   }
 
-  let subscription = null
-  try {
-    subscription = await prisma.subscription.findUnique({
-      where: { userId: user.id },
-    })
-  } catch (error) {
-    console.error('Error fetching subscription:', error)
-  }
+  const subscriptionResult = await safeFindUnique<any>(
+    'subscription',
+    { userId: user.id }
+  )
+  const subscription = subscriptionResult.data
 
   const currentPlan = subscription ? PLANS.find(p => p.planId === subscription.paddlePlanId) : null
   const otherPlans = PLANS.filter(p => !subscription || p.planId !== subscription.paddlePlanId)

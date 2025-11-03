@@ -174,6 +174,42 @@ export async function safeCount(
 }
 
 /**
+ * Safe upsert with automatic error handling
+ */
+export async function safeUpsert<T>(
+  model: string,
+  where: any,
+  create: any,
+  update: any,
+  options?: any
+): Promise<{ data: T | null; error: ReturnType<typeof normalizePrismaError> | null }> {
+  return safePrisma(async () => {
+    const modelClient = (prisma as any)[model]
+    if (!modelClient) {
+      throw new Error(`Model ${model} does not exist in Prisma client`)
+    }
+    return await modelClient.upsert({ where, create, update, ...options }) as T
+  }, null)
+}
+
+/**
+ * Safe updateMany with automatic error handling
+ */
+export async function safeUpdateMany<T>(
+  model: string,
+  where: any,
+  data: any
+): Promise<{ data: { count: number }; error: ReturnType<typeof normalizePrismaError> | null }> {
+  return safePrisma(async () => {
+    const modelClient = (prisma as any)[model]
+    if (!modelClient) {
+      throw new Error(`Model ${model} does not exist in Prisma client`)
+    }
+    return await modelClient.updateMany({ where, data }) as { count: number }
+  }, { count: 0 })
+}
+
+/**
  * Safe transaction with automatic error handling
  */
 export async function safeTransaction<T>(

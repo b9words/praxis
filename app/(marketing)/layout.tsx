@@ -1,5 +1,6 @@
 import CookieConsentBanner from '@/components/layout/CookieConsentBanner'
 import Footer from '@/components/layout/Footer'
+import GAProvider from '@/components/providers/GAProvider'
 
 export default function MarketingLayout({
   children,
@@ -11,6 +12,7 @@ export default function MarketingLayout({
       {children}
       <Footer />
       <CookieConsentBanner />
+      <GAProvider />
     </>
   )
 }

@@ -172,19 +172,27 @@ const ChannelIOSupport = () => {
 
   // Listen to ChannelIO events and control mobile behavior
   useChannelIOEvent('onShowMessenger', () => {
-    console.log('ChannelIO messenger opened');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ChannelIO messenger opened');
+    }
   });
 
   useChannelIOEvent('onHideMessenger', () => {
-    console.log('ChannelIO messenger closed');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ChannelIO messenger closed');
+    }
   });
 
   useChannelIOEvent('onBadgeChanged', ((...args: any[]) => {
-    console.log('ChannelIO badge changed:', args[0]);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ChannelIO badge changed:', args[0]);
+    }
   }) as any);
 
   useChannelIOEvent('onChatCreated', ((...args: any[]) => {
-    console.log('ChannelIO chat created:', args[0]);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ChannelIO chat created:', args[0]);
+    }
   }) as any);
 
   // Set up direct ChannelIO event listeners for mobile popup control
@@ -192,7 +200,9 @@ const ChannelIOSupport = () => {
     if (typeof window !== 'undefined' && window.ChannelIO && isMobile) {
       // Register popup event listener directly
       window.ChannelIO('onPopupDataReceived', () => {
-        console.log('ChannelIO popup detected on mobile - hiding');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('ChannelIO popup detected on mobile - hiding');
+        }
         window.ChannelIO('hidePopup');
       });
     }

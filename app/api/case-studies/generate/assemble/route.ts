@@ -308,7 +308,7 @@ export async function POST(request: NextRequest) {
           competencyName.toLowerCase().includes(key)
         )?.[1] || competencyName || 'Business Strategy'
 
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
         const thumbnailResponse = await fetch(`${baseUrl}/api/generate-thumbnail`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

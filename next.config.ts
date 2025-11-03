@@ -6,10 +6,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 const nextConfig: NextConfig = {
-  // Production: Should fail on type errors, but keeping this for now during transition
-  // TODO: Set to false before production cut
+  // Production: Fail on type errors to ensure type safety
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   images: {
     remotePatterns: [
@@ -22,7 +21,9 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
-    unoptimized: true, // Since we're using Unsplash Source which handles optimization
+    // Image optimization is disabled because Unsplash Source API handles optimization natively
+    // This reduces Next.js build overhead and leverages Unsplash's CDN for optimal image delivery
+    unoptimized: true,
   },
   // Note: instrumentationHook is handled via instrumentation.ts file in Next.js 15+
   webpack: (config, { isServer }) => {

@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation'
 import { cache, CacheTags } from '@/lib/cache'
+import { getAuditLogs } from '@/lib/admin/audit-log'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -7,22 +7,7 @@ export default async function AdminAuditLogPage() {
   // Cache audit log (5 minutes revalidate)
   const getCachedAuditLogs = cache(
     async () => {
-      // TODO: When audit_log table is created, fetch actual audit logs
-      // const auditLogs = await prisma.auditLog.findMany({
-      //   include: {
-      //     user: {
-      //       select: {
-      //         username: true,
-      //       },
-      //     },
-      //   },
-      //   orderBy: {
-      //     createdAt: 'desc',
-      //   },
-      //   take: 100,
-      // })
-
-      const auditLogs: any[] = []
+      const auditLogs = await getAuditLogs({ limit: 100 })
       return auditLogs
     },
     ['admin', 'system', 'audit-log'],

@@ -41,6 +41,17 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_STAGING || 'test-key' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_STAGING || 'test-key' }}
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL_STAGING || 'https://test.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY_STAGING || 'test-key' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_STAGING || 'test-key' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_STAGING || 'test-key' }}
+
       - name: Generate Prisma Client
         run: npx prisma generate
 

@@ -1,5 +1,5 @@
-import { prisma } from '../prisma/server';
-import { getCurrentUser } from './get-user';
+import { safeFindUnique } from '../prisma-safe'
+import { getCurrentUser } from './get-user'
 
 /**
  * Check if the current user has an active subscription
@@ -13,9 +13,12 @@ export async function requireSubscription(): Promise<{ id: string; subscriptionI
   }
 
   // Check for active subscription
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
-  })
+  const subscriptionResult = await safeFindUnique<any>(
+    'subscription',
+    { userId: user.id }
+  )
+
+  const subscription = subscriptionResult.data
 
   if (!subscription) {
     throw new Error('Subscription required')
@@ -53,9 +56,12 @@ export async function checkSubscription(): Promise<{
     }
   }
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { userId: user.id },
-  })
+  const subscriptionResult = await safeFindUnique<any>(
+    'subscription',
+    { userId: user.id }
+  )
+
+  const subscription = subscriptionResult.data
 
   if (!subscription) {
     return {

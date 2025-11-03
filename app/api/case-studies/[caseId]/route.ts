@@ -1,3 +1,5 @@
+import { getCurrentUser } from '@/lib/auth/get-user'
+import { requireRole } from '@/lib/auth/authorize'
 import { prisma } from '@/lib/prisma/server'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
 import fs from 'fs'
@@ -10,6 +12,7 @@ export async function GET(
 ) {
   try {
     const { caseId } = await params
+    const user = await getCurrentUser()
 
     // First try to get from database
     const caseItem = await prisma.case.findUnique({
@@ -22,6 +25,23 @@ export async function GET(
         },
       },
     })
+
+    // Check access permissions
+    if (caseItem) {
+      // If case is not published, require authentication and editor/admin role
+      if (caseItem.status !== 'published') {
+        if (!user) {
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        // Check if user is editor or admin
+        try {
+          await requireRole(['editor', 'admin'])
+        } catch {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        }
+      }
+      // For published cases, authentication is optional (public access allowed)
+    }
 
     if (caseItem && caseItem.storagePath) {
       // Fetch from storage

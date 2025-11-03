@@ -1,6 +1,7 @@
 import { serverAnalyticsTracker } from '@/lib/analytics'
 import { sendSubscriptionConfirmationEmail } from '@/lib/email'
 import { prisma } from '@/lib/prisma/server'
+import { safeFindUnique, safeFindFirst, safeUpsert, safeUpdateMany } from '@/lib/prisma-safe'
 import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
@@ -229,13 +230,14 @@ export async function POST(request: NextRequest) {
       // For update/cancel events, subscription might already exist
       if (!profile && (paddleEventType === 'subscription.updated' || paddleEventType === 'subscription.canceled')) {
         // Try to find existing subscription and get userId from there
-        const existingSubscription = await prisma.subscription.findUnique({
-          where: { paddleSubscriptionId },
-        })
+        const existingSubscriptionResult = await safeFindUnique<any>(
+          'subscription',
+          { paddleSubscriptionId }
+        )
         
-        if (existingSubscription) {
+        if (existingSubscriptionResult.data) {
           profile = await prisma.profile.findUnique({
-            where: { id: existingSubscription.userId },
+            where: { id: existingSubscriptionResult.data.userId },
             select: {
               id: true,
               username: true,
@@ -270,15 +272,10 @@ export async function POST(request: NextRequest) {
 
       switch (paddleEventType) {
         case 'subscription.created':
-          const createdSubscription = await prisma.subscription.upsert({
-            where: { paddleSubscriptionId },
-            update: {
-              status,
-              currentPeriodStart,
-              currentPeriodEnd,
-              updatedAt: new Date(),
-            },
-            create: {
+          const createdSubscriptionResult = await safeUpsert<any>(
+            'subscription',
+            { paddleSubscriptionId },
+            {
               userId: profile!.id,
               paddleSubscriptionId,
               paddlePlanId: subscription.plan_id?.toString() || '',
@@ -286,7 +283,20 @@ export async function POST(request: NextRequest) {
               currentPeriodStart,
               currentPeriodEnd,
             },
-          })
+            {
+              status,
+              currentPeriodStart,
+              currentPeriodEnd,
+              updatedAt: new Date(),
+            }
+          )
+          
+          if (createdSubscriptionResult.error) {
+            console.error('Failed to upsert subscription:', createdSubscriptionResult.error)
+            // Continue processing even if subscription save fails (non-critical)
+          }
+          
+          const createdSubscription = createdSubscriptionResult.data
           
           // Send subscription confirmation email
           try {
@@ -331,46 +341,70 @@ export async function POST(request: NextRequest) {
           break
 
         case 'subscription.updated':
-          await prisma.subscription.updateMany({
-            where: { paddleSubscriptionId },
-            data: {
-              status,
-              currentPeriodStart,
-              currentPeriodEnd,
-              paddlePlanId: subscription.plan_id?.toString() || subscription.paddlePlanId,
-              updatedAt: new Date(),
-            },
-          })
+          {
+            const updateResult = await safeUpdateMany(
+              'subscription',
+              { paddleSubscriptionId },
+              {
+                status,
+                currentPeriodStart,
+                currentPeriodEnd,
+                paddlePlanId: subscription.plan_id?.toString() || subscription.paddlePlanId,
+                updatedAt: new Date(),
+              }
+            )
+            if (updateResult.error) {
+              console.error('Failed to update subscription:', updateResult.error)
+            }
+          }
           break
 
         case 'subscription.canceled':
-          await prisma.subscription.updateMany({
-            where: { paddleSubscriptionId },
-            data: {
-              status: 'canceled',
-              updatedAt: new Date(),
-            },
-          })
+          {
+            const updateResult = await safeUpdateMany(
+              'subscription',
+              { paddleSubscriptionId },
+              {
+                status: 'canceled',
+                updatedAt: new Date(),
+              }
+            )
+            if (updateResult.error) {
+              console.error('Failed to cancel subscription:', updateResult.error)
+            }
+          }
           break
 
         case 'subscription.paused':
-          await prisma.subscription.updateMany({
-            where: { paddleSubscriptionId },
-            data: {
-              status: 'paused',
-              updatedAt: new Date(),
-            },
-          })
+          {
+            const updateResult = await safeUpdateMany(
+              'subscription',
+              { paddleSubscriptionId },
+              {
+                status: 'paused',
+                updatedAt: new Date(),
+              }
+            )
+            if (updateResult.error) {
+              console.error('Failed to pause subscription:', updateResult.error)
+            }
+          }
           break
 
         case 'subscription.past_due':
-          await prisma.subscription.updateMany({
-            where: { paddleSubscriptionId },
-            data: {
-              status: 'past_due',
-              updatedAt: new Date(),
-            },
-          })
+          {
+            const updateResult = await safeUpdateMany(
+              'subscription',
+              { paddleSubscriptionId },
+              {
+                status: 'past_due',
+                updatedAt: new Date(),
+              }
+            )
+            if (updateResult.error) {
+              console.error('Failed to update subscription to past_due:', updateResult.error)
+            }
+          }
           
           // Optionally send notification email for past due
           try {
@@ -415,26 +449,32 @@ export async function POST(request: NextRequest) {
 
       if (subscriptionId) {
         // Update subscription status if payment successful
-        const updatedSubscription = await prisma.subscription.findFirst({
-          where: { paddleSubscriptionId: subscriptionId },
-          select: { userId: true, paddlePlanId: true },
-        })
+        const findResult = await safeFindFirst<any>(
+          'subscription',
+          { paddleSubscriptionId: subscriptionId },
+          { select: { userId: true, paddlePlanId: true } }
+        )
 
-        await prisma.subscription.updateMany({
-          where: { paddleSubscriptionId: subscriptionId },
-          data: {
+        const updateResult = await safeUpdateMany(
+          'subscription',
+          { paddleSubscriptionId: subscriptionId },
+          {
             status: 'active',
             updatedAt: new Date(),
-          },
-        })
+          }
+        )
+        
+        if (updateResult.error) {
+          console.error('Failed to update subscription status from transaction:', updateResult.error)
+        }
 
         // Track subscription started event on first successful payment
-        if (updatedSubscription) {
+        if (findResult.data) {
           try {
             await serverAnalyticsTracker.track('subscription_started', {
               subscriptionId,
-              planId: updatedSubscription.paddlePlanId || '',
-              userId: updatedSubscription.userId,
+              planId: findResult.data.paddlePlanId || '',
+              userId: findResult.data.userId,
             })
           } catch (analyticsError) {
             console.error('Failed to track subscription started from transaction:', analyticsError)

@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma/server'
+import { safeCreate, safeFindMany } from '@/lib/prisma-safe'
 
 export interface AuditLogEntry {
   userId: string
@@ -14,27 +15,25 @@ export interface AuditLogEntry {
 }
 
 export async function logAdminAction(entry: AuditLogEntry) {
-  try {
-    // Store in audit_log table if it exists, otherwise log to console
-    // Note: You'll need to create an audit_log table in your Prisma schema
+  const result = await safeCreate(
+    'auditLog',
+    {
+      userId: entry.userId,
+      action: entry.action,
+      resourceType: entry.resourceType,
+      resourceId: entry.resourceId,
+      changes: entry.changes || {},
+      reason: entry.reason,
+    }
+  )
+  
+  if (result.error) {
+    // Log to console as fallback if database insert fails
+    console.error('[AUDIT] Failed to log admin action:', result.error)
     console.log('[AUDIT]', {
       timestamp: new Date().toISOString(),
       ...entry,
     })
-
-    // TODO: Uncomment when audit_log table is created
-    // await prisma.auditLog.create({
-    //   data: {
-    //     userId: entry.userId,
-    //     action: entry.action,
-    //     resourceType: entry.resourceType,
-    //     resourceId: entry.resourceId,
-    //     changes: entry.changes || {},
-    //     reason: entry.reason,
-    //   },
-    // })
-  } catch (error) {
-    console.error('Failed to log admin action:', error)
   }
 }
 
@@ -44,12 +43,41 @@ export async function getAuditLogs(filters?: {
   action?: string
   limit?: number
 }) {
-  try {
-    // TODO: Implement when audit_log table exists
-    return []
-  } catch (error) {
-    console.error('Failed to fetch audit logs:', error)
-    return []
+  const where: any = {}
+  
+  if (filters?.userId) {
+    where.userId = filters.userId
   }
+  if (filters?.resourceType) {
+    where.resourceType = filters.resourceType
+  }
+  if (filters?.action) {
+    where.action = filters.action
+  }
+
+  const result = await safeFindMany(
+    'auditLog',
+    where,
+    {
+      include: {
+        user: {
+          select: {
+            username: true,
+            fullName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: filters?.limit || 100,
+    }
+  )
+
+  if (result.error) {
+    console.error('Failed to fetch audit logs:', result.error)
+  }
+
+  return result.data || []
 }
 

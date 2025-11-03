@@ -34,6 +34,7 @@ model Profile {
   subscription       Subscription?
   notifications      Notification[]
   domainCompletions  DomainCompletion[]
+  auditLogs          AuditLog[]
 
   @@index([username])
   @@index([isPublic])
@@ -381,4 +382,24 @@ model BriefingSchedule {
   @@index([weekOf(sort: Desc)])
   @@index([domainId, moduleId])
   @@map("briefing_schedule")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  action       String   // create | update | delete | status_change | role_change
+  resourceType String   @map("resource_type")
+  resourceId   String   @map("resource_id")
+  changes      Json?    // Stores the changes made
+  reason       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_log")
 }

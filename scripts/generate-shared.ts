@@ -366,7 +366,7 @@ export async function syncFileMetadata(storagePath: string) {
   }
   
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-  const apiUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+  const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3400'
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
   if (!apiUrl || !serviceRoleKey) {
@@ -571,7 +571,7 @@ export async function generateAndUploadThumbnail(
   }
 
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+    const apiUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3400'
     
     // Call thumbnail generation API
     console.log('  🎨 Generating thumbnail...')

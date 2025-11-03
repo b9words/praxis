@@ -86,7 +86,7 @@ async function publishByPath(type: 'article' | 'case', storagePath: string) {
   
   console.log('✅ Published successfully!\n')
   
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3400'
   console.log('📝 View in platform:')
   console.log(`   Content: ${baseUrl}/admin/content`)
   if (type === 'article') {
@@ -154,7 +154,7 @@ async function publishById(type: 'article' | 'case', id: string) {
   
   console.log('✅ Published successfully!\n')
   
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3400'
   console.log('📝 View in platform:')
   console.log(`   Content: ${baseUrl}/admin/content`)
 }

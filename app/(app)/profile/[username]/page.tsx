@@ -51,7 +51,7 @@ export async function generateMetadata({
     }
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
   const ogImageUrl = `${baseUrl}/profile/${username}/opengraph-image`
 
   const title = `${profile.fullName || profile.username}'s Praxis Dossier`

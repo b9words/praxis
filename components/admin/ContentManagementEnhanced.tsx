@@ -108,11 +108,48 @@ export default function ContentManagementEnhanced({ articles, cases }: ContentMa
     }
   }
 
-  const handleBulkStatusChange = (newStatus: string) => {
-    if (confirm(`Change status to ${newStatus} for ${selectedItems.size} items?`)) {
-      // TODO: Implement bulk status update API call
-      toast.success(`Status updated for ${selectedItems.size} items`)
+  const handleBulkStatusChange = async (newStatus: string) => {
+    if (!confirm(`Change status to ${newStatus} for ${selectedItems.size} items?`)) {
+      return
+    }
+
+    try {
+      const selectedIds = Array.from(selectedItems)
+      
+      // Determine type: check if all selected items are the same type
+      const selectedItemsData = filteredContent.filter(item => selectedIds.includes(item.id))
+      const hasArticles = selectedItemsData.some(item => item.type === 'article')
+      const hasCases = selectedItemsData.some(item => item.type === 'case')
+      
+      const type = hasArticles && hasCases ? 'both' : (hasArticles ? 'article' : 'case')
+
+      const response = await fetch('/api/content/bulk-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ids: selectedIds,
+          type,
+          status: newStatus,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to update status')
+      }
+
+      const result = await response.json()
+      toast.success(
+        `Status updated: ${result.updated.articles} articles, ${result.updated.cases} cases`
+      )
       setSelectedItems(new Set())
+      
+      // Refresh the page to show updated status
+      window.location.reload()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update status')
     }
   }
 

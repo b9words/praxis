@@ -564,7 +564,7 @@ async function generateLesson(options: GenerateOptions = {}) {
   }
   
   // Output review links
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3400'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3400'
   console.log('✅ Generation complete!\n')
   console.log('📝 Review & Edit:')
   console.log(`   Content Management: ${baseUrl}/admin/content`)

@@ -97,7 +97,9 @@ export default function CookieConsentBanner() {
         ;(window as any).posthog = posthog
       }
     }).catch((error) => {
-      console.error('Failed to load PostHog:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Failed to load PostHog:', error)
+      }
     })
   }
 

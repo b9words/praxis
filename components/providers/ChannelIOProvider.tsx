@@ -11,7 +11,9 @@ export default function ChannelIOProvider({ children }: ChannelIOProviderProps) 
 
   // Only render if plugin key is configured
   if (!pluginKey) {
-    console.warn('ChannelIO plugin key not configured. Set NEXT_PUBLIC_CHANNEL_IO_PLUGIN_KEY environment variable.')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('ChannelIO plugin key not configured. Set NEXT_PUBLIC_CHANNEL_IO_PLUGIN_KEY environment variable.')
+    }
     return <>{children}</>
   }
 

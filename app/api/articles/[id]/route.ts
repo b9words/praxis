@@ -1,5 +1,5 @@
-
 import { getCurrentUser } from '@/lib/auth/get-user'
+import { requireRole } from '@/lib/auth/authorize'
 import { prisma } from '@/lib/prisma/server'
 import { getCachedArticle } from '@/lib/cache'
 import { NextRequest, NextResponse } from 'next/server'
@@ -32,10 +32,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: 'No user found' }, { status: 401 })
-    }
+    await requireRole(['editor', 'admin'])
+    
     const { id } = await params
     const body = await request.json()
 
@@ -46,6 +44,11 @@ export async function PUT(
 
     if (!existing) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const article = await prisma.article.update({
@@ -62,7 +65,7 @@ export async function PUT(
     return NextResponse.json({ article })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
     
     // Handle P2025 (record not found) gracefully
@@ -84,10 +87,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({ error: 'No user found' }, { status: 401 })
-    }
+    await requireRole(['editor', 'admin'])
+    
     const { id } = await params
     const body = await request.json()
 
@@ -98,6 +99,11 @@ export async function PATCH(
 
     if (!existing) {
       return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    }
+
+    const user = await getCurrentUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const article = await prisma.article.update({
@@ -114,7 +120,7 @@ export async function PATCH(
     return NextResponse.json({ article })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
     
     // Handle P2025 (record not found) gracefully
@@ -136,6 +142,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await requireRole(['editor', 'admin'])
     
     const { id } = await params
 
@@ -155,7 +162,7 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
     
     // Handle P2025 (record not found) gracefully
@@ -171,4 +178,3 @@ export async function DELETE(
     return NextResponse.json({ error: normalized }, { status: statusCode })
   }
 }
-

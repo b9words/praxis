@@ -1,7 +1,7 @@
 import Navbar from '@/components/layout/Navbar'
 import SentryUserProvider from '@/components/providers/SentryUserProvider'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getUserSubscriptionStatus } from '@/lib/auth/subscription'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -47,15 +47,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     profile = await getCachedProfile()
 
     // Fetch subscription status for past-due banner
-    try {
-      subscription = await prisma.subscription.findUnique({
-        where: { userId: user.id },
-        select: { status: true },
-      })
-    } catch (error) {
-      // Log error but don't crash - subscription lookup is optional
-      console.error('Error fetching subscription in layout:', error)
-    }
+    const subscriptionStatus = await getUserSubscriptionStatus(user.id)
+    subscription = subscriptionStatus.hasSubscription && subscriptionStatus.status
+      ? { status: subscriptionStatus.status }
+      : null
   }
 
   return (

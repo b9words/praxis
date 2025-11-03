@@ -8,11 +8,17 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(request: NextRequest) {
   try {
-    // Optional: Add authentication for cron job (e.g., secret token)
+    // Require authentication for cron job in production
     const authHeader = request.headers.get('authorization')
     const expectedSecret = process.env.CRON_SECRET
 
-    if (expectedSecret && authHeader !== `Bearer ${expectedSecret}`) {
+    // In production, CRON_SECRET must be set and match
+    if (!expectedSecret) {
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
+      }
+      // Allow in development without secret for testing
+    } else if (authHeader !== `Bearer ${expectedSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

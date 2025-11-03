@@ -59,7 +59,7 @@ async function generateImagenThumbnailWithProcessing(
     const imagenImageUrl = await generateImagenThumbnail(title, description)
 
     // Stage 3: Process image (crop and resize)
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
     const processResponse = await fetch(`${baseUrl}/api/thumbnail/process`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -119,7 +119,7 @@ async function generateImagenThumbnailWithProcessing(
 //     const dalleImageUrl = await generateDalleThumbnail(title, description, 'hd')
 //
 //     // Stage 3: Process image (crop and resize)
-//     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
+//     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
 //     const processResponse = await fetch(`${baseUrl}/api/thumbnail/process`, {
 //       method: 'POST',
 //       headers: { 'Content-Type': 'application/json' },
