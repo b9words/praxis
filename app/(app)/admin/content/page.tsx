@@ -102,7 +102,7 @@ export default async function AdminContentPage() {
         </TabsList>
         <TabsContent value="list" className="mt-6">
           <ContentManagementEnhanced
-            articles={articles.map((a) => ({
+            articles={articles.map((a: any) => ({
               id: a.id,
               type: 'article' as const,
               title: a.title,
@@ -111,10 +111,10 @@ export default async function AdminContentPage() {
               competency: a.competency,
               storagePath: a.storagePath,
               content: a.content || undefined,
-              creator: a.creator,
-              updater: a.updater,
+              creator: a.creator || undefined,
+              updater: a.updater || undefined,
             }))}
-            cases={cases.map((c) => ({
+            cases={cases.map((c: any) => ({
               id: c.id,
               type: 'case' as const,
               title: c.title,
@@ -122,8 +122,8 @@ export default async function AdminContentPage() {
               updatedAt: c.updatedAt,
               storagePath: c.storagePath,
               briefingDoc: c.briefingDoc || undefined,
-              creator: c.creator,
-              updater: c.updater,
+              creator: c.creator || undefined,
+              updater: c.updater || undefined,
             }))}
           />
         </TabsContent>

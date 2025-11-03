@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma/server'
-import { safeFindMany } from '@/lib/prisma-safe'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { redirect } from 'next/navigation'
 import { cache, CacheTags } from '@/lib/cache'
@@ -10,19 +9,23 @@ export default async function AdminTokenUsagePage() {
   const getCachedTokenUsage = cache(
     async () => {
       // Wrap with error handling for missing tables (P2021)
-      const result = await safeFindMany('tokenUsage', {}, {
-        orderBy: {
-          date: 'desc',
-        },
-        take: 100,
-      })
-      
-      // safeFindMany returns { data, error } and handles P2021 errors with fallback to []
-      const tokenUsage = result.data ?? []
-      
-      // Log errors in dev mode if they're not missing table errors
-      if (process.env.NODE_ENV === 'development' && result.error && !isMissingTable(result.error)) {
-        console.error('[admin/token-usage] Error fetching token usage:', result.error)
+      let tokenUsage: any[] = []
+      try {
+        tokenUsage = await (prisma as any).tokenUsage.findMany({
+          orderBy: {
+            date: 'desc',
+          },
+          take: 100,
+        })
+      } catch (error: any) {
+        if (isMissingTable(error)) {
+          tokenUsage = []
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[admin/token-usage] Error fetching token usage:', error)
+          }
+          tokenUsage = []
+        }
       }
       
       return tokenUsage

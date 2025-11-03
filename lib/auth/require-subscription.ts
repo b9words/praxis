@@ -1,4 +1,5 @@
-import { safeFindUnique } from '../prisma-safe'
+import { prisma } from '../prisma/server'
+import { isMissingTable } from '../api/route-helpers'
 import { getCurrentUser } from './get-user'
 
 /**
@@ -13,12 +14,17 @@ export async function requireSubscription(): Promise<{ id: string; subscriptionI
   }
 
   // Check for active subscription
-  const subscriptionResult = await safeFindUnique<any>(
-    'subscription',
-    { userId: user.id }
-  )
-
-  const subscription = subscriptionResult.data
+  let subscription: any = null
+  try {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+    })
+  } catch (error: any) {
+    if (isMissingTable(error)) {
+      throw new Error('Subscription required')
+    }
+    throw error
+  }
 
   if (!subscription) {
     throw new Error('Subscription required')
@@ -56,12 +62,21 @@ export async function checkSubscription(): Promise<{
     }
   }
 
-  const subscriptionResult = await safeFindUnique<any>(
-    'subscription',
-    { userId: user.id }
-  )
-
-  const subscription = subscriptionResult.data
+  let subscription: any = null
+  try {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+    })
+  } catch (error: any) {
+    if (isMissingTable(error)) {
+      return {
+        hasSubscription: false,
+        isActive: false,
+        userId: user.id,
+      }
+    }
+    throw error
+  }
 
   if (!subscription) {
     return {

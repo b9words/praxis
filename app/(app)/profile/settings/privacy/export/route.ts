@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
-import { safeFindUnique } from '@/lib/prisma-safe'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
@@ -49,7 +49,7 @@ export async function GET() {
       }
     }
 
-    const [profile, simulations, lessonProgress, articleProgress, residency, subscriptionResult, notifications, domainCompletions] =
+    const [profile, simulations, lessonProgress, articleProgress, residency, notifications, domainCompletions] =
       await Promise.all([
         prisma.profile.findUnique({
           where: { id: user.id },
@@ -85,7 +85,6 @@ export async function GET() {
         prisma.userResidency.findUnique({
           where: { userId: user.id },
         }),
-        safeFindUnique<any>('subscription', { userId: user.id }),
         prisma.notification.findMany({
           where: { userId: user.id },
         }),
@@ -94,7 +93,16 @@ export async function GET() {
         }),
       ])
     
-    const subscription = subscriptionResult.data
+    let subscription: any = null
+    try {
+      subscription = await prisma.subscription.findUnique({
+        where: { userId: user.id },
+      })
+    } catch (error: any) {
+      if (!isMissingTable(error)) {
+        console.error('Error fetching subscription:', error)
+      }
+    }
 
     const exportData = {
       profile,

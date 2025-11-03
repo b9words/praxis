@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma/server'
-import { safeFindMany } from '@/lib/prisma-safe'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { redirect } from 'next/navigation'
 import { cache, CacheTags } from '@/lib/cache'
@@ -11,27 +10,31 @@ export default async function AdminSubscriptionsPage() {
   const getCachedSubscriptions = cache(
     async () => {
       // Wrap with error handling for missing tables (P2021)
-      const result = await safeFindMany('subscription', {}, {
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              fullName: true,
+      let subscriptions: any[] = []
+      try {
+        subscriptions = await prisma.subscription.findMany({
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                fullName: true,
+              },
             },
           },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      })
-      
-      // safeFindMany returns { data, error } and handles P2021 errors with fallback to []
-      const subscriptions = result.data ?? []
-      
-      // Log errors in dev mode if they're not missing table errors
-      if (process.env.NODE_ENV === 'development' && result.error && !isMissingTable(result.error)) {
-        console.error('[admin/subscriptions] Error fetching subscriptions:', result.error)
+          orderBy: {
+            createdAt: 'desc',
+          },
+        })
+      } catch (error: any) {
+        if (isMissingTable(error)) {
+          subscriptions = []
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[admin/subscriptions] Error fetching subscriptions:', error)
+          }
+          subscriptions = []
+        }
       }
       
       return subscriptions

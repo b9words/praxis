@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { cache, CacheTags } from '@/lib/cache'
-import { safeFindMany } from '@/lib/prisma-safe'
 import { prisma } from '@/lib/prisma/server'
 import { CheckCircle2, Clock, XCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -26,7 +25,8 @@ export default async function AdminApplicationsPage({
       let stats: Array<{ status: string; _count: { id: number } }> = []
 
       try {
-        const applicationsResult = await safeFindMany('userApplication', where, {
+        applications = await (prisma as any).userApplication.findMany({
+          where,
           include: {
             user: {
               select: {
@@ -48,23 +48,12 @@ export default async function AdminApplicationsPage({
           },
         })
         
-        applications = applicationsResult.data ?? []
-        
-        // groupBy doesn't have a safe wrapper, use try-catch directly
-        try {
-          stats = await prisma.userApplication.groupBy({
-            by: ['status'],
-            _count: {
-              id: true,
-            },
-          })
-        } catch (error: any) {
-          if (isMissingTable(error)) {
-            stats = []
-          } else {
-            throw error
-          }
-        }
+        stats = await (prisma as any).userApplication.groupBy({
+          by: ['status'],
+          _count: {
+            id: true,
+          },
+        })
       } catch (error: any) {
         if (isMissingTable(error)) {
           // Table doesn't exist, use empty fallbacks

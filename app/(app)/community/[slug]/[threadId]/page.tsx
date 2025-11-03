@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { cache, CacheTags } from '@/lib/cache'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -25,7 +26,7 @@ export default async function ThreadPage({
     async () => {
       let thread: any = null
       try {
-        thread = await prisma.forumThread.findUnique({
+        thread = await (prisma as any).forumThread.findUnique({
           where: { id: threadId },
           include: {
             author: {
@@ -43,36 +44,7 @@ export default async function ThreadPage({
           },
         })
       } catch (error: any) {
-        // Handle missing metadata column (P2022) or other schema issues
-        if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
-          try {
-            // Fallback: explicit select without problematic columns
-            thread = await prisma.forumThread.findUnique({
-              where: { id: threadId },
-              select: {
-                id: true,
-                title: true,
-                content: true,
-                isPinned: true,
-                createdAt: true,
-                author: {
-                  select: {
-                    username: true,
-                    avatarUrl: true,
-                  },
-                },
-                channel: {
-                  select: {
-                    name: true,
-                    slug: true,
-                  },
-                },
-              },
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching thread (fallback):', fallbackError)
-          }
-        } else {
+        if (!isMissingTable(error)) {
           console.error('Error fetching thread:', error)
         }
       }
@@ -90,7 +62,7 @@ export default async function ThreadPage({
     async () => {
       let posts: any[] = []
       try {
-        posts = await prisma.forumPost.findMany({
+        posts = await (prisma as any).forumPost.findMany({
           where: {
             threadId,
             parentPostId: null,
@@ -108,41 +80,8 @@ export default async function ThreadPage({
           },
         })
       } catch (error: any) {
-        // Handle missing columns (P2022) or other schema issues
-        if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-          try {
-            // Fallback: explicit select without problematic columns
-            posts = await prisma.forumPost.findMany({
-              where: {
-                threadId,
-                parentPostId: null,
-              },
-              select: {
-                id: true,
-                threadId: true,
-                authorId: true,
-                content: true,
-                parentPostId: true,
-                createdAt: true,
-                updatedAt: true,
-                author: {
-                  select: {
-                    username: true,
-                    avatarUrl: true,
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: 'asc',
-              },
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching posts (fallback):', fallbackError)
-            posts = [] // Continue with empty posts array
-          }
-        } else {
+        if (!isMissingTable(error)) {
           console.error('Error fetching posts:', error)
-          posts = [] // Continue with empty posts array
         }
       }
       return posts
@@ -154,10 +93,13 @@ export default async function ThreadPage({
     }
   )
 
-  const [thread, posts] = await Promise.all([
+  const [threadResult, postsResult] = await Promise.all([
     getCachedThread(),
     getCachedPosts(),
   ])
+
+  const thread = threadResult as any
+  const posts = (postsResult || []) as any[]
 
   if (!thread) {
     notFound()

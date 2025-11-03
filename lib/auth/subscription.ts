@@ -3,7 +3,8 @@
  * Centralized helper for checking subscription status with safe error handling
  */
 
-import { safeFindUnique } from '../prisma-safe'
+import { prisma } from '../prisma/server'
+import { isMissingTable } from '../api/route-helpers'
 
 export interface SubscriptionStatus {
   hasSubscription: boolean
@@ -17,12 +18,20 @@ export interface SubscriptionStatus {
  * Returns subscription information with safe error handling for missing tables
  */
 export async function getUserSubscriptionStatus(userId: string): Promise<SubscriptionStatus> {
-  const result = await safeFindUnique<any>(
-    'subscription',
-    { userId }
-  )
-
-  const subscription = result.data
+  let subscription: any = null
+  try {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId },
+    })
+  } catch (error: any) {
+    if (isMissingTable(error)) {
+      return {
+        hasSubscription: false,
+        isActive: false,
+      }
+    }
+    throw error
+  }
 
   if (!subscription) {
     return {

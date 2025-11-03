@@ -1,7 +1,8 @@
 'use server'
 
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { safeFindUnique } from '@/lib/prisma-safe'
+import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { redirect } from 'next/navigation'
 
 /**
@@ -77,12 +78,17 @@ export async function handleManageBilling() {
     throw new Error('No user found')
   }
 
-  const subscriptionResult = await safeFindUnique<any>(
-    'subscription',
-    { userId: user.id }
-  )
-
-  const subscription = subscriptionResult.data
+  let subscription: any = null
+  try {
+    subscription = await prisma.subscription.findUnique({
+      where: { userId: user.id },
+    })
+  } catch (error: any) {
+    if (!isMissingTable(error)) {
+      console.error('Error fetching subscription:', error)
+      throw error
+    }
+  }
 
   if (!subscription) {
     throw new Error('No subscription found')

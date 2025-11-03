@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma/server'
-import { safeFindMany } from '@/lib/prisma-safe'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { redirect } from 'next/navigation'
 import { cache, CacheTags } from '@/lib/cache'
@@ -11,27 +10,31 @@ export default async function AdminNotificationsPage() {
   const getCachedNotifications = cache(
     async () => {
       // Wrap with error handling for missing tables (P2021)
-      const result = await safeFindMany('notification', {}, {
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
+      let notifications: any[] = []
+      try {
+        notifications = await prisma.notification.findMany({
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+              },
             },
           },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        take: 100,
-      })
-      
-      // safeFindMany returns { data, error } and handles P2021 errors with fallback to []
-      const notifications = result.data ?? []
-      
-      // Log errors in dev mode if they're not missing table errors
-      if (process.env.NODE_ENV === 'development' && result.error && !isMissingTable(result.error)) {
-        console.error('[admin/notifications] Error fetching notifications:', result.error)
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 100,
+        })
+      } catch (error: any) {
+        if (isMissingTable(error)) {
+          notifications = []
+        } else {
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[admin/notifications] Error fetching notifications:', error)
+          }
+          notifications = []
+        }
       }
       
       return notifications

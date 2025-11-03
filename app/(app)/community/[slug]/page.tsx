@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { cache, CacheTags } from '@/lib/cache'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -18,14 +19,15 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
   // Cache channel lookup (15 minutes revalidate)
   const getCachedChannel = cache(
     async () => {
-      let channel = null
+      let channel: any = null
       try {
-        channel = await prisma.forumChannel.findUnique({
+        channel = await (prisma as any).forumChannel.findUnique({
           where: { slug },
         })
-      } catch (error) {
-        console.error('Error fetching channel:', error)
-        return null
+      } catch (error: any) {
+        if (!isMissingTable(error)) {
+          console.error('Error fetching channel:', error)
+        }
       }
       return channel
     },
@@ -36,18 +38,20 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
     }
   )
 
-  const channel = await getCachedChannel()
+  const channelResult = await getCachedChannel()
 
-  if (!channel) {
+  if (!channelResult) {
     notFound()
   }
+
+  const channel = channelResult as any
 
   // Cache threads in this channel (2 minutes revalidate)
   const getCachedThreads = cache(
     async () => {
       let threads: any[] = []
       try {
-        threads = await prisma.forumThread.findMany({
+        threads = await (prisma as any).forumThread.findMany({
           where: {
             channelId: channel.id,
           },
@@ -70,42 +74,7 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
           ],
         })
       } catch (error: any) {
-        // Handle missing metadata column (P2022) or other schema issues
-        if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
-          try {
-            // Fallback: explicit select without problematic columns
-            threads = await prisma.forumThread.findMany({
-              where: {
-                channelId: channel.id,
-              },
-              select: {
-                id: true,
-                title: true,
-                content: true,
-                isPinned: true,
-                createdAt: true,
-                updatedAt: true,
-                author: {
-                  select: {
-                    username: true,
-                    avatarUrl: true,
-                  },
-                },
-                _count: {
-                  select: {
-                    posts: true,
-                  },
-                },
-              },
-              orderBy: [
-                { isPinned: 'desc' },
-                { updatedAt: 'desc' },
-              ],
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching threads (fallback):', fallbackError)
-          }
-        } else {
+        if (!isMissingTable(error)) {
           console.error('Error fetching threads:', error)
         }
       }

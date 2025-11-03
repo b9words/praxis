@@ -2,6 +2,7 @@ import { requireRole } from '@/lib/auth/authorize'
 import { sendApplicationStatusEmail } from '@/lib/email'
 import { notifyApplicationStatus } from '@/lib/notifications/triggers'
 import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     let applications: any[] = []
     try {
-      applications = await prisma.userApplication.findMany({
+      applications = await (prisma as any).userApplication.findMany({
         where,
         include: {
           user: {
@@ -42,9 +43,7 @@ export async function GET(request: NextRequest) {
         },
       })
     } catch (error: any) {
-      // Handle missing table (P2021) or missing columns (P2022)
-      if (error?.code === 'P2021' || error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-        // Table doesn't exist, return empty array
+      if (isMissingTable(error)) {
         applications = []
       } else {
         throw error
@@ -94,10 +93,8 @@ export async function POST(request: NextRequest) {
     // Check if application already exists for this user/email
     if (userId) {
       try {
-        const existing = await prisma.userApplication.findFirst({
-          where: {
-            userId,
-          },
+        const existing = await (prisma as any).userApplication.findFirst({
+          where: { userId },
         })
 
         if (existing) {
@@ -107,9 +104,7 @@ export async function POST(request: NextRequest) {
           )
         }
       } catch (error: any) {
-        // Handle missing table (P2021) - table doesn't exist, so no existing application
-        // Only ignore P2021 errors; throw all other errors
-        if (error?.code !== 'P2021' && !error?.message?.includes('does not exist')) {
+        if (!isMissingTable(error)) {
           throw error
         }
       }
@@ -117,7 +112,7 @@ export async function POST(request: NextRequest) {
 
     let application
     try {
-      application = await prisma.userApplication.create({
+      application = await (prisma as any).userApplication.create({
         data: {
           userId: userId || null,
           email,
@@ -128,8 +123,7 @@ export async function POST(request: NextRequest) {
         },
       })
     } catch (error: any) {
-      // Handle missing table (P2021)
-      if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      if (isMissingTable(error)) {
         return NextResponse.json(
           { error: 'Applications feature is not available' },
           { status: 503 }
@@ -187,7 +181,7 @@ export async function PATCH(request: NextRequest) {
 
     let application
     try {
-      application = await prisma.userApplication.findUnique({
+      application = await (prisma as any).userApplication.findUnique({
         where: { id: applicationId },
         include: {
           user: {
@@ -200,8 +194,7 @@ export async function PATCH(request: NextRequest) {
         },
       })
     } catch (error: any) {
-      // Handle missing table (P2021)
-      if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
+      if (isMissingTable(error)) {
         return NextResponse.json({ error: 'Application not found' }, { status: 404 })
       }
       throw error
@@ -213,7 +206,7 @@ export async function PATCH(request: NextRequest) {
 
     let updated
     try {
-      updated = await prisma.userApplication.update({
+      updated = await (prisma as any).userApplication.update({
         where: { id: applicationId },
         data: {
           status: status as any,
@@ -231,8 +224,7 @@ export async function PATCH(request: NextRequest) {
         },
       })
     } catch (error: any) {
-      // Handle missing table (P2021) or missing columns (P2022)
-      if (error?.code === 'P2021' || error?.code === 'P2022' || error?.message?.includes('does not exist')) {
+      if (isMissingTable(error) || error?.code === 'P2022') {
         return NextResponse.json(
           { error: 'Applications feature is not available' },
           { status: 503 }

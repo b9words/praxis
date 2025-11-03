@@ -58,7 +58,7 @@ export default async function AdminAuditLogPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {auditLogs.map((log) => (
+                  {auditLogs.map((log: any) => (
                     <tr key={log.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(log.createdAt).toLocaleString()}
@@ -70,7 +70,7 @@ export default async function AdminAuditLogPage() {
                         <Badge variant="outline">{log.action}</Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {log.resourceType}: {log.resourceId.slice(0, 8)}
+                        {log.resourceType}: {log.resourceId?.slice(0, 8) || 'N/A'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
                         <pre className="text-xs">
