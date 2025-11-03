@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
           { auth: { autoRefreshToken: false, persistSession: false } }
         )
 
-        const username = user.user_metadata?.username || user.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
+        const userWithMetadata = user as any
+        const username = userWithMetadata.user_metadata?.username || user.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
         const uniqueUsername = `${username}_${user.id.substring(0, 8)}`
 
         await supabaseAdmin
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
           .upsert({
             id: user.id,
             username: uniqueUsername,
-            full_name: user.user_metadata?.full_name || username,
+            full_name: userWithMetadata.user_metadata?.full_name || username,
             bio: strategicObjective,
             is_public: false,
           }, { onConflict: 'id' })

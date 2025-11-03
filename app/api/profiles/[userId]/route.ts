@@ -178,9 +178,15 @@ export async function PATCH(
     const { userId } = await params
     const body = await request.json()
 
+    // Get user's profile to check role
+    const profile = await prisma.profile.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    })
+
     // Allow admins to update any profile, users can only update their own
-    const isAdmin = user.role === 'admin'
-    const isUpdatingRole = body.role && body.role !== user.role
+    const isAdmin = profile?.role === 'admin'
+    const isUpdatingRole = body.role && body.role !== profile?.role
 
     if (!isAdmin && user.id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

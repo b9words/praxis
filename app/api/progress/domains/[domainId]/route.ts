@@ -32,7 +32,7 @@ export async function GET(
     const completion = await checkDomainCompletion(user.id, domainId)
 
     return NextResponse.json({
-      domainId,
+      domainId: domainId,
       domainTitle: domain.title,
       ...progress,
       completed: completion ? true : false,

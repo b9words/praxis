@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { hasRequiredRole } from '@/lib/auth/middleware-helpers'
+import { requireRole } from '@/lib/auth/authorize'
 import { prisma } from '@/lib/prisma/server'
 import { logAdminAction } from '@/lib/admin/audit-log'
 import { NextRequest, NextResponse } from 'next/server'
@@ -11,15 +11,19 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(request: NextRequest) {
   try {
+    // Only editors and admins can bulk update
+    try {
+      await requireRole(['editor', 'admin'])
+    } catch (error: any) {
+      if (error.message === 'Unauthorized') {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     const user = await getCurrentUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Only editors and admins can bulk update
-    const userRole = await hasRequiredRole(user.id, ['editor', 'admin'])
-    if (!userRole.hasRole) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const body = await request.json()

@@ -205,12 +205,14 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: 'Article not found' }, { status: 404 })
         }
 
+        const articleData = article as any
+
         // Use Imagen generation if requested
         if (useImagen) {
           try {
             const { url, imageBuffer } = await generateImagenThumbnailWithProcessing(
-              article.title,
-              article.description || undefined,
+              articleData.title,
+              articleData.description || undefined,
               contentId,
               'lesson',
               supabase
@@ -255,12 +257,14 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: 'Case not found' }, { status: 404 })
         }
 
+        const caseDataTyped = caseData as any
+
         // Use Imagen generation if requested
         if (useImagen) {
           try {
             const { url, imageBuffer } = await generateImagenThumbnailWithProcessing(
-              caseData.title,
-              caseData.description || undefined,
+              caseDataTyped.title,
+              caseDataTyped.description || undefined,
               contentId,
               'case',
               supabase
