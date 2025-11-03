@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   },
 }
 
+// Force dynamic rendering since content changes weekly
+export const dynamic = 'force-dynamic'
+
 export default async function BriefingPage() {
   const briefing = await getCurrentBriefing()
 

@@ -1,5 +1,6 @@
 import { prisma } from './prisma/server'
 import { cache, CacheTags } from './cache'
+import { isMissingTable } from './api/route-helpers'
 
 export interface CurrentBriefing {
   domainId: string
@@ -16,29 +17,44 @@ export interface CurrentBriefing {
 export async function getCurrentBriefing(): Promise<CurrentBriefing | null> {
   const getCachedBriefing = cache(
     async () => {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
+      try {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
 
-      const row = await prisma.briefingSchedule.findFirst({
-        where: {
-          weekOf: {
-            lte: today,
+        const row = await prisma.briefingSchedule.findFirst({
+          where: {
+            weekOf: {
+              lte: today,
+            },
           },
-        },
-        orderBy: {
-          weekOf: 'desc',
-        },
-      })
+          orderBy: {
+            weekOf: 'desc',
+          },
+        })
 
-      if (!row) {
+        if (!row) {
+          return null
+        }
+
+        return {
+          domainId: row.domainId,
+          moduleId: row.moduleId,
+          caseId: row.caseId,
+          weekOf: row.weekOf.toISOString().slice(0, 10),
+        }
+      } catch (error: any) {
+        // Handle missing table gracefully (P2021) - expected if migrations haven't run
+        if (isMissingTable(error)) {
+          // Silently return null if table doesn't exist
+          return null
+        }
+        
+        // Log other errors in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error fetching briefing schedule:', error)
+        }
+        // Return null on error to allow build to continue
         return null
-      }
-
-      return {
-        domainId: row.domainId,
-        moduleId: row.moduleId,
-        caseId: row.caseId,
-        weekOf: row.weekOf.toISOString().slice(0, 10),
       }
     },
     ['briefing', 'current'],
