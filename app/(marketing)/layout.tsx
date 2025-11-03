@@ -1,6 +1,7 @@
 import CookieConsentBanner from '@/components/layout/CookieConsentBanner'
 import Footer from '@/components/layout/Footer'
 import GAProvider from '@/components/providers/GAProvider'
+import { Suspense } from 'react'
 
 export default function MarketingLayout({
   children,
@@ -12,7 +13,9 @@ export default function MarketingLayout({
       {children}
       <Footer />
       <CookieConsentBanner />
-      <GAProvider />
+      <Suspense fallback={null}>
+        <GAProvider />
+      </Suspense>
     </>
   )
 }
