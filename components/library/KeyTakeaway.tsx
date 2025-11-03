@@ -16,7 +16,7 @@ export default function KeyTakeaway({ content }: KeyTakeawayProps) {
           <div className="text-xs font-semibold text-yellow-800 uppercase tracking-wide mb-1.5">
             Key Takeaway
           </div>
-          <ReactMarkdown className="text-sm text-neutral-800 leading-relaxed">
+          <ReactMarkdown>
             {content.trim()}
           </ReactMarkdown>
         </div>

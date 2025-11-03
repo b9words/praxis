@@ -53,113 +53,114 @@ export default function RichMarkdownEditor({
   const [stats, setStats] = useState<EditorStats>({ wordCount: 0, characterCount: 0, lineCount: 0 })
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isAutoSaving, setIsAutoSaving] = useState(false)
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>()
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Initialize CodeMirror
   useEffect(() => {
     if (!editorRef.current || viewRef.current) return
 
     try {
+      const extensions = [
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        highlightSpecialChars(),
+        history(),
+        foldGutter(),
+        drawSelection(),
+        dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion({
+          override: [
+            (context: any) => {
+              const word = context.matchBefore(/\w*/)
+              const options = [
+                { label: 'bold', type: 'keyword', apply: '**text**' },
+                { label: 'italic', type: 'keyword', apply: '*text*' },
+                { label: 'heading1', type: 'keyword', apply: '# Heading' },
+                { label: 'heading2', type: 'keyword', apply: '## Heading' },
+                { label: 'heading3', type: 'keyword', apply: '### Heading' },
+                { label: 'link', type: 'keyword', apply: '[text](url)' },
+                { label: 'code', type: 'keyword', apply: '`code`' },
+                { label: 'codeBlock', type: 'keyword', apply: '```\ncode\n```' },
+                { label: 'list', type: 'keyword', apply: '- Item' },
+                { label: 'orderedList', type: 'keyword', apply: '1. Item' },
+              ]
+              return {
+                from: word ? word.from : context.pos,
+                options,
+              }
+            },
+          ],
+        }),
+        rectangularSelection(),
+        crosshairCursor(),
+        highlightActiveLine(),
+        highlightSelectionMatches(),
+        keymap.of([
+          ...closeBracketsKeymap,
+          ...defaultKeymap,
+          ...searchKeymap,
+          ...historyKeymap,
+          ...foldKeymap,
+          ...completionKeymap,
+          ...lintKeymap,
+          {
+            key: 'Mod-s',
+            preventDefault: true,
+            run: () => {
+              if (onSave) {
+                onSave()
+              }
+              return true
+            },
+          },
+        ]),
+        markdown(),
+        EditorState.tabSize.of(2),
+        EditorView.updateListener.of((update: any) => {
+          if (update.docChanged) {
+            const newValue = update.state.doc.toString()
+            onChange(newValue)
+            setStats(calculateStats(newValue))
+
+            // Auto-save logic
+            if (autoSave && onAutoSave) {
+              setIsAutoSaving(true)
+              if (autoSaveTimeoutRef.current) {
+                clearTimeout(autoSaveTimeoutRef.current)
+              }
+              autoSaveTimeoutRef.current = setTimeout(() => {
+                onAutoSave(newValue)
+                setLastSaved(new Date())
+                setIsAutoSaving(false)
+              }, 30000) // 30 seconds debounce
+            }
+          }
+        }),
+        EditorView.theme({
+          '&': {
+            fontSize: '14px',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+          },
+          '.cm-content': {
+            minHeight,
+            padding: '16px',
+          },
+          '.cm-focused': {
+            outline: 'none',
+          },
+          '.cm-editor': {
+            border: '1px solid hsl(var(--border))',
+            borderRadius: 'calc(var(--radius) - 2px)',
+          },
+        }),
+      ]
+
       const state = EditorState.create({
         doc: value,
-        extensions: [
-          lineNumbers(),
-          highlightActiveLineGutter(),
-          highlightSpecialChars(),
-          history(),
-          foldGutter(),
-          drawSelection(),
-          dropCursor(),
-          EditorState.allowMultipleSelections.of(true),
-          defaultHighlightStyle.fallback,
-          bracketMatching(),
-          closeBrackets(),
-          autocompletion({
-            override: [
-              (context: any) => {
-                const word = context.matchBefore(/\w*/)
-                const options = [
-                  { label: 'bold', type: 'keyword', apply: '**text**' },
-                  { label: 'italic', type: 'keyword', apply: '*text*' },
-                  { label: 'heading1', type: 'keyword', apply: '# Heading' },
-                  { label: 'heading2', type: 'keyword', apply: '## Heading' },
-                  { label: 'heading3', type: 'keyword', apply: '### Heading' },
-                  { label: 'link', type: 'keyword', apply: '[text](url)' },
-                  { label: 'code', type: 'keyword', apply: '`code`' },
-                  { label: 'codeBlock', type: 'keyword', apply: '```\ncode\n```' },
-                  { label: 'list', type: 'keyword', apply: '- Item' },
-                  { label: 'orderedList', type: 'keyword', apply: '1. Item' },
-                ]
-                return {
-                  from: word ? word.from : context.pos,
-                  options,
-                }
-              },
-            ],
-          }),
-          rectangularSelection(),
-          crosshairCursor(),
-          highlightActiveLine(),
-          highlightSelectionMatches(),
-          keymap.of([
-            ...closeBracketsKeymap,
-            ...defaultKeymap,
-            ...searchKeymap,
-            ...historyKeymap,
-            ...foldKeymap,
-            ...completionKeymap,
-            ...lintKeymap,
-            {
-              key: 'Mod-s',
-              preventDefault: true,
-              run: () => {
-                if (onSave) {
-                  onSave()
-                }
-                return true
-              },
-            },
-          ]),
-          markdown(),
-          EditorState.tabSize.of(2),
-          EditorView.updateListener.of((update: any) => {
-            if (update.docChanged) {
-              const newValue = update.state.doc.toString()
-              onChange(newValue)
-              setStats(calculateStats(newValue))
-
-              // Auto-save logic
-              if (autoSave && onAutoSave) {
-                setIsAutoSaving(true)
-                if (autoSaveTimeoutRef.current) {
-                  clearTimeout(autoSaveTimeoutRef.current)
-                }
-                autoSaveTimeoutRef.current = setTimeout(() => {
-                  onAutoSave(newValue)
-                  setLastSaved(new Date())
-                  setIsAutoSaving(false)
-                }, 30000) // 30 seconds debounce
-              }
-            }
-          }),
-          EditorView.theme({
-            '&': {
-              fontSize: '14px',
-              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-            },
-            '.cm-content': {
-              minHeight,
-              padding: '16px',
-            },
-            '.cm-focused': {
-              outline: 'none',
-            },
-            '.cm-editor': {
-              border: '1px solid hsl(var(--border))',
-              borderRadius: 'calc(var(--radius) - 2px)',
-            },
-          }),
-        ],
+        extensions,
       })
 
       const view = new EditorView({

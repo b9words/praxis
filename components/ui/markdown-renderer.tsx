@@ -2,7 +2,7 @@
 
 import 'highlight.js/styles/github.css'
 import mermaid from 'mermaid'
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
@@ -265,7 +265,7 @@ export default function MarkdownRenderer({
     <div className={`prose prose-neutral max-w-none ${className}`}>
       {segments.map((segment, idx) => {
         if (segment.type === 'component' && segment.component) {
-          return <React.Fragment key={`segment-${idx}`}>{segment.component}</React.Fragment>
+          return React.createElement(React.Fragment, { key: `segment-${idx}` }, segment.component)
         }
         
         if (segment.type === 'markdown' && segment.content) {

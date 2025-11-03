@@ -71,7 +71,7 @@ async function importArticles() {
   for (const filePath of articleFiles) {
     try {
       const fileContent = fs.readFileSync(filePath, 'utf-8')
-      const { data: frontmatter, content } = matter(fileContent) as { 
+      const { data: frontmatter, content } = matter(fileContent) as unknown as { 
         data: ArticleFrontmatter, 
         content: string 
       }
@@ -254,7 +254,7 @@ async function importCases() {
   for (const filePath of caseFiles) {
     try {
       const fileContent = fs.readFileSync(filePath, 'utf-8')
-      const { data: frontmatter, content } = matter(fileContent) as {
+      const { data: frontmatter, content } = matter(fileContent) as unknown as {
         data: CaseFrontmatter,
         content: string
       }

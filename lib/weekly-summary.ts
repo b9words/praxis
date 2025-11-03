@@ -18,16 +18,38 @@ export async function sendWeeklySummaries(): Promise<WeeklySummaryResult> {
 
   try {
     // Get all active users
-    const users = await prisma.profile.findMany({
+    const profiles = await prisma.profile.findMany({
       select: {
         id: true,
-        email: true,
         fullName: true,
         username: true,
       },
       // Only users who have opted in for emails (if you add this field)
       // where: { emailNotificationsEnabled: true }
     })
+    
+    // Get emails from Supabase auth
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Supabase credentials not configured')
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+    
+    const users = await Promise.all(
+      profiles.map(async (profile) => {
+        const { data } = await supabase.auth.admin.getUserById(profile.id)
+        return {
+          ...profile,
+          email: data.user?.email || null,
+        }
+      })
+    )
 
     const now = new Date()
     const oneWeekAgo = new Date(now)
@@ -199,6 +221,10 @@ export async function sendWeeklySummaries(): Promise<WeeklySummaryResult> {
         if (lessonsCompleted > 0 || simulationsCompleted > 0 || articlesCompleted > 0 || strongestCompetency || simulatorTimeMinutes !== undefined) {
           const userName = user.fullName || user.username || undefined
           
+          if (!user.email) {
+            continue // Skip users without email
+          }
+          
           const result = await sendWeeklySummaryEmail(user.email, {
             userName,
             lessonsCompleted,
@@ -213,7 +239,7 @@ export async function sendWeeklySummaries(): Promise<WeeklySummaryResult> {
             emailsSent++
           } else {
             emailsFailed++
-            const errorMsg = `Failed to send weekly summary to ${user.email}: ${result.error || 'Unknown error'}`
+            const errorMsg = `Failed to send weekly summary to ${user.email || 'unknown email'}: ${result.error || 'Unknown error'}`
             errors.push(errorMsg)
             console.error(errorMsg)
           }

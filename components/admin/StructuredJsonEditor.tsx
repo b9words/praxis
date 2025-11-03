@@ -5,7 +5,7 @@ import { EditorView } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { json } from '@codemirror/lang-json'
 import { history, defaultKeymap, historyKeymap } from '@codemirror/commands'
-import { foldGutter, bracketMatching, defaultHighlightStyle } from '@codemirror/language'
+import { foldGutter, foldKeymap, bracketMatching, defaultHighlightStyle } from '@codemirror/language'
 import { closeBrackets, autocompletion, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
 import { searchKeymap, highlightSelectionMatches } from '@codemirror/search'
 import { lintKeymap } from '@codemirror/lint'
@@ -51,7 +51,6 @@ export default function StructuredJsonEditor({
         drawSelection(),
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
-        defaultHighlightStyle.fallback,
         bracketMatching(),
         closeBrackets(),
         autocompletion(),

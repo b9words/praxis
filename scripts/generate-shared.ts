@@ -211,14 +211,14 @@ export async function generateWithAI(
         })
         
         const text = result.response.text()
-        const usageMetadata = result.response.usageMetadata
+        const usageMetadata = result.response.usageMetadata as any
         
         // Track token usage if requested
         if (options.trackUsage && usageMetadata) {
           const tokens = {
-            prompt: usageMetadata.promptTokenCount || usageMetadata.prompt_tokens || 0,
-            completion: usageMetadata.candidatesTokenCount || usageMetadata.completion_tokens || 0,
-            total: usageMetadata.totalTokenCount || usageMetadata.total_tokens || 0,
+            prompt: usageMetadata.promptTokenCount || (usageMetadata as any).prompt_tokens || 0,
+            completion: usageMetadata.candidatesTokenCount || (usageMetadata as any).completion_tokens || 0,
+            total: usageMetadata.totalTokenCount || (usageMetadata as any).total_tokens || 0,
           }
           await trackTokenUsage(model, tokens)
         }
@@ -228,9 +228,9 @@ export async function generateWithAI(
           content: text,
           model: name,
           tokens: usageMetadata ? {
-            prompt: usageMetadata.promptTokenCount || usageMetadata.prompt_tokens || 0,
-            completion: usageMetadata.candidatesTokenCount || usageMetadata.completion_tokens || 0,
-            total: usageMetadata.totalTokenCount || usageMetadata.total_tokens || 0,
+            prompt: usageMetadata.promptTokenCount || (usageMetadata as any).prompt_tokens || 0,
+            completion: usageMetadata.candidatesTokenCount || (usageMetadata as any).completion_tokens || 0,
+            total: usageMetadata.totalTokenCount || (usageMetadata as any).total_tokens || 0,
           } : undefined,
         }
       }

@@ -122,7 +122,7 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       toast.success(`Saved ${variables.length} lessons to database!`)
       setProgress(prev => ({ ...prev, results: [] }))
       // Reload existing articles to update status
-      loadExistingArticles()
+      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save to database')
@@ -443,18 +443,19 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
 
   const regenerateThumbnail = async (lesson: any, index: number) => {
     try {
+      const lessonItem = progress.results[index] as any
       // Get domain information from original lesson data
-      const originalLesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lesson.lessonPath)
-      const domainTitle = originalLesson?.domainTitle || lesson.metadata?.domain_title || 'Business Strategy'
+      const originalLesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lessonItem.lessonPath)
+      const domainTitle = originalLesson?.domainTitle || lessonItem.metadata?.domain_title || 'Business Strategy'
 
       const response = await fetch('/api/generate-thumbnail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: lesson.title,
+          title: lessonItem.title,
           domainName: domainTitle,
           contentType: 'lesson',
-          description: lesson.metadata?.keyTakeaways?.join(' ') || undefined,
+          description: lessonItem.metadata?.keyTakeaways?.join(' ') || undefined,
           useImagen: true, // Use Imagen generation
         }),
       })
@@ -467,20 +468,31 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
 
       // Update the lesson in results
       const updatedResults = [...progress.results]
-      if (!updatedResults[index].metadata) {
-        updatedResults[index].metadata = {}
+      const currentMetadata = lessonItem.metadata || {
+        moduleNumber: lessonItem.moduleNumber || 0,
+        lessonNumber: lessonItem.lessonNumber || 0,
+        estimatedReadingTime: lessonItem.estimatedReadingTime || 0,
+        keyTakeaways: lessonItem.keyTakeaways || [],
+        visualizations: lessonItem.visualizations || [],
       }
 
       // Handle both PNG (Imagen) and SVG (fallback) responses
-      if (thumbnailData.type === 'png') {
-        updatedResults[index].metadata.thumbnailUrl = thumbnailData.imageBuffer || thumbnailData.url
-        updatedResults[index].metadata.thumbnailType = 'png'
-      } else {
-        const svg = thumbnailData.svg
-        updatedResults[index].metadata.thumbnailSvg = svg
-        updatedResults[index].metadata.thumbnailUrl = `data:image/svg+xml;base64,${btoa(svg)}`
-        updatedResults[index].metadata.thumbnailType = 'svg'
-      }
+      const metadataWithThumbnail = {
+        ...currentMetadata,
+        ...(thumbnailData.type === 'png' 
+          ? {
+              thumbnailUrl: thumbnailData.imageBuffer || thumbnailData.url,
+              thumbnailType: 'png',
+            }
+          : {
+              thumbnailSvg: thumbnailData.svg,
+              thumbnailUrl: `data:image/svg+xml;base64,${btoa(thumbnailData.svg)}`,
+              thumbnailType: 'svg',
+            }
+        ),
+      } as any
+
+      updatedResults[index].metadata = metadataWithThumbnail
 
       setProgress(prev => ({
         ...prev,
@@ -1022,9 +1034,9 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
                         <div className="flex gap-3">
                           {/* Thumbnail */}
                           <div className="flex-shrink-0">
-                            {lesson.metadata?.thumbnailUrl ? (
+                            {(lesson.metadata as any)?.thumbnailUrl ? (
                               <img
-                                src={lesson.metadata.thumbnailUrl}
+                                src={(lesson.metadata as any).thumbnailUrl}
                                 alt={lesson.title}
                                 className="w-[75px] h-[100px] object-cover border border-gray-300 rounded"
                               />

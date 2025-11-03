@@ -48,13 +48,12 @@ function parseTestResults(jsonOutput: string): TestFailure[] {
             const testName = `${spec.title} > ${test.title}`
             
             // Categorize failure
-            let category: TestFailure['category'] = ' অজানা'
+            let category: TestFailure['category'] = 'ui' // Default to 'ui'
             if (error.includes('404') || error.includes('not found')) category = 'route'
             else if (error.includes('API') || error.includes('route')) category = 'api'
             else if (error.includes('component') || error.includes('render')) category = 'component'
             else if (error.includes('auth') || error.includes('login') || error.includes('unauthorized')) category = 'auth'
             else if (error.includes('database') || error.includes('query') || error.includes('prisma')) category = 'data'
-            else category = 'ui'
             
             failures.push({
               test: testName,

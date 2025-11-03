@@ -69,7 +69,8 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
               }
               
               // Retry on 429 (rate limit) and 5xx (server errors)
-              const status = error?.status || error?.statusCode || error?.response?.status
+              const errorAny = error as any
+              const status = errorAny?.status || errorAny?.statusCode || errorAny?.response?.status
               if (status) {
                 return status >= 500 || status === 429
               }

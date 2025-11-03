@@ -155,7 +155,7 @@ async function generateThumbnailSVG(
   const svg = await satori(component, {
     width: 1200,
     height: 630,
-    fonts: fonts.length > 0 ? fonts : undefined, // Use system fonts if custom fonts unavailable
+    fonts: fonts.length > 0 ? fonts : [], // Use system fonts if custom fonts unavailable
   })
 
   return svg

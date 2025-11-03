@@ -23,6 +23,9 @@ interface PublishOptions {
  * Verify file exists in storage
  */
 async function verifyFileInStorage(storagePath: string): Promise<boolean> {
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
   const { data, error } = await supabase.storage
     .from('assets')
     .list(path.dirname(storagePath), {
@@ -51,6 +54,10 @@ async function publishByPath(type: 'article' | 'case', storagePath: string) {
   const tableName = type === 'article' ? 'articles' : 'cases'
   console.log(`🔍 Finding ${type} in database...`)
   
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
+  
   const { data: record, error: findError } = await supabase
     .from(tableName)
     .select('id, title, status')
@@ -75,6 +82,9 @@ async function publishByPath(type: 'article' | 'case', storagePath: string) {
   
   // Update status to published
   console.log('🔄 Updating status to published...')
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
   const { error: updateError } = await supabase
     .from(tableName)
     .update({ status: 'published' })
@@ -107,6 +117,9 @@ async function publishById(type: 'article' | 'case', id: string) {
   
   // Find record
   console.log(`🔍 Finding ${type} in database...`)
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
   const { data: record, error: findError } = await supabase
     .from(tableName)
     .select('id, title, status, storage_path')
@@ -143,6 +156,9 @@ async function publishById(type: 'article' | 'case', id: string) {
   
   // Update status to published
   console.log('🔄 Updating status to published...')
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
   const { error: updateError } = await supabase
     .from(tableName)
     .update({ status: 'published' })

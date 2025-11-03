@@ -490,7 +490,7 @@ export default function FocusedDashboard({
           <CardContent>
             {aggregateScores ? (
               <div className="space-y-4">
-                <ExecemyRadarChart data={aggregateScores} />
+                <ExecemyRadarChart data={aggregateScores as any} />
                 <div className="text-center">
                   <p className="text-sm text-blue-600 font-medium">
                     Complete more simulations to see your profile evolve

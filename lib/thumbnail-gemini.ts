@@ -188,7 +188,7 @@ Generate the SVG visualization now.`
   svg = svg.replace(/height\s*=\s*["'][^"']*["']/gi, 'height="300"')
   
   // Fix invalid rect dimensions - ensure all rects fit within 400x300 bounds
-  svg = svg.replace(/<rect\s+([^>]*)>/gi, (match, attrs) => {
+  svg = svg.replace(/<rect\s+([^>]*)>/gi, (match: string, attrs: string) => {
     const xMatch = attrs.match(/x\s*=\s*["'](\d+(?:\.\d+)?)["']/)
     const yMatch = attrs.match(/y\s*=\s*["'](\d+(?:\.\d+)?)["']/)
     const widthMatch = attrs.match(/width\s*=\s*["'](\d+(?:\.\d+)?)["']/)
@@ -215,7 +215,7 @@ Generate the SVG visualization now.`
   })
   
   // Fix invalid stroke-width values (must be 1, 2, or 4)
-  svg = svg.replace(/stroke-width\s*=\s*["'](\d+(?:\.\d+)?)["']/gi, (match, value) => {
+  svg = svg.replace(/stroke-width\s*=\s*["'](\d+(?:\.\d+)?)["']/gi, (match: string, value: string) => {
     const num = parseFloat(value)
     if (num === 1 || num === 2 || num === 4) return match
     // Round to nearest allowed value

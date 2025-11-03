@@ -87,7 +87,7 @@ class GeminiTestAnalyzer {
       return JSON.parse(response.text())
     } catch (error) {
       console.error('Gemini analysis failed:', error)
-      return { error: 'Analysis failed', details: error.message }
+      return { error: 'Analysis failed', details: error instanceof Error ? error.message : String(error) }
     }
   }
 

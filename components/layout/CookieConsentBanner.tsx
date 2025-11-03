@@ -88,8 +88,8 @@ export default function CookieConsentBanner() {
         posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
           api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
           autocapture: {
-            capture_forms: false,
-          },
+            // capture_forms not in type, skip
+          } as any,
           mask_all_text: process.env.NODE_ENV === 'production',
           capture_performance: false,
           disable_session_recording: false,

@@ -21,6 +21,7 @@ import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -63,34 +64,41 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
   // Fetch content in edit mode
   const { data: contentData, isLoading: loading, error } = useQuery({
     queryKey: contentType === 'article' 
-      ? queryKeys.articles.all()
+      ? [...queryKeys.articles.all(), contentId]
       : ['cases', contentId],
-    queryFn: ({ signal }) => 
+    queryFn: async ({ signal }) => 
       contentType === 'article'
         ? fetchJson<{ article: any }>(`/api/articles/${contentId}`, { signal })
         : fetchJson<{ case: any }>(`/api/cases/${contentId}`, { signal }),
     enabled: mode === 'edit' && !!contentId,
-    onSuccess: (data) => {
-      if (contentType === 'article' && 'article' in data) {
-        const article = data.article
+  })
+
+  useEffect(() => {
+    if (contentData) {
+      const data = contentData as any
+      if (contentType === 'article' && data.article) {
+        const article = data.article as any
         setTitle(article.title)
         setCompetencyId(article.competencyId)
         setContent(article.content || '')
         setStatus(article.status)
-      } else if ('case' in data) {
-        const caseItem = data.case
+      } else if (data.case) {
+        const caseItem = data.case as any
         setTitle(caseItem.title)
         setBriefingDoc(caseItem.briefingDoc || '')
         setDatasets(caseItem.datasets ? JSON.stringify(caseItem.datasets, null, 2) : '')
         setRubric(caseItem.rubric ? JSON.stringify(caseItem.rubric, null, 2) : '')
         setStatus(caseItem.status)
       }
-    },
-    onError: (error) => {
+    }
+  }, [contentData, contentType])
+
+  useEffect(() => {
+    if (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to load content')
       router.push('/admin/content')
-    },
-  })
+    }
+  }, [error, router])
 
   // Validate before save
   const validate = () => {
@@ -177,17 +185,21 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
         }
       }
     },
-    onSuccess: async () => {
+  })
+
+  useEffect(() => {
+    if (saveMutation.isSuccess) {
       queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
       queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(`${contentType === 'article' ? 'Article' : 'Case'} ${mode === 'create' ? 'created' : 'updated'} successfully`)
-      const { safeRedirectAfterMutation } = await import('@/lib/utils/redirect-helpers')
-      await safeRedirectAfterMutation(router, '/admin/content')
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Failed to save content')
-    },
-  })
+      import('@/lib/utils/redirect-helpers').then(({ safeRedirectAfterMutation }) => {
+        safeRedirectAfterMutation(router, '/admin/content')
+      })
+    }
+    if (saveMutation.isError) {
+      toast.error(saveMutation.error instanceof Error ? saveMutation.error.message : 'Failed to save content')
+    }
+  }, [saveMutation.isSuccess, saveMutation.isError, saveMutation.error, contentType, mode, queryClient, router])
 
   const handleSave = () => {
     saveMutation.mutate()

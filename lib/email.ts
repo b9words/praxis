@@ -109,7 +109,7 @@ export async function sendWelcomeEmail(userEmail: string, userName?: string) {
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
-  const html = renderEmailTemplate('welcome', {
+  const html = await renderEmailTemplate('welcome', {
     welcome: {
       userName,
       loginUrl: `${baseUrl}/dashboard`,
@@ -135,7 +135,7 @@ export async function sendSubscriptionConfirmationEmail(
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
-  const html = renderEmailTemplate('subscription_confirmation', {
+  const html = await renderEmailTemplate('subscription_confirmation', {
     subscription_confirmation: {
       planName,
       userName,
@@ -162,7 +162,7 @@ export async function sendSimulationCompleteEmail(
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
-  const html = renderEmailTemplate('simulation_complete', {
+  const html = await renderEmailTemplate('simulation_complete', {
     simulation_complete: {
       caseTitle,
       debriefUrl: debriefUrl || `${baseUrl}/dashboard`,
@@ -195,7 +195,7 @@ export async function sendWeeklySummaryEmail(
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
-  const html = renderEmailTemplate('weekly_summary', {
+  const html = await renderEmailTemplate('weekly_summary', {
     weekly_summary: {
       ...options,
       dashboardUrl: `${baseUrl}/dashboard`,
@@ -224,7 +224,7 @@ export async function sendGeneralNotificationEmail(
 ) {
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
-  const html = renderEmailTemplate('general', {
+  const html = await renderEmailTemplate('general', {
     general: options,
   })
 
@@ -246,7 +246,7 @@ export async function sendApplicationStatusEmail(
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')
   
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
-  const html = renderEmailTemplate('general', {
+  const html = await renderEmailTemplate('general', {
     general: {
       title: status === 'approved' ? 'Application Approved' : 'Application Update',
       message: status === 'approved' 
@@ -263,6 +263,7 @@ export async function sendApplicationStatusEmail(
     subject: getEmailSubject('general', { 
       general: {
         title: status === 'approved' ? 'Application Approved' : 'Application Update',
+        message: status === 'approved' ? 'Your application has been approved.' : 'Your application status has been updated.',
       }
     }),
     html,

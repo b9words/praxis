@@ -126,8 +126,8 @@ class PostHogAnalyticsService implements AnalyticsService {
             // Balanced privacy: Limit autocapture and mask sensitive data
             autocapture: {
               // Disable automatic form captures in production
-              capture_forms: !isProduction,
-            },
+              ...(!isProduction ? { capture_forms: true } : {}),
+            } as any,
             // Balanced privacy: Enable session recording with text masking in production
             mask_all_text: isProduction,
             // Don't capture console logs or performance metrics

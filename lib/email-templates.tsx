@@ -54,15 +54,15 @@ interface EmailTemplateProps {
 /**
  * Render email template to HTML string
  */
-export function renderEmailTemplate(
+export async function renderEmailTemplate(
   templateType: EmailTemplateType,
   props: EmailTemplateProps
-): string {
+): Promise<string> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com'
 
   switch (templateType) {
     case 'welcome':
-      return render(
+      return await render(
         WelcomeEmail({
           userName: props.welcome?.userName,
           loginUrl: props.welcome?.loginUrl || `${baseUrl}/dashboard`,
@@ -73,7 +73,7 @@ export function renderEmailTemplate(
       if (!props.simulation_complete?.caseTitle) {
         throw new Error('caseTitle is required for simulation_complete template')
       }
-      return render(
+      return await render(
         SimulationCompleteEmail({
           caseTitle: props.simulation_complete.caseTitle,
           debriefUrl: props.simulation_complete.debriefUrl || `${baseUrl}/dashboard`,
@@ -82,7 +82,7 @@ export function renderEmailTemplate(
       )
 
     case 'weekly_summary':
-      return render(
+      return await render(
         WeeklySummaryEmail({
           userName: props.weekly_summary?.userName,
           articlesCompleted: props.weekly_summary?.articlesCompleted,
@@ -99,7 +99,7 @@ export function renderEmailTemplate(
       if (!props.general?.title || !props.general?.message) {
         throw new Error('title and message are required for general template')
       }
-      return render(
+      return await render(
         GeneralNotificationEmail({
           title: props.general.title,
           message: props.general.message,
@@ -113,7 +113,7 @@ export function renderEmailTemplate(
       if (!props.subscription_confirmation?.planName) {
         throw new Error('planName is required for subscription_confirmation template')
       }
-      return render(
+      return await render(
         SubscriptionConfirmationEmail({
           planName: props.subscription_confirmation.planName,
           userName: props.subscription_confirmation.userName,

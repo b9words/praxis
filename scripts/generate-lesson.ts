@@ -12,19 +12,19 @@
 import matter from 'gray-matter'
 import { completeCurriculumData, getAllLessonsFlat } from '../lib/curriculum-data'
 import {
-    articleExists,
-    checkRequiredSections,
-    countWords,
-    extractCalculations,
-    extractTables,
-    generateAndUploadThumbnail,
-    generateWithAI,
-    getCoreValuesPrompt,
-    isSupabaseAvailable,
-    repairContent,
-    supabase,
-    syncFileMetadata,
-    uploadToStorage,
+  articleExists,
+  checkRequiredSections,
+  countWords,
+  extractCalculations,
+  extractTables,
+  generateAndUploadThumbnail,
+  generateWithAI,
+  getCoreValuesPrompt,
+  isSupabaseAvailable,
+  repairContent,
+  supabase,
+  syncFileMetadata,
+  uploadToStorage,
 } from './generate-shared'
 
 const TARGET_WORD_COUNT = { min: 1800, max: 2400 }
@@ -105,6 +105,10 @@ async function resolveCompetencyId(domainId: string, moduleId: string, lessonTit
     return null
   }
   
+  if (!supabase) {
+    throw new Error('Supabase client not available')
+  }
+
   // Get domain competency
   const { data: domainComp } = await supabase
     .from('competencies')

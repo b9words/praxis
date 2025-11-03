@@ -44,7 +44,7 @@ class TestFixCycle {
   async run(): Promise<void> {
     console.log('🚀 Starting Test-Fix Cycle')
     console.log(`📋 Configuration:`, this.config)
-    console.log('=' * 60)
+    console.log('='.repeat(60))
 
     try {
       // Initial setup
@@ -54,7 +54,7 @@ class TestFixCycle {
       while (this.iteration < this.config.maxIterations) {
         this.iteration++
         console.log(`\n🔄 Iteration ${this.iteration}/${this.config.maxIterations}`)
-        console.log('-' * 40)
+        console.log('-'.repeat(40))
 
         const success = await this.runIteration()
         
@@ -204,7 +204,7 @@ class TestFixCycle {
     
     console.log('\n' + '=' * 60)
     console.log('📊 TEST-FIX CYCLE SUMMARY')
-    console.log('=' * 60)
+    console.log('='.repeat(60))
     console.log(`🔄 Iterations completed: ${this.iteration}`)
     console.log(`❌ Total errors found: ${this.totalErrors}`)
     console.log(`🔧 Errors fixed: ${this.fixedErrors}`)
@@ -219,7 +219,7 @@ class TestFixCycle {
       console.log('⚠️ Some errors remain unfixed. Manual intervention required.')
     }
     
-    console.log('=' * 60)
+    console.log('='.repeat(60))
   }
 }
 

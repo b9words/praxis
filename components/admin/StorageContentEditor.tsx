@@ -16,7 +16,7 @@ import { syncMetadata, uploadFileToStorage } from '@/lib/supabase/storage-client
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FileCode, FileText, Save, Upload } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 interface StorageContentEditorProps {
@@ -39,13 +39,14 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
         `/api/storage?path=${encodeURIComponent(storagePath)}`,
         { signal }
       ),
-    onSuccess: (data) => {
-      if (data.success && data.content) {
-        setContent(data.content)
-      }
-    },
     retry: 2,
   })
+
+  useEffect(() => {
+    if (storageData?.success && storageData?.content) {
+      setContent(storageData.content)
+    }
+  }, [storageData])
 
   // Fetch metadata with React Query
   const { data: metadataData } = useQuery({
@@ -56,7 +57,8 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
         ? await fetchJson<{ articles: any[] }>(`/api/articles?status=all`, { signal })
         : await fetchJson<{ cases: any[] }>(`/api/cases`, { signal })
       
-      const list = contentType === 'article' ? items.articles : items.cases
+      const itemsTyped = items as any
+      const list = contentType === 'article' ? itemsTyped.articles : itemsTyped.cases
       return list?.find((item: any) => item.storagePath === storagePath) || null
     },
     enabled: !!storagePath,
