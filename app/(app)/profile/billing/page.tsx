@@ -50,7 +50,7 @@ export default async function BillingPage() {
     })
   } catch (error: any) {
     if (!isMissingTable(error)) {
-      console.error('Error fetching subscription:', error)
+    console.error('Error fetching subscription:', error)
     }
   }
 

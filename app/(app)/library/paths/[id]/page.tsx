@@ -118,6 +118,7 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
           // Fallback for items that don't match expected types
           return {
             ...item,
+            title: 'Untitled',
             url: '/library/paths',
             completed: false,
             progress: 0,

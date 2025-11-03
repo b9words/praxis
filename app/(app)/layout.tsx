@@ -3,6 +3,7 @@ import SentryUserProvider from '@/components/providers/SentryUserProvider'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserSubscriptionStatus } from '@/lib/auth/subscription'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
+import { prisma } from '@/lib/prisma/server'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()

@@ -12,11 +12,11 @@ export default async function AdminTokenUsagePage() {
       let tokenUsage: any[] = []
       try {
         tokenUsage = await (prisma as any).tokenUsage.findMany({
-          orderBy: {
-            date: 'desc',
-          },
-          take: 100,
-        })
+        orderBy: {
+          date: 'desc',
+        },
+        take: 100,
+      })
       } catch (error: any) {
         if (isMissingTable(error)) {
           tokenUsage = []

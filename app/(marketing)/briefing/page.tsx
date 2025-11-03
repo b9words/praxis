@@ -58,7 +58,7 @@ export default async function BriefingPage() {
     <>
       <PublicHeader />
       <div className="min-h-screen bg-white">
-        <SectionAccent />
+        <SectionAccent variant="edge" />
         
         <div className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
           {/* Header */}

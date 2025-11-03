@@ -2,6 +2,7 @@ import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLearningPaths, getLearningPathById } from '@/lib/learning-paths'
 import { prisma } from '@/lib/prisma/server'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -64,10 +65,10 @@ export async function GET(request: NextRequest) {
       const itemsWithProgress = path.items.map((item) => {
         if (item.type === 'lesson') {
           const progress = lessonProgress.find(
-            p => p.domainId === item.domain &&
+            (p: any) => p.domainId === item.domain &&
                  p.moduleId === item.module &&
                  p.lessonId === item.lesson
-          )
+            )
           return {
             ...item,
             completed: progress?.status === 'completed' || false,
@@ -112,7 +113,7 @@ export async function GET(request: NextRequest) {
         })
       )
 
-          const completedCount = itemsWithFullProgress.filter(item => item.completed).length
+          const completedCount = itemsWithFullProgress.filter((item: any) => item.completed).length
           const totalItems = itemsWithFullProgress.length
           const progressPercentage = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0
 
@@ -180,16 +181,16 @@ export async function GET(request: NextRequest) {
     ])
 
     const pathsWithProgress = await Promise.all(
-      allPaths.map(async (path) => {
+      allPaths.map(async (path: any) => {
         let completedCount = 0
         const totalItems = path.items.length
 
         for (const item of path.items) {
           if (item.type === 'lesson') {
-            const progress = lessonProgress.find(
-              p => p.domainId === item.domain &&
-                   p.moduleId === item.module &&
-                   p.lessonId === item.lesson
+          const progress = lessonProgress.find(
+            (p: any) => p.domainId === item.domain &&
+                 p.moduleId === item.module &&
+                 p.lessonId === item.lesson
             )
             if (progress?.status === 'completed') {
               completedCount++

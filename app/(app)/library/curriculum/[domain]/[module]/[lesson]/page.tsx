@@ -10,6 +10,7 @@ import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { loadLessonByPath } from '@/lib/content-loader'
 import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById, getCurriculumStats } from '@/lib/curriculum-data'
 import { prisma } from '@/lib/prisma/server'
+import { Prisma } from '@prisma/client'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { ChevronLeft, ChevronRight, Clock, Target, Info } from 'lucide-react'
@@ -328,7 +329,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
         const casesWithPrerequisites = await prisma.case.findMany({
           where: {
             prerequisites: {
-              not: null,
+              not: Prisma.JsonNull,
             },
           },
           include: {
@@ -440,12 +441,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         )
         
         if (hasThisLesson) {
+          const caseItemWithCompetencies = caseItem as any
           associatedCaseStudy = {
             id: caseItem.id,
             title: caseItem.title,
             url: `/simulations/${caseItem.id}/brief`,
             description: caseItem.description || undefined,
-            competencies: caseItem.competencies.map(cc => cc.competency.name),
+            competencies: caseItemWithCompetencies.competencies?.map((cc: any) => cc.competency?.name) || [],
             difficulty: caseItem.difficulty || undefined,
             estimatedMinutes: caseItem.estimatedMinutes || undefined,
           }
@@ -626,7 +628,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 moduleId={moduleId}
                 lessonId={lessonId}
                 initialProgress={currentProgress?.progress_percentage || 0}
-                initialStatus={currentProgress?.status || 'not_started'}
+                initialStatus={(currentProgress?.status as 'not_started' | 'in_progress' | 'completed') || 'not_started'}
                 initialTimeSpent={currentProgress?.time_spent_seconds || 0}
                 initialScrollPosition={currentProgress?.last_read_position?.scrollTop}
               />

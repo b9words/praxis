@@ -26,7 +26,7 @@ export default async function ChannelPage({ params }: { params: Promise<{ slug: 
         })
       } catch (error: any) {
         if (!isMissingTable(error)) {
-          console.error('Error fetching channel:', error)
+        console.error('Error fetching channel:', error)
         }
       }
       return channel

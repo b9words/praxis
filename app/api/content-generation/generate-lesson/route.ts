@@ -70,24 +70,34 @@ export async function POST(request: NextRequest) {
             // Imagen generated PNG
             thumbnailUrl = thumbnailData.imageBuffer || thumbnailData.url
             
-            // Add thumbnail to metadata
-            if (!generatedLesson.metadata) {
-              generatedLesson.metadata = {}
+            // Add thumbnail to metadata (extend existing metadata)
+            const metadata = generatedLesson.metadata || {
+              moduleNumber: 0,
+              lessonNumber: 0,
+              estimatedReadingTime: 0,
+              keyTakeaways: [],
+              visualizations: [],
             }
-            generatedLesson.metadata.thumbnailUrl = thumbnailUrl
-            generatedLesson.metadata.thumbnailType = 'png'
+            ;(metadata as any).thumbnailUrl = thumbnailUrl
+            ;(metadata as any).thumbnailType = 'png'
+            generatedLesson.metadata = metadata
           } else {
             // SVG fallback (legacy)
             const svg = thumbnailData.svg
             thumbnailUrl = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
             
-            // Add thumbnail to metadata
-            if (!generatedLesson.metadata) {
-              generatedLesson.metadata = {}
+            // Add thumbnail to metadata (extend existing metadata)
+            const metadata = generatedLesson.metadata || {
+              moduleNumber: 0,
+              lessonNumber: 0,
+              estimatedReadingTime: 0,
+              keyTakeaways: [],
+              visualizations: [],
             }
-            generatedLesson.metadata.thumbnailSvg = svg
-            generatedLesson.metadata.thumbnailUrl = thumbnailUrl
-            generatedLesson.metadata.thumbnailType = 'svg'
+            ;(metadata as any).thumbnailSvg = svg
+            ;(metadata as any).thumbnailUrl = thumbnailUrl
+            ;(metadata as any).thumbnailType = 'svg'
+            generatedLesson.metadata = metadata
           }
         }
       } catch (thumbnailError) {

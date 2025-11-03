@@ -13,18 +13,18 @@ export default async function ModerationPage() {
       let reports: any[] = []
       try {
         reports = await (prisma as any).report.findMany({
-          orderBy: { createdAt: 'desc' },
-          take: 100,
-          include: {
-            createdBy: {
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-              },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        include: {
+          createdBy: {
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
             },
           },
-        })
+        },
+      })
       } catch (error: any) {
         if (isMissingTable(error)) {
           reports = []

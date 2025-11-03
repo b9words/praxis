@@ -29,7 +29,7 @@ export async function logAdminAction(entry: AuditLogEntry) {
   } catch (error: any) {
     // Log to console as fallback if database insert fails
     if (!isMissingTable(error)) {
-      console.error('[AUDIT] Failed to log admin action:', error)
+    console.error('[AUDIT] Failed to log admin action:', error)
     }
     console.log('[AUDIT]', {
       timestamp: new Date().toISOString(),

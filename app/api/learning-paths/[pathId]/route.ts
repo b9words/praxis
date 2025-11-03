@@ -60,7 +60,7 @@ export async function GET(
       })
     )
 
-    const completedCount = itemsWithProgress.filter(item => item.completed).length
+    const completedCount = itemsWithProgress.filter((item: any) => item.completed || false).length
     const totalItems = itemsWithProgress.length
     const progressPercentage = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0
 

@@ -81,8 +81,8 @@ export async function handleManageBilling() {
   let subscription: any = null
   try {
     subscription = await prisma.subscription.findUnique({
-      where: { userId: user.id },
-    })
+    where: { userId: user.id },
+  })
   } catch (error: any) {
     if (!isMissingTable(error)) {
       console.error('Error fetching subscription:', error)

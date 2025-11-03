@@ -13,19 +13,19 @@ export default async function AdminSubscriptionsPage() {
       let subscriptions: any[] = []
       try {
         subscriptions = await prisma.subscription.findMany({
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-              },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              fullName: true,
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
-        })
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
       } catch (error: any) {
         if (isMissingTable(error)) {
           subscriptions = []

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 
@@ -14,16 +15,23 @@ export default async function ThreadRedirectPage({
   const { id } = await params
 
   try {
-    const thread = await prisma.forumThread.findUnique({
-      where: { id },
-      include: {
-        channel: {
-          select: {
-            slug: true,
+    let thread: any = null
+    try {
+      thread = await (prisma as any).forumThread.findUnique({
+        where: { id },
+        include: {
+          channel: {
+            select: {
+              slug: true,
+            },
           },
         },
-      },
-    })
+      })
+    } catch (error: any) {
+      if (!isMissingTable(error)) {
+        console.error('Error fetching thread for redirect:', error)
+      }
+    }
 
     if (!thread) {
       notFound()

@@ -20,9 +20,6 @@ export async function POST(request: NextRequest) {
     }
     const body = await request.json()
     const { action, ...params } = body
-    
-    // Import getCurrentUser once for use in multiple cases
-    const { getCurrentUser } = await import('@/lib/auth/get-user')
 
     switch (action) {
       case 'updateRole':
@@ -45,7 +42,7 @@ export async function POST(request: NextRequest) {
             { auth: { autoRefreshToken: false, persistSession: false } }
           )
           
-          const username = fullUser?.user_metadata?.username || fullUser?.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
+          const username = (fullUser as any)?.user_metadata?.username || fullUser?.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
           const uniqueUsername = `${username}_${user.id.substring(0, 8)}`
           
           const { error: createError } = await supabaseAdmin
@@ -53,7 +50,7 @@ export async function POST(request: NextRequest) {
             .upsert({
               id: user.id,
               username: uniqueUsername,
-              full_name: fullUser?.user_metadata?.full_name || username,
+              full_name: (fullUser as any)?.user_metadata?.full_name || username,
               role: params.role,
               is_public: false,
             }, { onConflict: 'id' })
@@ -175,33 +172,43 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true })
 
       case 'createTestThread':
-        const channel = await prisma.forumChannel.findFirst()
+        let channel: any = null
+        try {
+          channel = await (prisma as any).forumChannel.findFirst()
+        } catch (error: any) {
+          return NextResponse.json({ error: 'Forum channels are not available' }, { status: 503 })
+        }
         if (!channel) {
           return NextResponse.json({ error: 'No channels found' }, { status: 404 })
         }
-        const thread = await prisma.forumThread.create({
-          data: {
-            channelId: channel.id,
-            authorId: user.id,
-            title: `Test Thread - ${new Date().toLocaleTimeString()}`,
-            content: 'This is a test thread created by DevTools',
-          },
-          include: {
-            author: {
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
+        let thread: any = null
+        try {
+          thread = await (prisma as any).forumThread.create({
+            data: {
+              channelId: channel.id,
+              authorId: user.id,
+              title: `Test Thread - ${new Date().toLocaleTimeString()}`,
+              content: 'This is a test thread created by DevTools',
+            },
+            include: {
+              author: {
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                },
+              },
+              channel: {
+                select: {
+                  slug: true,
+                },
               },
             },
-            channel: {
-              select: {
-                slug: true,
-              },
-            },
-          },
-        })
-        return NextResponse.json({ success: true, thread })
+          })
+          return NextResponse.json({ success: true, thread })
+        } catch (error: any) {
+          return NextResponse.json({ error: 'Failed to create thread' }, { status: 500 })
+        }
 
       case 'seedComprehensive':
         // Get email from current user

@@ -82,12 +82,18 @@ export async function POST(
 
     // Create forum thread for this simulation (if forum channels exist)
     try {
-      const generalChannel = await prisma.forumChannel.findFirst({
-        where: { slug: 'general' },
-      })
+      let generalChannel: any = null
+      try {
+        generalChannel = await (prisma as any).forumChannel.findFirst({
+          where: { slug: 'general' },
+        })
+      } catch (error: any) {
+        // Forum tables don't exist, skip
+      }
 
       if (generalChannel) {
-        await prisma.forumThread.create({
+        try {
+          await (prisma as any).forumThread.create({
           data: {
             channelId: generalChannel.id,
             title: `Discussion: ${caseTitle}`,
@@ -100,10 +106,14 @@ export async function POST(
             },
           },
         })
+        } catch (threadError) {
+          // Don't fail the completion if forum thread creation fails
+          console.error('Failed to create forum thread:', threadError)
+        }
       }
     } catch (forumError) {
       // Don't fail the completion if forum thread creation fails
-      console.error('Failed to create forum thread:', forumError)
+      console.error('Failed to check/create forum thread:', forumError)
     }
 
     // Send notification

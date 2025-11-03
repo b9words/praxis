@@ -7,11 +7,17 @@ export async function GET(request: NextRequest) {
     // Cache channels (15 minutes revalidate)
     const getCachedChannels = cache(
       async () => {
-        const channels = await prisma.forumChannel.findMany({
-          orderBy: {
-            createdAt: 'asc',
-          },
-        })
+        let channels: any[] = []
+        try {
+          channels = await (prisma as any).forumChannel?.findMany({
+            orderBy: {
+              createdAt: 'asc',
+            },
+          }) || []
+        } catch (error: any) {
+          // Forum tables might not exist
+          channels = []
+        }
         return channels
       },
       ['api', 'forum', 'channels'],
@@ -45,13 +51,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name and slug are required' }, { status: 400 })
     }
 
-    const channel = await prisma.forumChannel.create({
-      data: {
-        name,
-        slug,
-        description: description || null,
-      },
-    })
+    let channel: any = null
+    try {
+      channel = await (prisma as any).forumChannel.create({
+        data: {
+          name,
+          slug,
+          description: description || null,
+        },
+      })
+    } catch (error: any) {
+      return NextResponse.json({ error: 'Forum channels are not available' }, { status: 503 })
+    }
 
     return NextResponse.json({ channel })
   } catch (error: any) {

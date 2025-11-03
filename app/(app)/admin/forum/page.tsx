@@ -15,65 +15,65 @@ export default async function AdminForumPage() {
       try {
         [channels, threads, posts] = await Promise.all([
           (prisma as any).forumChannel.findMany({
-            include: {
-              threads: {
-                select: {
-                  id: true,
-                },
+          include: {
+            threads: {
+              select: {
+                id: true,
               },
             },
-            orderBy: {
-              createdAt: 'asc',
-            },
-          }),
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        }),
           (prisma as any).forumThread.findMany({
-            include: {
-              author: {
-                select: {
-                  id: true,
-                  username: true,
-                  fullName: true,
-                },
-              },
-              channel: {
-                select: {
-                  id: true,
-                  name: true,
-                  slug: true,
-                },
-              },
-              posts: {
-                select: {
-                  id: true,
-                },
+          include: {
+            author: {
+              select: {
+                id: true,
+                username: true,
+                fullName: true,
               },
             },
-            orderBy: {
-              createdAt: 'desc',
+            channel: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
             },
-            take: 50,
-          }),
+            posts: {
+              select: {
+                id: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 50,
+        }),
           (prisma as any).forumPost.findMany({
-            include: {
-              author: {
-                select: {
-                  id: true,
-                  username: true,
-                },
-              },
-              thread: {
-                select: {
-                  id: true,
-                  title: true,
-                },
+          include: {
+            author: {
+              select: {
+                id: true,
+                username: true,
               },
             },
-            orderBy: {
-              createdAt: 'desc',
+            thread: {
+              select: {
+                id: true,
+                title: true,
+              },
             },
-            take: 50,
-          }),
-        ])
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 50,
+        }),
+      ])
       } catch (error: any) {
         if (!isMissingTable(error)) {
           console.error('Error fetching forum data:', error)

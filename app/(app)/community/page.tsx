@@ -23,26 +23,26 @@ export default async function CommunityPage() {
         })
       } catch (error: any) {
         if (!isMissingTable(error)) {
-          console.error('Error fetching channels:', error)
+        console.error('Error fetching channels:', error)
         }
       }
 
       // For each channel, get thread count with error handling (parallelize)
       const channelsWithCounts = await Promise.all(
-        channels.map(async (channel: any) => {
+          channels.map(async (channel: any) => {
           let threadCount = 0
           try {
             threadCount = await (prisma as any).forumThread.count({
               where: { channelId: channel.id },
-            })
+              })
           } catch (error: any) {
             if (!isMissingTable(error)) {
               console.error(`Error fetching thread count for channel ${channel.id}:`, error)
             }
           }
           return { ...channel, threadCount }
-        })
-      )
+          })
+        )
 
       return channelsWithCounts
     },

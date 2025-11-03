@@ -191,7 +191,7 @@ export default async function SimulationsPage() {
           const isCompleted = completedCaseIds.has(caseItem.id)
           const isInProgress = inProgressCaseIds.has(caseItem.id)
           const competencies = caseItem.competencies
-            .map((cc) => cc.competency.name)
+            .map((cc: any) => cc.competency?.name)
             .filter(Boolean)
 
           return (
@@ -237,7 +237,7 @@ export default async function SimulationsPage() {
                   </div>
                   {competencies.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                      {competencies.map((comp, idx) => (
+                      {competencies.map((comp: string, idx: number) => (
                         <Badge key={idx} variant="outline" className="text-xs font-medium text-gray-600 border-gray-300">
                           {comp}
                         </Badge>

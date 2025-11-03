@@ -12,6 +12,10 @@ export default async function DashboardPage() {
   // If user doesn't have residency, dashboard will show appropriate empty state
   // Client-side components can handle navigation if needed
 
+  if (!user) {
+    return null
+  }
+
   // Cache dashboard data with userId in key, 5 minute revalidation
   const getCachedDashboardData = getCachedUserData(
     user.id,

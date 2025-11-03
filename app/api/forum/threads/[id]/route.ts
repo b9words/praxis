@@ -1,5 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -11,7 +12,7 @@ export async function GET(
 
     let thread: any = null
     try {
-      thread = await prisma.forumThread.findUnique({
+      thread = await (prisma as any).forumThread.findUnique({
         where: { id },
         include: {
           author: {
@@ -40,7 +41,7 @@ export async function GET(
       if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
         try {
           // Fallback: explicit select without problematic columns
-          thread = await prisma.forumThread.findUnique({
+          thread = await (prisma as any).forumThread.findUnique({
             where: { id },
             select: {
               id: true,
@@ -111,7 +112,7 @@ export async function PUT(
     const { title, content, isPinned } = body
 
     // Check if user owns the thread or is admin/editor
-    const thread = await prisma.forumThread.findUnique({
+    const thread = await (prisma as any).forumThread.findUnique({
       where: { id },
       select: { authorId: true },
     })
@@ -132,7 +133,7 @@ export async function PUT(
 
     let updatedThread: any = null
     try {
-      updatedThread = await prisma.forumThread.update({
+      updatedThread = await (prisma as any).forumThread.update({
         where: { id },
         data: {
           title,
@@ -154,7 +155,7 @@ export async function PUT(
       if (error?.code === 'P2022' || error?.message?.includes('metadata') || error?.message?.includes('does not exist')) {
         try {
           // Fallback: explicit select without problematic columns
-          updatedThread = await prisma.forumThread.update({
+          updatedThread = await (prisma as any).forumThread.update({
             where: { id },
             data: {
               title,
@@ -230,7 +231,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const thread = await prisma.forumThread.findUnique({
+    const thread = await (prisma as any).forumThread.findUnique({
       where: { id },
     })
 
@@ -240,7 +241,7 @@ export async function PATCH(
 
     let updatedThread: any = null
     try {
-      updatedThread = await prisma.forumThread.update({
+      updatedThread = await (prisma as any).forumThread.update({
         where: { id },
         data: body, // Allow partial updates
         include: {
@@ -255,7 +256,7 @@ export async function PATCH(
       })
     } catch (error: any) {
       if (error?.code === 'P2022' || error?.message?.includes('metadata')) {
-        updatedThread = await prisma.forumThread.update({
+        updatedThread = await (prisma as any).forumThread.update({
           where: { id },
           data: body,
           select: {
@@ -313,7 +314,7 @@ export async function DELETE(
     const { id } = await params
 
     // Check if user owns the thread or is admin
-    const thread = await prisma.forumThread.findUnique({
+    const thread = await (prisma as any).forumThread.findUnique({
       where: { id },
       select: { authorId: true },
     })
@@ -332,7 +333,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    await prisma.forumThread.delete({
+    await (prisma as any).forumThread.delete({
       where: { id },
     })
 

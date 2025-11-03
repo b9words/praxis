@@ -17,8 +17,8 @@ export async function requireSubscription(): Promise<{ id: string; subscriptionI
   let subscription: any = null
   try {
     subscription = await prisma.subscription.findUnique({
-      where: { userId: user.id },
-    })
+    where: { userId: user.id },
+  })
   } catch (error: any) {
     if (isMissingTable(error)) {
       throw new Error('Subscription required')
@@ -65,8 +65,8 @@ export async function checkSubscription(): Promise<{
   let subscription: any = null
   try {
     subscription = await prisma.subscription.findUnique({
-      where: { userId: user.id },
-    })
+    where: { userId: user.id },
+  })
   } catch (error: any) {
     if (isMissingTable(error)) {
       return {

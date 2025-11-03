@@ -13,19 +13,19 @@ export default async function AdminNotificationsPage() {
       let notifications: any[] = []
       try {
         notifications = await prisma.notification.findMany({
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-              },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
             },
           },
-          orderBy: {
-            createdAt: 'desc',
-          },
-          take: 100,
-        })
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 100,
+      })
       } catch (error: any) {
         if (isMissingTable(error)) {
           notifications = []

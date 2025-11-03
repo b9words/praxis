@@ -58,12 +58,6 @@ export default async function AdminUsersPage({
                   status: true,
                 },
               },
-              applications: {
-                select: {
-                  id: true,
-                  status: true,
-                },
-              },
             },
             orderBy: {
               createdAt: 'desc',

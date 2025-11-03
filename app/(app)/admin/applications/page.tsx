@@ -49,11 +49,11 @@ export default async function AdminApplicationsPage({
         })
         
         stats = await (prisma as any).userApplication.groupBy({
-          by: ['status'],
-          _count: {
-            id: true,
-          },
-        })
+            by: ['status'],
+            _count: {
+              id: true,
+            },
+          })
       } catch (error: any) {
         if (isMissingTable(error)) {
           // Table doesn't exist, use empty fallbacks
