@@ -370,25 +370,4 @@ export async function generateImagenThumbnail(
   return imageUrl
 }
 
-// ============================================================================
-// DALL-E 3 PIPELINE (COMMENTED OUT - Using Imagen instead)
-// ============================================================================
-
-/**
- * Complete two-stage pipeline: Get metaphor and generate image using DALL-E (COMMENTED OUT - using Imagen instead)
- * @param title - Lesson or case title
- * @param description - Optional description
- * @param quality - DALL-E quality setting
- * @returns URL to generated DALL-E image
- */
-// export async function generateDalleThumbnail(
-//   title: string,
-//   description?: string,
-//   quality: 'hd' | 'standard' = 'hd'
-// ): Promise<string> {
-//   const metaphor = await getVisualMetaphor(title, description)
-//   const prompt = buildMasterPrompt(metaphor)
-//   const imageUrl = await generateDalleImage(prompt, quality)
-//   return imageUrl
-// }
 

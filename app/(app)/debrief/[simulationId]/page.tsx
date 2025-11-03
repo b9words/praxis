@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
 import { getAllLessonsFlat, getDomainById } from '@/lib/curriculum-data'
+import { getDomainIdForCompetency } from '@/lib/competency-mapping'
 import { fetchJson } from '@/lib/api'
 import { queryKeys } from '@/lib/queryKeys'
 import { useQuery } from '@tanstack/react-query'
@@ -104,14 +105,6 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
     .filter(Boolean)
 
   // Map competencies to domains and get foundational lessons
-  const competencyToDomainMapping: Record<string, string> = {
-    financialAcumen: 'second-order-decision-making',
-    strategicThinking: 'competitive-moat-architecture',
-    marketAwareness: 'technological-market-foresight',
-    riskManagement: 'crisis-leadership-public-composure',
-    leadershipJudgment: 'organizational-design-talent-density',
-  }
-
   const getFoundationalLessonForDomain = (domainId: string) => {
     const domain = getDomainById(domainId)
     if (!domain || domain.modules.length === 0) return null
@@ -139,14 +132,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
   }> = []
 
   weakCompetencies.slice(0, 5).forEach((competencyName: string) => {
-    // Try exact match first
-    let domainId = competencyToDomainMapping[competencyName]
-    
-    // Try normalized match
-    if (!domainId) {
-      const normalized = competencyName.toLowerCase().replace(/\s+/g, '')
-      domainId = competencyToDomainMapping[normalized]
-    }
+    const domainId = getDomainIdForCompetency(competencyName)
 
     if (domainId) {
       const lesson = getFoundationalLessonForDomain(domainId)

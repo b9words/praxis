@@ -33,7 +33,7 @@ export default function CookiePolicyPage() {
       
       <div className="prose prose-lg max-w-none">
             <p className="text-sm text-neutral-600 mb-8">
-          Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          Last updated: November 3, 2024
         </p>
 
         <section className="mb-8">

@@ -9,16 +9,6 @@ export const queryKeys = {
   profiles: {
     byId: (userId: string) => ['profiles', userId] as const,
   },
-  forum: {
-    channels: () => ['forum', 'channels'] as const,
-    threads: {
-      byChannel: (slug: string) => ['forum', 'threads', slug] as const,
-      byId: (id: string) => ['forum', 'thread', id] as const,
-    },
-    posts: {
-      byThread: (threadId: string) => ['forum', 'posts', threadId] as const,
-    },
-  },
   simulations: {
     byId: (id: string) => ['simulations', id] as const,
     state: (id: string) => ['simulations', id, 'state'] as const,

@@ -156,14 +156,7 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
 
   // Get recommended lessons for NeedARefresher based on case competencies
   const { getDomainById, getAllLessonsFlat } = await import('@/lib/curriculum-data')
-  
-  const competencyToDomainMapping: Record<string, string> = {
-    financialAcumen: 'second-order-decision-making',
-    strategicThinking: 'competitive-moat-architecture',
-    marketAwareness: 'technological-market-foresight',
-    riskManagement: 'crisis-leadership-public-composure',
-    leadershipJudgment: 'organizational-design-talent-density',
-  }
+  const { getDomainIdForCompetency } = await import('@/lib/competency-mapping')
 
   const getFoundationalLessonForDomain = (domainId: string) => {
     const domain = getDomainById(domainId)
@@ -189,8 +182,7 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
   if (caseItem.competencies) {
     caseItem.competencies.forEach((cc: any) => {
       const competencyName = cc.competency?.name || 'Unknown'
-      const domainId = competencyToDomainMapping[competencyName] || 
-                       competencyToDomainMapping[competencyName.toLowerCase().replace(/\s+/g, '')]
+      const domainId = getDomainIdForCompetency(competencyName)
       
       if (domainId) {
         const lesson = getFoundationalLessonForDomain(domainId)

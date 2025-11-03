@@ -3,20 +3,17 @@ import { createClient } from '@supabase/supabase-js'
 
 /**
  * Comprehensive seed function that creates ALL demo data from scratch
- * Creates: competencies, cases, articles, channels, then user data
+ * Creates: competencies, cases, articles, then user data
  */
 export async function seedComprehensiveData(userId: string, email?: string) {
   const results: any = {
     competencies: 0,
     cases: 0,
     articles: 0,
-    channels: 0,
     simulations: 0,
     debriefs: 0,
     articleProgress: 0,
     notifications: 0,
-    threads: 0,
-    posts: 0,
     errors: [] as string[],
   }
 
@@ -421,52 +418,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
       }
     }
 
-    // STEP 4: CREATE FORUM CHANNELS (if they don't exist)
-    const channelData = [
-      { name: 'Simulation Debriefs', description: 'Discuss your simulation results and learn from other members', slug: 'simulation-debriefs' },
-      { name: 'Business News & Analysis', description: 'Share and discuss current business news and trends', slug: 'business-news' },
-      { name: 'Strategy & Execution', description: 'Strategic planning and execution frameworks', slug: 'strategy-execution' },
-      { name: 'Career Paths', description: 'Advice and discussion about career development', slug: 'career-paths' },
-      { name: 'General Discussion', description: 'Everything else', slug: 'general' },
-    ]
-
-    const createdChannelIds: string[] = []
-
-    for (const channelInfo of channelData) {
-      try {
-        let existing: any = null
-        try {
-          existing = await (prisma as any).forumChannel.findUnique({
-            where: { slug: channelInfo.slug },
-          })
-        } catch (error: any) {
-          // Forum tables might not exist
-        }
-        
-        if (existing) {
-          createdChannelIds.push(existing.id)
-          // Channel exists, use it (don't increment counter)
-        } else {
-          try {
-            const newChannel = await (prisma as any).forumChannel.create({
-              data: {
-                name: channelInfo.name,
-                description: channelInfo.description,
-                slug: channelInfo.slug,
-              },
-            })
-            createdChannelIds.push(newChannel.id)
-            results.channels++
-          } catch (createError: any) {
-            results.errors.push(`Failed to create channel ${channelInfo.name}: ${createError.message}`)
-          }
-        }
-      } catch (error: any) {
-        results.errors.push(`Failed to create channel ${channelInfo.name}: ${error.message}`)
-      }
-    }
-
-    // STEP 5: CREATE SIMULATIONS for the user
+    // STEP 4: CREATE SIMULATIONS for the user
     if (createdCaseIds.length === 0) {
       results.errors.push('No case IDs available for creating simulations. Cases may not have been found or created.')
       // Try the fallback query here too
@@ -665,72 +617,6 @@ export async function seedComprehensiveData(userId: string, email?: string) {
         results.notifications++
       } catch (notifError: any) {
         results.errors.push(`Failed to create notification: ${notifError.message}`)
-      }
-    }
-
-    // STEP 8: CREATE COMMUNITY THREADS AND POSTS
-    if (createdChannelIds.length > 0) {
-      const threadTopics = [
-        'How do you approach decision-making under uncertainty?',
-        'Best practices for financial modeling in strategic planning',
-        'Managing stakeholder expectations during crisis',
-        'Operational efficiency vs. innovation trade-offs',
-        'Building high-performing executive teams',
-        'Market positioning strategies in competitive industries',
-        'Risk management frameworks for high-growth companies',
-      ]
-
-      for (let i = 0; i < Math.min(threadTopics.length, createdChannelIds.length * 2); i++) {
-        const channelId = createdChannelIds[i % createdChannelIds.length]
-        if (!channelId) continue
-
-        try {
-          const threadResult = await prisma.$queryRaw`
-            INSERT INTO forum_threads (id, channel_id, author_id, title, content, is_pinned, created_at, updated_at)
-            VALUES (
-              gen_random_uuid(),
-              ${channelId}::uuid,
-              ${userId}::uuid,
-              ${threadTopics[i]}::text,
-              ${`This is a discussion about ${threadTopics[i].toLowerCase()}. I'd love to hear your thoughts and experiences on this topic.\n\nLet's have a meaningful exchange about best practices and lessons learned. Share your insights!`}::text,
-              false,
-              NOW(),
-              NOW()
-            )
-            RETURNING id
-          ` as any[]
-          
-          if (!threadResult || threadResult.length === 0) continue
-          
-          const threadId = threadResult[0].id
-          results.threads++
-
-          if (i < 4 && threadId) {
-            const postContent = [
-              'Great question! In my experience, the key is to gather as much data as possible while recognizing that perfect information is rarely available. I usually create decision frameworks that help structure my thinking...',
-              'I think this depends significantly on the industry context. For tech companies, the approach differs from traditional manufacturing. What sector are you working in?',
-              'One thing that helped me was using scenario planning - developing 3-5 potential outcomes and preparing responses for each. This reduces the stress of uncertainty and makes decisions more systematic.',
-              'The balance between speed and thoroughness is crucial. Sometimes you need to make a "good enough" decision quickly rather than waiting for perfect information.',
-            ]
-
-            for (let j = 0; j < 3; j++) {
-              try {
-                await (prisma as any).forumPost.create({
-                  data: {
-                    threadId,
-                    authorId: userId,
-                    content: postContent[j % postContent.length],
-                  },
-                })
-                results.posts++
-              } catch (postError: any) {
-                results.errors.push(`Failed to create post: ${postError.message}`)
-              }
-            }
-          }
-        } catch (threadError: any) {
-          results.errors.push(`Failed to create thread: ${threadError.message}`)
-        }
       }
     }
 

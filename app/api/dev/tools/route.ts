@@ -171,45 +171,6 @@ export async function POST(request: NextRequest) {
         })
         return NextResponse.json({ success: true })
 
-      case 'createTestThread':
-        let channel: any = null
-        try {
-          channel = await (prisma as any).forumChannel.findFirst()
-        } catch (error: any) {
-          return NextResponse.json({ error: 'Forum channels are not available' }, { status: 503 })
-        }
-        if (!channel) {
-          return NextResponse.json({ error: 'No channels found' }, { status: 404 })
-        }
-        let thread: any = null
-        try {
-          thread = await (prisma as any).forumThread.create({
-            data: {
-              channelId: channel.id,
-              authorId: user.id,
-              title: `Test Thread - ${new Date().toLocaleTimeString()}`,
-              content: 'This is a test thread created by DevTools',
-            },
-            include: {
-              author: {
-                select: {
-                  id: true,
-                  username: true,
-                  fullName: true,
-                },
-              },
-              channel: {
-                select: {
-                  slug: true,
-                },
-              },
-            },
-          })
-          return NextResponse.json({ success: true, thread })
-        } catch (error: any) {
-          return NextResponse.json({ error: 'Failed to create thread' }, { status: 500 })
-        }
-
       case 'seedComprehensive':
         // Get email from current user
         const currentUser = await getCurrentUser()

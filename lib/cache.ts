@@ -52,8 +52,6 @@ export const CacheTags = {
   DASHBOARD: 'dashboard',
   ADMIN: 'admin',
   SYSTEM: 'system',
-  FORUM: 'forum',
-  COMMUNITY: 'community',
   APPLICATIONS: 'applications',
 } as const
 

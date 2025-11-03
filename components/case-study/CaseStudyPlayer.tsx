@@ -25,8 +25,7 @@ const challengeLayoutMap = {
   FINANCIAL_MODELING: FinancialModelingLayout,
   MULTI_STAGE: MultiStageLayout,
   NEGOTIATION: NegotiationLayout,
-  // Legacy/alternative mappings for backward compatibility
-  WRITTEN_ANALYSIS_LAYOUT: WrittenAnalysisLayout,
+  // Legacy mapping for backward compatibility (used in active case studies)
   STRATEGIC_OPTIONS_TRIAGE: StrategicOptionsLayout,
 }
 

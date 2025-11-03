@@ -4,6 +4,7 @@ import { getUserAggregateScores } from './database-functions'
 import { getAllLessonsFlat, getDomainById } from './curriculum-data'
 import { getAllInteractiveSimulations } from './case-study-loader'
 import { getAllLearningPaths, getLearningPathByCaseId } from './learning-paths'
+import { getDomainIdForCompetency } from './competency-mapping'
 
 export interface Recommendation {
   type: 'curriculum' | 'simulation'
@@ -18,17 +19,6 @@ export interface Recommendation {
 export interface RecommendationWithAlternates {
   primary: Recommendation | null
   alternates: Recommendation[]
-}
-
-/**
- * Maps competency names to curriculum domains
- */
-const competencyToDomainMapping: Record<string, string> = {
-  financialAcumen: 'second-order-decision-making',
-  strategicThinking: 'competitive-moat-architecture',
-  marketAwareness: 'technological-market-foresight',
-  riskManagement: 'crisis-leadership-public-composure',
-  leadershipJudgment: 'organizational-design-talent-density',
 }
 
 /**
@@ -389,8 +379,7 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
           // Find foundational lessons for weak competencies
           for (const lowScore of lowScores.slice(0, 2)) {
             const competencyName = typeof lowScore === 'object' ? lowScore.competencyName : ''
-            const domainId = competencyToDomainMapping[competencyName] || 
-                           competencyToDomainMapping[competencyName.toLowerCase().replace(/\s+/g, '')]
+            const domainId = getDomainIdForCompetency(competencyName)
             
             if (domainId) {
               const foundationalLesson = getFoundationalLessonForDomain(domainId)
@@ -429,7 +418,7 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
       const topWeakCompetencies = weakCompetencies.slice(0, 2)
       
       for (const [competencyName, score] of topWeakCompetencies) {
-        const domainId = competencyToDomainMapping[competencyName]
+        const domainId = getDomainIdForCompetency(competencyName)
         
         if (domainId) {
           const foundationalLesson = getFoundationalLessonForDomain(domainId)

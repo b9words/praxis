@@ -1,5 +1,4 @@
 import { cache, CacheTags } from '@/lib/cache'
-import { prisma } from '@/lib/prisma/server'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { MessageCircle } from 'lucide-react'
 import { Metadata } from 'next'
@@ -14,6 +13,7 @@ export default async function CommunityPage() {
   // Cache channels list (15 minutes revalidate)
   const getCachedChannels = cache(
     async () => {
+      const { prisma } = await import('@/lib/prisma/server')
       let channels: any[] = []
       try {
         channels = await (prisma as any).forumChannel.findMany({
@@ -56,6 +56,7 @@ export default async function CommunityPage() {
   // Cache recent threads (2 minutes revalidate)
   const getCachedRecentThreads = cache(
     async () => {
+      const { prisma } = await import('@/lib/prisma/server')
       let recentThreads: any[] = []
       try {
         recentThreads = await (prisma as any).forumThread.findMany({
@@ -194,3 +195,4 @@ export default async function CommunityPage() {
     </div>
   )
 }
+

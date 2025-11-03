@@ -100,66 +100,6 @@ async function generateImagenThumbnailWithProcessing(
   }
 }
 
-// ============================================================================
-// DALL-E 3 FUNCTION (COMMENTED OUT - Using Imagen instead)
-// ============================================================================
-
-/**
- * Generate DALL-E thumbnail and process it (COMMENTED OUT - using Imagen instead)
- */
-// async function generateDalleThumbnailWithProcessing(
-//   title: string,
-//   description: string | undefined,
-//   contentId: string | null,
-//   contentType: 'lesson' | 'case',
-//   supabase: ReturnType<typeof createClient> | null
-// ): Promise<{ url: string; imageBuffer: string }> {
-//   try {
-//     // Stage 1 & 2: Generate DALL-E image
-//     const dalleImageUrl = await generateDalleThumbnail(title, description, 'hd')
-//
-//     // Stage 3: Process image (crop and resize)
-//     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
-//     const processResponse = await fetch(`${baseUrl}/api/thumbnail/process`, {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({
-//         imageUrl: dalleImageUrl,
-//         targetWidth: 300,
-//         targetHeight: 400,
-//       }),
-//     })
-//
-//     if (!processResponse.ok) {
-//       throw new Error('Failed to process DALL-E image')
-//     }
-//
-//     const { imageBuffer: dataUri } = await processResponse.json()
-//
-//     // If contentId provided, upload to storage and update DB
-//     let thumbnailUrl = dataUri // Default to data URI
-//     if (contentId && supabase) {
-//       try {
-//         // Convert data URI to buffer for upload
-//         const base64Data = dataUri.replace(/^data:image\/png;base64,/, '')
-//         const buffer = Buffer.from(base64Data, 'base64')
-//         thumbnailUrl = await uploadThumbnailToStorage(buffer, contentId, contentType, supabase)
-//       } catch (uploadError) {
-//         console.error('Failed to upload thumbnail, using data URI:', uploadError)
-//         // Continue with data URI if upload fails
-//       }
-//     }
-//
-//     return {
-//       url: thumbnailUrl,
-//       imageBuffer: dataUri,
-//     }
-//   } catch (error) {
-//     console.error('DALL-E thumbnail generation failed:', error)
-//     throw error
-//   }
-// }
-
 export async function POST(request: NextRequest) {
   try {
     const { 

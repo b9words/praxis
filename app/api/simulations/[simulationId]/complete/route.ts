@@ -80,42 +80,6 @@ export async function POST(
       return NextResponse.json({ error: normalized }, { status: statusCode })
     }
 
-    // Create forum thread for this simulation (if forum channels exist)
-    try {
-      let generalChannel: any = null
-      try {
-        generalChannel = await (prisma as any).forumChannel.findFirst({
-          where: { slug: 'general' },
-        })
-      } catch (error: any) {
-        // Forum tables don't exist, skip
-      }
-
-      if (generalChannel) {
-        try {
-          await (prisma as any).forumThread.create({
-          data: {
-            channelId: generalChannel.id,
-            title: `Discussion: ${caseTitle}`,
-            content: `Completed simulation "${caseTitle}" and would love to discuss insights and learnings with the community!`,
-            authorId: user.id,
-            metadata: {
-              simulationId: simulation.id,
-              caseId: simulation.caseId,
-              autoCreated: true,
-            },
-          },
-        })
-        } catch (threadError) {
-          // Don't fail the completion if forum thread creation fails
-          console.error('Failed to create forum thread:', threadError)
-        }
-      }
-    } catch (forumError) {
-      // Don't fail the completion if forum thread creation fails
-      console.error('Failed to check/create forum thread:', forumError)
-    }
-
     // Send notification
     await notifySimulationComplete(
       user.id,

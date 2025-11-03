@@ -44,6 +44,33 @@ export function getDomainForCompetency(competencyKey: string): string | null {
 }
 
 /**
+ * Get domain ID for a competency name or key
+ * Handles both competency keys (from getUserAggregateScores) and display names
+ */
+export function getDomainIdForCompetency(competencyNameOrKey: string): string | null {
+  // Try direct key match first
+  if (COMPETENCY_TO_DOMAIN_MAP[competencyNameOrKey]) {
+    return COMPETENCY_TO_DOMAIN_MAP[competencyNameOrKey].domainId
+  }
+  
+  // Try normalized key match (lowercase, no spaces)
+  const normalized = competencyNameOrKey.toLowerCase().replace(/\s+/g, '')
+  if (COMPETENCY_TO_DOMAIN_MAP[normalized]) {
+    return COMPETENCY_TO_DOMAIN_MAP[normalized].domainId
+  }
+  
+  // Try display name match
+  for (const [key, mapping] of Object.entries(COMPETENCY_TO_DOMAIN_MAP)) {
+    if (mapping.displayName === competencyNameOrKey || 
+        mapping.displayName.toLowerCase() === competencyNameOrKey.toLowerCase()) {
+      return mapping.domainId
+    }
+  }
+  
+  return null
+}
+
+/**
  * Get display name for a competency key
  */
 export function getDisplayNameForCompetency(competencyKey: string): string {
