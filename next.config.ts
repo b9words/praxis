@@ -44,6 +44,7 @@ const nextConfig: NextConfig = {
       /node_modules\/@sentry/,
     ]
     
+    
     return config
   },
 };

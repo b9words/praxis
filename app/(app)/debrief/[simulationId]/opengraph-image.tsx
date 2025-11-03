@@ -68,17 +68,17 @@ export default async function Image({ params }: { params: Promise<{ simulationId
 
     return new ImageResponse(
       (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          width: '100%',
-          padding: '60px',
-          backgroundColor: '#ffffff',
-          color: '#1f2937',
-          fontFamily: 'Inter, system-ui, sans-serif',
-        }}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            width: '100%',
+            padding: '60px',
+            backgroundColor: '#ffffff',
+            color: '#1f2937',
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}
       >
         {/* Header */}
         <div
