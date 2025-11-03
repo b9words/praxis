@@ -10,7 +10,7 @@ import { CaseStudyThumbnail } from '../components/thumbnails/CaseStudyThumbnail'
 import { getLucideIconPath } from '../lib/thumbnail-utils'
 import { callGeminiForDataViz } from '../lib/thumbnail-gemini'
 import { config } from 'dotenv'
-import satori from 'satori'
+import satori, { type Font } from 'satori'
 import { Resvg } from '@resvg/resvg-js'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -141,7 +141,7 @@ async function generateThumbnailSVG(
 
   // Render to SVG
   // Only include fonts if they loaded successfully (non-empty buffers)
-  const fonts = []
+  const fonts: Font[] = []
   if (fontRegular.byteLength > 0) {
     fonts.push({ name: 'Inter', data: fontRegular, weight: 400, style: 'normal' })
   }

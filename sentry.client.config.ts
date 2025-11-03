@@ -69,14 +69,17 @@ Sentry.init({
     // Scrub sensitive headers
     if (event.request?.headers) {
       const sensitiveHeaders = ['authorization', 'cookie', 'x-api-key', 'x-auth-token']
-      sensitiveHeaders.forEach(header => {
-        const key = Object.keys(event.request.headers).find(
-          k => k.toLowerCase() === header.toLowerCase()
-        )
-        if (key) {
-          event.request.headers[key] = '[REDACTED]'
-        }
-      })
+      const headers = event.request.headers
+      if (headers) {
+        sensitiveHeaders.forEach(header => {
+          const key = Object.keys(headers).find(
+            k => k.toLowerCase() === header.toLowerCase()
+          )
+          if (key) {
+            headers[key] = '[REDACTED]'
+          }
+        })
+      }
     }
     
     return event

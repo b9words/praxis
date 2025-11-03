@@ -1,6 +1,6 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import matter from 'gray-matter'
-import path from 'path'
+import * as path from 'path'
 
 export interface CaseStudy {
   id: string

@@ -202,7 +202,7 @@ class TestFixCycle {
     const duration = Date.now() - this.startTime
     const durationMinutes = Math.round(duration / 60000)
     
-    console.log('\n' + '=' * 60)
+    console.log('\n' + '='.repeat(60))
     console.log('📊 TEST-FIX CYCLE SUMMARY')
     console.log('='.repeat(60))
     console.log(`🔄 Iterations completed: ${this.iteration}`)
