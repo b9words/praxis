@@ -44,8 +44,11 @@ export default function ContentShelf({
     }
   }
 
-  // Don't render if no content and not loading
-  if (!isLoading && !hasContent) {
+  // Always render if emptyMessage is provided (for catalog browsing)
+  const shouldRender = isLoading || hasContent || !!emptyMessage
+  
+  // Don't render if no content, not loading, and no empty message
+  if (!shouldRender) {
     return null
   }
 

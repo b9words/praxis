@@ -6,7 +6,6 @@ import NewContentCard from '@/components/dashboard/cards/NewContentCard'
 import ResidencyProgress from '@/components/dashboard/ResidencyProgress'
 import ContentShelf from '@/components/dashboard/shelves/ContentShelf'
 import SmartRecommendation from '@/components/dashboard/SmartRecommendation'
-import FirstTimeExperience from '@/components/dashboard/FirstTimeExperience'
 import ExecemyRadarChart from '@/components/profile/ExecemyRadarChart'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -106,21 +105,6 @@ export default function FocusedDashboard({
   const progressPercentage = residencyData 
     ? Math.round((residencyData.articlesCompleted / residencyData.totalArticles) * 100)
     : 0
-
-  // Detect first-time users: no jump back in items and no recent activities
-  const isFirstTime = (jumpBackInItems?.length ?? 0) === 0 && (recentActivities?.length ?? 0) === 0
-  const primary = recommendation?.primary || null
-
-  // Show FTUE for brand new users with a primary recommendation
-  if (isFirstTime && primary) {
-    return (
-      <FirstTimeExperience
-        user={user}
-        residencyData={residencyData}
-        primaryRecommendation={primary}
-      />
-    )
-  }
 
   return (
     <div className="space-y-8 px-6 lg:px-8 py-8 max-w-screen-2xl mx-auto">
