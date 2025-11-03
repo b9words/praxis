@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/server'
-import { prisma } from '@/lib/prisma/server'
+import { safeFindUnique } from '@/lib/prisma-safe'
 import { notFound } from 'next/navigation'
 
 export const runtime = 'nodejs'
@@ -11,21 +11,30 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ username: string }> }) {
-  const { username } = await params
+  try {
+    const { username } = await params
 
-  const profile = await prisma.profile.findUnique({
-    where: { username },
-    select: {
-      fullName: true,
-      username: true,
-      bio: true,
-      isPublic: true,
-    },
-  })
+    const profileResult = await safeFindUnique<{
+      fullName: string | null
+      username: string
+      bio: string | null
+      isPublic: boolean
+    }>('profile', {
+      username,
+    }, {
+      select: {
+        fullName: true,
+        username: true,
+        bio: true,
+        isPublic: true,
+      },
+    })
 
-  if (!profile || !profile.isPublic) {
-    notFound()
-  }
+    const profile = profileResult.data
+
+    if (!profile || !profile.isPublic) {
+      notFound()
+    }
 
   const displayName = profile.fullName || profile.username
 
@@ -104,4 +113,8 @@ export default async function Image({ params }: { params: Promise<{ username: st
       ...size,
     }
   )
+  } catch (error) {
+    console.error('Error generating opengraph image for profile:', error)
+    notFound()
+  }
 }

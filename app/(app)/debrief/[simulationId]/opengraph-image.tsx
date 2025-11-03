@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/server'
-import { prisma } from '@/lib/prisma/server'
+import { safeFindUnique } from '@/lib/prisma-safe'
 import { notFound } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/get-user'
 
@@ -12,34 +12,46 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image({ params }: { params: Promise<{ simulationId: string }> }) {
-  const { simulationId } = await params
+  try {
+    const { simulationId } = await params
 
-  // Verify user owns this simulation
-  const user = await getCurrentUser()
-  if (!user) {
-    notFound()
-  }
+    // Verify user owns this simulation
+    const user = await getCurrentUser()
+    if (!user) {
+      notFound()
+    }
 
-  const simulation = await prisma.simulation.findUnique({
-    where: { id: simulationId },
-    select: {
-      userId: true,
+    const simulationResult = await safeFindUnique<{
+      userId: string
       case: {
-        select: {
-          title: true,
-        },
-      },
+        title: string
+      } | null
       debrief: {
-        select: {
-          scores: true,
+        scores: any
+      } | null
+    }>('simulation', {
+      id: simulationId,
+    }, {
+      select: {
+        userId: true,
+        case: {
+          select: {
+            title: true,
+          },
+        },
+        debrief: {
+          select: {
+            scores: true,
+          },
         },
       },
-    },
-  })
+    })
 
-  if (!simulation || simulation.userId !== user.id) {
-    notFound()
-  }
+    const simulation = simulationResult.data
+
+    if (!simulation || simulation.userId !== user.id) {
+      notFound()
+    }
 
   const caseTitle = simulation.case?.title || 'Simulation Debrief'
   
@@ -143,4 +155,8 @@ export default async function Image({ params }: { params: Promise<{ simulationId
       ...size,
     }
   )
+  } catch (error) {
+    console.error('Error generating opengraph image for debrief:', error)
+    notFound()
+  }
 }
