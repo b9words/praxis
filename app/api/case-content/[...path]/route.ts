@@ -29,14 +29,16 @@ function getMimeType(filePath: string): string {
  */
 export async function GET(
   _request: Request,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ): Promise<NextResponse> {
   try {
+    const { path } = await params
+    
     // Resolve base directory (content/sources)
     const baseDir = join(process.cwd(), 'execemy', 'content', 'sources')
     
     // Join all path segments and normalize
-    const requestPath = join(...params.path)
+    const requestPath = join(...path)
     const resolvedPath = normalize(join(baseDir, requestPath))
     
     // Security: Ensure resolved path is within baseDir
