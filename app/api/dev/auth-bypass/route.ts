@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
 
       if (!existingProfile) {
         // Create profile with Supabase (handles schema correctly)
-        const { error: profileError } = await supabaseAdmin
+        const { error: profileError } = await (supabaseAdmin as any)
           .from('profiles')
           .upsert({
             id: userId,
@@ -189,9 +189,9 @@ export async function POST(request: NextRequest) {
           )
         }
         console.log(`[auth-bypass] Created profile for ${userId} with role: ${role || 'member'}`)
-      } else if (role && existingProfile.role !== role) {
+      } else if (role && (existingProfile as any).role !== role) {
         // Update role if specified and different
-        const { error: updateError } = await supabaseAdmin
+        const { error: updateError } = await (supabaseAdmin as any)
           .from('profiles')
           .update({ role: role })
           .eq('id', userId)
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
           )
         }
         console.log(`[auth-bypass] Updated profile for ${userId} to role: ${role}`)
-      } else if (role && existingProfile.role === role) {
+      } else if (role && (existingProfile as any).role === role) {
         console.log(`[auth-bypass] Profile for ${userId} already has role: ${role}`)
       }
     } catch (profileError: any) {
@@ -229,10 +229,11 @@ export async function POST(request: NextRequest) {
         .eq('id', userId)
         .single()
       
-      if (verifiedProfile && verifiedProfile.role !== role) {
-        console.warn(`[auth-bypass] Role verification failed: expected ${role}, got ${verifiedProfile.role}`)
+      const verifiedProfileTyped = verifiedProfile as any
+      if (verifiedProfileTyped && verifiedProfileTyped.role !== role) {
+        console.warn(`[auth-bypass] Role verification failed: expected ${role}, got ${verifiedProfileTyped.role}`)
         // Try one more update
-        await supabaseAdmin
+        await (supabaseAdmin as any)
           .from('profiles')
           .update({ role: role })
           .eq('id', userId)

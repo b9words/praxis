@@ -31,10 +31,13 @@ export async function GET(
     const progress = await getDomainProgress(user.id, domainId, totalLessons)
     const completion = await checkDomainCompletion(user.id, domainId)
 
+    // Extract domainId from progress if it exists, to avoid duplicate
+    const { domainId: _, ...progressWithoutDomainId } = progress as any
+
     return NextResponse.json({
-      domainId: domainId,
+      domainId,
       domainTitle: domain.title,
-      ...progress,
+      ...progressWithoutDomainId,
       completed: completion ? true : false,
       completedAt: completion?.completedAt?.toISOString() || null,
       certificateUrl: completion ? `/certificates/${domainId}` : null,

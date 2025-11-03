@@ -1,6 +1,5 @@
-import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
 import { cache, CacheTags } from '@/lib/cache'
+import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -179,14 +178,14 @@ export async function PATCH(
     const body = await request.json()
 
     // Get user's profile to check role
-    const profile = await prisma.profile.findUnique({
+    const currentUserProfile = await prisma.profile.findUnique({
       where: { id: user.id },
       select: { role: true },
     })
 
     // Allow admins to update any profile, users can only update their own
-    const isAdmin = profile?.role === 'admin'
-    const isUpdatingRole = body.role && body.role !== profile?.role
+    const isAdmin = currentUserProfile?.role === 'admin'
+    const isUpdatingRole = body.role && body.role !== currentUserProfile?.role
 
     if (!isAdmin && user.id !== userId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -200,9 +199,9 @@ export async function PATCH(
     // Filter out emailNotificationsEnabled as it may not exist in all database instances
     const { emailNotificationsEnabled, ...updateData } = body
 
-    let profile
+    let updatedProfile
     try {
-      profile = await prisma.profile.update({
+      updatedProfile = await prisma.profile.update({
         where: { id: userId },
         data: updateData,
         select: {
@@ -222,7 +221,7 @@ export async function PATCH(
       if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
         try {
           // Fallback: same update but Prisma will handle missing columns
-          profile = await prisma.profile.update({
+          updatedProfile = await prisma.profile.update({
             where: { id: userId },
             data: updateData,
             select: {
@@ -246,7 +245,7 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ profile })
+    return NextResponse.json({ profile: updatedProfile })
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })

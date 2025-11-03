@@ -32,7 +32,7 @@ async function uploadThumbnailToStorage(
 
   // Update database
   const tableName = contentType === 'lesson' ? 'articles' : 'cases'
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from(tableName)
     .update({ thumbnail_url: thumbnailUrl })
     .eq('id', contentId)
