@@ -291,6 +291,13 @@ export default async function CurriculumLibraryPage() {
 
             <div className="bg-white border border-gray-200 text-center p-6">
               <Users className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Community</h3>
+              <p className="text-xs text-gray-600 mb-4">Connect with other executives</p>
+              <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
+                <Link href="/community">View Community</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
