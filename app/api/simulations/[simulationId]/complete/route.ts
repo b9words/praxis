@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from 'next/server'
  * POST /api/simulations/[simulationId]/complete
  * Complete a simulation and trigger side effects:
  * - Generate debrief
- * - Create forum thread (if enabled)
  * - Send notifications
  */
 export async function POST(

@@ -88,7 +88,6 @@ const PLANS = [
       'AI Study Assistant for all articles',
       'Unlimited simulation attempts',
       'AI-powered performance debriefs',
-      'Community forum access',
       'Personal Execemy Profile'
     ],
     popular: false

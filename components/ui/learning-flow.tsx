@@ -5,7 +5,7 @@ import { ArrowRight, BarChart3, BookOpen, CheckCircle2, MessageCircle, Target } 
 import Link from 'next/link'
 
 interface LearningFlowProps {
-  currentStep: 'learn' | 'practice' | 'debrief' | 'connect'
+  currentStep: 'learn' | 'practice' | 'debrief'
   nextAction?: {
     label: string
     href: string
@@ -35,13 +35,6 @@ const FLOW_STEPS = [
     description: 'Review performance',
     color: 'purple'
   },
-  {
-    id: 'connect',
-    label: 'Connect',
-    icon: MessageCircle,
-    description: 'Discuss with community',
-    color: 'orange'
-  }
 ]
 
 export default function LearningFlow({ currentStep, nextAction, className = '' }: LearningFlowProps) {
@@ -52,8 +45,8 @@ export default function LearningFlow({ currentStep, nextAction, className = '' }
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-gray-900">The Execemy Method</h3>
-          <Badge variant="outline" className="text-xs">
-            Step {currentIndex + 1} of 4
+            <Badge variant="outline" className="text-xs">
+            Step {currentIndex + 1} of 3
           </Badge>
         </div>
 
@@ -121,7 +114,7 @@ export default function LearningFlow({ currentStep, nextAction, className = '' }
 }
 
 interface LearningFlowBannerProps {
-  currentStep: 'learn' | 'practice' | 'debrief' | 'connect'
+  currentStep: 'learn' | 'practice' | 'debrief'
   context: string
   nextAction?: {
     label: string

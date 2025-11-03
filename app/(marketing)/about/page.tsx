@@ -36,7 +36,7 @@ export default function AboutPage() {
               <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight">About Execemy</h1>
             </div>
             <p className="text-lg text-neutral-700 leading-relaxed">
-              Execemy is a systematic training program designed to build demonstrable business acumen through interactive simulations, rigorous assessment, and a curated community of analytical professionals.
+              Execemy is a systematic training program designed to build demonstrable business acumen through interactive simulations and rigorous assessment.
             </p>
           </div>
         </div>
@@ -84,9 +84,9 @@ export default function AboutPage() {
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-medium text-neutral-900 mb-3">Curated Community</h3>
+                <h3 className="text-xl font-medium text-neutral-900 mb-3">Assessment-Based Access</h3>
                 <p className="text-base text-neutral-700 leading-relaxed">
-                  Access is assessment-based. Our community consists of professionals committed to analytical rigor and continuous improvement. This ensures high-quality discussions and meaningful peer learning.
+                  Access is assessment-based, ensuring participants are committed to analytical rigor and continuous improvement. This enables focused, high-quality learning experiences.
                 </p>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
           <div className="max-w-4xl mx-auto text-center relative">
             <SectionAccent variant="center" />
-            <h2 className="text-3xl font-light mb-6 tracking-tight">Join the Execemy Community</h2>
+            <h2 className="text-3xl font-light mb-6 tracking-tight">Start Your Journey</h2>
             <p className="text-base text-neutral-300 mb-10 leading-relaxed max-w-2xl mx-auto">
               Start building demonstrable business acumen through systematic analysis and rigorous assessment
             </p>

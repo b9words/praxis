@@ -206,9 +206,9 @@ export default async function Home() {
               {
                 number: '04',
                 title: 'The Network',
-                description: 'Engage with a curated community of analytical professionals. Exchange strategic insights and validate frameworks.',
+                description: 'Build a comprehensive profile showcasing your analytical capabilities and track your progress over time.',
                 icon: Users,
-                features: ['The Exchange', 'Peer Analysis', 'Curated Community']
+                features: ['Performance Tracking', 'Analytical Profile', 'Progress Insights']
               }
             ].map((step) => {
               const IconComponent = step.icon
@@ -472,7 +472,7 @@ export default async function Home() {
               </Button>
             </div>
             <p className="mt-8 text-xs text-neutral-400 uppercase tracking-wider">
-              Curated community • Assessment-based access • 30-day evaluation period
+              Assessment-based access • 30-day evaluation period
             </p>
           </div>
         </div>

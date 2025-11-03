@@ -159,17 +159,6 @@ export default function DevTools() {
     router.refresh()
   }
 
-  const seedTestThread = () => {
-    if (!user) {
-      toast.error('No user logged in')
-      return
-    }
-    devToolsMutation.mutate({ action: 'createTestThread' }, {
-      onSuccess: () => {
-        toast.success('Test thread created')
-      },
-    })
-  }
 
   const seedComprehensive = () => {
     if (!user) {
@@ -414,7 +403,7 @@ export default function DevTools() {
                             {devToolsMutation.isPending ? 'Seeding...' : '🌱 Seed Full Platform Data'}
                           </Button>
                           <p className="text-xs text-gray-500 mt-2">
-                            Creates simulations, debriefs, article progress, notifications, and community content for a complete demo experience
+                            Creates simulations, debriefs, article progress, and notifications for a complete demo experience
                           </p>
                         </div>
 
@@ -435,22 +424,6 @@ export default function DevTools() {
                         </div>
 
                         <div>
-                          <h3 className="font-semibold mb-3">Community</h3>
-                          <Button
-                            onClick={seedTestThread}
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                            disabled={devToolsMutation.isPending}
-                          >
-                            Create Test Thread
-                          </Button>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Adds a test thread in the first channel
-                          </p>
-                        </div>
-
-                        <div>
                           <h3 className="font-semibold mb-3">Quick Navigation</h3>
                           <div className="grid grid-cols-2 gap-2">
                             <Button
@@ -465,7 +438,7 @@ export default function DevTools() {
                               variant="outline"
                               size="sm"
                             >
-                              Community
+                              Dashboard
                             </Button>
                             <Button
                               onClick={() => router.push('/library')}
@@ -513,7 +486,7 @@ export default function DevTools() {
                       <h3 className="font-semibold mb-3">Routes</h3>
                       <div className="text-xs space-y-1">
                         <div>✅ 20 total routes implemented</div>
-                        <div>✅ Auth, Library, Simulations, Community, Admin</div>
+                        <div>✅ Auth, Library, Simulations, Admin</div>
                         <div>✅ All features 100% complete</div>
                       </div>
                     </div>

@@ -589,12 +589,6 @@ export async function seedComprehensiveData(userId: string, email?: string) {
         message: 'Your account is ready. Start exploring the curriculum and case simulations to build your executive skills.',
         link: '/library',
       },
-      {
-        type: 'general',
-        title: 'Community Activity',
-        message: 'New discussions are starting in the community. Join the conversation and share your insights!',
-        link: '/dashboard',
-      },
     ]
 
     for (const notif of notifications) {

@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions. All plans include AI-powered coaching, interactive simulations, and community access.',
+  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions. All plans include AI-powered coaching and interactive simulations.',
   openGraph: {
     title: 'Pricing | Execemy',
     description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
@@ -38,7 +38,6 @@ export default function PricingPage() {
         'AI Study Assistant for all articles',
         'Unlimited simulation attempts',
         'AI-powered performance debriefs',
-        'Community forum access',
         'Personal Execemy Profile'
       ],
       cta: 'Start Explorer',
@@ -97,7 +96,7 @@ export default function PricingPage() {
               Invest in Your Business Acumen
             </h1>
             <p className="text-lg text-neutral-700 leading-relaxed">
-              Choose the plan that fits your ambition. All plans include AI-powered coaching, interactive simulations, and community access.
+              Choose the plan that fits your ambition. All plans include AI-powered coaching and interactive simulations.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 text-sm text-neutral-600">
               <div className="flex items-center gap-2">
@@ -260,7 +259,7 @@ export default function PricingPage() {
             <SectionAccent variant="center" />
             <h2 className="text-3xl font-light mb-6 tracking-tight">Ready to Start</h2>
             <p className="text-base text-neutral-300 mb-10 leading-relaxed max-w-2xl mx-auto">
-              Join the Execemy community today and start building world-class business acumen
+              Start building world-class business acumen today
             </p>
             <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
               <Link href="/signup">

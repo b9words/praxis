@@ -82,14 +82,12 @@ const DEFAULT_BENEFITS = {
     'Complete the full learning path',
     'Practice with associated case studies',
     'Get AI-powered feedback and coaching',
-    'Join the community discussion'
   ],
   curriculum: [
     'Full access to 5-year curriculum (52 articles, 14 cases)',
     'AI Study Assistant for personalized learning',
     'Unlimited simulation attempts',
     'AI-powered performance debriefs',
-    'Community forum access',
     'Personal Execemy Profile & credentials'
   ],
   debrief: [
@@ -121,7 +119,7 @@ const DEFAULT_DESCRIPTIONS = {
   lesson: 'Subscribe to access this lesson and unlock the complete curriculum.',
   'case-study': 'Subscribe to complete this case study and view your detailed performance analysis.',
   module: 'Subscribe to access all lessons in this module and the complete curriculum.',
-  curriculum: 'Get full access to the 5-year curriculum with AI coaching, simulations, and community features.',
+  curriculum: 'Get full access to the 5-year curriculum with AI coaching and simulations.',
   debrief: 'Your performance analysis and competency scores are ready. Subscribe to view them.',
   simulation: 'Subscribe to complete all stages and receive your comprehensive performance debrief.'
 }

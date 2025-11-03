@@ -67,7 +67,7 @@ export default async function ModerationPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-base font-medium text-gray-900">
-                        {report.reportedType === 'thread' ? 'Thread Report' : 'Post Report'}
+                        Content Report
                       </h3>
                       <Badge
                         variant="outline"
@@ -81,17 +81,9 @@ export default async function ModerationPage() {
                     </p>
                     <p className="text-sm text-gray-600 mb-3">{report.reason}</p>
                     <div className="flex items-center gap-3">
-                      <Button asChild variant="outline" size="sm" className="border-gray-300 hover:border-gray-400 rounded-none">
-                        <Link
-                          href={
-                            report.reportedType === 'thread'
-                              ? `/community/thread/${report.reportedId}`
-                              : `/community/post/${report.reportedId}`
-                          }
-                        >
-                          View {report.reportedType === 'thread' ? 'Thread' : 'Post'}
-                        </Link>
-                      </Button>
+                      <span className="text-sm text-gray-500">
+                        Report ID: {report.reportedId}
+                      </span>
                       <span className="text-xs text-gray-500">
                         {new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>

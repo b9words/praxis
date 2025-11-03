@@ -199,7 +199,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
                 </div>
                 <div className="p-6">
                   <p className="text-sm text-gray-600">
-                    Learn from a vetted community of high-performing professionals and build your network
+                    Connect with industry professionals and expand your network
                   </p>
                 </div>
               </div>

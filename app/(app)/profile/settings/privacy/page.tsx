@@ -153,7 +153,7 @@ export default function PrivacySettingsPage() {
               <div>
                 <h3 className="text-sm font-medium text-gray-900 mb-1">Export My Data</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Download a JSON file containing all of your profile information, simulation history, and community contributions.
+                  Download a JSON file containing all of your profile information and simulation history.
                 </p>
               </div>
               <Button
@@ -195,7 +195,6 @@ export default function PrivacySettingsPage() {
                           <li>Your profile and dossier</li>
                           <li>All simulation history and debriefs</li>
                           <li>All progress and competency scores</li>
-                          <li>Community contributions</li>
                         </ul>
                         <p className="pt-2">
                           To confirm, type <strong>DELETE</strong> in the field below:
