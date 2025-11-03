@@ -10,7 +10,7 @@ export async function generateMetadata({
   const { simulationId } = await params
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
-  const ogImageUrl = `${baseUrl}/debrief/${simulationId}/opengraph-image`
+  const ogImageUrl = `${baseUrl}/og-default.png`
 
   // Try to get case title for better metadata (non-blocking)
   let caseTitle = 'Simulation Debrief'

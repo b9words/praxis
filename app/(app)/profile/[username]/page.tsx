@@ -52,7 +52,7 @@ export async function generateMetadata({
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
-  const ogImageUrl = `${baseUrl}/profile/${username}/opengraph-image`
+  const ogImageUrl = `${baseUrl}/og-default.png`
 
   const title = `${profile.fullName || profile.username}'s Praxis Dossier`
   const description = profile.bio || `View ${profile.fullName || profile.username}'s professional dossier, including their competency matrix and a history of completed business simulations.`
