@@ -37,10 +37,10 @@ export default async function Image({ params }: { params: Promise<{ username: st
       notFound()
     }
 
-  const displayName = profile.fullName || profile.username
+    const displayName = profile.fullName || profile.username
 
-  return new ImageResponse(
-    (
+    return new ImageResponse(
+      (
       <div
         style={{
           display: 'flex',
@@ -109,11 +109,11 @@ export default async function Image({ params }: { params: Promise<{ username: st
           </div>
         )}
       </div>
-    ),
-    {
-      ...size,
-    }
-  )
+      ),
+      {
+        ...size,
+      }
+    )
   } catch (error) {
     console.error('Error generating opengraph image for profile:', error)
     notFound()

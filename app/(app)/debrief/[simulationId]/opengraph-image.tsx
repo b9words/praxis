@@ -51,23 +51,23 @@ export default async function Image({ params }: { params: Promise<{ simulationId
       notFound()
     }
 
-  const caseTitle = simulation.case?.title || 'Simulation Debrief'
-  
-  // Calculate average score if available
-  let averageScore: number | null = null
-  if (simulation.debrief?.scores) {
-    const scores = simulation.debrief.scores as any[]
-    if (Array.isArray(scores) && scores.length > 0) {
-      const sum = scores.reduce((acc: number, s: any) => {
-        const score = typeof s === 'number' ? s : (s.score || 0)
-        return acc + score
-      }, 0)
-      averageScore = sum / scores.length
+    const caseTitle = simulation.case?.title || 'Simulation Debrief'
+    
+    // Calculate average score if available
+    let averageScore: number | null = null
+    if (simulation.debrief?.scores) {
+      const scores = simulation.debrief.scores as any[]
+      if (Array.isArray(scores) && scores.length > 0) {
+        const sum = scores.reduce((acc: number, s: any) => {
+          const score = typeof s === 'number' ? s : (s.score || 0)
+          return acc + score
+        }, 0)
+        averageScore = sum / scores.length
+      }
     }
-  }
 
-  return new ImageResponse(
-    (
+    return new ImageResponse(
+      (
       <div
         style={{
           display: 'flex',
@@ -148,11 +148,11 @@ export default async function Image({ params }: { params: Promise<{ simulationId
           View detailed competency analysis and recommendations
         </div>
       </div>
-    ),
-    {
-      ...size,
-    }
-  )
+      ),
+      {
+        ...size,
+      }
+    )
   } catch (error) {
     console.error('Error generating opengraph image for debrief:', error)
     notFound()
