@@ -55,6 +55,24 @@ export default function GAProvider() {
     }
   }, [])
 
+  // Update GA consent when consent changes
+  useEffect(() => {
+    if (!measurementId || typeof window === "undefined") return
+    if (typeof window.gtag !== "function") return
+
+    if (hasConsent) {
+      window.gtag('consent', 'update', { 
+        ad_storage: 'granted', 
+        analytics_storage: 'granted' 
+      })
+    } else {
+      window.gtag('consent', 'update', { 
+        ad_storage: 'denied', 
+        analytics_storage: 'denied' 
+      })
+    }
+  }, [measurementId, hasConsent])
+
   useEffect(() => {
     if (!measurementId || !hasConsent) return
     if (typeof window === "undefined") return
@@ -68,11 +86,23 @@ export default function GAProvider() {
     })
   }, [measurementId, pathname, searchParams, hasConsent])
 
-  // Only render GA if we have consent
-  if (!measurementId || !hasConsent) return null
+  // Only render GA scripts if measurementId exists (consent handled via consent mode)
+  if (!measurementId) return null
 
   return (
     <>
+      {/* GA Consent Mode v2 - default state (denied) */}
+      <Script id="ga-consent-default" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', { 
+            ad_storage: 'denied', 
+            analytics_storage: 'denied', 
+            wait_for_update: 500 
+          });
+        `}
+      </Script>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
@@ -80,19 +110,23 @@ export default function GAProvider() {
           if (!measurementId) return
           if (typeof window === "undefined") return
           if (typeof window.gtag !== "function") return
-          const query = searchParams?.toString()
-          const page_path = query ? `${pathname}?${query}` : pathname
-          window.gtag("event", "page_view", { page_path })
+          
+          // Initialize GA config
+          window.gtag('js', new Date())
+          window.gtag('config', measurementId, { send_page_view: false })
+          
+          // Send initial pageview if consent exists
+          if (hasConsent) {
+            const query = searchParams?.toString()
+            const page_path = query ? `${pathname}?${query}` : pathname
+            window.gtag("event", "page_view", { page_path })
+            window.gtag('consent', 'update', { 
+              ad_storage: 'granted', 
+              analytics_storage: 'granted' 
+            })
+          }
         }}
       />
-      <Script id="ga-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${measurementId}', { send_page_view: false });
-        `}
-      </Script>
     </>
   )
 }

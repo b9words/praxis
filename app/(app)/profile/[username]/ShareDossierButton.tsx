@@ -15,15 +15,15 @@ export default function ShareDossierButton({ username }: ShareDossierButtonProps
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'Praxis Dossier',
-          text: 'View my Execemy Praxis Dossier',
+          title: 'Profile',
+          text: 'View my Execemy Profile',
           url,
         })
-        toast.success('Dossier shared')
+        toast.success('Profile shared')
       } else {
         // Fallback: copy to clipboard
         await navigator.clipboard.writeText(url)
-        toast.success('Dossier URL copied to clipboard')
+        toast.success('Profile URL copied to clipboard')
       }
     } catch (error) {
       // User cancelled or error occurred
@@ -31,9 +31,9 @@ export default function ShareDossierButton({ username }: ShareDossierButtonProps
         // Fallback to clipboard if share fails
         try {
           await navigator.clipboard.writeText(url)
-          toast.success('Dossier URL copied to clipboard')
+          toast.success('Profile URL copied to clipboard')
         } catch (clipboardError) {
-          toast.error('Failed to share dossier')
+          toast.error('Failed to share profile')
         }
       }
     }
@@ -46,7 +46,7 @@ export default function ShareDossierButton({ username }: ShareDossierButtonProps
       className="border-gray-300 hover:border-gray-400 rounded-none"
     >
       <Share2 className="h-4 w-4 mr-2" />
-      Share Dossier
+      Share Profile
     </Button>
   )
 }

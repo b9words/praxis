@@ -123,20 +123,24 @@ class PostHogAnalyticsService implements AnalyticsService {
           
           posthog.init(this.apiKey, {
             api_host: this.host,
-            // Balanced privacy: Limit autocapture and mask sensitive data
-            autocapture: {
-              // Disable automatic form captures in production
-              ...(!isProduction ? { capture_forms: true } : {}),
-            } as any,
-            // Balanced privacy: Enable session recording with text masking in production
+            // Prevent auto pageviews - we send manually via router
+            capture_pageview: false,
+            // Autocapture: only in dev, disabled in production
+            autocapture: isProduction ? false : { capture_forms: true } as any,
+            // Mask all text in production for privacy
             mask_all_text: isProduction,
             // Don't capture console logs or performance metrics
             capture_performance: false,
             // Session recording enabled with masking for balanced privacy approach
             disable_session_recording: false,
-            loaded: (posthog) => {
+            // Enhanced session recording privacy settings
+            session_recording: {
+              maskAllText: true,
+              maskAllInputs: true,
+            },
+            loaded: (ph) => {
               if (process.env.NODE_ENV === 'development') {
-                posthog.debug()
+                ph.debug()
               }
             },
           })
@@ -196,6 +200,44 @@ class PostHogAnalyticsService implements AnalyticsService {
   }
 }
 
+// Retry helper for server-side analytics requests
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 2
+): Promise<Response | null> {
+  const delays = [200, 800] // ms delays for retries
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options)
+      
+      // Success - return immediately
+      if (response.ok) {
+        return response
+      }
+      
+      // 5xx errors - retry if attempts remaining
+      if (response.status >= 500 && attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delays[attempt]))
+        continue
+      }
+      
+      // 4xx errors should not be retried - return as-is
+      return response
+    } catch (error) {
+      // Network error - retry if attempts remaining
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, delays[attempt]))
+        continue
+      }
+      throw error
+    }
+  }
+  
+  return null
+}
+
 // Server-side analytics (for tracking server events)
 class ServerAnalyticsService implements AnalyticsService {
   private apiKey: string | null = null
@@ -210,7 +252,7 @@ class ServerAnalyticsService implements AnalyticsService {
     if (!this.apiKey) return
 
     try {
-      await fetch(`${this.host}/capture/`, {
+      await fetchWithRetry(`${this.host}/capture/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +268,10 @@ class ServerAnalyticsService implements AnalyticsService {
         }),
       })
     } catch (error) {
-      console.error('Server analytics identify error:', error)
+      // Silently fail - analytics should not block application flow
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Server analytics identify error:', error)
+      }
     }
   }
 
@@ -234,7 +279,7 @@ class ServerAnalyticsService implements AnalyticsService {
     if (!this.apiKey) return
 
     try {
-      await fetch(`${this.host}/capture/`, {
+      await fetchWithRetry(`${this.host}/capture/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -250,7 +295,10 @@ class ServerAnalyticsService implements AnalyticsService {
         }),
       })
     } catch (error) {
-      console.error('Server analytics track error:', error)
+      // Silently fail - analytics should not block application flow
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Server analytics track error:', error)
+      }
     }
   }
 

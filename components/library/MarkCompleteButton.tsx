@@ -38,7 +38,7 @@ export default function MarkCompleteButton({
     onSuccess: (_, variables) => {
       setIsCompleted(variables.completed)
       queryClient.invalidateQueries({ queryKey: queryKeys.progress.articles() })
-      toast.success(variables.completed ? 'Article internalized' : 'Progress reset')
+      toast.success(variables.completed ? 'Article marked complete' : 'Progress reset')
       router.refresh()
     },
     onError: (error) => {
@@ -60,12 +60,12 @@ export default function MarkCompleteButton({
       {isCompleted ? (
         <>
           <CheckCircle className="h-4 w-4" />
-          Internalized
+          Marked complete
         </>
       ) : (
         <>
           <Check className="h-4 w-4" />
-          Internalize
+          Mark complete
         </>
       )}
     </Button>

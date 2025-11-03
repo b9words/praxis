@@ -205,7 +205,7 @@ export default async function Home() {
               },
               {
                 number: '04',
-                title: 'The Network',
+                title: 'Community',
                 description: 'Build a comprehensive profile showcasing your analytical capabilities and track your progress over time.',
                 icon: Users,
                 features: ['Performance Tracking', 'Analytical Profile', 'Progress Insights']

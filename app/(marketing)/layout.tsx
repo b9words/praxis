@@ -1,6 +1,7 @@
 import CookieConsentBanner from '@/components/layout/CookieConsentBanner'
 import Footer from '@/components/layout/Footer'
 import GAProvider from '@/components/providers/GAProvider'
+import PostHogPageview from '@/components/providers/PostHogPageview'
 import { Suspense } from 'react'
 
 export default function MarketingLayout({
@@ -16,6 +17,7 @@ export default function MarketingLayout({
       <Suspense fallback={null}>
         <GAProvider />
       </Suspense>
+      <PostHogPageview />
     </>
   )
 }

@@ -57,6 +57,21 @@ export default function CookieConsentBanner() {
       clearAnalyticsCookies()
     }
     
+    // Update GA consent if gtag is available
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      if (preferences.analytics) {
+        (window as any).gtag('consent', 'update', { 
+          ad_storage: 'granted', 
+          analytics_storage: 'granted' 
+        })
+      } else {
+        (window as any).gtag('consent', 'update', { 
+          ad_storage: 'denied', 
+          analytics_storage: 'denied' 
+        })
+      }
+    }
+    
     // Dispatch custom event
     window.dispatchEvent(new CustomEvent('cc:onConsent', { detail: preferences }))
     
@@ -85,14 +100,21 @@ export default function CookieConsentBanner() {
 
     import('posthog-js').then(({ default: posthog }) => {
       if (posthog && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+        const isProduction = process.env.NODE_ENV === 'production'
         posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
           api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-          autocapture: {
-            // capture_forms not in type, skip
-          } as any,
-          mask_all_text: process.env.NODE_ENV === 'production',
+          // Prevent auto pageviews - we send manually via router
+          capture_pageview: false,
+          // Autocapture: only in dev, disabled in production
+          autocapture: isProduction ? false : { capture_forms: true } as any,
+          mask_all_text: isProduction,
           capture_performance: false,
           disable_session_recording: false,
+          // Enhanced session recording privacy settings
+          session_recording: {
+            maskAllText: true,
+            maskAllInputs: true,
+          },
         })
         ;(window as any).posthog = posthog
       }

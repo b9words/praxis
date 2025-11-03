@@ -182,7 +182,7 @@ export default async function SimulationsPage() {
   return (
     <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-2xl font-medium text-gray-900 mb-2">The Arena</h1>
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">Simulations</h1>
         <p className="text-sm text-gray-600">Deploy to scenarios and apply your analytical frameworks</p>
       </div>
 

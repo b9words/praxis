@@ -40,7 +40,7 @@ export default function PrivacySettingsPage() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['profile', 'current'] })
-      toast.success('Dossier visibility updated')
+      toast.success('Profile visibility updated')
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to update visibility')
@@ -117,17 +117,17 @@ export default function PrivacySettingsPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Dossier Visibility */}
+        {/* Profile Visibility */}
         <Card className="border-gray-200">
           <CardHeader>
-            <CardTitle className="text-lg">Dossier Visibility</CardTitle>
+            <CardTitle className="text-lg">Profile Visibility</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5 flex-1">
-                <Label htmlFor="isPublic" className="text-base">Public Dossier</Label>
+                <Label htmlFor="isPublic" className="text-base">Public Profile</Label>
                 <CardDescription>
-                  When enabled, your Praxis Dossier (including your competency matrix and engagement history) will be visible to anyone with the link. When disabled, it is classified and only visible to you.
+                  When enabled, your Profile (including your competency matrix and engagement history) will be visible to anyone with the link. When disabled, it is private and only visible to you.
                 </CardDescription>
               </div>
               <Switch
@@ -192,7 +192,7 @@ export default function PrivacySettingsPage() {
                           This action cannot be undone. This will permanently delete your account and all associated data, including:
                         </p>
                         <ul className="list-disc list-inside space-y-1 text-sm">
-                          <li>Your profile and dossier</li>
+                          <li>Your profile</li>
                           <li>All simulation history and debriefs</li>
                           <li>All progress and competency scores</li>
                         </ul>

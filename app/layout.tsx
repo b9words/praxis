@@ -2,6 +2,7 @@ import DevTools from "@/components/dev/DevTools";
 import QueryProvider from "@/components/providers/QueryProvider";
 import ChannelIOProvider from "@/components/providers/ChannelIOProvider";
 import GAProvider from "@/components/providers/GAProvider";
+import PostHogPageview from "@/components/providers/PostHogPageview";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -68,6 +69,7 @@ export default function RootLayout({
             </div>
             <Toaster />
             <DevTools />
+            <PostHogPageview />
           </ChannelIOProvider>
         </QueryProvider>
         <Analytics />

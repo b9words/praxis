@@ -133,7 +133,7 @@ export default function ProfileEditPage() {
   return (
     <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-2xl font-medium text-gray-900 mb-2">Update Dossier</h1>
+        <h1 className="text-2xl font-medium text-gray-900 mb-2">Edit Profile</h1>
         <p className="text-sm text-gray-600">Manage your profile settings</p>
       </div>
 
@@ -197,18 +197,18 @@ export default function ProfileEditPage() {
               id="bio"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder="A brief, one-line professional summary for your public dossier..."
+              placeholder="A brief, one-line professional summary for your public profile..."
               rows={3}
               className="mt-1 rounded-none"
             />
-            <p className="text-xs text-gray-500 mt-1">A brief, one-line professional summary for your public dossier.</p>
+            <p className="text-xs text-gray-500 mt-1">A brief, one-line professional summary for your public profile.</p>
           </div>
 
           {/* Public/Private Toggle */}
           <div className="flex items-center justify-between p-4 border border-gray-200">
             <div className="space-y-0.5">
-              <Label htmlFor="isPublic">Profile Visibility: {isPublic ? 'Public' : 'Classified'}</Label>
-              <p className="text-xs text-gray-500">A public dossier can be shared as a signal of your demonstrated acumen.</p>
+              <Label htmlFor="isPublic">Profile Visibility: {isPublic ? 'Public' : 'Private'}</Label>
+              <p className="text-xs text-gray-500">A public profile can be shared as a signal of your demonstrated acumen.</p>
             </div>
             <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
           </div>

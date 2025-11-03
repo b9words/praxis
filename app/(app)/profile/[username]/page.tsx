@@ -54,8 +54,8 @@ export async function generateMetadata({
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3400'
   const ogImageUrl = `${baseUrl}/og-default.png`
 
-  const title = `${profile.fullName || profile.username}'s Praxis Dossier`
-  const description = profile.bio || `View ${profile.fullName || profile.username}'s professional dossier, including their competency matrix and a history of completed business simulations.`
+  const title = `${profile.fullName || profile.username}'s Profile`
+  const description = profile.bio || `View ${profile.fullName || profile.username}'s profile, including their competency matrix and a history of completed business simulations.`
 
   return {
     title,
@@ -160,7 +160,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     return (
       <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
         <div className="bg-white border border-gray-200 p-12 text-center">
-          <p className="text-base font-medium text-gray-900 mb-2">This dossier is classified.</p>
+          <p className="text-base font-medium text-gray-900 mb-2">This profile is private.</p>
           <p className="text-sm text-gray-600">
             Access is restricted by the operative.
           </p>
@@ -346,7 +346,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                     <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
                       <Link href="/profile/edit">
                         <Edit className="h-4 w-4 mr-2" />
-                        Update Dossier
+                        Edit Profile
                       </Link>
                     </Button>
                   ) : profile.isPublic ? (

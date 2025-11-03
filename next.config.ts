@@ -25,6 +25,41 @@ const nextConfig: NextConfig = {
     // This reduces Next.js build overhead and leverages Unsplash's CDN for optimal image delivery
     unoptimized: true,
   },
+  // Security headers (conservative approach - no CSP to avoid breaking third-party scripts)
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          // Strict-Transport-Security only in production (HTTPS required)
+          ...(process.env.NODE_ENV === 'production'
+            ? [
+                {
+                  key: 'Strict-Transport-Security',
+                  value: 'max-age=31536000; includeSubDomains; preload',
+                },
+              ]
+            : []),
+        ],
+      },
+    ]
+  },
   // Note: instrumentationHook is handled via instrumentation.ts file in Next.js 15+
   webpack: (config, { isServer }) => {
     // Suppress OpenTelemetry/Sentry import trace warnings

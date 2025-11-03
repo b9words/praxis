@@ -64,13 +64,13 @@ export default function Navbar({ user, profile }: NavbarProps) {
     },
     { 
       href: '/library/curriculum', 
-      label: 'Intel',
+      label: 'Library',
       icon: BookOpen,
       description: userProgress ? `${userProgress.articlesCompleted}/${userProgress.totalArticles} articles` : 'Intelligence library'
     },
     { 
       href: '/simulations', 
-      label: 'The Arena',
+      label: 'Simulations',
       icon: Target,
       description: userProgress ? `${userProgress.simulationsCompleted} completed` : 'Simulation scenarios'
     },
@@ -150,7 +150,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href={profile?.username ? `/profile/${profile.username}` : '/profile'}>
-                      Your Dossier
+                      Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -229,7 +229,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href={profile?.username ? `/profile/${profile.username}` : '/profile'}>
-                  Your Dossier
+                  Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
