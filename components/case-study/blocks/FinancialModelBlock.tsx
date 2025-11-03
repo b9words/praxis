@@ -37,6 +37,42 @@ export default function FinancialModelBlock({
   const [calculatedValues, setCalculatedValues] = useState<ModelData>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Define functions before useEffects that use them
+  const evaluateFormula = (formula: string, data: ModelData): number => {
+    // Simple formula evaluation - replace variable names with values
+    let expression = formula
+    Object.entries(data).forEach(([key, value]) => {
+      if (typeof value === 'number') {
+        expression = expression.replace(new RegExp(`\\b${key}\\b`, 'g'), value.toString())
+      }
+    })
+
+    // Basic math evaluation (in production, use a proper math parser)
+    try {
+      // Remove any non-math characters for safety
+      expression = expression.replace(/[^0-9+\-*/.() ]/g, '')
+      return Function(`"use strict"; return (${expression})`)()
+    } catch {
+      throw new Error('Invalid formula')
+    }
+  }
+
+  const validateModel = (currentModelData: ModelData, currentErrors: Record<string, string>): boolean => {
+    // Check required fields
+    for (const field of requiredFields) {
+      if (!(field in currentModelData) || currentModelData[field] === '' || currentModelData[field] === null) {
+        return false
+      }
+    }
+
+    // Check for calculation errors
+    if (Object.keys(currentErrors).length > 0) {
+      return false
+    }
+
+    return true
+  }
+
   // Load existing model data
   useEffect(() => {
     if (currentStageId) {
@@ -74,46 +110,11 @@ export default function FinancialModelBlock({
       updateBlockState(currentStageId, blockId, {
         modelData,
         calculatedValues,
-        isValid: validateModel(),
+        isValid: validateModel(modelData, errors),
         lastUpdated: new Date().toISOString()
       })
     }
-  }, [modelData, calculatedValues, currentStageId, blockId, updateBlockState])
-
-  const evaluateFormula = (formula: string, data: ModelData): number => {
-    // Simple formula evaluation - replace variable names with values
-    let expression = formula
-    Object.entries(data).forEach(([key, value]) => {
-      if (typeof value === 'number') {
-        expression = expression.replace(new RegExp(`\\b${key}\\b`, 'g'), value.toString())
-      }
-    })
-
-    // Basic math evaluation (in production, use a proper math parser)
-    try {
-      // Remove any non-math characters for safety
-      expression = expression.replace(/[^0-9+\-*/.() ]/g, '')
-      return Function(`"use strict"; return (${expression})`)()
-    } catch {
-      throw new Error('Invalid formula')
-    }
-  }
-
-  const validateModel = (): boolean => {
-    // Check required fields
-    for (const field of requiredFields) {
-      if (!(field in modelData) || modelData[field] === '' || modelData[field] === null) {
-        return false
-      }
-    }
-
-    // Check for calculation errors
-    if (Object.keys(errors).length > 0) {
-      return false
-    }
-
-    return true
-  }
+  }, [modelData, calculatedValues, errors, currentStageId, blockId, updateBlockState])
 
   const handleInputChange = (key: string, value: string | number) => {
     setModelData(prev => ({
@@ -359,14 +360,14 @@ export default function FinancialModelBlock({
         {Object.keys(calculatedValues).length > 0 && renderCalculations()}
         
         {/* Validation Status */}
-        <div className={`p-3 rounded-lg ${validateModel() ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
+        <div className={`p-3 rounded-lg ${validateModel(modelData, errors) ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             <span className="text-sm font-medium">
-              Model Status: {validateModel() ? 'Valid' : 'Incomplete'}
+              Model Status: {validateModel(modelData, errors) ? 'Valid' : 'Incomplete'}
             </span>
           </div>
-          {!validateModel() && (
+          {!validateModel(modelData, errors) && (
             <p className="text-xs mt-1">
               Please complete all required fields to proceed.
             </p>
