@@ -1,5 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { updateProfile, ensureProfileExists } from '@/lib/db/profiles'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -23,43 +24,17 @@ export async function POST(request: NextRequest) {
     // Store strategic objective in bio field (or create a dedicated field if needed)
     // For now, we'll use a JSON structure in bio or store it separately
     try {
-      await prisma.profile.update({
-        where: { id: user.id },
-        data: {
-          bio: strategicObjective,
-        },
+      await updateProfile(user.id, {
+        bio: strategicObjective,
       })
     } catch (error: any) {
       // Handle case where profile doesn't exist yet
-      if (error?.code === 'P2025') {
+      if (error instanceof AppError && error.statusCode === 404) {
         // Profile doesn't exist, create it
-        const { createClient } = await import('@supabase/supabase-js')
-        const supabaseAdmin = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          { auth: { autoRefreshToken: false, persistSession: false } }
-        )
-
-        const userWithMetadata = user as any
-        const username = userWithMetadata.user_metadata?.username || user.email?.split('@')[0] || `user-${user.id.substring(0, 8)}`
-        const uniqueUsername = `${username}_${user.id.substring(0, 8)}`
-
-        await supabaseAdmin
-          .from('profiles')
-          .upsert({
-            id: user.id,
-            username: uniqueUsername,
-            full_name: userWithMetadata.user_metadata?.full_name || username,
-            bio: strategicObjective,
-            is_public: false,
-          }, { onConflict: 'id' })
-
+        await ensureProfileExists(user.id)
         // Retry the update
-        await prisma.profile.update({
-          where: { id: user.id },
-          data: {
-            bio: strategicObjective,
-          },
+        await updateProfile(user.id, {
+          bio: strategicObjective,
         })
       } else {
         throw error
@@ -75,7 +50,10 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Onboarding data saved successfully'
     })
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
     const normalized = normalizeError(error)
     console.error('Error saving onboarding data:', error)

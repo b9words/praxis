@@ -1,0 +1,1396 @@
+{
+  "arenas": [
+    {
+      "id": "ARENA_1",
+      "name": "The Office",
+      "theme": "Internal Leadership & Execution",
+      "competencies": [
+        {
+          "name": "Organizational Design",
+          "primaryChallengeType": "The First 100 Days Plan",
+          "secondaryTypes": [
+            "The \"Turnaround\" Town Hall Script"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_1_1_the_two_pizza_team_re_org",
+              "title": "The \"Two-Pizza Team\" Re-Org",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "A successful SaaS company has grown from 200 to 2,000 employees. The once-agile product development process is now bogged down in bureaucracy, with a bloated matrix structure causing endless meetings and slow decisions.",
+              "task": "As the newly hired Chief Product Officer, your mandate is to fix this. Create a detailed 100-day plan to restructure the entire Product & Engineering organization into smaller, autonomous \"two-pizza teams.\" The plan must include the new org chart, a communication plan to manage the anxiety of the change, and a new goal-setting process for the teams.",
+              "assets": [
+                "Org Chart",
+                "Employee Survey",
+                "Financial Data",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_2_the_integration_hardware_meets_software",
+              "title": "The Integration: Hardware Meets Software",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "A legacy industrial hardware company (\"Siemens-esque\") has just acquired a fast-moving, agile AI software startup to build its \"next-gen\" platform. The two cultures are polar opposites: one is process-driven and hierarchical, the other is flat and chaotic.",
+              "task": "As the newly appointed General Manager of the combined division, create a 100-day integration plan. The key challenge is not financial, but organizational. How do you structure the new division? Do you keep the startup as a separate, protected unit, or do you fully integrate them? The plan must address reporting lines, software development methodologies, and compensation structures.",
+              "assets": [
+                "Org Chart",
+                "Memo",
+                "Cultural Assessment",
+                "Financial Data"
+              ]
+            },
+            {
+              "id": "arena_1_3_the_remote_work_reset",
+              "title": "The Remote Work Reset",
+              "challengeType": "The \"Turnaround\" Town Hall Script",
+              "dilemma": "After a successful period of mandatory remote work, a company has decided to implement a \"hybrid\" model. The result is chaos: two distinct cultures are forming, remote employees feel like second-class citizens, and productivity is dropping.",
+              "task": "The CEO has decided to go \"remote-first\" and is forcing all executives to give up their private offices. Your task is to write the script for the CEO's all-hands meeting announcing this difficult but necessary reset. The script must explain the failures of the hybrid model and lay out the new principles and communication protocols for a successful remote-first culture.",
+              "assets": [
+                "Employee Survey",
+                "Productivity Data",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_4_the_sales_team_restructure",
+              "title": "The Sales Team Restructure",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "A B2B SaaS company is moving upmarket. Its current sales team is structured with \"full-stack\" account executives who handle everything from prospecting to closing to account management. To win enterprise clients, the Head of Sales believes she needs to specialize the team into distinct roles (SDRs, AEs, Customer Success). This requires a significant budget increase.",
+              "task": "You are the CEO. You are presented with two competing budget proposals for the next fiscal year.",
+              "assets": [
+                "Financial Model",
+                "Market Research",
+                "Sales Data"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Talent & Performance Management",
+          "primaryChallengeType": "The Capital Allocation Stack Rank",
+          "secondaryTypes": [
+            "The Board Deck Critique"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_1_5_the_a_team_budget",
+              "title": "The A-Team Budget",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "You are the Head of Engineering with a fixed budget for 20 new hires. You have three critical projects, each led by a VP with a different leadership style and a different argument for why their project is the most important.",
+              "task": "Allocate the 20 engineering \"headcount slots\" across the three projects. You cannot fund them all equally. You must decide whether to give all the resources to the highest-potential project, spread them out to hedge your bets, or allocate them to your best leader. Write a memo to the CEO justifying your allocation, knowing it will create significant political fallout.",
+              "assets": [
+                "Project Briefs",
+                "Leadership Profiles",
+                "Financial Data"
+              ]
+            },
+            {
+              "id": "arena_1_6_the_brilliant_jerk",
+              "title": "The Brilliant Jerk",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "You have just taken over a new division. Your top performer, the lead architect who is critical to your flagship product, is also a \"brilliant jerk.\" They deliver incredible results but are toxic to the team, creating a culture of fear and causing your best junior talent to quit.",
+              "task": "Create a 100-day plan to resolve this situation. The plan must detail the specific conversations you will have, the performance metrics you will use, and the clear, non-negotiable behavioral changes required. It must also include a contingency plan for what to do if the architect refuses to change, acknowledging the massive short-term risk of firing them.",
+              "assets": [
+                "Performance Data",
+                "HR Report",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_7_the_compensation_committee",
+              "title": "The Compensation Committee",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "Your Head of HR has prepared a presentation for the board's Compensation Committee proposing a new executive bonus structure. The proposal is a standard formula based 80% on revenue growth and 20% on profit. You believe this incentivizes short-term, \"growth-at-all-costs\" behavior.",
+              "task": "Critique the HR deck. Your comments must propose a more sophisticated bonus structure that incorporates non-financial metrics like customer satisfaction, product quality, and employee retention. You must write a summary email explaining to your HR head why a more balanced set of incentives will create more long-term value.",
+              "assets": [
+                "Presentation Deck",
+                "Financial Data",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_8_the_layoff_list",
+              "title": "The Layoff List",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "Due to a market downturn, you have been mandated to cut 15% of your division's headcount. This is not about performance; it is a financial necessity.",
+              "task": "You are given the full roster of your 100-person division, including performance review scores, compensation, and project assignments. Your task is to select the 15 people who will be laid off. You are not just cutting the lowest performers; you must make strategic cuts that preserve the most critical skills for the company's future while causing the least amount of operational disruption. You must produce the final list and a memo to the CEO justifying your painful choices.",
+              "assets": [
+                "Employee Roster",
+                "Strategic Plan",
+                "Financial Data"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Operational Excellence",
+          "primaryChallengeType": "The Pre-Mortem Red Team",
+          "secondaryTypes": [
+            "The Forensic Audit"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_1_9_the_ship_it_dilemma",
+              "title": "The \"Ship It\" Dilemma",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "Your company's most important software release in years is scheduled for next week. The Head of Sales is pushing hard to hit the date for the quarterly earnings report. The Head of Engineering has just reported a significant, non-catastrophic bug that will impact 10% of users.",
+              "task": "You are the CEO. Your task is to lead a \"Pre-Mortem\" analysis. Write a report that outlines all the potential negative second-order consequences of shipping the product",
+              "assets": [
+                "Engineering Report",
+                "Marketing Plan",
+                "Email"
+              ]
+            },
+            {
+              "id": "arena_1_10_the_technical_debt_default",
+              "title": "The Technical Debt Default",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "Your engineering team is spending 50% of its time fixing bugs and managing an unstable, outdated tech stack. The VP of Engineering has proposed a six-month \"platform investment\" project, where no new features will be shipped, to pay down this \"technical debt.\" The Head of Product argues this will kill the company's growth.",
+              "task": "You are the CTO. Write a memo to the CEO and Head of Product making the case for the six-month development freeze. You must frame technical debt not as an engineering problem, but as a financial liability on the company's balance sheet. Use data to show how the accelerating cost of bug-fixing will soon consume the entire R&D budget if not addressed now.",
+              "assets": [
+                "Engineering Data",
+                "Product Roadmap",
+                "Financial Data"
+              ]
+            },
+            {
+              "id": "arena_1_11_the_okr_cascade",
+              "title": "The OKR Cascade",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "Your company has implemented the OKR (Objectives and Key Results) system, but it's not working. The goals are misaligned, and teams are working at cross-purposes. The leadership team has prepared a deck for the next all-hands meeting to present the OKRs for the upcoming quarter.",
+              "task": "Critique the OKR deck. The deck is a list of departmental goals. Your task is to leave comments that force the team to rewrite the OKRs to be truly interconnected and aligned with the single, top-level company objective. You must identify where different departmental Key Results are in conflict with each other.",
+              "assets": [
+                "Presentation Deck",
+                "Memo",
+                "Employee Survey"
+              ]
+            },
+            {
+              "id": "arena_1_12_the_pricing_model_overhaul",
+              "title": "The Pricing Model Overhaul",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "A successful B2B SaaS company has a simple, one-size-fits-all pricing model. As they move upmarket, the Head of Product believes they need to move to a more complex, feature-based, three-tiered pricing model (\"Good, Better, Best\"). The Head of Sales argues this will create friction and slow down the sales cycle.",
+              "task": "You are presented with two detailed proposals.",
+              "assets": [
+                "Financial Model",
+                "Market Research",
+                "Customer Interviews"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Leading a Turnaround",
+          "primaryChallengeType": "The \"Turnaround\" Town Hall Script",
+          "secondaryTypes": [
+            "The Emergency Board Communication"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_1_13_the_legacy_turnaround",
+              "title": "The Legacy Turnaround",
+              "challengeType": "The \"Turnaround\" Town Hall Script",
+              "dilemma": "You have been hired as the new CEO of a 100-year-old, beloved consumer brand that is now near bankruptcy. The company is filled with loyal, long-serving employees but has failed to innovate. You have 90 days to implement a painful but necessary turnaround plan.",
+              "task": "Write the full script for your first all-hands meeting. The challenge is to strike an incredibly difficult balance: honoring the company's proud history and respecting the employees' loyalty, while simultaneously delivering the brutal news about the layoffs and strategic shifts required for survival.",
+              "assets": [
+                "Financial Data",
+                "Turnaround Plan",
+                "Employee Survey"
+              ]
+            },
+            {
+              "id": "arena_1_14_the_cash_is_king_mandate",
+              "title": "The \"Cash is King\" Mandate",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "You are the new CEO of a high-growth tech startup that has just had its funding pulled due to a market crash. The company has six months of cash runway left. The previous culture was focused on growth-at-all-costs. You must now pivot the entire company to a culture of immediate profitability and cash preservation.",
+              "task": "Create a 100-day plan that is ruthlessly focused on extending the company's cash runway. The plan must detail immediate budget cuts, a hiring freeze, changes to sales compensation to prioritize cash-upfront deals, and a renegotiation of supplier payment terms.",
+              "assets": [
+                "Financial Data",
+                "Sales Pipeline",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_15_the_post_acquisition_failure",
+              "title": "The Post-Acquisition Failure",
+              "challengeType": "The Forensic Audit",
+              "dilemma": "Two years ago, your company made a large, celebrated acquisition. It has been a complete failure. The acquired technology was never successfully integrated, key talent has left, and the division is now losing millions. The board has fired the previous CEO and hired you to fix it.",
+              "task": "You are the new CEO. Your task is to conduct a forensic audit of the original deal. You are given access to the original due diligence documents, the integration plan, and internal emails from the past two years. Your goal is to produce a report for the board that identifies the root causes of the failure. Was it a bad strategy, flawed due to diligence, or a failure of post-merger integration?",
+              "assets": []
+            },
+            {
+              "id": "arena_1_16_the_founder_s_mess",
+              "title": "The Founder's Mess",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "You are a professional CEO brought in to run a company where the brilliant but chaotic founder has just been moved to the Chairman role. The founder has left behind a portfolio of a dozen experimental \"moonshot\" projects, which are draining the resources of the profitable core business.",
+              "task": "The management team has prepared a deck for your first board meeting that timidly proposes continuing to fund all of the founder's projects. Your task is to critique this deck. You must leave comments that force the team to apply a rigorous financial and strategic filter, recommending that at least half of the moonshot projects be shut down immediately so you can reinvest in the core business.",
+              "assets": [
+                "Presentation Deck",
+                "Financial Data",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_1_17_the_kill_the_brand_decision",
+              "title": "The \"Kill the Brand\" Decision",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "You are the CEO of a consumer goods company with a portfolio of brands. One of your oldest brands is slowly declining but still profitable and has a small, intensely loyal customer base. Your marketing team argues that any further investment in this brand is a waste of money that should be reallocated to your high-growth brands.",
+              "task": "Write a memo to your leadership team making the final decision. You must choose between two paths: 1) Proactively \"kill\" the legacy brand and absorb its customers into your other brands. 2) Keep the brand alive with a minimal \"maintenance\" budget, preserving its cash flow but forgoing any growth. You must analyze the financial and brand equity implications of each choice.",
+              "assets": [
+                "Financial Data",
+                "Market Research",
+                "Marketing Proposals"
+              ]
+            },
+            {
+              "id": "arena_1_18_the_union_showdown",
+              "title": "The Union Showdown",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "You are the CEO of an old-line manufacturing company that is on the verge of bankruptcy. To survive, you must secure significant wage and benefits concessions from your powerful labor union. The union is deeply skeptical and is threatening a crippling strike.",
+              "task": "You are presented with the union's initial proposal for the new collective bargaining agreement. Your task is to redline the key clauses related to wages, healthcare costs, and work rules. You must write a justification for your counter-proposal that is both financially sound for the company and politically palatable enough for the union leadership to sell to its members.",
+              "assets": [
+                "Union Proposal",
+                "Financial Data",
+                "Consultant's Report"
+              ]
+            },
+            {
+              "id": "arena_1_19_the_sacred_cow_project",
+              "title": "The \"Sacred Cow\" Project",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "In a turnaround situation, you have identified that a major R&D project, which was the personal passion project of the former CEO and is beloved by the engineering team, has no viable path to commercialization and is draining millions in cash.",
+              "task": "You must kill the project. Your task is to write a Red Team analysis that serves as the basis for your decision. The report must respectfully acknowledge the project's technical achievements while ruthlessly detailing its commercial and strategic flaws. The goal is to create an undeniable, data-driven case that makes the difficult decision to kill the \"sacred cow\" seem rational and unavoidable.",
+              "assets": [
+                "Project Brief",
+                "Financial Data",
+                "Market Research"
+              ]
+            },
+            {
+              "id": "arena_1_20_the_new_narrative",
+              "title": "The New Narrative",
+              "challengeType": "The Public Shareholder Letter",
+              "dilemma": "After a brutal 18-month turnaround involving layoffs, divestitures, and restructuring, the company is finally financially stable but its growth prospects are unclear and employee morale is shattered.",
+              "task": "You are the CEO. Your task is to write the opening section of the annual shareholder letter. This is the most important communication of your tenure. You must pivot the narrative away from \"survival\" and towards a new, credible, and inspiring vision for the company's future growth. The letter must acknowledge the pain of the past while confidently charting a course for the future.",
+              "assets": [
+                "Financial Data",
+                "Press Clippings",
+                "Strategic Plan"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ARENA_2",
+      "name": "The Deal Room",
+      "theme": "M&A & Negotiations",
+      "competencies": [
+        {
+          "name": "M&A Valuation & Analysis",
+          "primaryChallengeType": "The \"Back of the Envelope\" Model",
+          "secondaryTypes": [
+            "The S-1 Teardown"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_2_1_the_acqui_hire_valuation",
+              "title": "The \"Acqui-Hire\" Valuation",
+              "challengeType": "The \"Back of the Envelope\" Model",
+              "dilemma": "A brilliant, 10-person AI research startup with no revenue and no commercial product is being courted by several tech giants. Your company needs to make a competitive offer to acquire the team.",
+              "task": "The startup has no cash flow to discount. Your task is to build a valuation model from scratch based on talent value, not financial performance. The model must quantify the \"build vs. buy\" decision by estimating the cost, time, and probability of success of building a similar world-class team internally. This is your justification for a multi-million dollar offer.",
+              "assets": [
+                "Team Profiles",
+                "Market Data",
+                "Internal Memo"
+              ]
+            },
+            {
+              "id": "arena_2_2_the_sum_of_the_parts_breakup",
+              "title": "The \"Sum-of-the-Parts\" Breakup",
+              "challengeType": "The S-1 Teardown",
+              "dilemma": "A legacy media conglomerate is trading at a significant discount to what an activist investor believes its individual assets are worth. The company consists of a declining but cash-generative broadcast network, a valuable movie studio IP library, a growing theme park division, and a money-losing streaming service.",
+              "task": "You are the activist investor. Analyze the provided segment-level financial data for each of the four divisions. Your task is to produce a detailed valuation report. You must apply different valuation multiples (e.g., EBITDA multiples for the network, revenue multiples for the streaming service) to each part to argue that the sum of the parts is worth significantly more than the current stock price, making a breakup the only logical path.",
+              "assets": [
+                "10-K Filing",
+                "Market Data",
+                "Analyst Reports"
+              ]
+            },
+            {
+              "id": "arena_2_3_the_synergy_sanity_check",
+              "title": "The \"Synergy\" Sanity Check",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "Your CEO is championing a massive \"merger of equals\" with your largest competitor. The investment bankers have presented a model showing billions in projected cost and revenue synergies, justifying a huge premium. You, as the Head of Strategy, are deeply skeptical.",
+              "task": "Write a confidential Red Team analysis of the synergy projections. Your task is to go line by line through the bankers' assumptions (e.g., \"reduce redundant headcount by 30%,\" \"cross-sell products to new customers\") and systematically dismantle them. You must identify the operational, cultural, and technical hurdles that will make achieving these synergies far more difficult and expensive than projected.",
+              "assets": [
+                "Banker's Deck",
+                "Org Charts",
+                "Internal Report"
+              ]
+            },
+            {
+              "id": "arena_2_4_the_distressed_asset_acquisition",
+              "title": "The Distressed Asset Acquisition",
+              "challengeType": "The Forensic Audit",
+              "dilemma": "A promising competitor has just declared bankruptcy. Their core technology is valuable, but their finances are a complete mess. You have the opportunity to acquire their assets out of bankruptcy for a potentially low price, but the risks are immense.",
+              "task": "You are given access to the bankrupt company's \"data room,\" containing messy financial statements, a list of outstanding liabilities, and key employee contracts. Your task is to conduct a rapid forensic audit. You must produce a report that separates the valuable \"clean\" assets from the toxic liabilities and determines a safe, defensible bidding price.",
+              "assets": [
+                "Financials",
+                "Legal Docs",
+                "Asset List"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Deal Structuring & Negotiation",
+          "primaryChallengeType": "The Redline Negotiation",
+          "secondaryTypes": [
+            "The Activist Investor Dialogue"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_2_5_the_term_sheet_tango",
+              "title": "The Term Sheet Tango",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "You are the founder of a promising startup. You have just received a Series A term sheet from a top-tier, aggressive venture capital firm. The valuation is good, but the terms seem punitive.",
+              "task": "You are presented with the full VC term sheet. Your task is to redline three key clauses: the `Liquidation Preference` (e.g., changing it from 2x participating to 1x non-participating), the composition of the `Board of Directors`, and the scope of the founder's `Vesting Schedule`. You must write a concise, professional justification for each of your counter-proposals.",
+              "assets": [
+                "Term Sheet",
+                "Market Data",
+                "Email"
+              ]
+            },
+            {
+              "id": "arena_2_6_the_earn_out_negotiation",
+              "title": "The \"Earn-Out\" Negotiation",
+              "challengeType": "The High-Stakes Negotiation",
+              "dilemma": "You are trying to acquire a founder-led company. You and the founder are far apart on valuation. The only way to bridge the gap is to propose an \"earn-out,\" where the founder will receive additional payments based on hitting certain performance targets post-acquisition.",
+              "task": "You enter a turn-based negotiation simulation with the AI-powered \"Founder.\" Your goal is to structure a multi-year earn-out agreement. The negotiation will focus on the key metrics (Revenue vs. Profit?), the targets (Ambitious vs. Realistic?), and the founder's post-deal autonomy.",
+              "assets": [
+                "Financials",
+                "Founder Profile",
+                "Internal Memo"
+              ]
+            },
+            {
+              "id": "arena_2_7_the_divestiture_spin_off_vs_sale",
+              "title": "The Divestiture: Spin-Off vs. Sale",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "You are the CEO of a conglomerate and have decided to divest a non-core division. You have two options: sell the division to a private equity firm for a fixed cash price, or spin it off to your existing shareholders as a new, independent public company.",
+              "task": "Write a memo to your board recommending one path over the other. Your analysis must compare the two options across several key criteria: immediate cash value, tax efficiency, speed of execution, and the potential for long-term upside for your shareholders.",
+              "assets": [
+                "PE Offer",
+                "Banker's Analysis",
+                "Tax Advisor Memo"
+              ]
+            },
+            {
+              "id": "arena_2_8_the_joint_venture_impasse",
+              "title": "The Joint Venture Impasse",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "Your company is entering into a 50/50 joint venture with a large foreign corporation to enter the Chinese market. The negotiation is stalled on one critical issue: who has ultimate control over the JV's intellectual property.",
+              "task": "You are presented with the IP section of the JV agreement. The foreign partner's redline gives them ownership of all IP developed",
+              "assets": [
+                "JV Agreement",
+                "Memo",
+                "Cultural Brief"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Post-Merger Integration (PMI)",
+          "primaryChallengeType": "",
+          "secondaryTypes": [],
+          "blueprints": [
+            {
+              "id": "arena_2_9_the_culture_clash",
+              "title": "The Culture Clash",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "Your nimble, fast-moving tech company has just been acquired by a massive, slow-moving industrial conglomerate. You, the founder of the acquired company, have been put in charge of the integration. The parent company wants to immediately impose its corporate processes (like performance reviews and budget approvals) on your team.",
+              "task": "Create a 100-day plan focused entirely on protecting your team's culture and autonomy. The plan must detail which parent company processes you will accept, which you will fight against, and how you will manage the relationship with your new corporate overseers to prevent your high-performing team from quitting en masse.",
+              "assets": [
+                "Integration Mandate",
+                "Employee Survey",
+                "Process Manual"
+              ]
+            },
+            {
+              "id": "arena_2_10_the_synergy_capture_plan",
+              "title": "The \"Synergy\" Capture Plan",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "You have just completed a major merger with a competitor. The deal was justified to Wall Street based on achieving $500 million in annual cost synergies. Now you have to actually find those savings.",
+              "task": "You are the head of the Integration Management Office. You are presented with five major synergy proposals from different departments (e.g., consolidating data centers, combining sales forces, rationalizing overlapping products). Each proposal has a projected savings amount, an implementation cost, and a \"risk of disruption\" score. Your task is to greenlight a portfolio of projects that meets the $500M target while minimizing the risk to the business.",
+              "assets": [
+                "Synergy Proposals",
+                "Banker's Deck",
+                "Risk Assessment"
+              ]
+            },
+            {
+              "id": "arena_2_11_the_redundant_roadmap",
+              "title": "The Redundant Roadmap",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "You have acquired a company with a product that directly competes with one of your own. Both products have loyal customer bases. The combined engineering team has created a complex, 18-month roadmap to merge the two products into a single \"best of both\" platform.",
+              "task": "You are the CEO. You believe this \"merge\" strategy is a recipe for disaster that will alienate both customer bases and result in a bloated, unfocused product. Your task is to write a Red Team analysis that kills this plan. You must argue for a more decisive (and painful) strategy: pick one product as the winner and create a plan to migrate the other product's customers, even at the risk of some short-term churn.",
+              "assets": [
+                "Product Roadmaps",
+                "Customer Data",
+                "Engineering Report"
+              ]
+            },
+            {
+              "id": "arena_2_12_the_best_of_both_leadership_team",
+              "title": "The \"Best of Both\" Leadership Team",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "After a merger of equals, you, as the new CEO of the combined company, must select your new, unified executive leadership team. You have two highly talented and political candidates for every C-suite position (two CFOs, two CHROs, etc.), one from each of the legacy companies.",
+              "task": "You are given detailed performance reviews and personality profiles for both candidates for the three most critical roles: CFO, CTO, and Head of Sales. Your task is to choose your new leadership team and write the internal memo announcing the new structure. You must justify your choices and outline the \"golden parachute\" packages for the executives you are letting go.",
+              "assets": [
+                "Executive Profiles",
+                "Strategic Plan",
+                "Consultant's Report"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Strategic Partnerships",
+          "primaryChallengeType": "The High-Stakes Negotiation",
+          "secondaryTypes": [
+            "The Redline Negotiation"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_2_13_the_platform_play",
+              "title": "The Platform Play",
+              "challengeType": "The High-Stakes Negotiation",
+              "dilemma": "You run a successful niche software app. A tech giant (\"Apple-esque\") has offered to make you a premier partner on their new platform, a move that could 10x your growth overnight. However, their standard partnership agreement is highly restrictive.",
+              "task": "You enter a negotiation simulation with the AI-powered \"Head of Partnerships\" from the tech giant. Your goals are to negotiate three key points: the `revenue share` (they want 30%, you want 15%), `data ownership` (they want access to your user data), and `exclusivity` (they want you to be exclusive to their platform for two years).",
+              "assets": [
+                "Partnership Agreement",
+                "Financial Model",
+                "Internal Memo"
+              ]
+            },
+            {
+              "id": "arena_2_14_the_co_opetition_dilemma",
+              "title": "The Co-opetition Dilemma",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "Your biggest competitor has proposed a partnership to jointly develop a new technology standard that would benefit both companies by growing the overall market. However, it would also require you to share some of your intellectual property and collaborate closely with your rival.",
+              "task": "Your Head of Partnerships is championing the deal. Your task is to write the Red Team analysis. You must identify all the ways this \"co-opetition\" could go wrong: the risk of the partner stealing your IP, the danger of them out-executing you on the new standard, and the potential for the partnership to distract you from your core business.",
+              "assets": [
+                "Partnership Proposal",
+                "IP Analysis",
+                "Market Data"
+              ]
+            },
+            {
+              "id": "arena_2_15_the_international_joint_venture",
+              "title": "The International Joint Venture",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "To enter a new, high-growth international market, you are required by local law to form a joint venture (JV) with a local company. The local partner is politically connected but has a very different business culture. The negotiation is stalled on the issue of operational control.",
+              "task": "You are presented with the \"Operating Agreement\" section of the JV contract. Your task is to redline the clauses related to `Board of Directors appointments`, `CEO selection`, and `annual budget approval`. You must propose a new governance structure that gives you enough control to protect your investment and brand, without alienating your essential local partner.",
+              "assets": [
+                "JV Agreement",
+                "Country Report",
+                "Partner Profile"
+              ]
+            },
+            {
+              "id": "arena_2_16_the_alliance_vs_acquisition_decision",
+              "title": "The Alliance vs. Acquisition Decision",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "To fill a critical gap in your product portfolio, you have two options: acquire a small, innovative startup for $200M, or form a deep, exclusive partnership with them.",
+              "task": "Write a memo to your CEO and CFO recommending one path over the other. Your analysis must go beyond the financial cost and compare the two options across several strategic dimensions: speed to market, level of control, integration risk, and cultural impact. You must make a clear recommendation based on a qualitative and quantitative trade-off analysis.",
+              "assets": [
+                "Acquisition Offer",
+                "Partnership Proposal",
+                "Startup Financials"
+              ]
+            },
+            {
+              "id": "arena_2_17_the_good_bank_bad_bank_restructuring",
+              "title": "The \"Good Bank / Bad Bank\" Restructuring",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "You are the new CEO of a company with two types of assets: a portfolio of high-growth, new-technology businesses, and a set of profitable but declining legacy businesses. The legacy businesses are draining management attention and hurting the company's valuation multiple.",
+              "task": "Create a 100-day plan to restructure the company into a \"Good Bank\" (the growth assets) and a \"Bad Bank\" (the legacy assets that will be managed for cash and eventually sold or wound down). The plan must detail the new corporate structure, the leadership teams for each entity, and the new capital allocation policy.",
+              "assets": [
+                "Business Unit Data",
+                "Analyst Reports",
+                "Org Chart"
+              ]
+            },
+            {
+              "id": "arena_2_18_the_activist_s_demand",
+              "title": "The Activist's Demand",
+              "challengeType": "The Activist Investor Dialogue",
+              "dilemma": "An activist investor has taken a large stake in your successful, integrated company and is publicly demanding that you spin off your fastest-growing division, arguing it will unlock shareholder value. You believe the company is stronger together.",
+              "task": "You enter a turn-based simulation where you must respond to a series of public letters and private demands from the AI-powered \"Activist.\" Your task is to craft responses that defend the strategic logic of your integrated model and placate the market, without appearing weak or dismissive.",
+              "assets": [
+                "Activist's Presentation",
+                "Your Internal Analysis",
+                "Stock Performance"
+              ]
+            },
+            {
+              "id": "arena_2_19_the_carve_out_ipo",
+              "title": "The Carve-Out IPO",
+              "challengeType": "The S-1 Teardown",
+              "dilemma": "You have decided to divest a fast-growing but non-core division. Instead of a simple sale, you are pursuing a \"carve-out\" IPO, selling a minority stake of the division to the public to establish a market value before selling the rest.",
+              "task": "You are the CFO. Your task is to write the critical \"Management's Discussion and Analysis\" (MD&A) and \"Risk Factors\" sections of the S-1 filing for the new company. You must tell a compelling growth story to attract public investors while accurately disclosing the risks and the new company's ongoing relationship with its parent.",
+              "assets": [
+                "Division Financials",
+                "Market Data",
+                "Legal Memo"
+              ]
+            },
+            {
+              "id": "arena_2_20_the_end_of_an_era",
+              "title": "The End of an Era",
+              "challengeType": "The \"Turnaround\" Town Hall Script",
+              "dilemma": "To save the company, you must sell its original, founding division—the business that gives the company its name and history. It is a financially necessary but deeply emotional decision that will feel like a betrayal to long-serving employees.",
+              "task": "Write the full script for the internal all-hands meeting where you announce the sale of this legacy division. The challenge is entirely in the communication. The script must convey empathy, respect for the company's history, and a clear, forward-looking rationale for why this painful amputation is the only way to ensure a healthy future for the rest of the company.",
+              "assets": [
+                "Sale Agreement",
+                "Financial Data",
+                "Company History"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ARENA_3",
+      "name": "The Board Room",
+      "theme": "Governance & High-Stakes Persuasion",
+      "competencies": [
+        {
+          "name": "Capital Allocation Strategy",
+          "primaryChallengeType": "The Capital Allocation Stack Rank",
+          "secondaryTypes": [
+            "The Investment Committee Memo"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_3_1_the_bet_the_company_moonshot",
+              "title": "The \"Bet the Company\" Moonshot",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "Your R&D division, led by a brilliant but notoriously difficult visionary, has proposed a \"moonshot\" project. It requires a massive, multi-year, multi-billion dollar investment that will crush short-term profits. If successful, it could redefine the company and the entire industry. If it fails, it could bankrupt the company.",
+              "task": "You are the CEO. You have decided to back the project. Your task is to write the definitive memo to your skeptical, financially-minded board. You must make a compelling, rational case for a seemingly irrational bet, framing it as a calculated risk necessary for long-term survival and dominance.",
+              "assets": [
+                "Project Brief",
+                "Financial Model",
+                "Risk Assessment",
+                "Board Profiles"
+              ]
+            },
+            {
+              "id": "arena_3_2_the_dividend_vs_buyback_debate",
+              "title": "The Dividend vs. Buyback Debate",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "Your mature, cash-generative company is sitting on a large pile of cash. Your CFO has prepared a presentation for the board proposing the initiation of a quarterly dividend. You, the CEO, believe a flexible share buyback program is a far superior tool for returning capital.",
+              "task": "Critique the CFO's board deck. Your comments must systematically dismantle the case for a dividend (highlighting its inflexibility and tax inefficiency) and insert new slides that make a powerful, data-driven argument for a share buyback program, emphasizing its ability to create value when the stock is undervalued.",
+              "assets": [
+                "Presentation Deck",
+                "Financial Data",
+                "Analyst Reports"
+              ]
+            },
+            {
+              "id": "arena_3_3_the_activist_s_ultimatum",
+              "title": "The Activist's Ultimatum",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "A well-known activist investor who owns 8% of your company has just privately delivered an ultimatum to you: announce a plan to spin off a major division within 30 days, or they will launch a public proxy fight to replace you and the board.",
+              "task": "You have 24 hours to prepare the urgent, confidential briefing for your Board of Directors. The document must summarize the activist's demands, provide a clear-eyed assessment of the activist's chances of success in a proxy fight, and outline your recommended response strategy (Negotiate? Fight? Capitulate?).",
+              "assets": [
+                "Activist's Letter",
+                "Shareholder Analysis",
+                "Financial Model"
+              ]
+            },
+            {
+              "id": "arena_3_4_the_harvest_or_invest_decision",
+              "title": "The \"Harvest or Invest\" Decision",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "You are the CEO of a conglomerate. Your legacy \"cash cow\" division is profitable but in a structurally declining market. The division's manager is lobbying for a significant capital investment to \"reinvigorate\" the brand. Your CFO argues the division should be put into \"harvest mode,\" with its cash flows reallocated to your high-growth digital division.",
+              "task": "You are presented with two detailed, five-year strategic plans and financial models.",
+              "assets": [
+                "Strategic Plans",
+                "Market Data",
+                "Memo"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Board Communication",
+          "primaryChallengeType": "The Board Deck Critique",
+          "secondaryTypes": [
+            "The Emergency Board Communication"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_3_5_the_pivot_presentation",
+              "title": "The Pivot Presentation",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "You have decided the company needs to make a massive, painful strategic pivot (e.g., from hardware to software). Your Head of Strategy has prepared a 50-slide, data-dense presentation for the board. It is factually correct but strategically incoherent and utterly unpersuasive.",
+              "task": "Your task is to critique the deck. You are not correcting typos; you are acting as a story editor. You must leave high-level comments that force the team to completely restructure the presentation, starting with a powerful \"why,\" building a clear narrative, and ending with a decisive call to action.",
+              "assets": [
+                "Presentation Deck",
+                "Financial Model",
+                "Board Profiles"
+              ]
+            },
+            {
+              "id": "arena_3_6_the_bad_news_briefing",
+              "title": "The \"Bad News\" Briefing",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "You have just learned that a major new product launch, which you personally championed to the board, is a catastrophic failure. Sales are 90% below projection, and the product is being savaged by early reviewers. You have to break the news to the board at their meeting tomorrow.",
+              "task": "Write the confidential, one-page briefing memo that will be sent to the board the night before the meeting. The memo must state the bad news directly and without sugarcoating, take personal accountability, provide a concise analysis of what went wrong, and outline your immediate plan to contain the damage.",
+              "assets": [
+                "Sales Data",
+                "Press Clippings",
+                "Project Plan"
+              ]
+            },
+            {
+              "id": "arena_3_7_the_leaker_on_the_board",
+              "title": "The Leaker on the Board",
+              "challengeType": "The High-Stakes Negotiation",
+              "dilemma": "Highly sensitive details from your last confidential board meeting have been leaked to a major newspaper, damaging a key negotiation. You are almost certain you know which of your directors is the source of the leak.",
+              "task": "You enter a one-on-one, turn-based negotiation simulation with the AI-powered \"Leaking Director.\" Your goal is not to accuse them directly, but to use a series of carefully worded questions and statements to get them to implicitly acknowledge their behavior and agree to a new code of conduct, all without causing them to resign and create a public governance crisis.",
+              "assets": [
+                "News Article",
+                "Board Minutes",
+                "Director Profile"
+              ]
+            },
+            {
+              "id": "arena_3_8_the_compensation_committee_showdown",
+              "title": "The Compensation Committee Showdown",
+              "challengeType": "The \"Murder Board\" Simulation",
+              "dilemma": "As CEO, your proposed multi-million dollar compensation package is up for approval by the board's Compensation Committee. One influential director, a well-known advocate for pay equity, believes it is excessive and is prepared to vote against it.",
+              "task": "You must present and defend your proposed compensation plan to the AI-powered \"Compensation Committee.\" The committee, led by the skeptical director, will aggressively question the justification for your pay, comparing it to the median employee salary and the company's recent stock performance. Your task is to make a rational, data-driven case without appearing greedy or out of touch.",
+              "assets": [
+                "Compensation Proposal",
+                "Benchmarking Data",
+                "Director Profile"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Risk Management & Governance",
+          "primaryChallengeType": "The Product Recall Decision",
+          "secondaryTypes": [
+            "The Forensic Audit"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_3_9_the_product_recall_decision",
+              "title": "The Product Recall Decision",
+              "challengeType": "The Product Recall Decision",
+              "dilemma": "Your company's best-selling consumer product has a potential safety flaw. Your engineering team believes the risk is \"one in a million.\" Your legal team warns that even one incident could lead to ruinous lawsuits and brand damage. A full recall would cost $500 million and wipe out the quarter's profits.",
+              "task": "You are the CEO. You must make the final \"Go/No-Go\" decision on the recall. The task is to write the formal decision memo for the board. The memo must weigh the quantifiable financial cost of the recall against the unquantifiable, but potentially catastrophic, risk of inaction.",
+              "assets": [
+                "Engineering Report",
+                "Legal Memo",
+                "Financial Analysis"
+              ]
+            },
+            {
+              "id": "arena_3_10_the_whistleblower_investigation",
+              "title": "The Whistleblower Investigation",
+              "challengeType": "The Forensic Audit",
+              "dilemma": "You are the chair of the board's Audit Committee. You have just received a credible, anonymous whistleblower email alleging that the company's Head of Sales for Europe is bribing officials to win contracts.",
+              "task": "You must lead the investigation. You are given access to a \"clean room\" data folder containing the European division's sales data, expense reports, and the Head of Sales's emails for the past year. Your task is to find the \"smoking gun\" and produce a timeline of events to present to the full board and the SEC.",
+              "assets": [
+                "Whistleblower Email",
+                "Data Folder",
+                "FCPA Guide"
+              ]
+            },
+            {
+              "id": "arena_3_11_the_bet_the_company_lawsuit",
+              "title": "The \"Bet the Company\" Lawsuit",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "Your company is facing a massive patent infringement lawsuit that threatens your core product. You believe you are in the right, but a trial is risky and could result in billions in damages. The plaintiff has offered to settle for $250 million.",
+              "task": "You are the General Counsel. Your CEO wants to fight. Your task is to redline the proposed settlement agreement. You will negotiate not the price, but the non-financial terms: the scope of the public admission of guilt, the cross-licensing of patents, and the agreement not to sue in the future. The goal is to make the settlement as strategically palatable as possible.",
+              "assets": [
+                "Settlement Agreement",
+                "Legal Analysis",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_3_12_the_data_breach_response",
+              "title": "The Data Breach Response",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "Your CTO has just informed you of a massive data breach that has exposed the personal information of millions of your customers. The breach happened two weeks ago, but you are just finding out now.",
+              "task": "You have 90 minutes before the story breaks in the press. Your task is to write the urgent, confidential briefing that must be sent to your Board of Directors. The memo must detail what you know, what you don't know, the immediate steps you are taking to contain the damage, and the communication plan for notifying customers and regulators.",
+              "assets": [
+                "CTO's Report",
+                "PR Plan",
+                "Legal Memo"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "CEO Succession & Governance",
+          "primaryChallengeType": "",
+          "secondaryTypes": [],
+          "blueprints": [
+            {
+              "id": "arena_3_13_the_founder_s_shadow",
+              "title": "The Founder's Shadow",
+              "challengeType": "The Public Shareholder Letter",
+              "dilemma": "You are the newly appointed CEO of a major tech company, taking over from its iconic, larger-than-life founder who is remaining on the board as Chairman. The market is skeptical that you can lead the company effectively with the founder still in the building.",
+              "task": "Write your first annual shareholder letter. The primary goal of this letter is to project authority and a clear, forward-looking vision. You must respectfully acknowledge the founder's legacy while simultaneously making it clear that you are now in charge and have your own distinct strategy for the company's next chapter.",
+              "assets": [
+                "Founder's Farewell Letter",
+                "Analyst Reports",
+                "Strategic Plan"
+              ]
+            },
+            {
+              "id": "arena_3_14_the_internal_horse_race",
+              "title": "The Internal Horse Race",
+              "challengeType": "The Capital Allocation Stack Rank",
+              "dilemma": "You are the retiring CEO. You have two brilliant, highly ambitious internal candidates to succeed you: the operational, process-driven COO, and the visionary, product-focused CPO. The board has asked for your final recommendation.",
+              "task": "You are presented with the detailed performance reviews, 360-degree feedback, and strategic plans proposed by both the COO and the CPO. Your task is to choose one as your successor and write the confidential memo to the board justifying your choice. The memo must analyze which candidate's skills are better suited to the company's strategic challenges for the",
+              "assets": [
+                "Candidate Profiles",
+                "Strategic Analysis",
+                "Board Profiles"
+              ]
+            },
+            {
+              "id": "arena_3_15_the_activist_s_board_seat",
+              "title": "The Activist's Board Seat",
+              "challengeType": "The Activist Investor Dialogue",
+              "dilemma": "An activist investor has won a proxy fight and now has a seat on your board. The activist is brilliant and aggressive, and is constantly challenging your strategy during board meetings, creating a toxic environment.",
+              "task": "You enter a turn-based simulation of a one-on-one dinner with the AI-powered \"Activist Director.\" Your goal is not to win an argument, but to find a constructive path forward. You must use a combination of empathy, data, and firm boundaries to transform the relationship from an adversarial one to a productive one.",
+              "assets": [
+                "Activist's Presentation",
+                "Board Minutes",
+                "Your Strategic Plan"
+              ]
+            },
+            {
+              "id": "arena_3_16_the_unwritten_rules",
+              "title": "The Unwritten Rules",
+              "challengeType": "The First 100 Days Plan",
+              "dilemma": "You are the first-ever outsider CEO hired to run a 150-year-old family-controlled company. The family members on the board operate on a set of unwritten rules, personal relationships, and historical grievances that you do not understand.",
+              "task": "Create a 100-day plan focused exclusively on navigating the complex governance and cultural dynamics of the family board. The plan should detail your strategy for building individual relationships with key family members, understanding the hidden power structures, and establishing your authority without alienating the family that ultimately controls the company.",
+              "assets": [
+                "Family Tree",
+                "Company History",
+                "Memo"
+              ]
+            },
+            {
+              "id": "arena_3_17_the_ethics_committee",
+              "title": "The Ethics Committee",
+              "challengeType": "The \"Murder Board\" Simulation",
+              "dilemma": "Your company's AI research team has developed a powerful new facial recognition technology. The sales team wants to sell it to law enforcement agencies, a contract worth hundreds of millions. The ethics team has warned that this could lead to serious misuse and public backlash.",
+              "task": "You must present your recommendation to the board's Ethics Committee. The AI-powered \"committee\" will include a former judge, a human rights advocate, and a profit-focused investor. They will grill you on the ethical implications, the potential for misuse, and the reputational risk of your decision, forcing you to defend your choice in a high-stakes moral and business debate.",
+              "assets": [
+                "Technical Brief",
+                "Sales Proposal",
+                "Ethics Report"
+              ]
+            },
+            {
+              "id": "arena_3_18_the_say_on_pay_failure",
+              "title": "The \"Say on Pay\" Failure",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "In a stunning rebuke, your company's shareholders have just voted against your executive compensation plan in the annual \"Say on Pay\" vote. The vote is non-binding, but it is a massive public embarrassment and a sign of deep investor dissatisfaction.",
+              "task": "*",
+              "assets": [
+                "Proxy Statement",
+                "Investor Report",
+                "Press Clippings"
+              ]
+            },
+            {
+              "id": "arena_3_19_the_independent_chairman",
+              "title": "The Independent Chairman",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "As a condition of settling with an activist investor, your board has agreed to appoint a new, truly independent Chairman, separating the roles of Chairman and CEO for the first time in the company's history. You, the CEO, must now negotiate your new working relationship and the division of power with the incoming Chairman.",
+              "task": "You are presented with a draft of the new \"Board Governance Charter,\" which outlines the respective duties of the CEO and the new Chairman. Your task is to redline the key clauses related to `setting the board agenda`, `acting as the primary spokesperson to investors`, and `leading the CEO performance review`. You must propose changes that protect your operational authority while respecting the Chairman's oversight role.",
+              "assets": [
+                "Governance Charter",
+                "Chairman Profile",
+                "Activist's Letter"
+              ]
+            },
+            {
+              "id": "arena_3_20_the_final_decision",
+              "title": "The Final Decision",
+              "challengeType": "The Investment Committee Memo",
+              "dilemma": "You are the Chairman of the Board. Your CEO has just presented a massive, bet-the-company acquisition. The vote is deadlocked: half the board supports the CEO's bold vision, the other half is deeply concerned about the immense financial risk. You hold the deciding vote.",
+              "task": "You must write the final, one-page memo that will be entered into the official board minutes, casting the deciding vote and explaining your rationale. The memo must be a masterclass in governance. It must respectfully acknowledge the valid arguments on both sides of the issue, clearly articulate the single most important factor driving your decision, and reaffirm your confidence in the CEO (if you vote yes) or establish a new path forward (if you vote no).",
+              "assets": [
+                "CEO's Proposal",
+                "CFO's Risk Analysis",
+                "Board Minutes"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ARENA_4",
+      "name": "The Platform",
+      "theme": "Public & Investor Narrative",
+      "competencies": [
+        {
+          "name": "Investor Relations",
+          "primaryChallengeType": "The Earnings Call Q&A",
+          "secondaryTypes": [
+            "The Public Shareholder Letter"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_4_1_the_mixed_quarter_earnings_call",
+              "title": "The \"Mixed Quarter\" Earnings Call",
+              "challengeType": "The Earnings Call Q&A",
+              "dilemma": "Your SaaS company's quarterly results are a strategic puzzle. Headline revenue and earnings missed analyst expectations due to a delayed product launch. However, Net Dollar Retention (NDR), a critical forward-looking metric of customer health, was a record high. The market will react badly to the headline miss unless you can successfully reframe the narrative.",
+              "task": "You are the CEO. You are given the full earnings report. Your task is to handle a tough Q&A simulation with three distinct AI analyst personas (a short-term trader, a long-term growth investor, a skeptical bear). You must use the strong NDR number to build a credible story about long-term health, without making excuses for the short-term execution failure.",
+              "assets": [
+                "Earnings Report",
+                "Analyst Estimates",
+                "Internal Memo"
+              ]
+            },
+            {
+              "id": "arena_4_2_the_guidance_tightrope",
+              "title": "The \"Guidance\" Tightrope",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "It is two weeks before your next quarterly earnings report. Your CFO has just informed you that due to an unexpected slowdown in a key market, you are almost certain to miss your publicly stated financial guidance for the quarter.",
+              "task": "You must write the urgent, confidential briefing for your Board of Directors. The memo must clearly state the financial shortfall, explain the root cause, and, most importantly, recommend a communication strategy. Do you \"pre-announce\" the miss now to soften the blow, or do you wait for the earnings call and risk a more severe market reaction?",
+              "assets": [
+                "Financial Forecast",
+                "IR Playbook",
+                "Legal Memo"
+              ]
+            },
+            {
+              "id": "arena_4_3_the_investor_day_narrative",
+              "title": "The Investor Day Narrative",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "Your company is holding its first-ever \"Investor Day.\" The goal is to lay out your five-year strategic vision and convince the market that your stock deserves a higher valuation multiple. Your team has prepared a dense, 100-slide deck that is full of data but lacks a clear, compelling story.",
+              "task": "You are the CEO. Your task is to critique the draft Investor Day presentation. You must act as a story editor, leaving high-level comments that force the team to structure the entire day around a single, powerful narrative. Your feedback must focus on simplifying the message, creating a clear \"aha\" moment for investors, and building a case for long-term value creation.",
+              "assets": [
+                "Presentation Deck",
+                "Financial Model",
+                "Analyst Reports"
+              ]
+            },
+            {
+              "id": "arena_4_4_the_activist_s_attack",
+              "title": "The Activist's Attack",
+              "challengeType": "The Activist Investor Dialogue",
+              "dilemma": "A well-known activist investor has taken a large stake in your company and just published a blistering 50-page presentation attacking your strategy, your cost structure, and your leadership. Your stock is down 10% on the news.",
+              "task": "You enter a turn-based simulation where you must craft the company's official public responses to a series of escalating attacks from the AI-powered \"Activist.\" The challenge is to respond to their data-driven arguments with your own, defending your strategy without appearing defensive or arrogant, and winning the battle for the hearts and minds of your other institutional shareholders.",
+              "assets": [
+                "Activist's Presentation",
+                "Your Internal Analysis",
+                "IR Crisis Plan"
+              ]
+            },
+            {
+              "id": "arena_4_5_the_shareholder_letter",
+              "title": "The Shareholder Letter",
+              "challengeType": "The Public Shareholder Letter",
+              "dilemma": "It has been a brutal year. Your company's stock has underperformed the market by 30% due to a failed product and a costly restructuring. Employee morale is low, and investors are losing faith.",
+              "task": "You are the CEO. Your task is to write the full, multi-page annual shareholder letter. This is your chance to reclaim the narrative. The letter must be brutally honest about the year's failures, take clear accountability, explain the lessons learned, and, most importantly, lay out a credible and compelling case for why the painful actions you took have positioned the company for a much stronger future.",
+              "assets": [
+                "Financial Data",
+                "Press Clippings",
+                "Strategic Plan"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Brand & Reputation Management",
+          "primaryChallengeType": "The Leaked Memo Response Chain",
+          "secondaryTypes": [
+            "The Public Statement / Press Release"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_4_6_the_viral_outrage",
+              "title": "The Viral Outrage",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "A junior marketing employee has posted a tone-deaf and offensive tweet from your main corporate account. It has gone viral for all the wrong reasons, and a #BoycottYourBrand hashtag is the #1 trend.",
+              "task": "*",
+              "assets": [
+                "Social Media Feed",
+                "Brand Guidelines",
+                "Crisis Comms Plan"
+              ]
+            },
+            {
+              "id": "arena_4_7_the_ceo_scandal",
+              "title": "The CEO Scandal",
+              "challengeType": "The \"Turnaround\" Town Hall Script",
+              "dilemma": "You have just been appointed interim CEO after your predecessor was fired for a major ethical scandal. The company's reputation is in tatters, and employees are demoralized and ashamed.",
+              "task": "Your first action as CEO is to address the entire company. Your task is to write the full script for this all-hands meeting. The script must be a masterclass in restoring trust. You must acknowledge the anger and betrayal of the employees, draw a clear, hard line between the past and the future, and lay out the first, concrete steps you will take to rebuild the company's culture and reputation.",
+              "assets": [
+                "News Articles",
+                "Employee Survey",
+                "Board Mandate"
+              ]
+            },
+            {
+              "id": "arena_4_8_the_product_safety_crisis",
+              "title": "The Product Safety Crisis",
+              "challengeType": "The Real-Time Crisis Simulation",
+              "dilemma": "A report has just been released by a major news organization linking your best-selling product to a serious safety issue. The story is credible and is spreading like wildfire. Your stock is in freefall.",
+              "task": "A 60-minute simulation unfolds via a stream of news alerts, legal memos, engineering reports, and demands for comment from reporters. You must make a series of time-stamped decisions: Issue a denial or a holding statement? Voluntarily halt sales of the product? Agree to an interview with a critical journalist? Each decision has consequences that shape the next stage of the crisis.",
+              "assets": [
+                "News Report",
+                "Internal Data",
+                "Decision Tree"
+              ]
+            },
+            {
+              "id": "arena_4_9_the_good_corporate_citizen",
+              "title": "The \"Good Corporate Citizen\"",
+              "challengeType": "The S-1 Teardown",
+              "dilemma": "Your company, a highly profitable but controversial tech firm, is preparing to go public. You need to convince investors that you are not a \"rogue actor\" and that your Environmental, Social, and Governance (ESG) policies are robust.",
+              "task": "You are the Head of Communications. Your task is to write the \"Corporate Responsibility\" and \"Risk Factors\" sections of the S-1 filing. You must frame the company's controversial business practices in the best possible light, while accurately disclosing the significant reputational and regulatory risks to meet legal requirements.",
+              "assets": [
+                "Risk Assessment",
+                "Positive Initiatives",
+                "Competitor S-1s"
+              ]
+            },
+            {
+              "id": "arena_4_10_the_rebrand",
+              "title": "The Rebrand",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "Your company has a legacy name that is now seen as dated and limiting. You have just completed a multi-million dollar rebranding effort, with a new name, logo, and corporate identity.",
+              "task": "Your task is to write the official press release and the CEO's public letter announcing the rebrand. The communication must clearly articulate the strategic rationale for the change, connect the new brand to the company's future vision, and generate excitement and positive momentum, preventing the market from seeing it as a frivolous or desperate move.",
+              "assets": [
+                "Brand Strategy Deck",
+                "Market Research",
+                "Financial Data"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Strategic Communication",
+          "primaryChallengeType": "The Public Statement / Press Release",
+          "secondaryTypes": [
+            "The Activist Investor Dialogue"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_4_11_the_price_hike",
+              "title": "The Price Hike",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "Due to rising costs, you must implement a 15% price increase on your popular consumer product. You know the decision will be deeply unpopular and risks alienating your loyal customer base.",
+              "task": "Your task is to write the official announcement to your customers. The challenge is in the framing. The communication must be transparent about the reasons for the increase, emphasize the continued value of the product, and be written with a tone of empathy and respect for the customer, not corporate greed.",
+              "assets": [
+                "Financial Data",
+                "Customer Data",
+                "Competitor Pricing"
+              ]
+            },
+            {
+              "id": "arena_4_12_the_no_memo",
+              "title": "The \"No\" Memo",
+              "challengeType": "The Internal \"Call to Action\" Memo",
+              "dilemma": "Your team has just spent six months working on a major new product. After a final review, you have made the gut-wrenching decision to kill the project because it is not strategically sound. Now you have to tell the team.",
+              "task": "Write the internal memo to the project team. The memo must be a masterclass in empathetic leadership. It must clearly and rationally explain the strategic reasons for the decision, validate the team's hard work and dedication, and, most importantly, pivot them towards a new, even more important mission without destroying their morale.",
+              "assets": [
+                "Project Plan",
+                "Review Data",
+                "New Strategic Plan"
+              ]
+            },
+            {
+              "id": "arena_4_13_the_vision_memo",
+              "title": "The Vision Memo",
+              "challengeType": "The Internal \"Call to Action\" Memo",
+              "dilemma": "Your company is successful and stable, but has become complacent. There is no clear, inspiring vision for the future beyond hitting the next quarterly target.",
+              "task": "You are the CEO. Your task is to write a company-wide memo that articulates a new, ambitious, ten-year vision. The memo must go beyond financial targets and create a powerful narrative about the company's purpose, its long-term impact on the world, and the exciting challenges that lie ahead.",
+              "assets": [
+                "Employee Survey",
+                "Market Trends",
+                "Financials"
+              ]
+            },
+            {
+              "id": "arena_4_14_the_open_source_decision",
+              "title": "The \"Open Source\" Decision",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "Your company has developed a groundbreaking piece of internal software. You have made the radical decision to open-source it, giving it away for free to the entire developer community.",
+              "task": "Write the official blog post announcing this decision. The post must explain the strategic rationale behind what seems like a financially irrational move. You must articulate how building a community and a new industry standard around your technology will create more long-term value for the company than keeping it proprietary.",
+              "assets": [
+                "Technical Brief",
+                "Financial Model",
+                "Strategic Plan"
+              ]
+            },
+            {
+              "id": "arena_4_15_the_simplicity_mandate",
+              "title": "The \"Simplicity\" Mandate",
+              "challengeType": "The \"Turnaround\" Town Hall Script",
+              "dilemma": "Your company's products have become bloated, complex, and difficult to use. You, as a newly returned founder CEO (a la Steve Jobs), are mandating a radical return to simplicity, which will involve killing popular but non-essential features and projects.",
+              "task": "Write the script for your first product strategy all-hands meeting. The script must be a powerful and inspiring defense of simplicity as a core value. You must use clear examples and strong language to explain why \"less is more\" and rally the team around this new, focused product philosophy, even though it means abandoning work they are proud of.",
+              "assets": [
+                "Product Portfolio",
+                "Customer Feedback",
+                "Founder's Memo"
+              ]
+            },
+            {
+              "id": "arena_4_16_the_m_a_announcement",
+              "title": "The M&A Announcement",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "You have just announced the largest acquisition in your company's history. Investors are skeptical, and employees of both companies are anxious about their future.",
+              "task": "Your task is to write the single, unified press release that will be sent to the media, and the separate, more detailed internal FAQ that will be sent to all employees. The challenge is to craft two documents with different tones and levels of detail that both tell the same, consistent strategic story.",
+              "assets": [
+                "Deal Terms",
+                "Strategic Rationale",
+                "Employee Data"
+              ]
+            },
+            {
+              "id": "arena_4_17_the_no_comment_conundrum",
+              "title": "The \"No Comment\" Conundrum",
+              "challengeType": "The Crisis Press Conference",
+              "dilemma": "A major news outlet is about to publish a story based on rumors that you are in talks to be acquired. Your company policy is to \"not comment on rumors.\" However, the rumor is true, and a simple \"no comment\" will be seen as a confirmation, potentially jeopardizing the deal.",
+              "task": "You enter a simulation where you must field a series of questions from an aggressive AI-powered journalist. Your task is to deflect, pivot, and bridge your way through the conversation without lying and without saying \"no comment,\" all while protecting the confidentiality of the deal.",
+              "assets": [
+                "Company Policy",
+                "Deal Status",
+                "Journalist Profile"
+              ]
+            },
+            {
+              "id": "arena_4_18_the_analyst_day_keynote",
+              "title": "The Analyst Day Keynote",
+              "challengeType": "The Board Deck Critique",
+              "dilemma": "You are preparing for your annual Analyst Day. Your goal is to get the market to believe in your new, long-term AI strategy. Your team has prepared a deck that is full of impressive technical demos but fails to connect them to a clear business and financial strategy.",
+              "task": "Critique the Analyst Day presentation. Your feedback must force the team to re-structure the entire narrative. You must push them to answer the three questions every investor has: How big is the market? Why will you win? And how will you make money?",
+              "assets": [
+                "Presentation Deck",
+                "Financial Model",
+                "Analyst Reports"
+              ]
+            },
+            {
+              "id": "arena_4_19_the_apology",
+              "title": "The Apology",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "Your service had a massive, multi-hour outage that affected millions of customers and cost them real money. The technical issue is now resolved, but customer trust is shattered.",
+              "task": "Write the official public apology to all of your customers. The document must follow the three rules of a good apology: 1) Clearly state what happened and take full responsibility (no excuses). 2) Genuinely express empathy for the impact it had on your customers. 3) Detail the specific, concrete steps you are taking to ensure it never happens again, including any compensation you will offer.",
+              "assets": [
+                "Technical Post-Mortem",
+                "Customer Impact Report",
+                "Social Media Feed"
+              ]
+            },
+            {
+              "id": "arena_4_20_the_victory_lap",
+              "title": "The Victory Lap",
+              "challengeType": "The Public Shareholder Letter",
+              "dilemma": "After a long and difficult five-year strategic pivot that was heavily criticized by the market, your strategy has been vindicated. Your company is now the undisputed market leader, and your stock is at an all-time high.",
+              "task": "You are the CEO. Your task is to write the opening section of your annual shareholder letter. This is your \"victory lap.\" The challenge is to write it with magnanimity, not arrogance. You must tell the story of the difficult journey, thank the long-term shareholders who kept the faith, and humbly articulate the lessons learned, all while confidently setting the stage for the next chapter of growth.",
+              "assets": [
+                "Stock Chart",
+                "Press Clippings",
+                "Financial Data"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ARENA_5",
+      "name": "The War Room",
+      "theme": "Crisis & High-Velocity Events",
+      "competencies": [
+        {
+          "name": "Crisis Decision-Making",
+          "primaryChallengeType": "The Real-Time Crisis Simulation",
+          "secondaryTypes": [
+            "The Emergency Board Communication"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_5_1_the_supply_chain_collapse",
+              "title": "The Supply Chain Collapse",
+              "challengeType": "The Real-Time Crisis Simulation",
+              "dilemma": "A sudden geopolitical event (e.g., a new tariff, a port closure) has instantly cut off access to the single-source supplier for a critical component in your flagship hardware product. Your entire production line will halt in 72 hours.",
+              "task": "A 60-minute simulation unfolds via a stream of alerts. You receive updates on your dwindling inventory, frantic emails from your Head of Manufacturing, a proposal for an expensive alternate supplier from your Head of Procurement, and demands for a public statement from your Head of PR. You must make a series of time-stamped decisions to mitigate the damage.",
+              "assets": [
+                "Supply Chain Map",
+                "Financial Model",
+                "Alternate Supplier Dossier"
+              ]
+            },
+            {
+              "id": "arena_5_2_the_activist_short_seller_report",
+              "title": "The Activist Short-Seller Report",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "A notorious activist short-selling firm has just published a scathing 100-page report accusing your company of fraud. The report is a mix of legitimate criticisms and wild exaggerations. Your stock is down 30% in pre-market trading.",
+              "task": "*",
+              "assets": [
+                "Short-Seller Report",
+                "Your Financials",
+                "Legal Memo"
+              ]
+            },
+            {
+              "id": "arena_5_3_the_hostile_takeover_bid",
+              "title": "The Hostile Takeover Bid",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "Your larger, more aggressive competitor has just launched a surprise, unsolicited \"hostile takeover\" bid for your company at a 20% premium to your current stock price. They have sent the offer directly to your shareholders.",
+              "task": "You have 90 minutes to prepare the urgent, confidential briefing for your Board of Directors. The memo must analyze the offer, provide a preliminary valuation of whether the bid is fair, and, most importantly, recommend a defensive strategy (e.g., \"Just Say No,\" \"Find a 'White Knight' acquirer,\" \"Negotiate for a higher price\").",
+              "assets": [
+                "Takeover Offer",
+                "Banker's Analysis",
+                "Board Profiles"
+              ]
+            },
+            {
+              "id": "arena_5_4_the_key_person_departure",
+              "title": "The Key Person Departure",
+              "challengeType": "The First 100 Days Plan (but in reverse)",
+              "dilemma": "The brilliant, visionary head of your AI division—the public face of your entire future strategy—has just resigned to join your biggest competitor. Her departure creates a massive strategic vacuum and a potential crisis of investor confidence.",
+              "task": "The resignation will be announced in 48 hours. Your task is to create the \"Emergency Transition Plan.\" The plan must detail the immediate actions to be taken, including the internal and external communication strategy, the appointment of an interim leader, and a clear plan to reassure the remaining AI team and prevent a mass exodus of talent.",
+              "assets": [
+                "Resignation Letter",
+                "Org Chart",
+                "Analyst Reports"
+              ]
+            },
+            {
+              "id": "arena_5_5_the_going_concern_warning",
+              "title": "The \"Going Concern\" Warning",
+              "challengeType": "The Redline Negotiation",
+              "dilemma": "Your struggling company is in the final stages of securing a life-saving round of financing. At the last minute, your auditors have informed you that they may have to include a \"going concern\" warning in your financial statements, which would almost certainly kill the deal and trigger bankruptcy.",
+              "task": "You enter a high-stakes negotiation simulation with the AI-powered \"Lead Audit Partner.\" Your task is to convince him not to issue the warning. You must present a credible, data-driven operating plan that demonstrates a viable path to profitability, and you must negotiate the specific milestones and covenants you are willing to commit to in order to avoid the warning.",
+              "assets": [
+                "Auditor's Memo",
+                "Your Financial Model",
+                "Financing Term Sheet"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Cybersecurity & Data Privacy",
+          "primaryChallengeType": "The Leaked Memo Response Chain",
+          "secondaryTypes": [
+            "The Forensic Audit"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_5_6_the_ransomware_attack",
+              "title": "The Ransomware Attack",
+              "challengeType": "The Real-Time Crisis Simulation",
+              "dilemma": "Your company's entire network has been encrypted by a ransomware attack. A bitcoin wallet address is on every screen with a demand for $10 million. Your operations are completely offline.",
+              "task": "A 60-minute simulation unfolds. You are presented with conflicting advice from your Head of Security (who is trying to restore from backups), your General Counsel (who advises that paying may be illegal), and your Head of Sales (who is losing millions every hour). You must make a series of time-stamped decisions, culminating in the final \"Pay/Don't Pay\" choice.",
+              "assets": [
+                "Ransom Note",
+                "Cyber Insurance Policy",
+                "FBI Advisory"
+              ]
+            },
+            {
+              "id": "arena_5_7_the_data_breach_containment_communication",
+              "title": "The Data Breach: Containment & Communication",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "Your security team has just discovered that a hacker has been inside your network for the past six months and has exfiltrated the personal data of millions of customers. The hacker is now threatening to release the data publicly unless you pay them.",
+              "task": "*",
+              "assets": [
+                "Forensic Report",
+                "Legal Memo",
+                "PR Crisis Plan"
+              ]
+            },
+            {
+              "id": "arena_5_8_the_insider_threat",
+              "title": "The Insider Threat",
+              "challengeType": "The Forensic Audit",
+              "dilemma": "Your company's most valuable intellectual property—the source code for your next-generation product—has just shown up on a competitor's new product. You suspect a high-level employee who recently quit to join the competitor is the source of the leak.",
+              "task": "You are the General Counsel. You are given access to a \"clean room\" data folder containing the departed employee's network access logs, email archive, and building entry/exit records for their final 30 days. Your task is to find the digital \"smoking gun\" and produce a timeline of events to be used as evidence in a major trade secret lawsuit.",
+              "assets": [
+                "Data Folder",
+                "IP Documents",
+                "Competitor's Product Specs"
+              ]
+            },
+            {
+              "id": "arena_5_9_the_nation_state_actor",
+              "title": "The Nation-State Actor",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "Your CISO informs you that your network has been breached not by criminals, but by a sophisticated hacking group linked to a foreign government. They have not stolen customer data; instead, they have been subtly altering your product's source code. The motive is unknown but could be industrial espionage or sabotage.",
+              "task": "This is a highly sensitive national security issue. Your task is to write the urgent, confidential briefing for your Board of Directors. The memo must explain the situation, the immense and uncertain risks, and your plan to engage with government agencies like the FBI and CISA.",
+              "assets": [
+                "CISO's Report",
+                "Threat Intel Brief",
+                "Legal Memo"
+              ]
+            },
+            {
+              "id": "arena_5_10_the_ethical_hack_dilemma",
+              "title": "The \"Ethical Hack\" Dilemma",
+              "challengeType": "The Public Statement / Press Release",
+              "dilemma": "A \"white hat\" security researcher has discovered a critical vulnerability in your product. They have responsibly disclosed it to you but have given you a 90-day deadline to fix it before they publish their findings publicly. The fix is complex and will require delaying a major product launch.",
+              "task": "You have decided to delay the product launch to fix the vulnerability. Your task is to write the public blog post announcing the delay. The challenge is to do so with transparency and humility, thanking the researcher and framing the decision as a sign of your company's commitment to security, turning a potential PR disaster into a brand-building moment.",
+              "assets": [
+                "Researcher's Report",
+                "Engineering Plan",
+                "Marketing Plan"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Competitive Warfare",
+          "primaryChallengeType": "The Pre-Mortem Red Team",
+          "secondaryTypes": [
+            "The High-Stakes Negotiation"
+          ],
+          "blueprints": [
+            {
+              "id": "arena_5_11_the_competitor_s_gambit",
+              "title": "The Competitor's Gambit",
+              "challengeType": "The Pre-Mortem Red Team",
+              "dilemma": "Your biggest and most aggressive competitor has just announced a major new strategic initiative that seems brilliant and threatens to upend the market. Your leadership team is in a panic and is proposing a hasty, reactive plan to copy the competitor's strategy.",
+              "task": "You are the Head of Strategy. You believe reacting is a mistake. Your task is to write a Red Team analysis of your",
+              "assets": [
+                "Competitor's Announcement",
+                "Your Team's Plan",
+                "Market Data"
+              ]
+            },
+            {
+              "id": "arena_5_12_the_disinformation_campaign",
+              "title": "The Disinformation Campaign",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "An anonymous online report filled with false and damaging rumors about your company's product quality and financial health is being aggressively pushed on social media and is starting to be picked up by mainstream journalists. You suspect a competitor is behind the campaign.",
+              "task": "*",
+              "assets": [
+                "Fake Report",
+                "Social Media Feed",
+                "Your Internal Data"
+              ]
+            },
+            {
+              "id": "arena_5_13_the_price_war",
+              "title": "The Price War",
+              "challengeType": "The Real-Time Crisis Simulation",
+              "dilemma": "Your main competitor, in a desperate move to gain market share, has just announced a 50% price cut on their competing product. Your sales team is reporting that deals are stalling and you are about to lose major customers.",
+              "task": "A 60-minute simulation unfolds. You are presented with a live stream of emails from your sales team, a financial model showing the devastating impact of matching the price cut, and proposals from your marketing team for non-price responses (e.g., adding new features, offering better support). You must make a series of time-stamped decisions on how to respond without destroying your company's profitability.",
+              "assets": [
+                "Competitor's Announcement",
+                "Financial Model",
+                "Customer Emails"
+              ]
+            },
+            {
+              "id": "arena_5_14_the_poaching_attack",
+              "title": "The Poaching Attack",
+              "challengeType": "The High-Stakes Negotiation",
+              "dilemma": "Your primary competitor has just hired away one of your key VPs. Now, they are systematically targeting her entire 50-person team with aggressive offers. This is not just hiring; it's a deliberate attempt to cripple your organization.",
+              "task": "You enter a negotiation simulation not with the competitor, but with one of your own \"at-risk\" senior engineers who has a competing offer. The AI-powered \"Engineer\" will tell you their reasons for considering the move. Your task is to go beyond a simple salary counter-offer and use the opportunity to understand the root causes of the team's dissatisfaction, and make credible promises to fix them.",
+              "assets": [
+                "HR Report",
+                "Employee Survey",
+                "Your Counter-Offer Toolkit"
+              ]
+            },
+            {
+              "id": "arena_5_15_the_sherlock_scan",
+              "title": "The \"Sherlock\" Scan",
+              "challengeType": "The S-1 Teardown",
+              "dilemma": "Apple is famous for \"Sherlocking\"—observing a popular third-party app and then building its core functionality directly into the next version of their operating system, instantly making the app obsolete.",
+              "task": "You are the founder of a successful app that lives on a major tech platform (like iOS or Salesforce). Your task is to analyze the platform owner's recent announcements, patent filings, and developer conference keynotes. You must produce a report that identifies the \"early warning signs\" that your app is at risk of being \"Sherlocked\" and proposes a strategic pivot to make your business more defensible.",
+              "assets": [
+                "Platform Announcements",
+                "Your App's Metrics",
+                "Case Studies"
+              ]
+            },
+            {
+              "id": "arena_5_16_the_surprise_successor",
+              "title": "The Surprise Successor",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "You are the CEO of a company. You have just been diagnosed with a serious illness that will require you to take an immediate, six-month leave of absence. You must name an interim CEO, but your two direct reports and likely successors are fierce rivals.",
+              "task": "You have 24 hours to prepare the confidential briefing for your Board of Directors. The memo must recommend one of the two rivals as interim CEO, provide a clear and defensible rationale for your choice, and, most importantly, outline a detailed plan to manage the \"losing\" executive to ensure they don't quit and destabilize the company in your absence.",
+              "assets": [
+                "Medical Note",
+                "Candidate Profiles",
+                "Org Chart"
+              ]
+            },
+            {
+              "id": "arena_5_17_the_plant_fire",
+              "title": "The Plant Fire",
+              "challengeType": "The Real-Time Crisis Simulation",
+              "dilemma": "A major fire has just broken out at your company's primary manufacturing facility. Initial reports are chaotic, with reports of injuries and a total production stoppage.",
+              "task": "A 60-minute simulation unfolds. You are presented with a stream of inputs: updates from the fire chief, frantic emails from your COO, demands for information from the local media, and social media posts from worried employee families. You must make a series of time-stamped decisions to manage the immediate crisis.",
+              "assets": [
+                "Initial Incident Report",
+                "Crisis Plan",
+                "Financial Model"
+              ]
+            },
+            {
+              "id": "arena_5_18_the_faa_grounding",
+              "title": "The FAA Grounding",
+              "challengeType": "The Leaked Memo Response Chain",
+              "dilemma": "You are the CEO of an airline. The FAA has just issued an emergency order to ground your entire fleet of Boeing 737 MAX aircraft due to a safety concern, effective immediately. Your operations are in chaos.",
+              "task": "*",
+              "assets": [
+                "FAA Directive",
+                "Leaked Memo",
+                "Operational Data"
+              ]
+            },
+            {
+              "id": "arena_5_19_the_rogue_employee",
+              "title": "The Rogue Employee",
+              "challengeType": "The Forensic Audit",
+              "dilemma": "A single, high-level trader at your investment bank has just been discovered to have hidden massive losses through a series of unauthorized trades, a \"rogue trader\" scenario. The total loss is unknown but could threaten the firm's solvency.",
+              "task": "You are the Head of Risk. You are given access to the rogue trader's complete, complex trade blotter for the past month. Your task is to conduct a rapid forensic audit to determine the full, catastrophic extent of the losses and produce a definitive report for the Federal Reserve before the market opens.",
+              "assets": [
+                "Trade Blotter",
+                "Risk Alerts",
+                "Internal Emails"
+              ]
+            },
+            {
+              "id": "arena_5_20_the_sudden_death",
+              "title": "The Sudden Death",
+              "challengeType": "The Emergency Board Communication",
+              "dilemma": "You are the Chairman of the Board. You have just been informed that your company's highly effective and beloved CEO has died unexpectedly overnight. The company's succession plan is not yet finalized.",
+              "task": "It is 5:00 AM. You have two hours before the market opens. Your task is to write the complete communications plan. This must include the press release announcing the death and naming an interim CEO, the internal memo to all employees, and the key talking points for the calls you must make to your top five institutional shareholders.",
+              "assets": [
+                "Succession Plan",
+                "Candidate Profiles",
+                "Stock Chart"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

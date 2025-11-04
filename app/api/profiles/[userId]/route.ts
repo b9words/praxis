@@ -1,5 +1,5 @@
 import { cache, CacheTags } from '@/lib/cache'
-import { prisma } from '@/lib/prisma/server'
+import { getProfileById, updateProfile, partialUpdateProfile, getProfileWithRole } from '@/lib/db/profiles'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -12,20 +12,7 @@ export async function GET(
     // Cache profile (5 minutes revalidate, userId in key)
     const getCachedProfile = cache(
       async () => {
-        const profile = await prisma.profile.findUnique({
-          where: { id: userId },
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-            avatarUrl: true,
-            bio: true,
-            isPublic: true,
-            role: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        })
+        const profile = await getProfileById(userId)
 
         if (!profile) {
           return null
@@ -92,65 +79,13 @@ export async function PUT(
     const body = await request.json()
     const { username, fullName, avatarUrl, bio, isPublic } = body
 
-    // Build update data object with only provided fields
-    const updateData: any = {}
-    if (username !== undefined) updateData.username = username
-    if (fullName !== undefined) updateData.fullName = fullName
-    if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl
-    if (bio !== undefined) updateData.bio = bio
-    if (isPublic !== undefined) updateData.isPublic = isPublic
-
-    let profile
-    try {
-      profile = await prisma.profile.update({
-        where: { id: userId },
-        data: updateData,
-        select: {
-          id: true,
-          username: true,
-          fullName: true,
-          avatarUrl: true,
-          bio: true,
-          isPublic: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-    } catch (error: any) {
-      // Handle missing columns (P2022) or other schema issues
-      if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-        try {
-          // Fallback: same update but Prisma will handle missing columns
-          profile = await prisma.profile.update({
-            where: { id: userId },
-            data: {
-              username,
-              fullName,
-              avatarUrl,
-              bio,
-              isPublic,
-            },
-            select: {
-              id: true,
-              username: true,
-              fullName: true,
-              avatarUrl: true,
-              bio: true,
-              isPublic: true,
-              role: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          })
-        } catch (fallbackError) {
-          console.error('Error updating profile (fallback):', fallbackError)
-          throw fallbackError
-        }
-      } else {
-        throw error
-      }
-    }
+    const profile = await updateProfile(userId, {
+      username,
+      fullName,
+      avatarUrl,
+      bio,
+      isPublic,
+    })
 
     return NextResponse.json({ profile })
   } catch (error) {
@@ -178,10 +113,7 @@ export async function PATCH(
     const body = await request.json()
 
     // Get user's profile to check role
-    const currentUserProfile = await prisma.profile.findUnique({
-      where: { id: user.id },
-      select: { role: true },
-    })
+    const currentUserProfile = await getProfileWithRole(user.id)
 
     // Allow admins to update any profile, users can only update their own
     const isAdmin = currentUserProfile?.role === 'admin'
@@ -199,51 +131,7 @@ export async function PATCH(
     // Filter out emailNotificationsEnabled as it may not exist in all database instances
     const { emailNotificationsEnabled, ...updateData } = body
 
-    let updatedProfile
-    try {
-      updatedProfile = await prisma.profile.update({
-        where: { id: userId },
-        data: updateData,
-        select: {
-          id: true,
-          username: true,
-          fullName: true,
-          avatarUrl: true,
-          bio: true,
-          isPublic: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-    } catch (error: any) {
-      // Handle missing columns (P2022) or other schema issues
-      if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-        try {
-          // Fallback: same update but Prisma will handle missing columns
-          updatedProfile = await prisma.profile.update({
-            where: { id: userId },
-            data: updateData,
-            select: {
-              id: true,
-              username: true,
-              fullName: true,
-              avatarUrl: true,
-              bio: true,
-              isPublic: true,
-              role: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          })
-        } catch (fallbackError) {
-          console.error('Error updating profile (fallback):', fallbackError)
-          throw fallbackError
-        }
-      } else {
-        throw error
-      }
-    }
+    const updatedProfile = await partialUpdateProfile(userId, updateData)
 
     return NextResponse.json({ profile: updatedProfile })
   } catch (error) {

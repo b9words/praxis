@@ -1,8 +1,11 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { requireRole } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
 import { getCachedArticle } from '@/lib/cache'
+import { getArticleById, updateArticle, deleteArticle } from '@/lib/db/articles'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +22,10 @@ export async function GET(
     }
 
     return NextResponse.json({ article })
-  } catch (error) {
+  } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
     const normalized = normalizeError(error)
     console.error('Error fetching article:', error)
@@ -37,29 +43,14 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    // Check if article exists before updating
-    const existing = await prisma.article.findUnique({
-      where: { id },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
-    }
-
     const user = await getCurrentUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const article = await prisma.article.update({
-      where: { id },
-      data: {
-        ...body,
-        updatedBy: user.id,
-      },
-      include: {
-        competency: true,
-      },
+    const article = await updateArticle(id, {
+      ...body,
+      updatedBy: user.id,
     })
 
     return NextResponse.json({ article })
@@ -67,18 +58,13 @@ export async function PUT(
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
-    
-    // Handle P2025 (record not found) gracefully
-    if (error?.code === 'P2025') {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
-    
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating article:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -92,29 +78,14 @@ export async function PATCH(
     const { id } = await params
     const body = await request.json()
 
-    // Check if article exists before updating
-    const existing = await prisma.article.findUnique({
-      where: { id },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
-    }
-
     const user = await getCurrentUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const article = await prisma.article.update({
-      where: { id },
-      data: {
-        ...body,
-        updatedBy: user.id,
-      },
-      include: {
-        competency: true,
-      },
+    const article = await updateArticle(id, {
+      ...body,
+      updatedBy: user.id,
     })
 
     return NextResponse.json({ article })
@@ -122,18 +93,13 @@ export async function PATCH(
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
-    
-    // Handle P2025 (record not found) gracefully
-    if (error?.code === 'P2025') {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
-    
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating article:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -146,35 +112,19 @@ export async function DELETE(
     
     const { id } = await params
 
-    // Check if article exists before deleting
-    const existing = await prisma.article.findUnique({
-      where: { id },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
-    }
-
-    await prisma.article.delete({
-      where: { id },
-    })
+    await deleteArticle(id)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
-    
-    // Handle P2025 (record not found) gracefully
-    if (error?.code === 'P2025') {
-      return NextResponse.json({ error: 'Article not found' }, { status: 404 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
-    
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error deleting article:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }

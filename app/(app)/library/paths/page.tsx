@@ -3,7 +3,8 @@ import { Progress } from '@/components/ui/progress'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllLearningPaths } from '@/lib/learning-paths'
-import { prisma } from '@/lib/prisma/server'
+import { getLessonProgressList } from '@/lib/db/progress'
+import { getCompletedSimulationByUserAndCase } from '@/lib/db/simulations'
 import { ArrowRight, CheckCircle2, Clock } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -33,9 +34,9 @@ export default async function LearningPathsPage() {
   // Cache user lesson progress (2 minutes revalidate)
   const getCachedLessonProgress = getCachedUserData(
     user.id,
-    () => prisma.userLessonProgress.findMany({
-      where: { userId: user.id },
-    }),
+    async () => {
+      return await getLessonProgressList(user.id).catch(() => [])
+    },
     ['lesson', 'progress'],
     {
       tags: [CacheTags.USER_PROGRESS],
@@ -56,7 +57,7 @@ export default async function LearningPathsPage() {
       for (const item of path.items) {
         if (item.type === 'lesson') {
           const progress = lessonProgress.find(
-            p => p.domainId === item.domain &&
+            (p: any) => p.domainId === item.domain &&
                  p.moduleId === item.module &&
                  p.lessonId === item.lesson &&
                  p.status === 'completed'
@@ -65,13 +66,7 @@ export default async function LearningPathsPage() {
             completedCount++
           }
         } else if (item.type === 'case' && item.caseId) {
-          const simulation = await prisma.simulation.findFirst({
-            where: {
-              userId: user.id,
-              caseId: item.caseId,
-              status: 'completed',
-            },
-          }).catch(() => null)
+          const simulation = await getCompletedSimulationByUserAndCase(user.id, item.caseId).catch(() => null)
           if (simulation) {
             completedCount++
           }

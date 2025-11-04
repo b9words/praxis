@@ -1,10 +1,10 @@
+import CaseAssetsManager from '@/components/admin/CaseAssetsManager'
+import CaseBlueprintsPanel from '@/components/admin/CaseBlueprintsPanel'
 import CurriculumGenerator from '@/components/admin/CurriculumGenerator'
-import CaseStudyGenerator from '@/components/admin/CaseStudyGenerator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { prisma } from '@/lib/prisma/server'
-import { getAllLessonsFlat, completeCurriculumData, getCurriculumStats } from '@/lib/curriculum-data'
+import { completeCurriculumData, getAllLessonsFlat } from '@/lib/curriculum-data'
 import Link from 'next/link'
 
 export default async function AdminGeneratePage() {
@@ -103,7 +103,10 @@ export default async function AdminGeneratePage() {
           <CurriculumGenerator />
         </TabsContent>
         <TabsContent value="cases" className="mt-6">
-          <CaseStudyGenerator />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CaseBlueprintsPanel />
+            <CaseAssetsManager />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,0 +1,155 @@
+{
+  "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762236877673",
+  "version": "1.0",
+  "title": "The \"Two-Pizza Team\" Re-Org",
+  "description": "As the new Chief Product Officer at NexusFlow, a rapidly scaling SaaS company, you're tasked with fixing a product engine bogged down by its own growth. Your mandate is to restructure the 850-person Product & Engineering organization into agile, autonomous teams and present your 100-day plan to the board.",
+  "competencies": [
+    "Organizational Design",
+    "Strategic Communication",
+    "Stakeholder Management",
+    "Data-Driven Decision Making"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_nexusflow_org_chart_v1",
+      "fileName": "NexusFlow_P&E_OrgChart.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "EmployeeID,Name,Title,Department,Sub-Team,ManagerID,Tenure (Years)"
+      }
+    },
+    {
+      "fileId": "file_nexusflow_employee_survey_q3",
+      "fileName": "Q3_Employee_Morale_Survey_Summary.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Q3 P&E Employee Morale Survey Results\n\n**Quantitative Highlights:**\n- I can get an answer to a cross-team dependency quickly: 1.8/5.0\n- I feel the meetings I attend are a good use of time: 2.2/5.0\n- I understand how my work contributes to the company's goals: 3.1/5.0\n- I feel empowered to make decisions about my work: 2.5/5.0\n\n**Selected Anonymous Comments:**\n- *Product Manager:* \"I spend my entire week just trying to align engineering teams. Nothing gets done.\"\n- *Senior Backend Engineer:* \"The new PMs don't understand our architecture. Our current structure protects code quality from unrealistic feature requests.\"\n- *Junior Frontend Engineer:* \"I have no idea if the feature I'm building actually matters to the customer.\"\n- *QA Engineer:* \"By the time a feature gets to us, the requirements have changed three times and no one from the original dev team is available to answer questions.\""
+      }
+    },
+    {
+      "fileId": "file_nexusflow_delivery_metrics",
+      "fileName": "Product_Delivery_Metrics_36mo.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "FeatureID,LaunchDate,DevCycleTime (Days),TeamSize,R&D_Cost_Allocation ($)"
+      }
+    },
+    {
+      "fileId": "file_nexusflow_vp_eng_memo",
+      "fileName": "Memo_from_VP_Engineering.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "**TO:** Chief Product Officer\n**FROM:** David Chen, VP of Engineering\n**DATE:** October 26, 2023\n**SUBJECT:** Proposal for a P&E Process Optimization Initiative\n\nWelcome to NexusFlow. I've been giving our recent delivery challenges considerable thought and believe I have a clear diagnosis. The root cause of our slowdown is not our engineering structure, which has successfully scaled our platform's reliability and quality. Instead, the issues stem from an immature product management function and poorly defined cross-functional processes.\n\nI propose we launch a 6-month, cross-functional initiative focused on improving documentation standards, meeting hygiene, and our ticketing/JIRA protocols. A disruptive re-org would be a mistake; it would create chaos, threaten quality, and demoralize my most senior engineers who thrive in the current structure. Let's fix the process before we blow up the organization."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_diagnosis_and_alignment",
+      "title": "Stage 1: Diagnosis & Initial Alignment (Days 1-30)",
+      "description": "You've completed your initial listening tour and data analysis. The CEO, Alistair Vance, is impatient for a plan. Your task is to draft a summary for the executive team that frames the problem and outlines your proposed approach for the next 30 days. This memo will set the tone for the entire transformation.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a 1-page memo to the NexusFlow executive team. Your memo must:\n1.  Provide your diagnosis of the root cause of the product delivery slowdown, referencing the provided case files.\n2.  Propose a clear plan of action for the next 30 days to design the solution.\n3.  Address the key strategic decision points below, justifying your choices.",
+        "context": "The CEO is eager for a bold, public announcement. The CFO, Brenda Patel, is wary of disruption and wants a data-driven business case. The VP of Engineering, David Chen, has already proposed a less disruptive, process-focused alternative. Your memo must navigate these competing interests.",
+        "options": [
+          {
+            "id": "decision_problem_framing",
+            "title": "Problem Framing",
+            "description": "How do you frame the core problem? Is it primarily a structural problem (org chart), a process problem (how we work), or a people problem (skills/talent)?"
+          },
+          {
+            "id": "decision_next_action",
+            "title": "Immediate Next Action",
+            "description": "What is your next move? (A) Form a cross-functional 'Transformation Task Force' to build buy-in, (B) Immediately start designing the new org chart yourself to show progress, or (C) Announce the re-org in principle now and promise details later?"
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_architectural_choice",
+      "title": "Stage 2: The Architectural Choice (Days 30-60)",
+      "description": "Your diagnosis that a structural change is required has been accepted. Now, you must choose the fundamental architecture for the new Product & Engineering organization. This is the most critical decision you will make, defining how 850 people will work for years to come.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Prepare a 2-page proposal outlining your recommended organizational model. Your proposal must:\n1.  Clearly state which model you have chosen (Pure, Hybrid, or Pilot Program).\n2.  Provide a rationale for your choice, using data from the case files to justify the trade-offs (e.g., speed vs. disruption).\n3.  Include a high-level visual representation or description of the new organizational chart.\n4.  Explicitly address and counter the potential objections from the CFO and VP of Engineering.",
+        "context": "You are at a fork in the road. A radical change could be fast and transformative but risks massive disruption. A more cautious approach is safer but may not solve the underlying problem, wasting your political capital.",
+        "options": [
+          {
+            "id": "model_pure",
+            "title": "The Pure Model",
+            "description": "Restructure the entire 850-person org into autonomous 'squads,' 'tribes,' and 'chapters' (i.e., the Spotify model). This offers the highest potential impact but also the highest disruption."
+          },
+          {
+            "id": "model_hybrid",
+            "title": "The Hybrid Model",
+            "description": "Re-org product-facing teams into autonomous squads but keep core platform and infrastructure teams centralized. A balanced approach that contains disruption but creates complexity at the seams."
+          },
+          {
+            "id": "model_pilot",
+            "title": "The Pilot Program",
+            "description": "Select one product line (~100 people) to pilot the 'two-pizza team' model for 6 months. This is the lowest-risk option but is slow and may be perceived as indecisive by the CEO."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_implementation_strategy",
+      "title": "Stage 3: The Implementation Strategy (Days 60-90)",
+      "description": "Your chosen architectural model has been approved in principle. Now you must deliver the detailed 100-day implementation plan. The executive team wants to see a concrete plan for managing the transition, communicating the change, and selecting new leadership.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Create your detailed 100-day implementation plan. This document must include:\n1.  **Rollout Pacing:** Choose between a 'Big Bang' or 'Phased Rollout' and defend your decision.\n2.  **Leadership Selection Process:** Define how new leaders (e.g., Tribe Leads, Chapter Leads) will be identified and appointed.\n3.  **Communication Plan:** Draft the announcement memo for the all-hands meeting and a short internal FAQ to address employee anxieties.\n4.  **Success Metrics:** Define 3-5 KPIs to measure the success of the re-org over the next 12 months.",
+        "context": "Execution is everything. A brilliant design can fail if the rollout is fumbled. You need to balance the need for speed with the need to bring people along, manage anxiety, and ensure business continuity during the transition.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Assesses the quality, logic, and feasibility of the proposed organizational structure and its alignment with the company's strategic goals.",
+        "scoringGuide": {
+          "1": "Proposes a generic or illogical org chart. Fails to define how new teams will interact or what their mandates are. The design does not address the core problems identified in the data.",
+          "3": "Presents a logical structure, but leaves key questions unanswered (e.g., role of managers, interaction between teams). The design is a plausible solution but not strongly justified by the data.",
+          "5": "Presents a clear, detailed structure that directly addresses the problems of speed and bureaucracy. Defines team typologies, interfaces, and the evolution of key roles. The design is explicitly and convincingly justified by case file data."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Evaluates the ability to craft and sequence communications to manage change, align stakeholders, and mitigate employee anxiety.",
+        "scoringGuide": {
+          "1": "Communication plan is an afterthought. Messaging is generic, uses corporate jargon, and fails to address obvious employee fears, likely causing panic.",
+          "3": "Develops a basic communication plan with messaging for different audiences. Addresses some anxieties but may miss key nuances or stakeholder concerns.",
+          "5": "Creates a sophisticated, multi-stage communication plan with tailored messaging for executives, managers, and individual contributors. Proactively addresses key anxieties (layoffs, manager roles) with empathy and clarity."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Measures the ability to anticipate, understand, and incorporate the competing interests of key stakeholders into the final plan.",
+        "scoringGuide": {
+          "1": "Ignores or dismisses the legitimate concerns of the CFO and VP of Engineering. The plan is purely top-down and likely to be met with significant internal resistance.",
+          "3": "Acknowledges stakeholder concerns but does not substantively address them in the plan. The solution may be technically correct but fails to build necessary buy-in.",
+          "5": "The final plan explicitly mitigates risks raised by the CFO (cost, predictability) and the VP of Engineering (quality, morale). The strategy shows a clear path to gaining their support and turning them into partners."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Assesses the ability to use quantitative and qualitative data from the case files to diagnose problems and justify recommendations.",
+        "scoringGuide": {
+          "1": "Recommendations are based on generic 'best practices' or personal opinion, with little or no reference to the provided data.",
+          "3": "References some data points but does not synthesize them into a coherent argument. The link between the data and the conclusion is weak.",
+          "5": "Consistently and explicitly references specific data from the case files (e.g., cycle time trends, survey scores, qualitative comments) to build a compelling and evidence-based case for each major decision."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

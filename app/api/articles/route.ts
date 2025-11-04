@@ -1,8 +1,10 @@
-
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
 import { cache, CacheTags } from '@/lib/cache'
+import { listArticles, createArticle } from '@/lib/db/articles'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,32 +15,10 @@ export async function GET(request: NextRequest) {
     // Cache articles list (15 minutes revalidate)
     const getCachedArticles = cache(
       async () => {
-        const where: any = {}
-        if (status && status !== 'all') {
-          where.status = status
-        }
-        if (competencyId) {
-          where.competencyId = competencyId
-        }
-
-        const articles = await prisma.article.findMany({
-          where,
-          include: {
-            competency: true,
-            creator: {
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: 'desc',
-          },
+        return listArticles({
+          status: status || undefined,
+          competencyId: competencyId || undefined,
         })
-
-        return articles
       },
       ['api', 'articles', status || 'all', competencyId || 'all'],
       {
@@ -51,12 +31,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ articles })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching articles:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -82,21 +63,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const article = await prisma.article.create({
-      data: {
-        competencyId,
-        title,
-        content: content || null,
-        description,
-        status,
-        storagePath,
-        metadata: metadata || {},
-        createdBy: user.id,
-        updatedBy: user.id,
-      },
-      include: {
-        competency: true,
-      },
+    const article = await createArticle({
+      competencyId,
+      title,
+      content: content || null,
+      description,
+      status,
+      storagePath: storagePath || null,
+      metadata: metadata || {},
+      createdBy: user.id,
+      updatedBy: user.id,
     })
 
     return NextResponse.json({ article }, { status: 201 })
@@ -104,13 +80,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
     }
-    
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error creating article:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

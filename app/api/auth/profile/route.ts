@@ -1,6 +1,6 @@
 import { ensureProfileExists } from '@/lib/auth/authorize'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getProfileById } from '@/lib/db/profiles'
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -19,16 +19,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Try to get profile
-    let profile = await prisma.profile.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        role: true,
-        username: true,
-        fullName: true,
-        isPublic: true,
-      },
-    })
+    let profile = await getProfileById(user.id).catch(() => null)
+    
+    if (profile) {
+      // Map to expected format
+      profile = {
+        id: profile.id,
+        role: profile.role,
+        username: profile.username,
+        fullName: profile.fullName,
+        isPublic: profile.isPublic,
+      } as any
+    }
 
     // If profile doesn't exist, try to create it (non-blocking)
     if (!profile) {
@@ -36,16 +38,16 @@ export async function GET(request: NextRequest) {
       
       if (createdProfile) {
         // Fetch full profile after creation
-        profile = await prisma.profile.findUnique({
-          where: { id: user.id },
-          select: {
-            id: true,
-            role: true,
-            username: true,
-            fullName: true,
-            isPublic: true,
-          },
-        })
+        const fullProfile = await getProfileById(user.id).catch(() => null)
+        if (fullProfile) {
+          profile = {
+            id: fullProfile.id,
+            role: fullProfile.role,
+            username: fullProfile.username,
+            fullName: fullProfile.fullName,
+            isPublic: fullProfile.isPublic,
+          } as any
+        }
       }
     }
 

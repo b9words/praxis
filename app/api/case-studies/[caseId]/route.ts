@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { requireRole } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
+import { getCaseByIdWithCompetencies } from '@/lib/db/cases'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
 import fs from 'fs'
 import { NextRequest, NextResponse } from 'next/server'
@@ -15,16 +15,7 @@ export async function GET(
     const user = await getCurrentUser()
 
     // First try to get from database
-    const caseItem = await prisma.case.findUnique({
-      where: { id: caseId },
-      include: {
-        competencies: {
-          include: {
-            competency: true,
-          },
-        },
-      },
-    })
+    const caseItem = await getCaseByIdWithCompetencies(caseId)
 
     // Check access permissions
     if (caseItem) {

@@ -1,6 +1,8 @@
-import { prisma } from '@/lib/prisma/server'
 import { getSmartCurriculumRecommendation } from './content-mapping'
-import { getUserAggregateScores } from './database-functions'
+import { getUserAggregateScores, getRecentDebriefsForRecommendations } from './db/debriefs'
+import { getUserResidency } from './db/profiles'
+import { getLessonProgressList } from './db/progress'
+import { getRecentSimulations, getSimulationByUserAndCase } from './db/simulations'
 import { getAllLessonsFlat, getDomainById } from './curriculum-data'
 import { getAllInteractiveSimulations } from './case-study-loader'
 import { getAllLearningPaths, getLearningPathByCaseId } from './learning-paths'
@@ -163,52 +165,11 @@ function getFirstYear2Module(): { domain: string; module: string; lesson: string
  */
 export async function getSmartRecommendations(userId: string): Promise<RecommendationWithAlternates> {
   // Get user's current residency
-  let userResidency
-  try {
-    userResidency = await prisma.userResidency.findUnique({
-      where: { userId },
-      select: { currentResidency: true },
-    })
-  } catch (error: any) {
-    // Handle missing table (P2021) or missing columns (P2022)
-    if (error?.code === 'P2021' || error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-      // Table doesn't exist, use default residency of 1
-      userResidency = { currentResidency: 1 }
-    } else {
-      throw error
-    }
-  }
+  const residencyResult = await getUserResidency(userId).catch(() => null)
+  const userResidency = residencyResult ? { currentResidency: residencyResult.currentResidency } : { currentResidency: 1 }
 
   // Get user's curriculum progress
-  let lessonProgress: Array<{
-    domainId: string
-    moduleId: string
-    lessonId: string
-    status: string
-    completedAt: Date | null
-    updatedAt: Date
-  }> = []
-  try {
-    lessonProgress = await prisma.userLessonProgress.findMany({
-      where: { userId },
-      select: {
-        domainId: true,
-        moduleId: true,
-        lessonId: true,
-        status: true,
-        completedAt: true,
-        updatedAt: true,
-      },
-      orderBy: { completedAt: 'desc' },
-    })
-  } catch (error: any) {
-    // Handle missing table gracefully (P2021) - expected if migrations haven't run
-    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
-      lessonProgress = []
-    } else if (process.env.NODE_ENV === 'development') {
-      console.error('Error fetching lesson progress in recommendations:', error)
-    }
-  }
+  const lessonProgress = await getLessonProgressList(userId)
 
   // Get recently touched content (last 7 days) for cooldown
   const sevenDaysAgo = new Date()
@@ -223,35 +184,7 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
   })
   
   // Get recent simulations - track by Case UUID
-  let recentSimulations: Array<{
-    caseId: string
-    case: { title: string } | null
-  }> = []
-  try {
-    recentSimulations = await prisma.simulation.findMany({
-      where: {
-        userId,
-        updatedAt: {
-          gte: sevenDaysAgo,
-        },
-      },
-      select: {
-        caseId: true,
-        case: {
-          select: {
-            title: true,
-          },
-        },
-      },
-    })
-  } catch (error: any) {
-    // Handle missing table gracefully (P2021) - expected if migrations haven't run
-    if (error?.code === 'P2021' || error?.message?.includes('does not exist')) {
-      recentSimulations = []
-    } else if (process.env.NODE_ENV === 'development') {
-      console.error('Error fetching recent simulations in recommendations:', error)
-    }
-  }
+  const recentSimulations = await getRecentSimulations(userId, sevenDaysAgo).catch(() => [])
   // Store both UUID and a normalized title-based ID for matching
   const recentCaseTitles = new Set<string>()
   recentSimulations.forEach(s => {
@@ -276,89 +209,8 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
 
   // RULE 0: Check debrief scores for low performance (< 3.0) - highest priority
   try {
-    let recentDebriefs: any[] = []
-    try {
-      recentDebriefs = await prisma.debrief.findMany({
-        where: {
-          simulation: {
-            userId,
-          },
-          createdAt: {
-            gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Last 90 days
-          },
-        },
-        include: {
-          simulation: {
-            include: {
-              case: {
-                include: {
-                  competencies: {
-                    include: {
-                      competency: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        take: 10,
-      })
-    } catch (error: any) {
-      // Handle missing rubric_version column (P2022) or other schema issues
-      if (error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-        try {
-          // Fallback: explicit select without problematic columns
-          recentDebriefs = await prisma.debrief.findMany({
-            where: {
-              simulation: {
-                userId,
-              },
-              createdAt: {
-                gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Last 90 days
-              },
-            },
-            select: {
-              id: true,
-              scores: true,
-              createdAt: true,
-              simulation: {
-                select: {
-                  id: true,
-                  case: {
-                    select: {
-                      id: true,
-                      title: true,
-                      competencies: {
-                        select: {
-                          competency: {
-                            select: {
-                              id: true,
-                              name: true,
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
-            orderBy: {
-              createdAt: 'desc',
-            },
-            take: 10,
-          })
-        } catch (fallbackError) {
-          console.error('Error fetching debriefs (fallback):', fallbackError)
-        }
-      } else {
-        throw error
-      }
-    }
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+    const recentDebriefs = await getRecentDebriefsForRecommendations(userId, ninetyDaysAgo).catch(() => [])
 
     for (const debrief of recentDebriefs) {
       const scores = debrief.scores as any
@@ -531,14 +383,8 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
           }
         } else if (item.type === 'case' && item.caseId) {
           caseItem = item
-          const simulation = await prisma.simulation.findFirst({
-            where: {
-              userId,
-              caseId: item.caseId,
-              status: 'completed',
-            },
-          }).catch(() => null)
-          if (simulation) {
+          const simulation = await getSimulationByUserAndCase(userId, item.caseId).catch(() => null)
+          if (simulation && simulation.status === 'completed') {
             completedCase = true
           }
         }

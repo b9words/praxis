@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { completeCurriculumData, getCurriculumStats } from '@/lib/curriculum-data'
-import { prisma } from '@/lib/prisma/server'
+import { listArticles } from '@/lib/db/articles'
 import { cache, CacheTags } from '@/lib/cache'
 import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
@@ -12,51 +12,20 @@ export default async function CurriculumLibraryPage() {
       // Try to load curriculum structure from database with error handling
       let articlesFromDb: any[] = []
       try {
-        // First try with enum value (if enum exists in DB)
-        articlesFromDb = await prisma.article.findMany({
-          where: {
-            status: 'published',
-            storagePath: {
-              not: null,
-            },
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            storagePath: true,
-            metadata: true,
-            status: true,
-          },
-        })
+        const articles = await listArticles({ status: 'published' })
+        articlesFromDb = articles
+          .filter(article => article.storagePath !== null)
+          .map(article => ({
+            id: article.id,
+            title: article.title,
+            description: article.description,
+            storagePath: article.storagePath,
+            metadata: article.metadata,
+            status: article.status,
+          }))
       } catch (error: any) {
-        // If enum doesn't exist in DB, try querying without status filter
-        if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-          // Import error suppression helper
-          const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
-          logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
-          try {
-            articlesFromDb = await prisma.article.findMany({
-              where: {
-                storagePath: {
-                  not: null,
-                },
-              },
-              select: {
-                id: true,
-                title: true,
-                description: true,
-                storagePath: true,
-                metadata: true,
-                status: true,
-              },
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching articles from database:', fallbackError)
-          }
-        } else {
-          console.error('Error fetching articles from database:', error)
-        }
+        // On error, return empty array
+        console.error('Error fetching articles:', error)
       }
 
       // Build curriculum structure from database articles if available

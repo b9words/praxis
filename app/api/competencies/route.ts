@@ -1,6 +1,6 @@
-
-import { prisma } from '@/lib/prisma/server'
 import { getCachedCompetencies } from '@/lib/cache'
+import { listCompetencies, createCompetency, getCompetencyBasic } from '@/lib/db/competencies'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -20,32 +20,16 @@ export async function GET(request: NextRequest) {
     const { cache, CacheTags } = await import('@/lib/cache')
     const getCachedFilteredCompetencies = cache(
       async () => {
-        const where: any = {}
-        if (level) {
-          where.level = level
-        }
-        if (parentId) {
-          where.parentId = parentId
-        } else if (parentId === null) {
-          where.parentId = null
+        const filters: any = {}
+        if (level) filters.level = level
+        if (parentId !== null) {
+          filters.parentId = parentId || null
         }
         if (residencyYear) {
-          where.residencyYear = parseInt(residencyYear)
+          filters.residencyYear = parseInt(residencyYear)
         }
 
-        const competencies = await prisma.competency.findMany({
-          where,
-          include: {
-            parent: true,
-            children: true,
-          },
-          orderBy: [
-            { displayOrder: 'asc' },
-            { name: 'asc' },
-          ],
-        })
-
-        return competencies
+        return listCompetencies(filters)
       },
       ['api', 'competencies', level || 'all', parentId || 'all', residencyYear || 'all'],
       {
@@ -58,12 +42,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ competencies })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching competencies:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -82,9 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Validate parent relationship
     if (body.parentId) {
-      const parent = await prisma.competency.findUnique({
-        where: { id: body.parentId },
-      })
+      const parent = await getCompetencyBasic(body.parentId)
       if (!parent) {
         return NextResponse.json(
           { error: 'Parent competency not found' },
@@ -93,28 +76,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const competency = await prisma.competency.create({
-      data: {
-        name: body.name,
-        description: body.description || null,
-        parentId: body.parentId || null,
-        level: body.level,
-        residencyYear: body.residencyYear ? parseInt(body.residencyYear) : null,
-        displayOrder: body.displayOrder ? parseInt(body.displayOrder) : 0,
-      },
-      include: {
-        parent: true,
-        children: true,
-      },
+    const competency = await createCompetency({
+      name: body.name,
+      description: body.description || null,
+      parentId: body.parentId || null,
+      level: body.level,
+      residencyYear: body.residencyYear ? parseInt(body.residencyYear) : null,
+      displayOrder: body.displayOrder ? parseInt(body.displayOrder) : 0,
     })
 
     return NextResponse.json({ competency })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error creating competency:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }

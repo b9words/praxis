@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getSimulationByIdFull } from '@/lib/db/simulations'
 
 export async function generateMetadata({
   params,
@@ -17,18 +17,7 @@ export async function generateMetadata({
   try {
     const user = await getCurrentUser()
     if (user) {
-      const simulation = await prisma.simulation.findUnique({
-        where: { id: simulationId },
-        select: {
-          userId: true,
-          case: {
-            select: {
-              title: true,
-            },
-          },
-        },
-      })
-
+      const simulation = await getSimulationByIdFull(simulationId).catch(() => null)
       if (simulation && simulation.userId === user.id && simulation.case?.title) {
         caseTitle = simulation.case.title
       }

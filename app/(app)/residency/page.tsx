@@ -1,6 +1,6 @@
 import ResidencySelector from '@/components/dashboard/ResidencySelector'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getUserResidencyFull } from '@/lib/db/profiles'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
 
 export default async function ResidencyPage() {
@@ -15,17 +15,7 @@ export default async function ResidencyPage() {
   const getCachedUserResidency = getCachedUserData(
     user.id,
     async () => {
-      // Get user's current residency with error handling
-      let userResidency = null
-      try {
-        userResidency = await prisma.userResidency.findUnique({
-          where: { userId: user.id },
-          select: { currentResidency: true },
-        })
-      } catch (error) {
-        console.error('Error fetching user residency:', error)
-      }
-      return userResidency
+      return await getUserResidencyFull(user.id).catch(() => null)
     },
     ['residency'],
     {

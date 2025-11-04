@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentBriefing } from '@/lib/briefing'
 import { getDomainById, getModuleById, getCurriculumStats } from '@/lib/curriculum-data'
-import { prisma } from '@/lib/prisma/server'
+import { getCaseById } from '@/lib/db/cases'
 import { BookOpen, PlayCircle } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -41,19 +41,7 @@ export default async function BriefingPage() {
   }
 
   // Get case metadata
-  let caseItem = null
-  try {
-    caseItem = await prisma.case.findFirst({
-      where: { id: briefing.caseId },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-      },
-    })
-  } catch (error) {
-    console.error('Error fetching case:', error)
-  }
+  const caseItem = await getCaseById(briefing.caseId).catch(() => null)
 
   const stats = getCurriculumStats()
 

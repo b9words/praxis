@@ -1,7 +1,8 @@
-
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import matter from 'gray-matter'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 const STORAGE_BUCKET = 'assets'
 

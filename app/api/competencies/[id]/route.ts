@@ -1,6 +1,6 @@
-
-import { prisma } from '@/lib/prisma/server'
+import { getCompetencyById, getCompetencyBasic, updateCompetency, deleteCompetency } from '@/lib/db/competencies'
 import { cache, CacheTags } from '@/lib/cache'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -13,20 +13,7 @@ export async function GET(
     // Cache competency by ID (1 hour revalidate)
     const getCachedCompetency = cache(
       async () => {
-        const competency = await prisma.competency.findUnique({
-          where: { id },
-          include: {
-            parent: true,
-            children: true,
-            articles: {
-              select: {
-                id: true,
-                title: true,
-              },
-            },
-          },
-        })
-        return competency
+        return getCompetencyById(id)
       },
       ['api', 'competency', id],
       {
@@ -43,12 +30,13 @@ export async function GET(
 
     return NextResponse.json({ competency })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching competency:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -62,10 +50,7 @@ export async function PUT(
     const body = await request.json()
 
     // Check if competency exists
-    const existing = await prisma.competency.findUnique({
-      where: { id },
-    })
-
+    const existing = await getCompetencyBasic(id)
     if (!existing) {
       return NextResponse.json({ error: 'Competency not found' }, { status: 404 })
     }
@@ -80,9 +65,7 @@ export async function PUT(
 
     // Validate parent relationship
     if (body.parentId) {
-      const parent = await prisma.competency.findUnique({
-        where: { id: body.parentId },
-      })
+      const parent = await getCompetencyBasic(body.parentId)
       if (!parent) {
         return NextResponse.json(
           { error: 'Parent competency not found' },
@@ -91,30 +74,24 @@ export async function PUT(
       }
     }
 
-    const competency = await prisma.competency.update({
-      where: { id },
-      data: {
-        name: body.name,
-        description: body.description !== undefined ? body.description : existing.description,
-        parentId: body.parentId !== undefined ? body.parentId : existing.parentId,
-        level: body.level,
-        residencyYear: body.residencyYear !== undefined ? (body.residencyYear ? parseInt(body.residencyYear) : null) : existing.residencyYear,
-        displayOrder: body.displayOrder !== undefined ? parseInt(body.displayOrder) : existing.displayOrder,
-      },
-      include: {
-        parent: true,
-        children: true,
-      },
+    const competency = await updateCompetency(id, {
+      name: body.name,
+      description: body.description !== undefined ? body.description : existing.description,
+      parentId: body.parentId !== undefined ? body.parentId : existing.parentId,
+      level: body.level,
+      residencyYear: body.residencyYear !== undefined ? (body.residencyYear ? parseInt(body.residencyYear) : null) : existing.residencyYear,
+      displayOrder: body.displayOrder !== undefined ? parseInt(body.displayOrder) : existing.displayOrder,
     })
 
     return NextResponse.json({ competency })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating competency:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -126,46 +103,20 @@ export async function DELETE(
     // All auth checks removed
     const { id } = await params
 
-    // Check if competency exists
-    const existing = await prisma.competency.findUnique({
-      where: { id },
-      include: {
-        children: true,
-        articles: true,
-      },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Competency not found' }, { status: 404 })
-    }
-
-    // Check for dependencies
-    if (existing.children && existing.children.length > 0) {
-      return NextResponse.json(
-        { error: 'Cannot delete competency with child competencies. Delete children first.' },
-        { status: 400 }
-      )
-    }
-
-    if (existing.articles && existing.articles.length > 0) {
-      return NextResponse.json(
-        { error: 'Cannot delete competency with associated articles. Remove articles first.' },
-        { status: 400 }
-      )
-    }
-
-    await prisma.competency.delete({
-      where: { id },
-    })
+    await deleteCompetency(id)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+    if (error instanceof Error && error.message.includes('Cannot delete')) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error deleting competency:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

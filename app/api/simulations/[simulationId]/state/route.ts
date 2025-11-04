@@ -1,5 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getSimulationState, updateSimulationState, verifySimulationOwnership } from '@/lib/db/simulations'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function PUT(
@@ -18,59 +19,30 @@ export async function PUT(
     const { stageStates, currentStageId, eventLog } = body
 
     // Verify simulation ownership
-    const simulation = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-      select: { userId: true },
-    })
-
-    if (!simulation) {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
-    }
-
-    if (simulation.userId !== user.id) {
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Update simulation state in userInputs JSONB field
-    try {
-      await prisma.simulation.update({
-        where: { id: simulationId },
-        data: {
-          userInputs: {
-            stageStates: stageStates || {},
-            currentStageId: currentStageId || null,
-            eventLog: eventLog || [],
-            lastSaved: new Date().toISOString(),
-          },
-          updatedAt: new Date(),
-        },
-      })
-    } catch (updateError: any) {
-      // Handle P2025 (record not found) or any other Prisma errors
-      if (updateError?.code === 'P2025') {
-        return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
-      }
-      
-      const { normalizeError } = await import('@/lib/api/route-helpers')
-      const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
-      const normalized = normalizeError(updateError)
-      const statusCode = getPrismaErrorStatusCode(updateError)
-      console.error('Error updating simulation state:', updateError)
-      return NextResponse.json({ error: normalized }, { status: statusCode })
-    }
+    await updateSimulationState(simulationId, {
+      stageStates,
+      currentStageId,
+      eventLog,
+    })
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error saving simulation state:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -87,17 +59,15 @@ export async function GET(
     const { simulationId } = await params
 
     // Verify simulation ownership
-    const simulation = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-      select: { userId: true, userInputs: true },
-    })
-
-    if (!simulation) {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    if (simulation.userId !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    // Get simulation state
+    const simulation = await getSimulationState(simulationId)
+    if (!simulation) {
+      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
     }
 
     // Extract state from userInputs
@@ -112,13 +82,13 @@ export async function GET(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error fetching simulation state:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

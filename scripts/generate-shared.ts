@@ -388,6 +388,12 @@ export async function syncFileMetadata(storagePath: string) {
     })
     
     if (!response.ok) {
+      // Check if it's a 404 (route doesn't exist) - make it non-fatal
+      if (response.status === 404) {
+        console.warn(`Metadata sync route not found (404) - skipping sync for ${storagePath}`)
+        return { success: false, skipped: true, message: 'Sync route not available' }
+      }
+      
       const errorText = await response.text()
       let errorData
       try {
@@ -408,10 +414,10 @@ export async function syncFileMetadata(storagePath: string) {
     return data
   } catch (error: any) {
     // Catch network errors, parsing errors, etc.
-    if (error?.message) {
-      throw new Error(`Sync failed: ${error.message}`)
-    }
-    throw new Error(`Sync failed: ${String(error)}`)
+    // Make sync failures non-fatal - log but don't throw
+    const errorMessage = error?.message || String(error)
+    console.warn(`Metadata sync failed (non-fatal): ${errorMessage}`)
+    return { success: false, error: errorMessage, skipped: true }
   }
 }
 

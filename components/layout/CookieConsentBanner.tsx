@@ -110,11 +110,6 @@ export default function CookieConsentBanner() {
           mask_all_text: isProduction,
           capture_performance: false,
           disable_session_recording: false,
-          // Enhanced session recording privacy settings
-          session_recording: {
-            maskAllText: true,
-            maskAllInputs: true,
-          },
         })
         ;(window as any).posthog = posthog
       }

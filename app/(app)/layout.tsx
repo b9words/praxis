@@ -3,7 +3,7 @@ import SentryUserProvider from '@/components/providers/SentryUserProvider'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserSubscriptionStatus } from '@/lib/auth/subscription'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
-import { prisma } from '@/lib/prisma/server'
+import { getProfileById } from '@/lib/db/profiles'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
@@ -18,21 +18,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       user.id,
       async () => {
         try {
-          const profileData = await prisma.profile.findUnique({
-            where: { id: user.id },
-            select: {
-              id: true,
-              username: true,
-              fullName: true,
-              avatarUrl: true,
-              bio: true,
-              isPublic: true,
-              role: true,
-              createdAt: true,
-              updatedAt: true,
-            },
-          })
-          return profileData
+          return await getProfileById(user.id)
         } catch (error) {
           // Log error but don't crash - middleware will handle auth issues
           console.error('Error fetching profile in layout:', error)

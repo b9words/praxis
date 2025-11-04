@@ -1,7 +1,10 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { notifySimulationComplete } from '@/lib/notifications/triggers'
-import { prisma } from '@/lib/prisma/server'
+import { getSimulationById, updateSimulationStatus, verifySimulationOwnership } from '@/lib/db/simulations'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 /**
  * POST /api/simulations/[simulationId]/complete
@@ -21,63 +24,27 @@ export async function POST(
     }
     const { simulationId } = await params
 
-    // Get simulation with case and user info
-    const simulation = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-      include: {
-        case: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-        user: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-    })
-
-    if (!simulation) {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    // Verify ownership
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    if (simulation.userId !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    // Get simulation with case info
+    const simulation = await getSimulationById(simulationId)
+    if (!simulation) {
+      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
     }
 
     if (simulation.status === 'completed') {
       return NextResponse.json({ error: 'Simulation already completed' }, { status: 400 })
     }
 
-    // Store case title before updating (needed after update when TypeScript loses type info)
-    const caseTitle = simulation.case.title
+    // Store case title before updating
+    const caseTitle = simulation.case?.title || 'Case'
 
     // Mark simulation as completed
-    try {
-      await prisma.simulation.update({
-        where: { id: simulationId },
-        data: {
-          status: 'completed',
-          completedAt: new Date(),
-        },
-      })
-    } catch (updateError: any) {
-      // Handle P2025 (record not found) or any other Prisma errors
-      if (updateError?.code === 'P2025') {
-        return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
-      }
-      
-      // For other errors, log and return error
-      const { normalizeError } = await import('@/lib/api/route-helpers')
-      const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
-      const normalized = normalizeError(updateError)
-      const statusCode = getPrismaErrorStatusCode(updateError)
-      console.error('Error updating simulation status:', updateError)
-      return NextResponse.json({ error: normalized }, { status: statusCode })
-    }
+    await updateSimulationStatus(simulationId, 'completed')
 
     // Send notification
     await notifySimulationComplete(
@@ -136,14 +103,13 @@ export async function POST(
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    
-    // Handle Prisma errors comprehensively
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error completing simulation:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

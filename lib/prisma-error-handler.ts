@@ -22,6 +22,127 @@ export function getPrismaErrorInfo(error: any): PrismaErrorInfo | null {
   const code = error.code || error.meta?.code || error.cause?.code
   const message = error.message || error.meta?.message || 'Unknown error'
 
+  // P1014 - Unable to connect to database
+  if (code === 'P1014') {
+    return {
+      code: 'P1014',
+      message: 'Unable to connect to database',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1015 - Connection closed
+  if (code === 'P1015') {
+    return {
+      code: 'P1015',
+      message: 'Database connection closed',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1016 - Connection failure
+  if (code === 'P1016') {
+    return {
+      code: 'P1016',
+      message: 'Database connection failure',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1017 - Server has closed the connection
+  if (code === 'P1017') {
+    return {
+      code: 'P1017',
+      message: 'Server has closed the connection',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1018 - Connection pool timeout
+  if (code === 'P1018') {
+    return {
+      code: 'P1018',
+      message: 'Connection pool timeout',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1019 - Connection pool exhausted
+  if (code === 'P1019') {
+    return {
+      code: 'P1019',
+      message: 'Connection pool exhausted',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1020 - Connection timed out
+  if (code === 'P1020') {
+    return {
+      code: 'P1020',
+      message: 'Connection timed out',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // P1021 - Connection string missing
+  if (code === 'P1021') {
+    return {
+      code: 'P1021',
+      message: 'Database connection string missing',
+      statusCode: 500,
+      recoverable: false,
+    }
+  }
+
+  // P1022 - Connection string invalid
+  if (code === 'P1022') {
+    return {
+      code: 'P1022',
+      message: 'Database connection string invalid',
+      statusCode: 500,
+      recoverable: false,
+    }
+  }
+
+  // P1029 - Connection timeout
+  if (code === 'P1029') {
+    return {
+      code: 'P1029',
+      message: 'Connection timeout',
+      statusCode: 503,
+      recoverable: true,
+    }
+  }
+
+  // Fallback: Check for connection-related error messages
+  if (message && typeof message === 'string') {
+    const lowerMessage = message.toLowerCase()
+    if (
+      lowerMessage.includes('server has closed the connection') ||
+      lowerMessage.includes('connection closed') ||
+      lowerMessage.includes('connection terminated') ||
+      lowerMessage.includes('connection refused') ||
+      lowerMessage.includes('connection timed out') ||
+      lowerMessage.includes('connection pool') ||
+      lowerMessage.includes('connection limit')
+    ) {
+      return {
+        code: code || 'CONNECTION_ERROR',
+        message: 'Database connection error',
+        statusCode: 503,
+        recoverable: true,
+      }
+    }
+  }
+
   // P2000 - Value out of range
   if (code === 'P2000') {
     return {

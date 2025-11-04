@@ -6,7 +6,8 @@ import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getLearningPathById } from '@/lib/learning-paths'
-import { prisma } from '@/lib/prisma/server'
+import { getAllUserProgress } from '@/lib/progress-tracking'
+import { getCompletedSimulationByUserAndCase } from '@/lib/db/simulations'
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock, Target } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -67,9 +68,8 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
     user.id,
     async () => {
       // Get user's progress for this path
-      const lessonProgress = await prisma.userLessonProgress.findMany({
-        where: { userId: user.id },
-      })
+      const progressMap = await getAllUserProgress(user.id)
+      const lessonProgress = Array.from(progressMap.values())
 
       const { allLessons, allSimulations } = await getCachedLessonsAndSimulations()
 
@@ -78,9 +78,9 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
         path.items.map(async (item) => {
           if (item.type === 'lesson') {
             const progress = lessonProgress.find(
-              p => p.domainId === item.domain &&
-                   p.moduleId === item.module &&
-                   p.lessonId === item.lesson
+              (p: any) => p.domain_id === item.domain &&
+                   p.module_id === item.module &&
+                   p.lesson_id === item.lesson
             )
             
             const lesson = allLessons.find(
@@ -94,16 +94,10 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
               title: lesson?.lessonTitle || 'Unknown Lesson',
               url: `/library/curriculum/${item.domain}/${item.module}/${item.lesson}`,
               completed: progress?.status === 'completed' || false,
-              progress: progress?.progressPercentage || 0,
+              progress: progress?.progress_percentage || 0,
             }
           } else if (item.type === 'case' && item.caseId) {
-            const simulation = await prisma.simulation.findFirst({
-              where: {
-                userId: user.id,
-                caseId: item.caseId,
-                status: 'completed',
-              },
-            }).catch(() => null)
+            const simulation = await getCompletedSimulationByUserAndCase(user.id, item.caseId).catch(() => null)
 
             const caseStudy = allSimulations.find(s => s.caseId === item.caseId)
 

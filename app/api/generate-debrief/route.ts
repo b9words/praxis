@@ -1,9 +1,12 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { notifyDebriefGenerationFailure } from '@/lib/notifications/triggers'
 import { createJob } from '@/lib/job-processor'
-import { prisma } from '@/lib/prisma/server'
+import { getDebriefBySimulationId } from '@/lib/db/debriefs'
+import { AppError } from '@/lib/db/utils'
 import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 // In-memory rate limit store (simple implementation for GA)
 // In production, consider using Redis or similar
@@ -66,21 +69,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if debrief already exists (idempotency)
-    const existingDebrief = await prisma.debrief.findUnique({
-      where: { simulationId },
-      select: {
-        id: true,
-        scores: true,
-        summaryText: true,
-        radarChartData: true,
-        createdAt: true,
-      },
-    })
+    const existingDebrief = await getDebriefBySimulationId(simulationId)
 
     if (existingDebrief) {
       return NextResponse.json({
         debriefId: existingDebrief.id,
-        debrief: existingDebrief,
+        debrief: {
+          id: existingDebrief.id,
+          scores: existingDebrief.scores,
+          summaryText: existingDebrief.summaryText,
+          radarChartData: existingDebrief.radarChartData,
+          createdAt: existingDebrief.createdAt,
+        },
         fromCache: true,
       })
     }

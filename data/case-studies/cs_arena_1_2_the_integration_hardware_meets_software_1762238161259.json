@@ -1,0 +1,128 @@
+{
+  "caseId": "cs_arena_1_2_the_integration_hardware_meets_software_1762238161259",
+  "version": "1.0",
+  "title": "The Integration: Hardware Meets Software",
+  "description": "As the new GM of a combined division, you must integrate a fast-moving AI startup into a legacy hardware giant. Your task is to design a 100-day plan that merges two polar-opposite cultures without destroying the value of the acquisition or causing a mass exodus of critical talent.",
+  "competencies": [
+    "Organizational Design",
+    "Stakeholder Management",
+    "Change Management",
+    "Strategic Communication"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_org_charts_pre_acq_01",
+      "fileName": "Org Charts (Pre-Acquisition).md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER: Markdown content showing a hierarchical chart for Titan Dynamics' Sensor Division and a flat, team-based chart for Aether AI."
+      }
+    },
+    {
+      "fileId": "cf_coo_memo_confidential_02",
+      "fileName": "CONFIDENTIAL - Memo from COO David Chen.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER: Markdown content of a memo from the COO expressing concern over the acquisition price and Aether's cash burn, emphasizing the need for 'operational discipline'."
+      }
+    },
+    {
+      "fileId": "cf_hr_cultural_assessment_03",
+      "fileName": "HR Cultural Assessment Report.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER: Markdown content with a table comparing Titan and Aether on dimensions like Work Hours, Decision Making, Risk Tolerance, and Compensation."
+      }
+    },
+    {
+      "fileId": "cf_financial_data_04",
+      "fileName": "Financial & Operational Data.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER: CSV data showing P&L and key metrics for both divisions, highlighting Titan's scale and Aether's high-margin, high-burn model."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_triage",
+      "title": "Stage 1 (Day 1-30): Triage & Signaling",
+      "description": "Your first major test involves the initial joint project. Your decision on how it's managed will send a powerful signal to both teams about the future. You must balance the conflicting demands of your key lieutenants, Frank Vogel (legacy Titan) and Dr. Lena Petrova (legacy Aether).",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Frank Vogel wants to immediately establish a formal Program Management Office (PMO) with rigid stage-gates for the first integrated product. Lena Petrova insists on using Aether's autonomous 'squad' model to maintain speed. Draft a 1-page memo outlining your decision for the initial project governance model. Justify your choice, acknowledging the risks and explaining how you will mitigate them.",
+        "context": "This first decision is less about process and more about symbolism. The entire 575-person division is watching to see whose culture will prevail. Alienating either Frank or Lena early on could be catastrophic for morale and productivity.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_structure",
+      "title": "Stage 2 (Day 31-90): The Structural Dilemma",
+      "description": "With initial observations from the first month, you must now tackle the most critical and politically charged decision: the formal organizational structure of the new 'Intelligent Systems Division'. This choice will define reporting lines, power structures, and workflows for the foreseeable future.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Based on the provided case files and the conflicting cultural dynamics, propose the formal organizational structure for the combined 575-person division. Your submission must be a 2-page document that includes: \n1. A clear description of the chosen model (e.g., Full Integration, Autonomous Unit, Product-Line Matrix). \n2. A high-level organizational chart. \n3. A strong rationale explaining WHY this structure is optimal for achieving your objectives of talent retention and product integration.",
+        "context": "Your boss, COO David Chen, is pushing for a structure that maximizes synergy and simplifies reporting. Lena's team is threatening to leave if their autonomy is compromised. Frank's team is resistant to any changes they perceive as 'chaotic'. There is no perfect answer, only a series of trade-offs.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_final_plan",
+      "title": "Stage 3 (Day 91-100): The First 100-Day Plan",
+      "description": "Synthesize your previous decisions and analysis into a comprehensive integration plan. This is the definitive document you will present to the COO and the executive committee. It must be clear, defensible, and actionable.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Produce a 3-page memo to COO David Chen outlining your complete 100-Day Integration Plan for the Intelligent Systems Division. The memo must be a polished, executive-level document that explicitly details: \n1. **The Final Organizational Structure:** Including the definitive org chart. \n2. **The Defined Development Methodology:** Your final decision on how software and hardware development will be managed (e.g., Agile, Waterfall, a hybrid model). \n3. **The Compensation & Talent Plan:** A proposal for aligning compensation. Will you argue for an exception to keep Aether's equity-based plan for key talent, or move everyone to Titan's corporate bonus structure? \n4. **The Communication Plan:** A brief outline of how and when you will announce these changes to the division to manage the inevitable disruption.",
+        "context": "This is your final deliverable. It needs to tell a compelling story that shows you have a firm grasp on the strategic, financial, and human-capital challenges. It must persuade a skeptical COO that your plan will not only work, but will create the value promised to investors.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the logic, viability, and rationale behind the chosen organizational structure and operating model.",
+        "scoringGuide": {
+          "1": "Chooses a simplistic structure that ignores the core cultural conflict or stakeholder needs. The plan is not defensible and likely to fail.",
+          "3": "Selects a viable, conventional structure and identifies the most obvious risks. The plan is logical but may be too conservative or fail to unlock the full potential of the acquisition.",
+          "5": "Designs a thoughtful, nuanced structure (e.g., a clever hybrid model) that directly addresses the central tension. Proposes specific processes to make the structure work and clearly justifies the trade-offs."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the ability to understand and balance the competing motivations and concerns of key stakeholders (Frank, Lena, David Chen).",
+        "scoringGuide": {
+          "1": "The plan heavily favors one stakeholder's perspective at the expense of others, creating significant political risk and alienating key leaders.",
+          "3": "Acknowledges the concerns of all key stakeholders and attempts a reasonable compromise. The plan is politically realistic but may not fully inspire all parties.",
+          "5": "Proactively designs solutions that give each stakeholder a meaningful 'win' while advancing the core strategic goals. The plan skillfully navigates the political landscape and builds buy-in."
+        }
+      },
+      {
+        "competencyName": "Change Management",
+        "description": "Measures the quality of the plan for implementing the changes, communicating them, and mitigating disruption.",
+        "scoringGuide": {
+          "1": "The plan consists only of the final state, with no consideration for how to transition the organization or manage the human element of the change.",
+          "3": "Includes a basic communication plan and identifies the need to manage the transition, but lacks specific, actionable steps.",
+          "5": "Presents a robust implementation and communication plan that anticipates employee reactions, identifies change agents, and sequences actions to build momentum and minimize attrition."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Evaluates the clarity, persuasiveness, and executive presence of the final memo to the COO.",
+        "scoringGuide": {
+          "1": "The final memo is poorly structured, unclear, and fails to present a convincing argument. It reads like a simple list of decisions.",
+          "3": "The memo is professional, well-organized, and clearly articulates the 'what' and 'how' of the plan. It meets the requirements of the prompt.",
+          "5": "The memo frames the plan within a powerful strategic narrative. It articulates a compelling 'why' that inspires confidence and aligns stakeholders, turning a difficult change into an exciting mission."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

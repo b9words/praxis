@@ -6,9 +6,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserResidency } from '@/lib/auth/get-residency'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
-import { getUserAggregateScores } from '@/lib/database-functions'
-import { isEnumError } from '@/lib/prisma-enum-fallback'
-import { prisma } from '@/lib/prisma/server'
+import { getUserAggregateScores } from '@/lib/db/debriefs'
+import { getProfileByUsername, getProfileById } from '@/lib/db/profiles'
+import { listSimulations } from '@/lib/db/simulations'
 import { Award, ArrowRight, Calendar, Edit, Share2, Target } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -25,16 +25,14 @@ export async function generateMetadata({
   // Cache profile metadata
   const getCachedProfileMetadata = cache(
     async () => {
-      const profile = await prisma.profile.findUnique({
-        where: { username },
-        select: {
-          fullName: true,
-          username: true,
-          bio: true,
-          isPublic: true,
-        },
-      })
-      return profile
+      const profile = await getProfileByUsername(username)
+      if (!profile) return null
+      return {
+        fullName: profile.fullName,
+        username: profile.username,
+        bio: profile.bio,
+        isPublic: profile.isPublic,
+      }
     },
     ['profile', 'metadata', username],
     {
@@ -125,21 +123,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   // Cache profile data (5 minutes revalidate, userId in key)
   const getCachedProfile = cache(
     async () => {
-      const profile = await prisma.profile.findUnique({
-        where: { username },
-        select: {
-          id: true,
-          username: true,
-          fullName: true,
-          avatarUrl: true,
-          bio: true,
-          isPublic: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      })
-      return profile
+      return getProfileByUsername(username)
     },
     ['profile', username],
     {
@@ -193,66 +177,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   const getCachedSimulations = getCachedUserData(
     profile.id,
     async () => {
-      let simulations: any[] = []
-      try {
-        simulations = await prisma.simulation.findMany({
-          where: {
-            userId: profile.id,
-            status: 'completed',
-          },
-          include: {
-            case: {
-              select: {
-                title: true,
-              },
-            },
-            debrief: {
-              select: {
-                id: true,
-                scores: true,
-              },
-            },
-          },
-          orderBy: {
-            completedAt: 'desc',
-          },
-          take: 10,
-        })
-      } catch (error: any) {
-        if (isEnumError(error)) {
-          // Fallback: query without status filter, filter by completedAt
-          try {
-            const allSimulations = await prisma.simulation.findMany({
-              where: {
-                userId: profile.id,
-              },
-              include: {
-                case: {
-                  select: {
-                    title: true,
-                  },
-                },
-                debrief: {
-                  select: {
-                    id: true,
-                    scores: true,
-                  },
-                },
-              },
-              orderBy: {
-                completedAt: 'desc',
-              },
-              take: 10,
-            })
-            simulations = allSimulations.filter((s: any) => s.completedAt !== null)
-          } catch (fallbackError) {
-            console.error('Error fetching simulations (fallback):', fallbackError)
-          }
-        } else {
-          console.error('Error fetching simulations:', error)
-        }
-      }
-      return simulations
+      const { listSimulations } = await import('@/lib/db/simulations')
+      const simulations = await listSimulations({
+        userId: profile.id,
+        status: 'completed',
+      })
+      // Take first 10 and map to expected format
+      return simulations.slice(0, 10).map(sim => ({
+        ...sim,
+        case: sim.case,
+        debrief: sim.debrief,
+      }))
     },
     ['simulations', 'completed'],
     {

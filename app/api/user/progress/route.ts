@@ -1,10 +1,13 @@
-import { isMissingTable } from '@/lib/api/route-helpers'
 import { ensureProfileExists } from '@/lib/auth/authorize'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { ensureUserArticleProgressTable } from '@/lib/db/schemaGuard'
-import { prisma } from '@/lib/prisma/server'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
+import { getUserResidency } from '@/lib/db/profiles'
+import { countArticlesForResidency } from '@/lib/db/articles'
+import { countCompletedArticlesForResidency } from '@/lib/db/articleProgress'
+import { countCompletedSimulations } from '@/lib/db/simulations'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 /**
  * GET /api/user/progress
@@ -34,26 +37,7 @@ export async function GET(request: NextRequest) {
       user.id,
       async () => {
         // Get user residency
-        let residency
-        try {
-          residency = await prisma.userResidency.findUnique({
-            where: { userId: user.id },
-            select: { currentResidency: true },
-          })
-        } catch (error: any) {
-          // Handle missing table (P2021) or missing columns (P2022)
-          if (error?.code === 'P2021' || error?.code === 'P2022' || error?.message?.includes('does not exist')) {
-            // Table doesn't exist, return null residency
-            return {
-              currentResidency: null,
-              articlesCompleted: 0,
-              totalArticles: 0,
-              simulationsCompleted: 0,
-              progressPercentage: 0,
-            }
-          }
-          throw error
-        }
+        const residency = await getUserResidency(user.id).catch(() => null)
 
         if (!residency?.currentResidency) {
           return {
@@ -68,70 +52,13 @@ export async function GET(request: NextRequest) {
         const residencyYear = residency.currentResidency
 
         // Get articles for current residency
-        const totalArticles = await prisma.article.count({
-          where: {
-            competency: {
-              residencyYear,
-            },
-            status: 'published',
-          },
-        })
+        const totalArticles = await countArticlesForResidency(residencyYear)
 
-        // Get completed articles - handle P2021 (missing table)
-        let articlesCompleted = 0
-        try {
-          articlesCompleted = await prisma.userArticleProgress.count({
-            where: {
-              userId: user.id,
-              status: 'completed',
-              article: {
-                competency: {
-                  residencyYear,
-                },
-              },
-            },
-          })
-        } catch (error: any) {
-          // Handle missing table (P2021)
-          if (isMissingTable(error)) {
-            // In dev, try to create the table
-            if (process.env.NODE_ENV === 'development') {
-              await ensureUserArticleProgressTable()
-              
-              // Retry once after creating table
-              try {
-                articlesCompleted = await prisma.userArticleProgress.count({
-                  where: {
-                    userId: user.id,
-                    status: 'completed',
-                    article: {
-                      competency: {
-                        residencyYear,
-                      },
-                    },
-                  },
-                })
-              } catch (retryError) {
-                // Still failed, use default 0
-                articlesCompleted = 0
-              }
-            } else {
-              // Non-dev: use default 0
-              articlesCompleted = 0
-            }
-          } else {
-            // Other errors: use default 0
-            articlesCompleted = 0
-          }
-        }
+        // Get completed articles
+        const articlesCompleted = await countCompletedArticlesForResidency(user.id, residencyYear)
 
         // Get completed simulations
-        const simulationsCompleted = await prisma.simulation.count({
-          where: {
-            userId: user.id,
-            status: 'completed',
-          },
-        })
+        const simulationsCompleted = await countCompletedSimulations(user.id)
 
         const progressPercentage = totalArticles > 0 ? Math.round((articlesCompleted / totalArticles) * 100) : 0
 

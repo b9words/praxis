@@ -1,6 +1,8 @@
-
-import { prisma } from '@/lib/prisma/server'
+import { bulkCreateArticles } from '@/lib/db/articles'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 /**
  * POST /api/articles/bulk
@@ -22,24 +24,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Articles array required' }, { status: 400 })
     }
 
-    const created = await prisma.article.createMany({
-      data: articles.map((article) => ({
-        title: article.title,
-        content: article.content || null,
-        competencyId: article.competencyId,
-        status: article.status || 'draft',
-        storagePath: article.storagePath || null,
-        metadata: article.metadata || {},
-        description: article.description || null,
-        createdBy: user.id,
-        updatedBy: user.id,
-      })),
-    })
+    const created = await bulkCreateArticles(articles, user.id)
 
     return NextResponse.json({ success: true, count: created.count }, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })
+    }
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
     console.error('Error creating bulk articles:', error)
     return NextResponse.json({ error: 'Failed to create articles' }, { status: 500 })

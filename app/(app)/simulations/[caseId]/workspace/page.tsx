@@ -1,9 +1,11 @@
 import SimulationWorkspace from '@/components/simulation/SimulationWorkspace'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getCaseByIdWithCompetencies } from '@/lib/db/cases'
+import { getSimulationByUserAndCase, createSimulation } from '@/lib/db/simulations'
+import { getLessonProgressList } from '@/lib/db/progress'
 import { checkSubscription } from '@/lib/auth/require-subscription'
 import { getCurrentBriefing } from '@/lib/briefing'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { AlertCircle, CheckCircle2, BookOpen } from 'lucide-react'
@@ -18,59 +20,9 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
 
   const { caseId } = await params
 
-  // Fetch case details with error handling
-  let caseItem = null
-  try {
-    caseItem = await prisma.case.findFirst({
-      where: {
-        id: caseId,
-        status: 'published',
-      },
-      include: {
-        competencies: {
-          include: {
-            competency: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    })
-  } catch (error: any) {
-    // If enum doesn't exist, fall back to querying without status filter
-    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-      try {
-        caseItem = await prisma.case.findFirst({
-          where: {
-            id: caseId,
-          },
-          include: {
-            competencies: {
-              include: {
-                competency: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        })
-      } catch (fallbackError) {
-        console.error('Error fetching case:', fallbackError)
-        notFound()
-      }
-    } else {
-      console.error('Error fetching case:', error)
-      notFound()
-    }
-  }
-
-  if (!caseItem) {
+  // Fetch case details
+  const caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
+  if (!caseItem || caseItem.status !== 'published') {
     notFound()
   }
 
@@ -86,20 +38,11 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
       
       if (prerequisites.length > 0) {
         // Check user's progress on prerequisites
-        const lessonProgress = await prisma.userLessonProgress.findMany({
-          where: {
-            userId: user.id,
-            OR: prerequisites.map((prereq: any) => ({
-              domainId: prereq.domain,
-              moduleId: prereq.module,
-              lessonId: prereq.lesson,
-            })),
-          },
-        })
+        const allProgress = await getLessonProgressList(user.id).catch(() => [])
         
         prerequisiteProgress = prerequisites.map((prereq: any) => {
-          const progress = lessonProgress.find(
-            p => p.domainId === prereq.domain &&
+          const progress = allProgress.find(
+            (p: any) => p.domainId === prereq.domain &&
                  p.moduleId === prereq.module &&
                  p.lessonId === prereq.lesson
           )
@@ -114,31 +57,16 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
     }
   }
 
-  // Check for existing simulation with error handling
-  let simulation = null
-  try {
-    simulation = await prisma.simulation.findFirst({
-      where: {
-        userId: user.id,
-        caseId: caseId,
-      },
-    })
-  } catch (error) {
-    console.error('Error fetching simulation:', error)
-  }
+  // Check for existing simulation or create new one
+  let simulation = await getSimulationByUserAndCase(user.id, caseId).catch(() => null)
 
-  // All redirects removed
-
-  // Create new simulation if none exists with error handling
   if (!simulation) {
     try {
-      simulation = await prisma.simulation.create({
-        data: {
-          userId: user.id,
-          caseId: caseId,
-          status: 'in_progress',
-          userInputs: {},
-        },
+      simulation = await createSimulation({
+        userId: user.id,
+        caseId: caseId,
+        status: 'in_progress',
+        userInputs: {},
       })
     } catch (error) {
       console.error('Error creating simulation:', error)

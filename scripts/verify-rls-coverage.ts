@@ -4,11 +4,9 @@
  * Compares Prisma schema models with migration files to ensure all tables have RLS policies
  */
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../lib/prisma/client'
 import fs from 'fs'
 import path from 'path'
-
-const prisma = new PrismaClient()
 
 interface TableInfo {
   name: string

@@ -1,8 +1,9 @@
-import { isMissingTable } from '@/lib/api/route-helpers'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { ensureUserArticleProgressTable } from '@/lib/db/schemaGuard'
-import { prisma } from '@/lib/prisma/server'
+import { AppError } from '@/lib/db/utils'
+import { listArticleProgress, upsertArticleProgress, updateArticleProgress, deleteArticleProgress } from '@/lib/db/articleProgress'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,95 +13,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
     const searchParams = request.nextUrl.searchParams
-    const articleId = searchParams.get('articleId')
-    const status = searchParams.get('status')
+    const articleId = searchParams.get('articleId') || undefined
+    const status = searchParams.get('status') || undefined
 
-    const where: any = {
+    const progress = await listArticleProgress({
       userId: user.id,
-    }
-
-    if (articleId) {
-      where.articleId = articleId
-    }
-    if (status) {
-      where.status = status
-    }
-
-    // Handle P2021 (missing table) errors
-    let progress
-    try {
-      progress = await prisma.userArticleProgress.findMany({
-      where,
-      include: {
-        article: {
-          select: {
-            id: true,
-            title: true,
-            competency: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        },
-      },
-        orderBy: {
-          updatedAt: 'desc',
-        },
-      })
-    } catch (error: any) {
-      // Handle missing table (P2021)
-      if (isMissingTable(error)) {
-        // In dev, try to create the table
-        if (process.env.NODE_ENV === 'development') {
-          await ensureUserArticleProgressTable()
-          
-          // Retry once after creating table
-          try {
-            progress = await prisma.userArticleProgress.findMany({
-              where,
-              include: {
-                article: {
-                  select: {
-                    id: true,
-                    title: true,
-                    competency: {
-                      select: {
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-              orderBy: {
-                updatedAt: 'desc',
-              },
-            })
-          } catch (retryError) {
-            // Still failed, return empty array
-            return NextResponse.json({ progress: [] }, { status: 200 })
-          }
-        } else {
-          // Non-dev: return empty array
-          return NextResponse.json({ progress: [] }, { status: 200 })
-        }
-      } else {
-        // Other errors: return empty array
-        return NextResponse.json({ progress: [] }, { status: 200 })
-      }
-    }
+      articleId,
+      status,
+    })
 
     return NextResponse.json({ progress })
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
-    const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
-    console.error('Error fetching article progress:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+    // Return empty array on error (soft fail)
+    return NextResponse.json({ progress: [] }, { status: 200 })
   }
 }
 
@@ -119,45 +50,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing articleId' }, { status: 400 })
     }
 
-    const progress = await prisma.userArticleProgress.upsert({
-      where: {
-        userId_articleId: {
-          userId: user.id,
-          articleId,
-        },
-      },
-      update: {
-        status,
-        completedAt: status === 'completed' ? new Date() : undefined,
-      },
-      create: {
-        userId: user.id,
-        articleId,
-        status,
-        completedAt: status === 'completed' ? new Date() : null,
-      },
-      include: {
-        article: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
+    const progress = await upsertArticleProgress({
+      userId: user.id,
+      articleId,
+      status,
     })
 
     return NextResponse.json({ progress }, { status: 201 })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
-    }
-    // Handle missing table (P2021) - try to create in dev
-    if (isMissingTable(error)) {
-      if (process.env.NODE_ENV === 'development') {
-        await ensureUserArticleProgressTable()
-        // Don't retry for POST - user should retry manually
-      }
-      return NextResponse.json({ error: 'Database table not ready' }, { status: 503 })
     }
     const { normalizeError } = await import('@/lib/api/route-helpers')
     const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
@@ -183,46 +85,20 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing articleId' }, { status: 400 })
     }
 
-    const progress = await prisma.userArticleProgress.update({
-      where: {
-        userId_articleId: {
-          userId: user.id,
-          articleId,
-        },
-      },
-      data: {
-        status,
-        completedAt: status === 'completed' ? new Date() : undefined,
-      },
-      include: {
-        article: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    })
+    const progress = await updateArticleProgress(user.id, articleId, status)
 
     return NextResponse.json({ progress })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    // Handle missing table (P2021) - try to create in dev
-    if (isMissingTable(error)) {
-      if (process.env.NODE_ENV === 'development') {
-        await ensureUserArticleProgressTable()
-        // Don't retry for PUT - user should retry manually
-      }
-      return NextResponse.json({ error: 'Database table not ready' }, { status: 503 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating article progress:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -240,26 +116,12 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Missing articleId' }, { status: 400 })
     }
 
-    await prisma.userArticleProgress.delete({
-      where: {
-        userId_articleId: {
-          userId: user.id,
-          articleId,
-        },
-      },
-    })
+    await deleteArticleProgress(user.id, articleId)
 
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
-    }
-    // Handle missing table (P2021) - try to create in dev
-    if (isMissingTable(error)) {
-      if (process.env.NODE_ENV === 'development') {
-        await ensureUserArticleProgressTable()
-      }
-      return NextResponse.json({ error: 'Database table not ready' }, { status: 503 })
     }
     const { normalizeError } = await import('@/lib/api/route-helpers')
     const normalized = normalizeError(error)

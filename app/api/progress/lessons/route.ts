@@ -1,9 +1,10 @@
-import { isMissingTable } from '@/lib/api/route-helpers'
 import { ensureProfileExists } from '@/lib/auth/authorize'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { ensureUserLessonProgressTable } from '@/lib/db/schemaGuard'
 import { getAllUserProgress, updateLessonProgress } from '@/lib/progress-tracking'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,32 +21,12 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
 
     // Use the helper function instead of direct Prisma calls
-    // Handle P2021 (missing table) errors
     let progressMap = new Map()
     try {
       progressMap = await getAllUserProgress(user.id)
     } catch (error: any) {
-      // Handle missing table (P2021)
-      if (isMissingTable(error)) {
-        // In dev, try to create the table
-        if (process.env.NODE_ENV === 'development') {
-          await ensureUserLessonProgressTable()
-          
-          // Retry once after creating table
-          try {
-            progressMap = await getAllUserProgress(user.id)
-          } catch (retryError) {
-            // Still failed, return empty array
-            return NextResponse.json({ progress: [] }, { status: 200 })
-          }
-        } else {
-          // Non-dev: return empty array
-          return NextResponse.json({ progress: [] }, { status: 200 })
-        }
-      } else {
-        // Other errors: return empty array
-        return NextResponse.json({ progress: [] }, { status: 200 })
-      }
+      // Return empty array on error
+      return NextResponse.json({ progress: [] }, { status: 200 })
     }
     
     let progress = Array.from(progressMap.values())

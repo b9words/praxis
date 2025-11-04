@@ -1,7 +1,10 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getLearningPathById } from '@/lib/learning-paths'
-import { prisma } from '@/lib/prisma/server'
+import { getAllUserProgress } from '@/lib/progress-tracking'
+import { listSimulations } from '@/lib/db/simulations'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 
 export async function GET(
   request: NextRequest,
@@ -21,34 +24,30 @@ export async function GET(
     }
 
     // Get user's progress for this path
-    const lessonProgress = await prisma.userLessonProgress.findMany({
-      where: {
-        userId: user.id,
-      },
-    })
+    const progressMap = await getAllUserProgress(user.id)
+    const lessonProgress = Array.from(progressMap.values())
 
     // Calculate progress for each item
     const itemsWithProgress = await Promise.all(
       path.items.map(async (item) => {
         if (item.type === 'lesson') {
           const progress = lessonProgress.find(
-            p => p.domainId === item.domain &&
-                 p.moduleId === item.module &&
-                 p.lessonId === item.lesson
+            p => p.domain_id === item.domain &&
+                 p.module_id === item.module &&
+                 p.lesson_id === item.lesson
           )
           return {
             ...item,
             completed: progress?.status === 'completed' || false,
-            progress: progress?.progressPercentage || 0,
+            progress: progress?.progress_percentage || 0,
           }
         } else if (item.type === 'case') {
-          const simulation = await prisma.simulation.findFirst({
-            where: {
-              userId: user.id,
-              caseId: item.caseId,
-              status: 'completed',
-            },
-          }).catch(() => null)
+          const simulations = await listSimulations({
+            userId: user.id,
+            caseId: item.caseId,
+            status: 'completed',
+          }).catch(() => [])
+          const simulation = simulations[0] || null
           
           return {
             ...item,

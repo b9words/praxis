@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getDomainById } from '@/lib/curriculum-data'
-import { prisma } from '@/lib/prisma/server'
+import { getDomainCompletion } from '@/lib/db/progress'
+import { getProfileById } from '@/lib/db/profiles'
 import { redirect } from 'next/navigation'
 import DomainCertificate from '@/components/certificates/DomainCertificate'
 import { notFound } from 'next/navigation'
@@ -26,14 +27,7 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
   }
 
   // Get domain completion
-  const completion = await prisma.domainCompletion.findUnique({
-    where: {
-      userId_domainId: {
-        userId: user.id,
-        domainId,
-      },
-    },
-  })
+  const completion = await getDomainCompletion(user.id, domainId).catch(() => null)
 
   if (!completion) {
     // User hasn't completed this domain yet
@@ -41,14 +35,7 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
   }
 
   // Get user profile for name
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    select: {
-      fullName: true,
-      username: true,
-    },
-  })
-
+  const profile = await getProfileById(user.id).catch(() => null)
   const userName = profile?.fullName || profile?.username || 'Learner'
 
   return (

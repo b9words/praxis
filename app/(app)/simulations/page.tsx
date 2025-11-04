@@ -2,9 +2,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import MarkdownPreview from '@/components/ui/markdown-preview'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { isEnumError } from '@/lib/prisma-enum-fallback'
-import { prisma } from '@/lib/prisma/server'
 import { getCachedUserData, cache, CacheTags } from '@/lib/cache'
+import { listCases } from '@/lib/db/cases'
+import { getCompletedSimulations, listSimulations } from '@/lib/db/simulations'
 import { CheckCircle2, Clock, Signal } from 'lucide-react'
 import Link from 'next/link'
 
@@ -18,55 +18,7 @@ export default async function SimulationsPage() {
   // Cache published cases list (15 minutes revalidate)
   const getCachedCases = cache(
     async () => {
-      let cases: any[] = []
-      try {
-        cases = await prisma.case.findMany({
-          where: {
-            status: 'published',
-          },
-          include: {
-            competencies: {
-              include: {
-                competency: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-          orderBy: {
-            createdAt: 'asc',
-          },
-        })
-      } catch (error: any) {
-        // If enum doesn't exist, fall back to querying without status filter
-        if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-          try {
-            cases = await prisma.case.findMany({
-              include: {
-                competencies: {
-                  include: {
-                    competency: {
-                      select: {
-                        name: true,
-                      },
-                    },
-                  },
-                },
-              },
-              orderBy: {
-                createdAt: 'asc',
-              },
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching cases (fallback):', fallbackError)
-          }
-        } else {
-          console.error('Error fetching cases:', error)
-        }
-      }
-      return cases
+      return listCases({ status: 'published' })
     },
     ['simulations', 'cases', 'published'],
     {
@@ -79,77 +31,22 @@ export default async function SimulationsPage() {
   const getCachedUserSimulations = getCachedUserData(
     user.id,
     async () => {
-      // Get user's completed simulations with error handling
-      let completedSimulations: any[] = []
-      try {
-        completedSimulations = await prisma.simulation.findMany({
-          where: {
-            userId: user.id,
-            status: 'completed',
-          },
-          select: {
-            caseId: true,
-            completedAt: true,
-          },
-        })
-      } catch (error: any) {
-        if (isEnumError(error)) {
-          // Fallback: query without status filter, filter by completedAt
-          try {
-            const allSimulations = await prisma.simulation.findMany({
-              where: {
-                userId: user.id,
-              },
-              select: {
-                caseId: true,
-                completedAt: true,
-              },
-            })
-            completedSimulations = allSimulations.filter((s: any) => s.completedAt !== null)
-          } catch (fallbackError) {
-            console.error('Error fetching completed simulations (fallback):', fallbackError)
-          }
-        } else {
-          console.error('Error fetching completed simulations:', error)
-        }
-      }
+      const completed = await getCompletedSimulations(user.id)
+      const inProgress = await listSimulations({
+        userId: user.id,
+        status: 'in_progress',
+      })
 
-      // Check for in-progress simulations with error handling
-      let inProgressSimulations: any[] = []
-      try {
-        inProgressSimulations = await prisma.simulation.findMany({
-          where: {
-            userId: user.id,
-            status: 'in_progress',
-          },
-          select: {
-            caseId: true,
-            completedAt: true,
-          },
-        })
-      } catch (error: any) {
-        if (isEnumError(error)) {
-          // Fallback: query without status filter, filter by completedAt being null
-          try {
-            const allSimulations = await prisma.simulation.findMany({
-              where: {
-                userId: user.id,
-              },
-              select: {
-                caseId: true,
-                completedAt: true,
-              },
-            })
-            inProgressSimulations = allSimulations.filter((s: any) => s.completedAt === null)
-          } catch (fallbackError) {
-            console.error('Error fetching in-progress simulations (fallback):', fallbackError)
-          }
-        } else {
-          console.error('Error fetching in-progress simulations:', error)
-        }
+      return {
+        completedSimulations: completed.map(s => ({
+          caseId: s.caseId,
+          completedAt: null, // Will be set from the simulation record if needed
+        })),
+        inProgressSimulations: inProgress.map(s => ({
+          caseId: s.caseId,
+          completedAt: null,
+        })),
       }
-
-      return { completedSimulations, inProgressSimulations }
     },
     ['simulations', 'status'],
     {

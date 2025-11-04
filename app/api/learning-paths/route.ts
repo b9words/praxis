@@ -55,34 +55,32 @@ export async function GET(request: NextRequest) {
       const getCachedPathProgress = getCachedUserData(
         user.id,
         async () => {
-          const lessonProgress = await prisma.userLessonProgress.findMany({
-            where: {
-              userId: user.id,
-            },
-          })
+          const { getAllUserProgress } = await import('@/lib/progress-tracking')
+          const progressMap = await getAllUserProgress(user.id)
+          const lessonProgress = Array.from(progressMap.values())
 
       // Calculate progress for each item
       const itemsWithProgress = path.items.map((item) => {
         if (item.type === 'lesson') {
           const progress = lessonProgress.find(
-            (p: any) => p.domainId === item.domain &&
-                 p.moduleId === item.module &&
-                 p.lessonId === item.lesson
+            (p: any) => p.domain_id === item.domain &&
+                 p.module_id === item.module &&
+                 p.lesson_id === item.lesson
             )
           return {
             ...item,
             completed: progress?.status === 'completed' || false,
-            progress: progress?.progressPercentage || 0,
+            progress: progress?.progress_percentage || 0,
           }
         } else if (item.type === 'case') {
           // Check if user has completed the simulation
-          const simulation = prisma.simulation.findFirst({
-            where: {
-              userId: user.id,
-              caseId: item.caseId,
-              status: 'completed',
-            },
-          }).catch(() => null)
+          const { listSimulations } = await import('@/lib/db/simulations')
+          const simulations = await listSimulations({
+            userId: user.id,
+            caseId: item.caseId,
+            status: 'completed',
+          }).catch(() => [])
+          const simulation = simulations[0] || null
           
           return {
             ...item,
@@ -97,13 +95,13 @@ export async function GET(request: NextRequest) {
       const itemsWithFullProgress = await Promise.all(
         itemsWithProgress.map(async (item) => {
           if (item.type === 'case') {
-            const simulation = await prisma.simulation.findFirst({
-              where: {
-                userId: user.id,
-                caseId: item.caseId,
-                status: 'completed',
-              },
-            }).catch(() => null)
+            const { listSimulations } = await import('@/lib/db/simulations')
+            const simulations = await listSimulations({
+              userId: user.id,
+              caseId: item.caseId,
+              status: 'completed',
+            }).catch(() => [])
+            const simulation = simulations[0] || null
             return {
               ...item,
               completed: !!simulation,
@@ -163,11 +161,11 @@ export async function GET(request: NextRequest) {
     // Cache user lesson progress (2 minutes revalidate, userId in key)
     const getCachedLessonProgress = getCachedUserData(
       user.id,
-      () => prisma.userLessonProgress.findMany({
-        where: {
-          userId: user.id,
-        },
-      }),
+      async () => {
+        const { getAllUserProgress } = await import('@/lib/progress-tracking')
+        const progressMap = await getAllUserProgress(user.id)
+        return Array.from(progressMap.values())
+      },
       ['lesson', 'progress'],
       {
         tags: [CacheTags.USER_PROGRESS],
@@ -188,21 +186,21 @@ export async function GET(request: NextRequest) {
         for (const item of path.items) {
           if (item.type === 'lesson') {
           const progress = lessonProgress.find(
-            (p: any) => p.domainId === item.domain &&
-                 p.moduleId === item.module &&
-                 p.lessonId === item.lesson
+            (p: any) => p.domain_id === item.domain &&
+                 p.module_id === item.module &&
+                 p.lesson_id === item.lesson
             )
             if (progress?.status === 'completed') {
               completedCount++
             }
-          } else if (item.type === 'case') {
-            const simulation = await prisma.simulation.findFirst({
-              where: {
-                userId: user.id,
-                caseId: item.caseId,
-                status: 'completed',
-              },
-            }).catch(() => null)
+        } else if (item.type === 'case') {
+          const { listSimulations } = await import('@/lib/db/simulations')
+          const simulations = await listSimulations({
+            userId: user.id,
+            caseId: item.caseId,
+            status: 'completed',
+          }).catch(() => [])
+          const simulation = simulations[0] || null
             if (simulation) {
               completedCount++
             }

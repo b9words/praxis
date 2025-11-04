@@ -2,7 +2,9 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getCaseByIdWithCompetencies } from '@/lib/db/cases'
+import { getSimulationByUserAndCase } from '@/lib/db/simulations'
+import { getLessonProgressList } from '@/lib/db/progress'
 import { getCachedUserData, getCachedCase, CacheTags } from '@/lib/cache'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { AlertCircle, CheckCircle2, BookOpen } from 'lucide-react'
@@ -41,45 +43,13 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
   }
 
   // Cache case lookup (1 hour revalidate) - use existing helper
-  let caseItem = null
-  try {
-    caseItem = await getCachedCase(caseId)
-    if (!caseItem) {
-      // Fallback if not found in cache
-      caseItem = await prisma.case.findFirst({
-        where: {
-          id: caseId,
-          status: 'published',
-        },
-      })
-      if (!caseItem) {
-        notFound()
-      }
-    }
-  } catch (error: any) {
-    // If enum doesn't exist, fall back to querying without status filter
-    if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-      try {
-        caseItem = await prisma.case.findFirst({
-          where: {
-            id: caseId,
-          },
-        })
-        if (!caseItem) {
-          notFound()
-        }
-      } catch (fallbackError) {
-        console.error('Error fetching case:', fallbackError)
-        notFound()
-      }
-    } else {
-      console.error('Error fetching case:', error)
+  let caseItem = await getCachedCase(caseId)
+  if (!caseItem) {
+    // Fallback if not found in cache
+    caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
+    if (!caseItem || caseItem.status !== 'published') {
       notFound()
     }
-  }
-
-  if (!caseItem) {
-    notFound()
   }
 
   // Cache user simulation status (5 minutes revalidate, userId in key)
@@ -87,23 +57,8 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
     user.id,
     async () => {
       // Check if user has an in-progress simulation
-      let existingSimulation = null
-      try {
-        existingSimulation = await prisma.simulation.findFirst({
-          where: {
-            userId: user.id,
-            caseId: caseId,
-            status: 'in_progress',
-          },
-        })
-      } catch (error: any) {
-        // Handle any Prisma errors gracefully
-        // If query fails, just continue without existing simulation
-        console.error('Error checking existing simulation:', error)
-        existingSimulation = null
-      }
-
-      return existingSimulation
+      const existingSimulation = await getSimulationByUserAndCase(user.id, caseId).catch(() => null)
+      return existingSimulation && existingSimulation.status === 'in_progress' ? existingSimulation : null
     },
     ['simulation', 'status', caseId],
     {
@@ -128,16 +83,10 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
         // Cache user's progress on prerequisites (2 minutes revalidate, userId in key)
         const getCachedPrerequisiteProgress = getCachedUserData(
           user.id,
-          () => prisma.userLessonProgress.findMany({
-            where: {
-              userId: user.id,
-              OR: prerequisites.map((prereq: any) => ({
-                domainId: prereq.domain,
-                moduleId: prereq.module,
-                lessonId: prereq.lesson,
-              })),
-            },
-          }),
+          async () => {
+            const allProgress = await getLessonProgressList(user.id).catch(() => [])
+            return allProgress
+          },
           ['prerequisites', 'progress', caseId],
           {
             tags: [CacheTags.USER_PROGRESS],
@@ -145,11 +94,11 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
           }
         )
 
-        const lessonProgress = await getCachedPrerequisiteProgress()
+        const allProgress = await getCachedPrerequisiteProgress()
         
         prerequisiteProgress = prerequisites.map((prereq: any) => {
-          const progress = lessonProgress.find(
-            p => p.domainId === prereq.domain &&
+          const progress = allProgress.find(
+            (p: any) => p.domainId === prereq.domain &&
                  p.moduleId === prereq.module &&
                  p.lessonId === prereq.lesson
           )

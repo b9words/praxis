@@ -4,41 +4,25 @@ import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { getDisplayNameForCompetency, getDomainForCompetency } from '@/lib/competency-mapping'
 import { ContentCollection, createThemedCollections, getModuleCollections } from '@/lib/content-collections'
 import { completeCurriculumData, getAllLessonsFlat, getDomainById } from '@/lib/curriculum-data'
-import { getUserAggregateScores } from '@/lib/database-functions'
+import { getUserAggregateScores } from '@/lib/db/debriefs'
+import { getResidencyArticles } from '@/lib/db/articles'
+import { getRecentCases } from '@/lib/db/cases'
+import { getRecentArticles } from '@/lib/db/articles'
+import { getCompletedArticleIds, getRecentCompletedArticles, getArticleProgressCompletionDates } from '@/lib/db/articleProgress'
+import { getCompletedSimulationsForDashboard, getInProgressSimulationsForDashboard, getAllSimulationsForDashboard, getCompletedSimulationsByCaseIds, getPopularSimulations } from '@/lib/db/simulations'
+import { getInProgressLessonsForDashboard, getLessonProgressSummary, getPopularLessons } from '@/lib/db/progress'
 import { getAllLearningPaths } from '@/lib/learning-paths'
-import { prisma } from '@/lib/prisma/server'
 import { getSmartRecommendations, RecommendationWithAlternates } from '@/lib/recommendation-engine'
 
 // Cache residency articles count (shared data, changes when articles are published/unpublished)
 const getCachedResidencyArticles = (residencyYear: number) => cache(
   async () => {
     try {
-      return await prisma.article.findMany({
-        where: {
-          competency: {
-            residencyYear,
-          },
-          status: 'published',
-        },
-        select: {
-          id: true,
-        },
-      })
+      return await getResidencyArticles(residencyYear)
     } catch (error: any) {
-      // If enum doesn't exist, fall back to querying without status filter
-      if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-        return await prisma.article.findMany({
-          where: {
-            competency: {
-              residencyYear,
-            },
-          },
-          select: {
-            id: true,
-          },
-        })
-      }
-      throw error
+      // On error, return empty array
+      console.error('Error fetching residency articles:', error)
+      return []
     }
   },
   ['residency-articles', residencyYear.toString()],
@@ -140,80 +124,18 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     latestArticlesResult,
   ] = await Promise.allSettled([
     currentResidency ? getCachedResidencyArticles(currentResidency) : Promise.resolve([]),
-    prisma.userArticleProgress.findMany({
-      where: { userId, status: 'completed' },
-      select: { articleId: true },
-    }).catch(() => []),
-    prisma.simulation.findMany({
-      where: { userId, status: 'completed' },
-      select: { id: true, completedAt: true },
-    }).catch(() => []),
-    prisma.userLessonProgress.findMany({
-      where: { userId, status: { in: ['in_progress'] } },
-      select: {
-        domainId: true,
-        moduleId: true,
-        lessonId: true,
-        progressPercentage: true,
-        lastReadPosition: true,
-        updatedAt: true,
-      },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-    }).catch(() => []),
-    prisma.simulation.findMany({
-      where: { userId, status: 'in_progress' },
-      include: { case: { select: { id: true, title: true } } },
-      orderBy: { updatedAt: 'desc' },
-      take: 5,
-    }).catch(() => []),
-    prisma.userLessonProgress.findMany({
-      where: { userId },
-      select: { domainId: true, moduleId: true, lessonId: true, status: true },
-    }).catch(() => []),
-    prisma.userArticleProgress.findMany({
-      where: { userId, status: 'completed' },
-      include: { article: { select: { id: true, title: true, competency: { select: { name: true } } } } },
-      orderBy: { completedAt: 'desc' },
-      take: 5,
-    }).catch(() => []),
-    prisma.simulation.findMany({
-      where: { userId },
-      include: { case: { select: { title: true } } },
-      orderBy: { createdAt: 'desc' },
-      take: 3,
-    }).catch(() => []),
-    prisma.userArticleProgress.findMany({
-      where: { userId, completedAt: { not: null } },
-      select: { completedAt: true },
-      orderBy: { completedAt: 'desc' },
-    }).catch(() => []),
-    prisma.userLessonProgress.groupBy({
-      by: ['domainId', 'moduleId', 'lessonId'],
-      where: { status: 'completed' },
-      _count: { id: true },
-      orderBy: { _count: { id: 'desc' } },
-      take: 6,
-    }).catch(() => []),
-    prisma.simulation.groupBy({
-      by: ['caseId'],
-      where: { status: 'completed' },
-      _count: { id: true },
-      orderBy: { _count: { id: 'desc' } },
-      take: 3,
-    }).catch(() => []),
-    prisma.case.findMany({
-      where: { status: 'published', createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-      select: { id: true, title: true, createdAt: true },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-    }).catch(() => []),
-    prisma.article.findMany({
-      where: { status: 'published', createdAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-      select: { id: true, title: true, createdAt: true, storagePath: true },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-    }).catch(() => []),
+    getCompletedArticleIds(userId),
+    getCompletedSimulationsForDashboard(userId),
+    getInProgressLessonsForDashboard(userId),
+    getInProgressSimulationsForDashboard(userId),
+    getLessonProgressSummary(userId),
+    getRecentCompletedArticles(userId),
+    getAllSimulationsForDashboard(userId),
+    getArticleProgressCompletionDates(userId),
+    getPopularLessons(),
+    getPopularSimulations(),
+    getRecentCases(),
+    getRecentArticles(),
   ])
 
   // Extract results with fallbacks
@@ -680,14 +602,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     })
 
     // Batch query: Get all completed simulations for relevant cases in one query
-    const completedCaseSimulations = await prisma.simulation.findMany({
-      where: {
-        userId,
-        caseId: { in: Array.from(caseIdsToCheck) },
-        status: 'completed',
-      },
-      select: { caseId: true },
-    }).catch(() => [])
+    const completedCaseSimulations = await getCompletedSimulationsByCaseIds(userId, Array.from(caseIdsToCheck))
     
     const completedCaseIds = new Set(completedCaseSimulations.map(s => s.caseId))
 

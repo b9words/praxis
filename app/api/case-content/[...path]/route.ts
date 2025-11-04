@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createReadStream, statSync } from 'fs'
 import { join, normalize } from 'path'
 
+export const runtime = 'nodejs'
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
 /**
@@ -35,7 +37,7 @@ export async function GET(
     const { path } = await params
     
     // Resolve base directory (content/sources)
-    const baseDir = join(process.cwd(), 'execemy', 'content', 'sources')
+    const baseDir = join(process.cwd(), 'content', 'sources')
     
     // Join all path segments and normalize
     const requestPath = join(...path)

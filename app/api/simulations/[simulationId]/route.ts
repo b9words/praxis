@@ -1,5 +1,6 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { prisma } from '@/lib/prisma/server'
+import { getSimulationByIdFull, getSimulationById, updateSimulation, verifySimulationOwnership } from '@/lib/db/simulations'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
@@ -14,20 +15,15 @@ export async function GET(
     }
     const { simulationId } = await params
 
-    const simulation = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-      include: {
-        case: true,
-        debrief: true,
-      },
-    })
+    const simulation = await getSimulationByIdFull(simulationId)
 
     if (!simulation) {
       return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
     }
 
     // Users can only access their own simulations
-    if (simulation.userId !== user.id) {
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -57,48 +53,25 @@ export async function PUT(
     const body = await request.json()
 
     // Check ownership
-    const existing = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
-    }
-
-    if (existing.userId !== user.id) {
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const simulation = await prisma.simulation.update({
-      where: { id: simulationId },
-      data: body,
-      include: {
-        case: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    })
+    const simulation = await updateSimulation(simulationId, body)
 
     return NextResponse.json({ simulation })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    
-    // Handle P2025 (record not found) gracefully
-    if (error?.code === 'P2025') {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
-    
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating simulation:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 
@@ -116,47 +89,24 @@ export async function PATCH(
     const body = await request.json()
 
     // Check ownership
-    const existing = await prisma.simulation.findUnique({
-      where: { id: simulationId },
-    })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
-    }
-
-    if (existing.userId !== user.id) {
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const simulation = await prisma.simulation.update({
-      where: { id: simulationId },
-      data: body,
-      include: {
-        case: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    })
+    const simulation = await updateSimulation(simulationId, body)
 
     return NextResponse.json({ simulation })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
-    
-    // Handle P2025 (record not found) gracefully
-    if (error?.code === 'P2025') {
-      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
-    
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error updating simulation:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }

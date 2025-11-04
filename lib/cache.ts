@@ -1,10 +1,13 @@
-import { unstable_cache } from 'next/cache'
-
 /**
  * Caching utilities for Next.js Server Components
  * Uses Next.js unstable_cache for server-side caching
  * Can be extended with Redis in production if needed
+ * 
+ * Server-only: Cannot be used in client components
  */
+
+import { unstable_cache } from 'next/cache'
+import { withConnectionRetry } from './prisma/retry'
 
 interface CacheOptions {
   tags?: string[]
@@ -77,11 +80,13 @@ export const getCachedCurriculum = cache(
 export const getCachedCompetencies = cache(
   async () => {
     const { prisma } = await import('./prisma/server')
-    return prisma.competency.findMany({
-      orderBy: [
-        { level: 'asc' },
-        { displayOrder: 'asc' },
-      ],
+    return withConnectionRetry(async () => {
+      return prisma.competency.findMany({
+        orderBy: [
+          { level: 'asc' },
+          { displayOrder: 'asc' },
+        ],
+      })
     })
   },
   ['competencies', 'all'],
@@ -98,11 +103,13 @@ export function getCachedArticle(articleId: string) {
   return cache(
     async () => {
       const { prisma } = await import('./prisma/server')
-      return prisma.article.findUnique({
-        where: { id: articleId },
-        include: {
-          competency: true,
-        },
+      return withConnectionRetry(async () => {
+        return prisma.article.findUnique({
+          where: { id: articleId },
+          include: {
+            competency: true,
+          },
+        })
       })
     },
     ['article', articleId],
@@ -120,15 +127,17 @@ export function getCachedCase(caseId: string) {
   return cache(
     async () => {
       const { prisma } = await import('./prisma/server')
-      return prisma.case.findUnique({
-        where: { id: caseId },
-        include: {
-          competencies: {
-            include: {
-              competency: true,
+      return withConnectionRetry(async () => {
+        return prisma.case.findUnique({
+          where: { id: caseId },
+          include: {
+            competencies: {
+              include: {
+                competency: true,
+              },
             },
           },
-        },
+        })
       })
     },
     ['case', caseId],

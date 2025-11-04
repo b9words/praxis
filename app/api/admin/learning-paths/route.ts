@@ -1,9 +1,11 @@
-import { getCurrentUser } from '@/lib/auth/get-user'
 import { requireRole } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
 import { revalidateCache, CacheTags } from '@/lib/cache'
+import { listLearningPaths, createLearningPath } from '@/lib/db/learningPaths'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
+
+export const runtime = 'nodejs'
 
 /**
  * GET /api/admin/learning-paths
@@ -13,14 +15,7 @@ export async function GET(request: NextRequest) {
   try {
     await requireRole(['editor', 'admin'])
 
-    const paths = await prisma.learningPath.findMany({
-      include: {
-        items: {
-          orderBy: { order: 'asc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    })
+    const paths = await listLearningPaths()
 
     return NextResponse.json({
       paths: paths.map(p => ({
@@ -47,7 +42,9 @@ export async function GET(request: NextRequest) {
     if (error.message === 'Unauthorized' || error.message === 'Forbidden') {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
-    
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     console.error('Error fetching learning paths:', error)
     Sentry.captureException(error)
     return NextResponse.json({ error: 'Failed to fetch learning paths' }, { status: 500 })
@@ -73,80 +70,55 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate slug from title
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .substring(0, 100)
-
-    // Check if slug already exists
-    const existing = await prisma.learningPath.findUnique({
-      where: { slug },
-    })
-
-    if (existing) {
-      return NextResponse.json(
-        { error: 'A learning path with this title already exists' },
-        { status: 400 }
-      )
-    }
-
-    // Create path with items
-    const path = await prisma.learningPath.create({
-      data: {
-        slug,
+    try {
+      const path = await createLearningPath({
         title,
         description: description || null,
         duration,
         status: status || 'draft',
-        items: {
-          create: items.map((item: any, index: number) => ({
-            order: index,
+        items: items || [],
+      })
+
+      // Invalidate cache
+      await revalidateCache(CacheTags.CURRICULUM)
+
+      return NextResponse.json({
+        path: {
+          id: path.id,
+          slug: path.slug,
+          title: path.title,
+          description: path.description,
+          duration: path.duration,
+          status: path.status,
+          createdAt: path.createdAt,
+          updatedAt: path.updatedAt,
+          items: path.items.map(item => ({
+            id: item.id,
+            order: item.order,
             type: item.type,
-            domain: item.domain || null,
-            module: item.module || null,
-            lesson: item.lesson || null,
-            caseId: item.caseId || null,
+            domain: item.domain,
+            module: item.module,
+            lesson: item.lesson,
+            caseId: item.caseId,
           })),
         },
-      },
-      include: {
-        items: {
-          orderBy: { order: 'asc' },
-        },
-      },
-    })
-
-    // Invalidate cache
-    await revalidateCache(CacheTags.CURRICULUM)
-
-    return NextResponse.json({
-      path: {
-        id: path.id,
-        slug: path.slug,
-        title: path.title,
-        description: path.description,
-        duration: path.duration,
-        status: path.status,
-        createdAt: path.createdAt,
-        updatedAt: path.updatedAt,
-        items: path.items.map(item => ({
-          id: item.id,
-          order: item.order,
-          type: item.type,
-          domain: item.domain,
-          module: item.module,
-          lesson: item.lesson,
-          caseId: item.caseId,
-        })),
-      },
-    }, { status: 201 })
+      }, { status: 201 })
+    } catch (error: any) {
+      if (error.message?.includes('already exists')) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: 400 }
+        )
+      }
+      throw error
+    }
   } catch (error: any) {
     if (error.message === 'Unauthorized' || error.message === 'Forbidden') {
       return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
-    
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     console.error('Error creating learning path:', error)
     Sentry.captureException(error)
     return NextResponse.json({ error: 'Failed to create learning path' }, { status: 500 })

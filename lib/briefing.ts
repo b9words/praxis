@@ -1,6 +1,5 @@
-import { prisma } from './prisma/server'
+import { createClient } from '@supabase/supabase-js'
 import { cache, CacheTags } from './cache'
-import { isMissingTable } from './api/route-helpers'
 
 export interface CurrentBriefing {
   domainId: string
@@ -12,44 +11,47 @@ export interface CurrentBriefing {
 /**
  * Get the current week's briefing schedule
  * Returns the most recent schedule entry where weekOf <= today
+ * Uses Supabase directly to avoid Prisma dependency in edge runtime
  * Cached for 5 minutes
  */
 export async function getCurrentBriefing(): Promise<CurrentBriefing | null> {
   const getCachedBriefing = cache(
     async () => {
       try {
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false,
+            },
+          }
+        )
+
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
-        const row = await prisma.briefingSchedule.findFirst({
-          where: {
-            weekOf: {
-              lte: today,
-            },
-          },
-          orderBy: {
-            weekOf: 'desc',
-          },
-        })
+        const { data, error } = await supabase
+          .from('briefing_schedule')
+          .select('domain_id, module_id, case_id, week_of')
+          .lte('week_of', today.toISOString())
+          .order('week_of', { ascending: false })
+          .limit(1)
+          .maybeSingle()
 
-        if (!row) {
+        if (error || !data) {
           return null
         }
 
         return {
-          domainId: row.domainId,
-          moduleId: row.moduleId,
-          caseId: row.caseId,
-          weekOf: row.weekOf.toISOString().slice(0, 10),
+          domainId: data.domain_id,
+          moduleId: data.module_id,
+          caseId: data.case_id,
+          weekOf: new Date(data.week_of).toISOString().slice(0, 10),
         }
       } catch (error: any) {
-        // Handle missing table gracefully (P2021) - expected if migrations haven't run
-        if (isMissingTable(error)) {
-          // Silently return null if table doesn't exist
-          return null
-        }
-        
-        // Log other errors in development
+        // Log errors in development
         if (process.env.NODE_ENV === 'development') {
           console.error('Error fetching briefing schedule:', error)
         }

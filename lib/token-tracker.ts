@@ -1,5 +1,5 @@
 import { OPENAI_TOKEN_LIMITS } from './content-generator'
-import { prisma } from './prisma/server'
+import { fetchJson } from './api'
 
 export interface TokenUsage {
   id?: string
@@ -23,14 +23,9 @@ export interface DailyUsageSummary {
 export class TokenTracker {
   async trackUsage(usage: Omit<TokenUsage, 'id' | 'created_at'>): Promise<void> {
     try {
-      await prisma.tokenUsage.create({
-        data: {
-          date: new Date(usage.date),
-          model: usage.model,
-          promptTokens: usage.prompt_tokens,
-          completionTokens: usage.completion_tokens,
-          totalTokens: usage.total_tokens,
-        },
+      await fetchJson('/api/tokens/track', {
+        method: 'POST',
+        body: JSON.stringify(usage),
       })
     } catch (error) {
       console.error('Failed to track token usage:', error)
@@ -39,63 +34,12 @@ export class TokenTracker {
 
   async getDailyUsage(date: string, model?: string): Promise<DailyUsageSummary[]> {
     try {
-      const dateObj = new Date(date)
-
-      const where: any = {
-        date: dateObj,
-      }
-
+      const params = new URLSearchParams({ date })
       if (model) {
-        where.model = model
+        params.append('model', model)
       }
-
-      const usageRecords = await prisma.tokenUsage.findMany({
-        where,
-        select: {
-          model: true,
-          promptTokens: true,
-          completionTokens: true,
-          totalTokens: true,
-        },
-      })
-
-      // Group by model and sum tokens
-      const modelUsage = usageRecords.reduce(
-        (acc, usage) => {
-          if (!acc[usage.model]) {
-            acc[usage.model] = {
-              total_tokens: 0,
-              prompt_tokens: 0,
-              completion_tokens: 0,
-            }
-          }
-          acc[usage.model].total_tokens += usage.totalTokens
-          acc[usage.model].prompt_tokens += usage.promptTokens
-          acc[usage.model].completion_tokens += usage.completionTokens
-          return acc
-        },
-        {} as Record<
-          string,
-          { total_tokens: number; prompt_tokens: number; completion_tokens: number }
-        >
-      )
-
-      // Convert to summary format
-      return Object.entries(modelUsage).map(([modelName, usage]) => {
-        const limit =
-          OPENAI_TOKEN_LIMITS[modelName as keyof typeof OPENAI_TOKEN_LIMITS] || 0
-        const remaining = Math.max(0, limit - usage.total_tokens)
-        const percentage_used = limit > 0 ? (usage.total_tokens / limit) * 100 : 0
-
-        return {
-          date,
-          model: modelName,
-          total_tokens: usage.total_tokens,
-          limit,
-          remaining,
-          percentage_used,
-        }
-      })
+      const data = await fetchJson<DailyUsageSummary[]>(`/api/tokens/usage?${params.toString()}`)
+      return data || []
     } catch (error) {
       console.error('Failed to get daily usage:', error)
       return []

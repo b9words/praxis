@@ -29,6 +29,37 @@ const challengeLayoutMap = {
   STRATEGIC_OPTIONS_TRIAGE: StrategicOptionsLayout,
 }
 
+/**
+ * Resolve challenge type to layout enum using taxonomy map if needed
+ */
+function resolveChallengeType(
+  challengeType: string,
+  challengeTypeMap?: Record<string, string>
+): keyof typeof challengeLayoutMap | null {
+  // First try direct match
+  if (challengeType in challengeLayoutMap) {
+    return challengeType as keyof typeof challengeLayoutMap
+  }
+
+  // Try using challenge type map if available
+  if (challengeTypeMap && challengeType in challengeTypeMap) {
+    const mapped = challengeTypeMap[challengeType]
+    if (mapped in challengeLayoutMap) {
+      return mapped as keyof typeof challengeLayoutMap
+    }
+  }
+
+  // Try case-insensitive match
+  const upper = challengeType.toUpperCase()
+  for (const key in challengeLayoutMap) {
+    if (key.toUpperCase() === upper) {
+      return key as keyof typeof challengeLayoutMap
+    }
+  }
+
+  return null
+}
+
 interface CaseStudyPlayerProps {
   className?: string
   simulationId?: string | null
@@ -50,6 +81,17 @@ export default function CaseStudyPlayer({ className = '', simulationId = null }:
   } = useCaseStudyStore()
 
   const [isInitialized, setIsInitialized] = useState(false)
+  const [challengeTypeMap, setChallengeTypeMap] = useState<Record<string, string> | undefined>(undefined)
+
+  // Load challenge type map on mount
+  useEffect(() => {
+    fetch('/api/case-taxonomy')
+      .then(res => res.json())
+      .then(data => setChallengeTypeMap(data.challengeTypeMap))
+      .catch(() => {
+        // Silently fail - will use direct matching only
+      })
+  }, [])
 
   // Auto-save simulation state to database
   useSimulationPersistence(simulationId)
@@ -147,20 +189,37 @@ export default function CaseStudyPlayer({ className = '', simulationId = null }:
   }
 
   // Get the appropriate layout component
-  const LayoutComponent = challengeLayoutMap[currentStage.challengeType as keyof typeof challengeLayoutMap] ||
-    challengeLayoutMap[currentStage.challengeLayout as keyof typeof challengeLayoutMap]
+  const resolvedType = resolveChallengeType(
+    currentStage.challengeType || currentStage.challengeLayout || '',
+    challengeTypeMap
+  )
+  const LayoutComponent = resolvedType ? challengeLayoutMap[resolvedType] : null
 
+  // Fallback to WrittenAnalysisLayout for unknown types (most flexible)
   if (!LayoutComponent) {
+    console.warn(
+      `Unknown challenge type: "${currentStage.challengeType || currentStage.challengeLayout}". Using fallback layout.`
+    )
+    // Use WrittenAnalysisLayout as fallback - it can handle most content types
     return (
-      <div className={`flex items-center justify-center min-h-[400px] ${className}`}>
-        <Card className="max-w-md border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="text-red-900">Unknown Challenge Type</CardTitle>
-            <CardDescription className="text-red-700">
-              Challenge type "{currentStage.challengeType}" is not supported.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+      <div className={className}>
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            <strong>Note:</strong> Challenge type "{currentStage.challengeType || currentStage.challengeLayout}" is not mapped. 
+            Using default layout.
+          </p>
+        </div>
+        <WrittenAnalysisLayout
+          stage={currentStage}
+          caseStudyData={caseStudyData}
+          stageState={stageStates[currentStage.stageId]}
+          onUpdate={(updates) => {
+            // Update stage state
+            const currentState = stageStates[currentStage.stageId] || { status: 'in_progress', data: {} }
+            // Merge updates
+            Object.assign(currentState.data || {}, updates)
+          }}
+        />
       </div>
     )
   }

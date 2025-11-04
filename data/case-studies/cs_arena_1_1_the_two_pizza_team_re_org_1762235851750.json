@@ -1,0 +1,176 @@
+{
+  "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762235851750",
+  "version": "1.0",
+  "title": "The ConnectSphere Re-Org: A 'Two-Pizza Team' Transformation",
+  "description": "ConnectSphere, a high-growth B2B SaaS company, is a victim of its own success. The once-agile culture is now buried under a complex matrix, slowing innovation to a crawl while a nimble competitor gains ground. As the new Chief Product Officer, you must design and execute a radical 'two-pizza team' re-org to reclaim the company's competitive edge.",
+  "competencies": [
+    "Organizational Design",
+    "Stakeholder Management",
+    "Change Communication",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_cs_1_org_chart",
+      "fileName": "org_chart_current.csv",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "EmployeeID,Name,Title,Department,Sub-Department,ManagerID,HireDate\n[Placeholder for CSV data showing a complex, multi-layered matrix structure]"
+      }
+    },
+    {
+      "fileId": "file_cs_1_sentiment",
+      "fileName": "employee_sentiment_q3.csv",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "SurveyID,Department,Tenure_Years,Score_PaceOfWork,Score_Bureaucracy,Score_Collaboration,Qualitative_Comment\n[Placeholder for CSV data showing high pride but low scores for bureaucracy and impact]"
+      }
+    },
+    {
+      "fileId": "file_cs_1_kpi",
+      "fileName": "kpi_dashboard.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Quarter,R&D_Spend_USD,Revenue_USD,Feature_Release_Count,P1_Bugs_Reported,Competitor_QuickSync_Feature_Count\n[Placeholder for CSV data showing R&D spend increasing while feature releases decline]"
+      }
+    },
+    {
+      "fileId": "file_cs_1_memos",
+      "fileName": "memos.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "### Memo 1: From CEO to You\n**Subject: My Full Support**\n\nWelcome aboard! We are all thrilled to have you lead this critical charge. You have my full mandate to do what's necessary to get our product engine firing on all cylinders again. The board was asking about the QuickSync threat again in our last meeting. They need to see a turnaround in velocity, and soon.\n\n### Memo 2: Email from Maria Flores (VP Eng) to her team (sent last week)\n**Subject: Upholding our Engineering Standards**\n\nTeam, I want to take a moment to recognize the incredible work you all do to maintain the stability and quality of our platform. Our robust processes and Centers of Excellence are what allow us to serve our enterprise customers reliably. Let's continue to uphold these high standards.\n[End of Memos]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_momentum",
+      "title": "Stage 1 (Days 1-30): The First Move",
+      "description": "You're 30 days in. You've analyzed the data and spoken to key leaders. The pressure from the CEO to 'show a plan' is immense. You need to make a decisive first move to build momentum and signal your intent, forming the first part of your 100-day plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "As the first section of your 100-day plan, outline your initial strategic move. Justify your choice by explaining how it builds momentum, manages stakeholder expectations (particularly the CEO, CFO, and VP of Engineering), and sets the stage for the larger structural change. Which of the following approaches will you take?",
+        "context": "Your analysis of the case files reveals a deep frustration with bureaucracy (Employee Survey) but also a strong institutional defense of the current system's stability (Maria's Memo). The KPI data confirms the innovation crisis, and the CEO's memo underscores the urgency.",
+        "options": [
+          {
+            "id": "opt_1a",
+            "title": "Announce a Pilot Program",
+            "description": "Select one product line to be a 'pathfinder' for the new model. This is a lower-risk, data-driven approach, but it's slower and risks creating a 'haves and have-nots' culture."
+          },
+          {
+            "id": "opt_1b",
+            "title": "Hold a Re-Org 'Offsite'",
+            "description": "Bring all 50+ VPs and Directors together for a 2-day workshop to co-design the new structure. This aims to build buy-in but is slow and may result in a watered-down compromise."
+          },
+          {
+            "id": "opt_1c",
+            "title": "Present a High-Level Vision",
+            "description": "Go to the CEO and Board with a bold, top-down declaration of the new operating model, timeline, and principles. This shows decisive leadership but risks alienating key stakeholders like Maria who feel excluded."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_blueprint",
+      "title": "Stage 2 (Days 30-60): The Structural Blueprint",
+      "description": "Your initial move has been made. Now you must finalize the core architecture of the new organization. This decision will define the trade-offs between speed, quality, and efficiency for years to come.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "For the second section of your 100-day plan, define the structural model for your 'two-pizza teams.' Create a high-level conceptual org chart or diagram. Defend your choice, specifically addressing how you will balance the competing demands of Ben (VP Product) for speed and Maria (VP Eng) for technical stability and quality. How does your model mitigate the risks of its chosen approach?",
+        "context": "Maria Flores, your VP of Engineering, is advocating for maintaining strong central teams to prevent architectural fragmentation. Conversely, Ben Carter, your VP of Product, is pushing for total decentralization to maximize speed and accountability.",
+        "options": [
+          {
+            "id": "opt_2a",
+            "title": "The 'Pure Autonomy' Model",
+            "description": "Teams are fully cross-functional (PM, Eng, QA, Design, Ops) and own a vertical slice of the product P&L. This optimizes for speed but risks technical debt and fragmentation."
+          },
+          {
+            "id": "opt_2b",
+            "title": "The 'Platform & Missions' Hybrid Model",
+            "description": "Create autonomous 'Mission Teams' for features, but they rely on centralized 'Platform Teams' for core services (infrastructure, data, security). This balances speed and stability but risks creating new bottlenecks at the platform level."
+          },
+          {
+            "id": "opt_2c",
+            "title": "The 'Guild' Model",
+            "description": "Re-organize into autonomous teams, but maintain strong functional 'Guilds' (e.g., Front-End Guild) led by senior technical leaders to enforce standards. This optimizes for quality and consistency but risks a return to the matrix in disguise."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_rollout",
+      "title": "Stage 3 (Days 60-100): The Communication & Rollout",
+      "description": "The new org structure is finalized on paper. Now comes the most dangerous phase: implementation. A single misstep in communication could create fear, uncertainty, and resistance, dooming the entire effort before it begins.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Finalize your 100-day plan by detailing your communication and rollout strategy. Who will you tell, what will you say, and in what sequence? Your plan should explicitly address how to manage the anxiety of the 900 people in your organization and secure the buy-in of middle management.",
+        "context": "The employee sentiment data shows a workforce proud of the company but wary of bureaucracy. Any communication plan must inspire them with a vision of a better way to work, not just present a new, confusing org chart. Your choice will determine whether the change feels like it's being 'done to them' or 'done with them.'",
+        "options": [
+          {
+            "id": "opt_3a",
+            "title": "The 'Big Bang' Town Hall",
+            "description": "Announce the new structure, team assignments, and leadership changes to all 900 people in a single, company-wide meeting. This is transparent and fast, but carries a high risk of panic and message overload."
+          },
+          {
+            "id": "opt_3b",
+            "title": "The 'Cascading Waterfall'",
+            "description": "Brief your direct reports, who then brief their teams in structured sessions over a 48-hour period using a pre-approved script and FAQ. This is controlled and allows for small-group Q&A, but risks message distortion."
+          },
+          {
+            "id": "opt_3c",
+            "title": "The 'Phased & Voluntary' Rollout",
+            "description": "Formally launch the new structure in one division first. Open applications for managers and engineers in other divisions to join new teams as they are formed over the next 6 months. This is empathetic but is also slow and creates prolonged uncertainty."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the quality and feasibility of the proposed organizational structure, including its alignment with strategic goals and its handling of inherent trade-offs.",
+        "scoringGuide": {
+          "1": "Proposes a simplistic structure that ignores the company's scale or fails to address the core tension between autonomy and stability.",
+          "3": "Selects a reasonable model but does not fully articulate how it mitigates risks or addresses stakeholder concerns. The plan is theoretically sound but lacks practical detail.",
+          "5": "Designs a nuanced structure that fits the company's context, clearly articulates trade-offs (e.g., accepting some redundancy for speed), and includes specific mechanisms for cross-team coordination."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the ability to anticipate, understand, and manage the motivations and concerns of key stakeholders throughout the change process.",
+        "scoringGuide": {
+          "1": "Ignores the legitimate concerns of key stakeholders like the CFO (cost) and VP of Eng (stability), attempting to ram through a plan without buy-in.",
+          "3": "Acknowledges stakeholder concerns but offers generic reassurances rather than concrete solutions integrated into the plan.",
+          "5": "Proactively anticipates stakeholder objections and incorporates specific elements into the plan designed to mitigate their concerns and give them a role in the new world (e.g., a pilot for the CFO, a Technical Council for the VP of Eng)."
+        }
+      },
+      {
+        "competencyName": "Change Communication",
+        "description": "Measures the effectiveness of the communication strategy in building trust, creating clarity, and inspiring action during a period of significant uncertainty.",
+        "scoringGuide": {
+          "1": "Chooses a communication strategy that is tone-deaf, creates an information vacuum, or fails to provide a compelling 'why' behind the change.",
+          "3": "Develops a logical communication plan but it lacks empathy and fails to tailor the message to different audiences, leading to potential confusion.",
+          "5": "Develops a multi-channel communication plan that is clear, empathetic, and tailored to different audiences. It explains the 'why,' the 'what,' and the 'what's in it for me' for employees at all levels."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Evaluates the ability to connect internal organizational changes to external market realities and competitive threats.",
+        "scoringGuide": {
+          "1": "Frames the re-org as a purely internal process improvement, failing to connect the plan to the competitive threat from QuickSync.",
+          "3": "Mentions the competitive threat as a justification but does not consistently link specific design choices back to the goal of increasing market-facing velocity.",
+          "5": "Consistently and explicitly links organizational design choices directly to the strategic imperative of beating the competition. The re-org is framed as a competitive weapon, not just an HR exercise."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

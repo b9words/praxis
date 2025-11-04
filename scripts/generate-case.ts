@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 /**
- * Generate case studies - supports two modes:
+ * Generate case studies - supports multiple modes:
  * 
  * 1. Curriculum-based generation (original):
  *   tsx scripts/generate-case.ts
@@ -10,6 +10,12 @@
  * 
  * 2. Manifest-based generation (Phase 1 - new "Cyborg" workflow):
  *   tsx scripts/generate-case.ts --topic "Disney's 2017 Streaming Pivot" --case-id cs_disney_streaming_pivot
+ * 
+ * 3. Blueprint-based generation (new - see generate-case-from-blueprint.ts):
+ *   tsx scripts/generate-case-from-blueprint.ts --arena ARENA_1 --competency "Organizational Design" --blueprint-id two_pizza_reorg
+ *   
+ * Note: For blueprint-driven generation using the Crucible Framework, use generate-case-from-blueprint.ts instead.
+ * This script (generate-case.ts) uses the legacy curriculum-based approach.
  */
 
 import fs from 'fs'

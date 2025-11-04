@@ -133,11 +133,6 @@ class PostHogAnalyticsService implements AnalyticsService {
             capture_performance: false,
             // Session recording enabled with masking for balanced privacy approach
             disable_session_recording: false,
-            // Enhanced session recording privacy settings
-            session_recording: {
-              maskAllText: true,
-              maskAllInputs: true,
-            },
             loaded: (ph) => {
               if (process.env.NODE_ENV === 'development') {
                 ph.debug()

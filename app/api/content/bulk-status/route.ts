@@ -1,7 +1,9 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { requireRole } from '@/lib/auth/authorize'
-import { prisma } from '@/lib/prisma/server'
+import { bulkUpdateArticleStatuses } from '@/lib/db/articles'
+import { bulkUpdateCaseStatuses } from '@/lib/db/cases'
 import { logAdminAction } from '@/lib/admin/audit-log'
+import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
@@ -55,15 +57,7 @@ export async function POST(request: NextRequest) {
         : ids
 
       try {
-        const result = await prisma.article.updateMany({
-          where: {
-            id: { in: articleIds },
-          },
-          data: {
-            status,
-            updatedBy: user.id,
-          },
-        })
+        const result = await bulkUpdateArticleStatuses(articleIds, status, user.id)
         updatedArticles = result.count
 
         // Log audit actions
@@ -98,15 +92,7 @@ export async function POST(request: NextRequest) {
         : ids
 
       try {
-        const result = await prisma.case.updateMany({
-          where: {
-            id: { in: caseIds },
-          },
-          data: {
-            status,
-            updatedBy: user.id,
-          },
-        })
+        const result = await bulkUpdateCaseStatuses(caseIds, status, user.id)
         updatedCases = result.count
 
         // Log audit actions
@@ -143,12 +129,13 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error: any) {
+    if (error instanceof AppError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
     const { normalizeError } = await import('@/lib/api/route-helpers')
-    const { getPrismaErrorStatusCode } = await import('@/lib/prisma-error-handler')
     const normalized = normalizeError(error)
-    const statusCode = getPrismaErrorStatusCode(error)
     console.error('Error in bulk status update:', error)
-    return NextResponse.json({ error: normalized }, { status: statusCode })
+    return NextResponse.json({ error: normalized }, { status: 500 })
   }
 }
 

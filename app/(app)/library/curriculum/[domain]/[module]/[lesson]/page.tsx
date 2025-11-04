@@ -9,8 +9,9 @@ import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { loadLessonByPath } from '@/lib/content-loader'
 import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById, getCurriculumStats } from '@/lib/curriculum-data'
-import { prisma } from '@/lib/prisma/server'
-import { Prisma } from '@prisma/client'
+import { findArticleByStoragePath } from '@/lib/db/articles'
+import { getCasesWithPrerequisites } from '@/lib/db/cases'
+import { getLessonProgress } from '@/lib/db/progress'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { ChevronLeft, ChevronRight, Clock, Target, Info } from 'lucide-react'
@@ -160,55 +161,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
   // Cache article lookup (1 hour revalidate)
   const getCachedArticle = cache(
     async () => {
-      let articleFromDb = null
       try {
-        // First try with enum value (if enum exists in DB)
-        articleFromDb = await prisma.article.findFirst({
-          where: {
-            status: 'published',
-            storagePath: {
-              contains: `${domainId}/${moduleId}/${lessonId}.md`,
-            },
-          },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            storagePath: true,
-            metadata: true,
-            status: true,
-          },
-        })
+        return await findArticleByStoragePath(`${domainId}/${moduleId}/${lessonId}.md`)
       } catch (error: any) {
-        // If enum doesn't exist in DB, try querying without status filter
-        if (error?.code === 'P2034' || error?.message?.includes('ContentStatus') || error?.message?.includes('42704')) {
-          // Import error suppression helper
-          const { logErrorOnce } = await import('@/lib/prisma-enum-fallback')
-          logErrorOnce('ContentStatus enum not found, using fallback', error, 'warn')
-          try {
-            articleFromDb = await prisma.article.findFirst({
-              where: {
-                storagePath: {
-                  contains: `${domainId}/${moduleId}/${lessonId}.md`,
-                },
-              },
-              select: {
-                id: true,
-                title: true,
-                description: true,
-                storagePath: true,
-                metadata: true,
-                status: true,
-              },
-            })
-          } catch (fallbackError) {
-            console.error('Error fetching article from database:', fallbackError)
-          }
-        } else {
-          console.error('Error fetching article from database:', error)
-        }
+        // On error, continue without DB article
+        console.error('Error fetching article from database:', error)
+        return null
       }
-      return articleFromDb
     },
     ['lesson', 'article', domainId, moduleId, lessonId],
     {
@@ -326,25 +285,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const getCachedCasesWithPrerequisites = cache(
     async () => {
       try {
-        const casesWithPrerequisites = await prisma.case.findMany({
-          where: {
-            prerequisites: {
-              not: Prisma.JsonNull,
-            },
-          },
-          include: {
-            competencies: {
-              include: {
-                competency: {
-                  select: {
-                    name: true,
-                  },
-                },
-              },
-            },
-          },
-        })
-        return casesWithPrerequisites
+        return await getCasesWithPrerequisites()
       } catch (error) {
         console.error('Error checking case prerequisites:', error)
         return []
@@ -364,45 +305,36 @@ export default async function LessonPage({ params }: LessonPageProps) {
     const getCachedProgress = getCachedUserData(
       user.id,
       async () => {
-        const progress = await prisma.userLessonProgress.findUnique({
-          where: {
-            userId_domainId_moduleId_lessonId: {
-              userId: user.id,
-              domainId,
-              moduleId,
-              lessonId,
-            },
-          },
-        })
-        
-        if (progress) {
-          // Extract reflections from lastReadPosition
-          const lastReadPos = progress.lastReadPosition as Record<string, any>
-          let reflections: Record<string, string> = {}
-          if (lastReadPos?.reflections && typeof lastReadPos.reflections === 'object') {
-            reflections = lastReadPos.reflections
-          }
-
-          return {
-            progress: {
-              id: progress.id,
-              user_id: progress.userId,
-              domain_id: progress.domainId,
-              module_id: progress.moduleId,
-              lesson_id: progress.lessonId,
-              status: progress.status,
-              progress_percentage: progress.progressPercentage,
-              time_spent_seconds: progress.timeSpentSeconds,
-              last_read_position: progress.lastReadPosition as Record<string, any>,
-              completed_at: progress.completedAt?.toISOString() || null,
-              bookmarked: progress.bookmarked,
-              created_at: progress.createdAt.toISOString(),
-              updated_at: progress.updatedAt.toISOString(),
-            },
-            reflections,
-          }
+        const progressData = await getLessonProgress(user.id, domainId, moduleId, lessonId)
+        if (!progressData) {
+          return { progress: null, reflections: {} }
         }
-        return { progress: null, reflections: {} }
+        
+        // Extract reflections from lastReadPosition
+        const lastReadPos = progressData.last_read_position as Record<string, any>
+        let reflections: Record<string, string> = {}
+        if (lastReadPos?.reflections && typeof lastReadPos.reflections === 'object') {
+          reflections = lastReadPos.reflections
+        }
+
+        return {
+          progress: {
+            id: progressData.id,
+            user_id: progressData.user_id,
+            domain_id: progressData.domain_id,
+            module_id: progressData.module_id,
+            lesson_id: progressData.lesson_id,
+            status: progressData.status,
+            progress_percentage: progressData.progress_percentage,
+            time_spent_seconds: progressData.time_spent_seconds,
+            last_read_position: progressData.last_read_position,
+            completed_at: progressData.completed_at,
+            bookmarked: progressData.bookmarked,
+            created_at: progressData.created_at,
+            updated_at: progressData.updated_at,
+          },
+          reflections,
+        }
       },
       ['lesson', 'progress', domainId, moduleId, lessonId],
       {
