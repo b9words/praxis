@@ -1,6 +1,6 @@
 import SimulationWorkspace from '@/components/simulation/SimulationWorkspace'
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { getCaseByIdWithCompetencies } from '@/lib/db/cases'
+import { getCaseByIdWithCompetencies, listCaseFiles } from '@/lib/db/cases'
 import { getSimulationByUserAndCase, createSimulation } from '@/lib/db/simulations'
 import { getLessonProgressList } from '@/lib/db/progress'
 import { checkSubscription } from '@/lib/auth/require-subscription'
@@ -22,9 +22,12 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
 
   // Fetch case details
   const caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
-  if (!caseItem || caseItem.status !== 'published') {
+  if (!caseItem || !caseItem.published) {
     notFound()
   }
+
+  // Fetch case files (which contain the actual dataset data)
+  const caseFiles = await listCaseFiles(caseItem.id).catch(() => [])
 
   // Check prerequisites
   let prerequisites: Array<{ domain: string; module: string; lesson: string; title?: string }> = []
@@ -58,13 +61,14 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
   }
 
   // Check for existing simulation or create new one
-  let simulation = await getSimulationByUserAndCase(user.id, caseId).catch(() => null)
+  // Use caseItem.id (UUID) instead of caseId from URL (slug)
+  let simulation = await getSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
 
   if (!simulation) {
     try {
       simulation = await createSimulation({
         userId: user.id,
-        caseId: caseId,
+        caseId: caseItem.id, // Use UUID from database, not slug from URL
         status: 'in_progress',
         userInputs: {},
       })
@@ -153,7 +157,10 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
   // Enabled when: user is logged-in non-subscriber AND case is current weekly case
   const { isActive } = await checkSubscription()
   const briefing = await getCurrentBriefing()
-  const softPaywallEnabled = !isActive && briefing?.caseId === caseId
+  // Compare using metadata.caseId (slug) for briefing match
+  const caseMetadata = caseItem.metadata as any
+  const caseIdFromMetadata = caseMetadata?.caseId || caseItem.id
+  const softPaywallEnabled = !isActive && briefing?.caseId === caseIdFromMetadata
 
   return (
     <div className="h-[calc(100vh-8rem)]">
@@ -161,6 +168,7 @@ export default async function SimulationWorkspacePage({ params }: { params: Prom
         caseItem={{
           ...caseItem,
           recommendedLessons,
+          files: caseFiles,
         }}
         simulation={simulation}
         userId={user.id}

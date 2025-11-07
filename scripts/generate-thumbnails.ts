@@ -64,7 +64,7 @@ async function main() {
     const { data: articles, error: articlesError } = await supabase
       .from('articles')
       .select('id, title')
-      .eq('status', 'published')
+      .eq('published', true)
       .limit(2)
       .order('created_at', { ascending: true })
 
@@ -82,7 +82,7 @@ async function main() {
     const { data: cases, error: casesError } = await supabase
       .from('cases')
       .select('id, title')
-      .eq('status', 'published')
+      .eq('published', true)
       .limit(1)
       .order('created_at', { ascending: true })
 

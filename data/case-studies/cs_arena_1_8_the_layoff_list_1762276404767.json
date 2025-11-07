@@ -1,0 +1,182 @@
+{
+  "caseId": "cs_arena_1_8_the_layoff_list_1762276404767",
+  "version": "1.0",
+  "title": "The Layoff List",
+  "description": "As VP of Product at Innovatech Solutions, you face a market downturn and a board mandate to cut 15% of your division's headcount. This is a financially-driven layoff, not a performance cull. You must decide who to let go, balancing the need to protect the future of the company with the stability of its current revenue engine.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Strategic Thinking",
+    "Decision Making Under Pressure",
+    "Stakeholder Management"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_roster_01",
+      "fileName": "employee_roster.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "EmployeeID,Name,RoleTitle,Team,Manager,Tenure,AnnualSalary,LatestPerfScore,Skills\nIS001,Rajesh Singh,Principal Engineer,Legacy,David Chen,12,220000,4,\"COBOL,DB2,Mainframe,Architecture\"\nIS002,Lena Petrova,Lead AI Architect,Odyssey,You,4,250000,5,\"Python,TensorFlow,LLM,Strategic Vision\"\n..."
+      }
+    },
+    {
+      "fileId": "cf_ceo_memo_01",
+      "fileName": "ceo_strategy_memo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# Innovatech's Dual Mandate\n\nTo the Board:\n\nOur strategy for the next 24 months is clear: we must navigate the current market headwinds while securing our future. This requires a dual mandate:\n\n1.  **Maximize Free Cash Flow:** Our Legacy Platform is our cash cow. We must protect this revenue stream to fund operations and extend our runway.\n2.  **Secure the Future:** The Odyssey Project is our path to long-term relevance. We must ensure it launches on schedule and meets its ambitious goals.\n\nThese priorities are not in conflict; they are symbiotic. The Legacy Platform funds Odyssey's development. Odyssey ensures Innovatech exists in five years. All leadership decisions must serve both mandates."
+      }
+    },
+    {
+      "fileId": "cf_cfo_mandate_01",
+      "fileName": "cfo_rif_mandate.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# ACTION REQUIRED: Q4 Headcount Reduction\n\nTo: Divisional VPs\nFrom: Anya Sharma, CFO\n\nPer the board's directive, we are implementing a company-wide Reduction in Force (RIF) to reduce operating expenses.\n\nYour division's current annual salary budget is **$18.5M**.\nYour post-RIF salary target is **$15.7M**.\n\nA reduction of **15 employees (15% of your 100-person division)** is the approved mechanism to achieve this target. Your final, unchangeable list is due EOD in one week. There are no exceptions."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_principles",
+      "title": "Stage 1: Define Your Principles",
+      "description": "Before looking at a single name, you must establish the guiding principle for this reduction. This framework will be the foundation for every painful choice you make and the core of your justification to the CEO. Choose your philosophy.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Which core principle will guide your layoff decisions?",
+        "context": "You have been given a clear mandate: cut 15 people from your 100-person division. The case files outline the company's dual mandate of protecting current revenue (Legacy Platform) while investing in the future (Odyssey Project). Your first move is to define your high-level strategy.",
+        "options": [
+          {
+            "id": "opt_1_strategy",
+            "title": "Strategy-First",
+            "description": "Protect roles most critical to the 'Odyssey Project' at all costs. Make deeper cuts to the 'Legacy Platform' and shared services, accepting the risk of short-term revenue disruption to secure the long-term future."
+          },
+          {
+            "id": "opt_1_cost",
+            "title": "Cost-First",
+            "description": "Prioritize maximizing immediate financial savings. Target the 15 most expensive employees, regardless of their role or project, to send the strongest signal of fiscal discipline to the board and CFO."
+          },
+          {
+            "id": "opt_1_performance",
+            "title": "Performance-First",
+            "description": "Target the 15 employees with the lowest recent performance scores. This is the most 'objective' method, but may result in losing key skills or institutional knowledge from solid B-players in critical roles."
+          },
+          {
+            "id": "opt_1_stability",
+            "title": "Stability-First",
+            "description": "Protect the 'Legacy Platform' team above all else. Make cuts primarily from the 'Odyssey Project' and shared services, arguing that sacrificing the present revenue engine for an unproven future bet is too risky."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_stakeholders",
+      "title": "Stage 2: Navigate the Stakeholder Gauntlet",
+      "description": "You've shared your guiding principle with your key stakeholders. As expected, their reactions are strong and conflicting. Review their feedback and decide how it will influence your approach. Your ability to hold the line or strategically adjust will be critical.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "After receiving pushback from your CFO, Legacy Engineering Director, and Lead AI Architect, how will you proceed?",
+        "context": "Your inbox is now filled with passionate, contradictory emails. Anya (CFO) is pushing for deeper cost cuts. David (Legacy Eng) warns of imminent system failures if you touch his team. Lena (Odyssey AI) claims any cut to her team will kill the company's future. The pressure is immense.",
+        "options": [
+          {
+            "id": "opt_2_hold",
+            "title": "Hold Firm on Principle",
+            "description": "Acknowledge their concerns but maintain your original strategy. You made a decision based on the available data and believe it's the best path forward, despite the political cost."
+          },
+          {
+            "id": "opt_2_pivot_cfo",
+            "title": "Pivot Towards Financial Prudence",
+            "description": "The CFO's pressure is significant. Adjust your list to cut more higher-salaried employees, even if it means sacrificing more experienced talent than you originally planned."
+          },
+          {
+            "id": "opt_2_pivot_legacy",
+            "title": "Pivot Towards Legacy Stability",
+            "description": "David's warnings are credible. Revise your list to spare more of the tenured Legacy Platform engineers, forcing you to find the necessary cuts within the innovative but unproven Odyssey team."
+          },
+          {
+            "id": "opt_2_pivot_odyssey",
+            "title": "Pivot Towards Future Innovation",
+            "description": "Lena's argument is compelling. Double down on protecting the Odyssey project, creating a 'ring-fence' around her team and forcing all 15 cuts to come from the Legacy and Shared Services groups."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_final_list",
+      "title": "Stage 3: Finalize the List",
+      "description": "The time for debate is over. You must now finalize the list of 15 names. This is the point of no return. Your selections will directly impact the company's ability to execute on its dual mandate and will change the lives of 15 people.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Based on your refined principles, which composition of cuts best balances the company's conflicting needs?",
+        "context": "You have the full employee roster in front of you. You must select a final 'package' of 15 employees. Each option represents a different strategic trade-off, balancing skill preservation, cost savings, and operational risk.",
+        "options": [
+          {
+            "id": "opt_3_list_surgical",
+            "title": "The Surgical Cut",
+            "description": "Finalize a list that precisely balances cuts across teams (e.g., 3 from Odyssey, 9 from Legacy, 3 from Shared). This spreads the pain but may not be strategically optimal, protecting neither team completely."
+          },
+          {
+            "id": "opt_3_list_future_bet",
+            "title": "The 'Bet the Future' Cut",
+            "description": "Finalize a list that heavily shields the Odyssey team (e.g., only 1 junior cut) while making deep, painful cuts to the Legacy platform team, accepting a high risk of near-term revenue disruption."
+          },
+          {
+            "id": "opt_3_list_cash_cow",
+            "title": "The 'Protect the Cash Cow' Cut",
+            "description": "Finalize a list that heavily shields the Legacy team (e.g., only 2 non-critical cuts) while sacrificing several key roles on the Odyssey project, delaying its timeline to guarantee short-term stability."
+          },
+          {
+            "id": "opt_3_list_financial_focus",
+            "title": "The 'Fiscal Hawk' Cut",
+            "description": "Finalize a list based almost entirely on salary. This list removes the most expensive employees from every team, severely impacting senior leadership and institutional knowledge across the entire division."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "Ability to assess talent holistically, moving beyond simple performance scores to evaluate an employee's total contribution, critical skills, and future potential in a strategic context.",
+        "scoringGuide": {
+          "1": "Relies on a single metric like performance score or salary to make decisions. Fails to differentiate between a high performer in a non-critical role and an average performer in a mission-critical one.",
+          "3": "Considers multiple factors but struggles to resolve conflicts between them. The final list shows some strategic thought but includes some questionable cuts that create obvious operational risks.",
+          "5": "Demonstrates a sophisticated understanding of the talent portfolio. The final choices and justification show a clear, defensible logic that connects individual roles to the company's strategic imperatives, even when it means letting go of good people."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Ability to connect the immediate task (layoffs) to the long-term strategic goals of the company, even when those goals are in conflict (e.g., short-term stability vs. long-term innovation).",
+        "scoringGuide": {
+          "1": "Focuses solely on the immediate task of cutting 15 heads without considering the second-order effects on either the Legacy or Odyssey projects. The decision feels random or reactive.",
+          "3": "Acknowledges the strategic tension but applies a simplistic solution, such as splitting cuts evenly. Fails to make a decisive choice about which strategic risk is more acceptable to the business.",
+          "5": "Explicitly articulates a point of view on how to manage the 'dual mandate' tension. The final list and justification memo demonstrate a clear, forward-looking principle that prioritizes one strategic path while providing a plan to mitigate the risks of the other."
+        }
+      },
+      {
+        "competencyName": "Decision Making Under Pressure",
+        "description": "Ability to make and defend difficult, values-based decisions with incomplete information and significant human impact, while managing ambiguity and conflicting stakeholder inputs.",
+        "scoringGuide": {
+          "1": "Waffles significantly between stages, changing strategy based on the most recent stakeholder pressure. The final justification is weak, apologetic, or blames others.",
+          "3": "Makes a decision but struggles to defend it coherently. The justification memo is clear on the 'what' but not the 'why', and may not fully address the risks created by the decision.",
+          "5": "Establishes a clear set of principles early on and makes decisions consistent with that framework. The final justification is decisive, empathetic, and takes full ownership of the difficult trade-offs made, presenting a confident plan to manage the consequences."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Ability to absorb conflicting stakeholder demands, understand their underlying motivations, and make a decision that serves the whole business, not just the loudest voice.",
+        "scoringGuide": {
+          "1": "Completely capitulates to one stakeholder's demands (e.g., the CFO or one of the directors) at the expense of the overall business strategy.",
+          "3": "Attempts to appease all stakeholders by splitting the difference, resulting in a watered-down, strategically incoherent final decision that satisfies no one.",
+          "5": "Listens to and acknowledges the validity of all stakeholder concerns, but ultimately makes an independent decision based on a clear-eyed assessment of the business's best interests. The justification memo anticipates and addresses stakeholder objections proactively."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

@@ -1,4 +1,4 @@
-import { cache, CacheTags } from '@/lib/cache'
+import { cache, CacheTags, revalidateCache } from '@/lib/cache'
 import { listCases, createCase } from '@/lib/db/cases'
 import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
@@ -82,6 +82,11 @@ export async function POST(request: NextRequest) {
       createdBy: user.id,
       updatedBy: user.id,
     })
+
+    // Revalidate caches
+    await revalidateCache(CacheTags.CASES)
+    await revalidateCache('admin')
+    await revalidateCache('content')
 
     return NextResponse.json({ case: caseItem }, { status: 201 })
   } catch (error: any) {

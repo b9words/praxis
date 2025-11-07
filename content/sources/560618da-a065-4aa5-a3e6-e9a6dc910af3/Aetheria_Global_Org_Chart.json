@@ -1,0 +1,155 @@
+{
+  "title": "Aetheria Global - Corporate Organizational Structure",
+  "summary": "Aetheria Global operates under a geographically-decentralized model, with strong regional leadership responsible for P&L. The executive team, led by CEO Isabella Rossi, sets global strategy, but regional VPs, particularly in Sales, are empowered with significant operational autonomy to meet aggressive growth targets. This structure prioritizes market responsiveness and rapid expansion, with key functions like Finance and Legal providing centralized oversight and governance from the corporate headquarters.",
+  "organization": [
+    {
+      "name": "Isabella Rossi",
+      "title": "Chief Executive Officer",
+      "department": "Executive",
+      "role": "Sets overall corporate strategy and vision. Accountable to the Board of Directors for company performance.",
+      "reportsTo": null,
+      "children": [
+        {
+          "name": "David Chen",
+          "title": "Chief Financial Officer",
+          "department": "Finance",
+          "role": "Oversees all financial operations, including accounting, treasury, and internal audit. Manages investor relations and corporate risk.",
+          "reportsTo": "Isabella Rossi",
+          "children": [
+            {
+              "name": "Emily Carter",
+              "title": "VP, Finance",
+              "department": "Finance",
+              "role": "Manages day-to-day financial planning and analysis (FP&A) and reporting.",
+              "reportsTo": "David Chen",
+              "children": []
+            },
+            {
+              "name": "Ben Carter",
+              "title": "Director, Internal Audit",
+              "department": "Finance",
+              "role": "Leads independent assessments of internal controls, risk management, and governance processes.",
+              "reportsTo": "David Chen",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Liam O'Connell",
+          "title": "Chief Revenue Officer",
+          "department": "Sales",
+          "role": "Responsible for all revenue-generating activities globally, including sales strategy and execution.",
+          "reportsTo": "Isabella Rossi",
+          "children": [
+            {
+              "name": "Maria Garcia",
+              "title": "VP, Sales (Americas)",
+              "department": "Sales",
+              "role": "Leads sales teams and strategy for the North and South American markets.",
+              "reportsTo": "Liam O'Connell",
+              "children": []
+            },
+            {
+              "name": "Marcus Thorne",
+              "title": "VP, Sales (Europe)",
+              "department": "Sales",
+              "role": "Leads all sales activities and contract negotiations across the European region.",
+              "reportsTo": "Liam O'Connell",
+              "children": [
+                {
+                    "name": "Javier Torres",
+                    "title": "Director, Sales (Southern Europe)",
+                    "department": "Sales",
+                    "role": "Manages sales teams in Italy, Spain, and Portugal.",
+                    "reportsTo": "Marcus Thorne",
+                    "children": [
+                        {
+                            "name": "Luca Moretti",
+                            "title": "Senior Account Executive",
+                            "department": "Sales",
+                            "role": "Top-performing salesperson focused on large government contracts in Italy.",
+                            "reportsTo": "Javier Torres",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Fiona Campbell",
+                    "title": "Director, Sales (UK & Ireland)",
+                    "department": "Sales",
+                    "role": "Manages sales for the UK and Irish markets.",
+                    "reportsTo": "Marcus Thorne",
+                    "children": []
+                },
+                {
+                    "name": "Sophie Dubois",
+                    "title": "Manager, Sales Operations (Europe)",
+                    "department": "Sales",
+                    "role": "Manages sales process, CRM, and expense report validation for the European team.",
+                    "reportsTo": "Marcus Thorne",
+                    "children": []
+                }
+              ]
+            },
+            {
+                "name": "Wei Zhang",
+                "title": "VP, Sales (APAC)",
+                "department": "Sales",
+                "role": "Leads sales teams and strategy for the Asia-Pacific markets.",
+                "reportsTo": "Liam O'Connell",
+                "children": []
+            }
+          ]
+        },
+        {
+          "name": "Priya Sharma",
+          "title": "General Counsel & Corp Sec",
+          "department": "Legal",
+          "role": "Oversees all legal matters, corporate governance, and compliance. Acts as Secretary to the Board.",
+          "reportsTo": "Isabella Rossi",
+          "children": []
+        },
+        {
+          "name": "Sarah Jenkins",
+          "title": "Chief Operating Officer",
+          "department": "Operations",
+          "role": "Manages global operations, supply chain, and customer service delivery.",
+          "reportsTo": "Isabella Rossi",
+          "children": [
+            {
+                "name": "Omar Hassan",
+                "title": "Director, Global Logistics",
+                "department": "Operations",
+                "role": "Manages the international supply chain and distribution network.",
+                "reportsTo": "Sarah Jenkins",
+                "children": []
+            }
+          ]
+        },
+        {
+          "name": "Kenji Tanaka",
+          "title": "Chief Technology Officer",
+          "department": "Engineering",
+          "role": "Leads product development, research, and technology infrastructure.",
+          "reportsTo": "Isabella Rossi",
+          "children": [
+            {
+                "name": "Anya Petrova",
+                "title": "VP, Product Management",
+                "department": "Engineering",
+                "role": "Defines the product roadmap and feature priorities.",
+                "reportsTo": "Kenji Tanaka",
+                "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "keyTakeaways": [
+    "The European Sales division, led by Marcus Thorne, operates with significant autonomy, reporting directly to the CRO, Liam O'Connell, rather than through a central European managing director.",
+    "A potential for conflict exists between the aggressive, revenue-focused Sales organization and the risk-averse Finance & Internal Audit functions, which report up a separate line to the CFO, David Chen.",
+    "Critical gatekeeping roles, such as the Manager of Sales Operations (Sophie Dubois), who validates expenses, report directly to the head of the region they are supposed to be monitoring, creating a potential conflict of interest.",
+    "The reporting structure is heavily siloed by function at the C-level, which can impede cross-functional communication and create blind spots regarding regional activities that have both sales and financial implications."
+  ]
+}

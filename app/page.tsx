@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ChannelIOSupport from '@/components/ui/ChannelIOSupport'
 import Footer from '@/components/layout/Footer'
+import PublicHeader from '@/components/layout/PublicHeader'
 
 export const metadata: Metadata = {
   title: 'Execemy - The Proving Ground for Business Leaders',
@@ -63,41 +64,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation Header */}
-      <nav className="border-b border-neutral-200 bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-12">
-              <Link href="/" className="text-lg font-semibold text-neutral-900 tracking-tight relative">
-                Execemy
-                <div className="absolute -bottom-1 left-0 w-full h-[0.5px] bg-neutral-900"></div>
-              </Link>
-              <div className="hidden md:flex gap-8">
-                <Link href="#method" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                  Method
-                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
-                </Link>
-                <Link href="#curriculum" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                  Curriculum
-                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
-                </Link>
-                <Link href="/pricing" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                  Pricing
-                  <span className="absolute -bottom-1 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
-                </Link>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
-                <Link href="/login">Authenticate</Link>
-              </Button>
-              <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
-                <Link href="/signup">Request Access</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section className="border-b border-neutral-200 relative">

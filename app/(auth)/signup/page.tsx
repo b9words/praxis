@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { trackEvents } from '@/lib/analytics'
-import { sendWelcomeEmail } from '@/lib/email'
+// Welcome email is now handled by automated email system - no import needed
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -66,13 +66,8 @@ export default function SignupPage() {
         setEmailSent(true)
         setLoading(false)
       } else {
-        if (process.env.NODE_ENV === 'production') {
-          try {
-            await sendWelcomeEmail(email, fullName || username)
-          } catch (emailError) {
-            console.error('Failed to send welcome email:', emailError)
-          }
-        }
+        // Welcome email is now handled by automated email system via webhook
+        // No need to send here - it will be triggered by the database webhook to /api/webhooks/db-trigger
 
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {

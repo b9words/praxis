@@ -94,9 +94,32 @@ class TestFixCycle {
       console.log('📊 Resetting database...')
       await execAsync('npm run db:reset')
       
-      // Seed test data
-      console.log('🌱 Seeding test data...')
-      await execAsync('npm run db:seed:test')
+      // Seed test data programmatically
+      console.log('🌱 Seeding test data programmatically...')
+      const { createOrGetTestUser } = await import('../tests/helpers/supabase-admin')
+      const { seedTestUserData } = await import('../tests/helpers/seed')
+      const { prisma } = await import('../lib/prisma/server')
+      
+      const userId = await createOrGetTestUser('e2e.user@execemy.test', 'Test1234!', 'e2e_user')
+      
+      // Ensure residency exists
+      let residency = await prisma.userResidency.findUnique({
+        where: { userId },
+      })
+      
+      if (!residency) {
+        await prisma.userResidency.create({
+          data: {
+            userId,
+            currentResidency: 1,
+          },
+        })
+      }
+      
+      // Seed comprehensive data
+      await seedTestUserData(userId, 'e2e.user@execemy.test')
+      
+      await prisma.$disconnect()
       
       console.log('✅ Test environment ready')
     } catch (error) {

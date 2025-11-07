@@ -1,5 +1,6 @@
 import { bulkCreateArticles } from '@/lib/db/articles'
 import { AppError } from '@/lib/db/utils'
+import { revalidateCache, CacheTags } from '@/lib/cache'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -25,6 +26,11 @@ export async function POST(request: NextRequest) {
     }
 
     const created = await bulkCreateArticles(articles, user.id)
+
+    // Revalidate caches
+    await revalidateCache(CacheTags.ARTICLES)
+    await revalidateCache('admin')
+    await revalidateCache('content')
 
     return NextResponse.json({ success: true, count: created.count }, { status: 201 })
   } catch (error: any) {

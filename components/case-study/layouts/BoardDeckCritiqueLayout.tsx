@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import SlidesRenderer from '@/components/admin/renderers/SlidesRenderer'
 import { useCaseFile } from '@/hooks/useCaseFile'
 import { ChallengeBlock } from '@/lib/case-study-store'
 import { AlertCircle, FileText, MessageSquare } from 'lucide-react'
@@ -104,9 +105,7 @@ export default function BoardDeckCritiqueLayout({ challengeData }: BoardDeckCrit
                 <p className="text-xs text-red-700">{documentData.error}</p>
               </div>
             ) : documentData.fileType === 'PRESENTATION_DECK' && documentData.content ? (
-              <div className="prose prose-neutral max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: documentData.content }} />
-              </div>
+              <SlidesRenderer content={documentData.content} />
             ) : (
               <div className="text-neutral-600 p-4 bg-neutral-50 rounded-lg">
                 <p>Document preview not available. Please refer to the document details provided in the case materials.</p>

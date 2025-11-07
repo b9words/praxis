@@ -35,6 +35,16 @@ export async function POST(request: NextRequest) {
         where: { userId: user.id },
       })
 
+      // Delete article progress
+      await prisma.userArticleProgress.deleteMany({
+        where: { userId: user.id },
+      })
+
+      // Delete domain completions
+      await prisma.domainCompletion.deleteMany({
+        where: { userId: user.id },
+      })
+
       // Delete user residency if it exists
       try {
         await prisma.userResidency.delete({
@@ -46,7 +56,41 @@ export async function POST(request: NextRequest) {
         // Ignore if table doesn't exist
       }
 
+      // Delete notifications
+      await prisma.notification.deleteMany({
+        where: { userId: user.id },
+      }).catch(() => {
+        // Ignore if table doesn't exist
+      })
+
+      // Delete subscriptions
+      await prisma.subscription.deleteMany({
+        where: { userId: user.id },
+      }).catch(() => {
+        // Ignore if table doesn't exist
+      })
+
+      // Delete audit logs
+      await prisma.auditLog.deleteMany({
+        where: { userId: user.id },
+      }).catch(() => {
+        // Ignore if table doesn't exist
+      })
+
+      // Delete reports created by user (if table exists)
+      try {
+        await prisma.$executeRaw`
+          DELETE FROM public.reports WHERE created_by = ${user.id}::uuid
+        `.catch(() => {
+          // Ignore if table doesn't exist
+        })
+      } catch (error) {
+        // Ignore if table doesn't exist
+      }
+
       // Delete profile (should cascade or handle other relations)
+      // Note: We've already manually deleted all user-related data above
+      // This ensures we don't rely on database-level cascade deletes
       await prisma.profile.delete({
         where: { id: user.id },
       }).catch((error) => {

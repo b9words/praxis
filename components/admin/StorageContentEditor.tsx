@@ -22,9 +22,10 @@ import { toast } from 'sonner'
 interface StorageContentEditorProps {
   contentType: 'article' | 'case'
   storagePath: string // e.g., "articles/year1/financial-acumen/lesson1.md"
+  onClose?: () => void // Optional callback for modal close
 }
 
-export default function StorageContentEditor({ contentType, storagePath }: StorageContentEditorProps) {
+export default function StorageContentEditor({ contentType, storagePath, onClose }: StorageContentEditorProps) {
   const router = useRouter()
   const supabase = createClient()
   const queryClient = useQueryClient()
@@ -95,7 +96,12 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
       queryClient.invalidateQueries({ queryKey: queryKeys.storage.byPath(storagePath) })
       queryClient.invalidateQueries({ queryKey: [contentType === 'article' ? 'articles' : 'cases', 'metadata', storagePath] })
       queryClient.invalidateQueries({ queryKey: contentType === 'article' ? queryKeys.articles.all() : ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-content'] }) // Also invalidate admin content queries
       toast.success('Content saved successfully')
+      // Close modal if onClose callback provided
+      if (onClose) {
+        setTimeout(() => onClose(), 500)
+      }
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save content')
@@ -123,8 +129,10 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
           title="Failed to load content"
           message="Unable to load the file content. Please try again."
           error={storageError}
-          onRetry={() => window.location.reload()}
-          showBackToDashboard={true}
+          onRetry={() => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.storage.byPath(storagePath) })
+          }}
+          showBackToDashboard={false}
         />
       </div>
     )
@@ -134,42 +142,48 @@ export default function StorageContentEditor({ contentType, storagePath }: Stora
   const icon = isMarkdown ? <FileText className="h-5 w-5" /> : <FileCode className="h-5 w-5" />
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-50 rounded-lg">
-            {icon}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Edit {contentType === 'article' ? 'Article' : 'Case'}
-            </h1>
-            <p className="text-sm text-gray-600 font-mono">{storagePath}</p>
+    <div className="space-y-4">
+      {/* Header - Compact for modal */}
+      {!onClose && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-50 rounded-lg">
+              {icon}
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Edit {contentType === 'article' ? 'Article' : 'Case'}
+              </h1>
+              <p className="text-sm text-gray-600 font-mono">{storagePath}</p>
+            </div>
           </div>
         </div>
-        
-        <div className="flex gap-2">
+      )}
+      
+      {/* Action buttons - always visible */}
+      <div className="flex gap-2 justify-end pb-2 border-b">
+        {onClose && (
           <Button
             variant="outline"
-            onClick={() => router.back()}
+            onClick={onClose}
+            disabled={saving}
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={saving || !content}>
-            {saving ? (
-              <>
-                <Upload className="h-4 w-4 mr-2 animate-pulse" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save to Storage
-              </>
-            )}
-          </Button>
-        </div>
+        )}
+        <Button onClick={handleSave} disabled={saving || !content}>
+          {saving ? (
+            <>
+              <Upload className="h-4 w-4 mr-2 animate-pulse" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save to Storage
+            </>
+          )}
+        </Button>
       </div>
 
       {/* Metadata Card */}

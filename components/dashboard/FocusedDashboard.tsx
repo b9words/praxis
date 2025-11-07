@@ -7,6 +7,7 @@ import ResidencyProgress from '@/components/dashboard/ResidencyProgress'
 import ContentShelf from '@/components/dashboard/shelves/ContentShelf'
 import SmartRecommendation from '@/components/dashboard/SmartRecommendation'
 import ExecemyRadarChart from '@/components/profile/ExecemyRadarChart'
+import LearningStreak from '@/components/dashboard/LearningStreak'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -27,6 +28,7 @@ interface FocusedDashboardProps {
     totalSimulations: number
   } | null
   currentStreak: number
+  longestStreak: number
   recentActivities: any[]
   aggregateScores?: Record<string, number> | null
   jumpBackInItems: Array<{ type: 'lesson' | 'simulation'; id: string; title: string; url: string; progress?: number }>
@@ -68,6 +70,7 @@ export default function FocusedDashboard({
   recommendation,
   residencyData,
   currentStreak,
+  longestStreak,
   recentActivities,
   aggregateScores,
   jumpBackInItems,
@@ -127,6 +130,25 @@ export default function FocusedDashboard({
         )}
       </div>
 
+      {/* Learning Streak Card - Prominent Placement */}
+      {currentStreak > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <LearningStreak currentStreak={currentStreak} longestStreak={longestStreak} />
+          </div>
+          <div className="lg:col-span-2">
+            {/* Your Next Optimal Move */}
+            <ContentShelf
+              title="Your Next Optimal Move"
+              subtitle="Personalized recommendation based on your learning journey"
+              emptyMessage="Complete your first lesson or simulation to get personalized recommendations"
+            >
+              <SmartRecommendation recommendation={recommendation} aggregateScores={aggregateScores} />
+            </ContentShelf>
+          </div>
+        </div>
+      )}
+
       {/* Learning Phase Indicator */}
       <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
         <CardContent className="p-6">
@@ -184,14 +206,16 @@ export default function FocusedDashboard({
         </CardContent>
       </Card>
 
-      {/* Your Next Optimal Move - Smart Recommendation */}
-      <ContentShelf
-        title="Your Next Optimal Move"
-        subtitle="Personalized recommendation based on your learning journey"
-        emptyMessage="Complete your first lesson or simulation to get personalized recommendations"
-      >
-        <SmartRecommendation recommendation={recommendation} aggregateScores={aggregateScores} />
-      </ContentShelf>
+      {/* Your Next Optimal Move - Smart Recommendation - Only show if no streak card above */}
+      {currentStreak === 0 && (
+        <ContentShelf
+          title="Your Next Optimal Move"
+          subtitle="Personalized recommendation based on your learning journey"
+          emptyMessage="Complete your first lesson or simulation to get personalized recommendations"
+        >
+          <SmartRecommendation recommendation={recommendation} aggregateScores={aggregateScores} />
+        </ContentShelf>
+      )}
 
       {/* Jump Back In */}
       <ContentShelf

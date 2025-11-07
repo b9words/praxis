@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { fetchJson } from '@/lib/api'
 import { queryKeys } from '@/lib/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check, CheckCircle } from 'lucide-react'
+import { Check, CheckCircle, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -38,7 +38,13 @@ export default function MarkCompleteButton({
     onSuccess: (_, variables) => {
       setIsCompleted(variables.completed)
       queryClient.invalidateQueries({ queryKey: queryKeys.progress.articles() })
-      toast.success(variables.completed ? 'Article marked complete' : 'Progress reset')
+      if (variables.completed) {
+        toast.success('Article marked complete', {
+          icon: <CheckCircle2 className="h-4 w-4" />,
+        })
+      } else {
+        toast.success('Progress reset')
+      }
       router.refresh()
     },
     onError: (error) => {

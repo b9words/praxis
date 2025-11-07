@@ -1,0 +1,157 @@
+{
+  "caseId": "cs_arena_1_14_the_cash_is_king_mandate_1762416123006",
+  "version": "1.0",
+  "title": "The \"Cash is King\" Mandate",
+  "description": "You are the new CEO of AetherFlow AI, a high-growth SaaS startup. Your Series C funding just collapsed due to a market downturn, leaving you with only six months of cash. You must pivot the company from a 'growth-at-all-costs' culture to one of immediate survival and cash preservation.",
+  "competencies": [
+    "Leading a Turnaround",
+    "Financial Acumen",
+    "Executive Communication",
+    "Strategic Prioritization"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_aether_fin_01",
+      "fileName": "AetherFlow_P&L_CashFlow_L12M.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aether_sales_02",
+      "fileName": "Sales_Pipeline_Deal_Structure.csv",
+      "fileType": "MARKET_DATASET",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aether_board_03",
+      "fileName": "Memo_from_Board_of_Directors.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aether_sales_vp_04",
+      "fileName": "Email_from_VP_Sales.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aether_org_05",
+      "fileName": "AetherFlow_Org_Chart.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aether_stakeholders_06",
+      "fileName": "Executive_Leadership_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_triage",
+      "title": "Stage 1: The Triage (Days 1-30)",
+      "description": "Your first move must be decisive to stop the bleeding. The board requires an immediate action plan to drastically reduce the burn rate. This decision will signal your leadership style to the entire company and set the tone for the turnaround.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Using the provided case files, draft a 1-page memo to the board outlining your immediate cost-cutting plan. You must specify the percentage of budget cuts per department and detail the rationale for any headcount reductions. Your primary goal is to extend the runway by at least 6 months with this action alone.",
+        "context": "Current situation: $12M in cash, burning $2M per month, leaving 6 months of runway. The culture is accustomed to high spending, especially in Sales & Marketing and R&D. Your CFO is advocating for deep, across-the-board cuts, while your VPs of Sales and Engineering are pushing to protect their teams.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_commercial_pivot",
+      "title": "Stage 2: The Commercial Pivot (Days 31-90)",
+      "description": "Cutting costs has bought you time, but the core business model is still unprofitable. To survive, you must shift the company's focus from booking long-term contracts (ARR) to generating immediate cash. This requires restructuring the sales team's incentives.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft a new Sales Compensation Plan overview (max 500 words). The plan must be designed to aggressively prioritize upfront cash collection over total contract value. Detail the new commission structure, any cash-based bonuses, and anticipate the primary objections from the VP of Sales, Sarah Jenkins.",
+        "context": "The Sales Pipeline analysis shows a healthy ARR pipeline, but the average deal has 'Net 60' payment terms and only 10% are paid annually upfront. The current sales compensation is 100% tied to booked ARR, creating no incentive for sales reps to negotiate better payment terms.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_supplier_squeeze",
+      "title": "Stage 3: The Supplier Squeeze (Days 60-90)",
+      "description": "In addition to cutting costs and accelerating cash in, you must also manage cash out. A significant portion of your burn is tied to vendor and supplier contracts with unfavorable payment terms negotiated during the 'growth' era.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a brief (300 words) internal directive to your CFO, Maria Flores, establishing the strategy for renegotiating supplier contracts. Identify the top 3 vendor categories to target based on the P&L statement and specify the new standard payment terms (e.g., Net 90, Net 120) you want to implement. Acknowledge the potential risks to key supplier relationships.",
+        "context": "Your P&L reveals major monthly expenses for cloud infrastructure, data providers, and marketing software. These contracts were signed with standard Net 30 terms. Your CFO is risk-averse and fears that aggressive renegotiation could cause critical vendors to suspend services.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_new_narrative",
+      "title": "Stage 4: The New Narrative (Day 100)",
+      "description": "The initial, painful changes have been implemented. The company is leaner, and the runway is extended, but morale is at an all-time low. The remaining employees are scared and uncertain. You must now stand before them, explain the new reality, and rally them for the hard road ahead.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the full script for a 5-minute speech to be delivered at the company-wide all-hands meeting. Your speech must achieve three objectives: 1) Acknowledge the pain of the recent changes with transparency. 2) Clearly articulate the new company strategy: 'Default Alive'. 3) Inspire the remaining team with a credible vision for the future they can fight for.",
+        "context": "After a 25% reduction in force and deep budget cuts, the office is quiet and tense. Rumors are flying. Your leadership team is looking to you to provide clarity, confidence, and a reason to stay. This speech will define your legacy as the turnaround CEO.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Leading a Turnaround",
+        "description": "Assesses the ability to make difficult, data-driven decisions under pressure with a clear focus on corporate survival and stabilization.",
+        "scoringGuide": {
+          "1": "Avoids decisive action, makes superficial cuts that don't solve the core cash problem, and caves to stakeholder pressure.",
+          "3": "Makes necessary cuts but struggles to balance short-term needs with long-term strategy, resulting in a viable but weakened company.",
+          "5": "Acts with speed and conviction, making strategic cuts that surgically address the burn while protecting core assets, and successfully pivots the company's operating model towards profitability."
+        }
+      },
+      {
+        "competencyName": "Financial Acumen",
+        "description": "Evaluates the ability to interpret financial statements and use them to drive operational decisions that directly impact cash flow.",
+        "scoringGuide": {
+          "1": "Misinterprets the P&L and cash flow, focusing on vanity metrics (e.g., ARR) instead of cash. Decisions do not materially extend the runway.",
+          "3": "Correctly identifies the main drivers of cash burn but is hesitant to make the aggressive changes to payment terms or sales comp needed to fully solve the problem.",
+          "5": "Deeply understands the levers of cash flow. Connects financial data directly to operational changes in costs, sales incentives, and supplier terms to maximize cash runway."
+        }
+      },
+      {
+        "competencyName": "Executive Communication",
+        "description": "Measures the skill of communicating difficult news with clarity, transparency, and empathy, while rallying a team during a crisis.",
+        "scoringGuide": {
+          "1": "Communication is unclear, evasive, or overly corporate, creating more fear and uncertainty. Fails to build buy-in for the new direction.",
+          "3": "Communicates changes clearly but fails to inspire confidence or connect with the team on an emotional level. The message is heard but not felt.",
+          "5": "Balances radical transparency about the situation with a credible and inspiring vision for the future. Memos are clear and decisive; speeches successfully rebuild morale and focus."
+        }
+      },
+      {
+        "competencyName": "Strategic Prioritization",
+        "description": "Assesses the ability to make difficult trade-offs between competing priorities (e.g., cost savings vs. revenue generation, short-term survival vs. long-term product vision).",
+        "scoringGuide": {
+          "1": "Makes cuts indiscriminately, crippling revenue-generating teams or future product viability in the name of saving cash.",
+          "3": "Prioritizes survival correctly but may cut too deep into one area, creating an imbalance that will need to be corrected later.",
+          "5": "Demonstrates a sophisticated understanding of trade-offs, protecting the most critical assets (e.g., top sales reps, core engineering talent) while ruthlessly cutting non-essential activities."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

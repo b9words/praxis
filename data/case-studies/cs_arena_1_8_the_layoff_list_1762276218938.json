@@ -1,0 +1,208 @@
+{
+  "caseId": "cs_arena_1_8_the_layoff_list_1762276218938",
+  "version": "1.0",
+  "title": "The Layoff List",
+  "description": "Aperture Analytics, a venture-backed SaaS company, is facing a market correction. The Board has mandated a 15% reduction-in-force to extend the company's financial runway. As the VP of Product, you must decide who from your 100-person division stays and who goes, balancing financial targets, future strategy, and team morale.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Strategic Acumen",
+    "Decision-Making Under Pressure",
+    "Quantitative Literacy"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_roster_001",
+      "fileName": "Employee Roster.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for 100-row CSV with columns: EmployeeID, Name, Role, Team, Tenure (Months), AnnualCompensation, LastPerformanceScore (1-5), Skills (Tags), CurrentProjectCode, ManagerNotes]"
+      }
+    },
+    {
+      "fileId": "file_strategy_memo_002",
+      "fileName": "Aperture 2.0 Strategic Plan.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for 1-page Markdown memo from the CEO detailing the strategic pivot towards AI-driven predictive insights and away from legacy SMB tools.]"
+      }
+    },
+    {
+      "fileId": "file_financials_003",
+      "fileName": "Divisional Financial Summary.md",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for Markdown table showing Total Headcount (100), Total Annual Salary Burden ($18,500,000), Mandated Headcount Reduction (15), and Target Annual Salary Savings (~$2,775,000).]"
+      }
+    },
+    {
+      "fileId": "file_stakeholder_emails_004",
+      "fileName": "Stakeholder Emails.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for Markdown file containing three emails from the CFO (Anya Sharma), VP of Engineering (Ben Carter), and VP of Sales (Maria Flores), each advocating for their departmental priorities.]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_framework",
+      "title": "Stage 1: Establish Your Framework",
+      "description": "Before looking at individual names, you must define the principles that will guide your decision-making. This framework will be the foundation for your justification to the CEO.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "The raw employee roster is in front of you. How will you primarily weigh your choices to create the initial shortlist?",
+        "context": "Your choice of framework will shape every subsequent decision. It determines which employees are immediately at risk and which are protected, and it signals your values as a leader.",
+        "options": [
+          {
+            "id": "opt_1_strategy",
+            "title": "Strategy-First Approach",
+            "description": "Start with the 'Aperture 2.0' plan and identify roles critical for the future. Employees on non-strategic projects will form the initial cut list, regardless of performance or tenure. This prioritizes the future over the present."
+          },
+          {
+            "id": "opt_2_performance",
+            "title": "Performance-First Approach",
+            "description": "Stack rank all employees by their last performance review score and cut from the bottom up. This is a purely meritocratic, though potentially short-sighted, approach."
+          },
+          {
+            "id": "opt_3_cost",
+            "title": "Cost-First Approach",
+            "description": "Stack rank by total compensation and cut from the top down to meet the financial target with the fewest people. This satisfies the CFO but risks gutting senior talent."
+          },
+          {
+            "id": "opt_4_lifo",
+            "title": "LIFO (Last-In, First-Out) Approach",
+            "description": "Cut the most recently hired employees. This is often perceived as 'fair' and is organizationally simple, but is strategically random and sacrifices your most recent talent investments."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_stakeholders",
+      "title": "Stage 2: Synthesize Conflicting Inputs",
+      "description": "You've received impassioned emails from the CFO, VP of Engineering, and VP of Sales. Their requests are valid but mutually exclusive. You must now decide how to integrate their feedback without compromising your core principles.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "How do you incorporate the conflicting feedback from your peers, Anya (CFO), Ben (Engineering), and Maria (Sales)?",
+        "context": "Your peers are powerful and their cooperation is critical for future success. Alienating them could have long-term consequences, but caving to their demands could undermine the strategic rationale for the RIF.",
+        "options": [
+          {
+            "id": "opt_1_stick_to_framework",
+            "title": "Hold Firm to Your Framework",
+            "description": "Acknowledge their input but explain that you must adhere strictly to your initial framework (from Stage 1) to ensure a fair and consistent process. You will not make exceptions for specific individuals."
+          },
+          {
+            "id": "opt_2_negotiate",
+            "title": "Negotiate Politically",
+            "description": "Meet with each stakeholder individually. Offer to save one of their 'must-keep' employees in exchange for their public support of your final list and their help managing another difficult cut."
+          },
+          {
+            "id": "opt_3_blend",
+            "title": "Create a Blended Scorecard",
+            "description": "Revise your initial framework. Create a 'blended' scorecard that assigns a specific weight to each stakeholder's concern (e.g., 50% Strategic Alignment, 20% Cost, 20% Technical Skill, 10% Current Revenue Impact) to create a new, data-driven stack rank."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_final_list",
+      "title": "Stage 3: Finalize The List",
+      "description": "It's time to make the final, painful decisions. You must now select the 15 employees for the RIF list. The choices you make here will determine the future capabilities and morale of your entire division.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Using your framework and stakeholder input, which guiding principle will you use to make the final trade-offs for your list of 15?",
+        "context": "You cannot save everyone. The last few choices are the hardest, often pitting two valuable, high-performing employees against each other. Your choice here reflects your ultimate priority.",
+        "options": [
+          {
+            "id": "opt_1_protect_future",
+            "title": "Protect the Future at All Costs",
+            "description": "Finalize the list by cutting anyone, regardless of performance or revenue impact, who is not mission-critical for the 'Aperture 2.0' strategy. This may mean sacrificing a stable, revenue-generating legacy product team."
+          },
+          {
+            "id": "opt_2_protect_present",
+            "title": "Protect Current Revenue Above All",
+            "description": "Finalize the list by protecting every employee tied to current, major revenue streams (like the legacy dashboard team). This protects short-term financials but may require cutting promising talent from the riskier 'Aperture 2.0' teams."
+          },
+          {
+            "id": "opt_3_protect_high_performers",
+            "title": "Protect Top Performers, Regardless of Role",
+            "description": "Finalize the list by ensuring your highest-rated performers are safe, even if their current role is not perfectly aligned with the future strategy. This is a bet on talent over specific skills, assuming great people can adapt."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_4_justify",
+      "title": "Stage 4: Justify Your Decision",
+      "description": "Your list of 15 is locked. Now you must write a memo to the CEO and CPO. This document will be your official record, articulating the rationale for your choices and demonstrating your leadership through a crisis.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "What will be the primary focus of your 300-word justification memo to the CEO?",
+        "context": "The memo must be more than a list of names. It needs to build confidence that you've made sound, strategic choices under immense pressure. The tone and focus you choose will define how your leadership perceives your handling of this crisis.",
+        "options": [
+          {
+            "id": "opt_1_memo_process",
+            "title": "Focus on a Rigorous, Defensible Process",
+            "description": "Emphasize the objective framework and data used, showcasing a fair and analytical process to minimize legal risk and perceptions of favoritism."
+          },
+          {
+            "id": "opt_2_memo_strategy",
+            "title": "Focus on Strategic Realignment",
+            "description": "Frame the RIF as a necessary and proactive step to align the team with the 'Aperture 2.0' strategy, showing your focus on the company's future success."
+          },
+          {
+            "id": "opt_3_memo_risk",
+            "title": "Focus on Acknowledged Risks and Mitigation",
+            "description": "Clearly state the rationale, but also proactively identify the operational risks created by the cuts (e.g., knowledge gaps, project delays) and your initial plan to mitigate them."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "Assesses the user's ability to evaluate talent holistically, moving beyond simplistic metrics to make sophisticated decisions that retain critical and high-potential employees.",
+        "scoringGuide": {
+          "1": "Makes cuts based on a single, simplistic heuristic (e.g., only lowest performers, only highest paid, only last hired).",
+          "3": "Creates a balanced list that considers performance, cost, and skills, but struggles to articulate the trade-offs clearly.",
+          "5": "Creates a sophisticated list that clearly protects critical and high-potential talent, even if it means cutting tenured or seemingly 'safe' employees."
+        }
+      },
+      {
+        "competencyName": "Strategic Acumen",
+        "description": "Measures the user's ability to align their personnel decisions with the company's long-term strategy, even when it conflicts with short-term pressures.",
+        "scoringGuide": {
+          "1": "The final team composition is misaligned with the 'Aperture 2.0' strategy memo (e.g., guts the AI Insights team).",
+          "3": "The final team can execute the new strategy but at a significant cost to the current business, or vice versa. The balance is off.",
+          "5": "The final team composition is optimally aligned with future strategic priorities, while consciously and explicitly managing the risks to the legacy business."
+        }
+      },
+      {
+        "competencyName": "Decision-Making Under Pressure",
+        "description": "Evaluates the user's ability to make and defend rational, clear-headed decisions in a high-stakes, emotionally charged environment with conflicting inputs.",
+        "scoringGuide": {
+          "1": "The justification memo is vague, defensive, or shows that the user was heavily swayed by a single stakeholder's input.",
+          "3": "The decision is logical, but the memo fails to address the inherent risks or the 'second-order effects' of the cuts (e.g., impact on morale, knowledge loss).",
+          "5": "The final memo is clear, concise, and defensible. It justifies the hard choices, acknowledges the risks, and demonstrates a rational synthesis of all inputs."
+        }
+      },
+      {
+        "competencyName": "Quantitative Literacy",
+        "description": "Assesses the user's ability to correctly interpret and apply financial data and personnel metrics to meet the concrete objectives of the mandate.",
+        "scoringGuide": {
+          "1": "Fails to meet the financial target or misunderstands the financial implications of their choices.",
+          "3": "Meets the basic financial and headcount targets.",
+          "5": "Meets all targets and uses financial data in the memo to strengthen the strategic argument for their choices."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

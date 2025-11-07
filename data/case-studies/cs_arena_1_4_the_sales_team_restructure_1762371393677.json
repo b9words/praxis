@@ -1,0 +1,194 @@
+{
+  "caseId": "cs_arena_1_4_the_sales_team_restructure_1762371393677",
+  "version": "1.0",
+  "title": "The Sales Team Restructure",
+  "description": "As the CEO of MomentumCloud, a high-growth B2B SaaS company, you must decide how to structure your sales team to capture the lucrative enterprise market. This decision pits a costly but potentially transformative specialization strategy against a more conservative, optimization-focused approach, with the company's future growth trajectory hanging in the balance.",
+  "competencies": [
+    "Organizational Design",
+    "Financial Acumen",
+    "Strategic Thinking",
+    "Stakeholder Management"
+  ],
+  "estimatedDuration": 90,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cf_budget_proposals_xlsx_01",
+      "fileName": "FY_Next_Budget_Proposals.xlsx",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Spreadsheet with two tabs: 'Specialization Model (Anya)' showing high upfront S&M cost, increased headcount, and high long-term LTV. 'Optimized Model (David)' shows modest S&M increase, flat headcount, and stable CAC payback.]"
+      }
+    },
+    {
+      "fileId": "cf_anya_memo_md_02",
+      "fileName": "Memo_Anya_Sharma_GoUpmarket.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Passionate, forward-looking memo from the VP of Sales arguing that specialization is the only path to market leadership and long-term growth.]"
+      }
+    },
+    {
+      "fileId": "cf_david_email_md_03",
+      "fileName": "Email_David_Chen_Fiscal_Concerns.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Data-driven, cautious email from the CFO highlighting the risks of increased burn rate, uncertain ROI, and potential disruption to the currently profitable sales engine.]"
+      }
+    },
+    {
+      "fileId": "cf_pilot_debrief_pdf_04",
+      "fileName": "Q3_Enterprise_Pilot_Debrief.pdf",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Report on two recent enterprise deals, detailing an extremely long sales cycle (270 days) and a massive time-sink for the AEs involved, which caused their SMB pipeline to suffer.]"
+      }
+    },
+    {
+      "fileId": "cf_saas_benchmark_json_05",
+      "fileName": "SaaS_GTM_Benchmark_Data.json",
+      "fileType": "MARKET_DATASET",
+      "source": {
+        "type": "STATIC",
+        "content": "[Dataset showing top-quartile enterprise SaaS companies use a specialized sales model (SDR/AE/CSM), but their S&M spend as a percentage of revenue is 40-50% higher than MomentumCloud's current spend.]"
+      }
+    },
+    {
+      "fileId": "cf_stakeholder_profiles_json_06",
+      "fileName": "Executive_Team_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": "[JSON file containing detailed personas for Anya Sharma (VP of Sales), David Chen (CFO), and Maria Flores (Top AE) as described in the blueprint.]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_analysis",
+      "title": "Stage 1: Initial Analysis & Hypothesis",
+      "description": "You've received the competing proposals from your VP of Sales and CFO. The data is conflicting, and the stakes are high. Your first move will set the tone for this entire decision-making process.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "You have reviewed the two competing budget proposals and the supporting memos. Before meeting with your executive team, what is your most critical next step to validate assumptions and frame this decision?",
+        "context": "The board requires a preliminary direction within 30 days. Anya (VP Sales) is pushing for immediate action to avoid falling behind competitors, while David (CFO) is urging a 'wait-and-see' approach to gather more data on the profitability of the existing model.",
+        "options": [
+          {
+            "id": "opt_1a_risk_analysis",
+            "title": "Request a detailed risk analysis from the CFO.",
+            "description": "Ask David to model the financial impact of a slower-than-expected ramp for the specialized team, focusing on cash burn and runway implications."
+          },
+          {
+            "id": "opt_1b_implementation_plan",
+            "title": "Request a 90-day implementation plan from the VP of Sales.",
+            "description": "Ask Anya to detail the hiring profiles, onboarding milestones, and lead-indicator KPIs for the proposed specialized team to assess operational readiness."
+          },
+          {
+            "id": "opt_1c_competitor_research",
+            "title": "Engage a consultant for a rapid competitor analysis.",
+            "description": "Commission a third-party report on the GTM structures of three specific competitors who have successfully moved upmarket in the last 24 months."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_strategic_allocation",
+      "title": "Stage 2: The Pilot Program",
+      "description": "Further analysis reveals a discretionary growth fund of $750k that can be allocated for the next two quarters. This is not enough to fund a full restructure, but it is enough to run a meaningful experiment. Your choice will signal your strategic direction.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "How will you allocate the $750k discretionary fund to test your hypothesis and gather the data needed for a final, company-wide decision?",
+        "context": "This allocation is a clear signal to the team and the board about your priorities. Anya argues a pilot is the only way to get real data. David cautions that any pilot will divert focus from the core SMB business. The top AEs are anxious about how this will impact their roles and compensation.",
+        "options": [
+          {
+            "id": "opt_2a_specialization_pilot",
+            "title": "Fund a 'Specialization Pod' Pilot.",
+            "description": "Allocate the full $750k to hire and support a dedicated 'pod' of 1 SDR, 2 Enterprise AEs, and 1 CSM to test the new model on a specific industry vertical for six months."
+          },
+          {
+            "id": "opt_2b_elite_ae_team",
+            "title": "Fund a 'Full-Stack Enterprise' Team.",
+            "description": "Use the $750k to hire 3 senior 'full-stack' AEs with proven enterprise experience to hunt large deals within the current sales structure, supported by an extra marketing budget."
+          },
+          {
+            "id": "opt_2c_enablement_investment",
+            "title": "Invest in 'Upmarket Enablement' for the existing team.",
+            "description": "Allocate the $750k to advanced enterprise sales training, better sales engineering support, and enhanced marketing collateral to help the current full-stack team hunt bigger deals more effectively."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_final_recommendation",
+      "title": "Stage 3: The Board Recommendation",
+      "description": "The pilot phase is complete, and the budget deadline is here. You must now make a definitive recommendation to the board for the next fiscal year's sales organization structure.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "The board meeting is next week. Based on all the data and the results of your pilot, what is your final recommendation for the go-forward sales structure?",
+        "context": "This decision will be the single largest line item in the new budget. It will define the company's growth strategy for the next 18-24 months and have a significant impact on company culture and short-term profitability.",
+        "options": [
+          {
+            "id": "opt_3a_full_specialization",
+            "title": "Recommend Full Specialization.",
+            "description": "Commit to Anya's plan. Restructure the entire sales organization into specialized SDR, AE, and CSM roles, accepting the high upfront cost and cultural disruption for the prize of long-term enterprise dominance."
+          },
+          {
+            "id": "opt_3b_hybrid_model",
+            "title": "Recommend a Hybrid Model.",
+            "description": "Formally create two teams: maintain the existing full-stack team for the profitable SMB segment and create a dedicated, specialized 'Enterprise Hunter' team to focus exclusively on deals over $100k ACV."
+          },
+          {
+            "id": "opt_3c_optimized_current_model",
+            "title": "Recommend Optimizing the Current Model.",
+            "description": "Commit to David's plan. Keep the full-stack structure but continue to invest heavily in enablement and hire only experienced enterprise reps, focusing on profitable growth and efficiency over a high-risk, high-cost transformation."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the ability to align organizational structure with company strategy, considering trade-offs between specialization, efficiency, culture, and market demands.",
+        "scoringGuide": {
+          "1": "Chooses a structure based on a single factor (e.g., lowest cost or highest ambition) without linking it to the company's strategic stage. Fails to consider implementation risks or cultural impact.",
+          "3": "Selects a reasonable structure but provides a weak rationale that overlooks key risks, such as team morale or the financial burden of the transition.",
+          "5": "Articulates a clear thesis for why the chosen structure (or pilot) aligns strategy, market opportunity, and financial reality. Acknowledges the human/cultural challenges and proposes mitigation steps."
+        }
+      },
+      {
+        "competencyName": "Financial Acumen",
+        "description": "Assesses the ability to use financial data and unit economics (LTV, CAC, burn rate) to justify a strategic investment and understand its impact on the company's financial health.",
+        "scoringGuide": {
+          "1": "Makes decisions based on top-line revenue projections or simple cost-cutting. Ignores or misinterprets key unit economic metrics from the provided models.",
+          "3": "Correctly identifies relevant financial metrics but struggles to articulate the trade-offs between short-term profitability and long-term investment in growth.",
+          "5": "Justifies budget allocation using specific metrics (CAC payback, LTV:CAC, burn rate). Clearly explains the financial trade-offs and presents a fiscally responsible path forward."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Measures the ability to balance short-term operational needs with long-term strategic goals, navigating ambiguity to set a clear, defensible direction for the company.",
+        "scoringGuide": {
+          "1": "Over-indexes on short-term stability at the risk of market obsolescence, OR makes a massive, unsupported bet without a clear, phased approach to de-risk the decision.",
+          "3": "Identifies the correct strategic tension but chooses a 'middle ground' option that fails to commit to a clear direction, potentially leading to mediocre results on all fronts.",
+          "5": "Balances the immediate need for results with the long-term strategic necessity of entering a new market. The chosen path is incremental, testable, and aligned with a larger vision."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the ability to synthesize competing perspectives from key stakeholders and make a decision that, while not pleasing everyone, is clearly communicated and justified.",
+        "scoringGuide": {
+          "1": "Accepts one stakeholder's view wholesale while dismissing the other's. Fails to synthesize the valid points from both the optimistic and pragmatic perspectives.",
+          "3": "Acknowledges the different viewpoints but the final decision does not reflect a true synthesis, appearing to simply appease the loudest voice.",
+          "5": "The final recommendation demonstrates a deep understanding of the competing viewpoints. The rationale acknowledges the CFO's risks while also addressing the VP of Sales's strategic imperative."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

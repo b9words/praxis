@@ -2,7 +2,7 @@ import { getSmartCurriculumRecommendation } from './content-mapping'
 import { getUserAggregateScores, getRecentDebriefsForRecommendations } from './db/debriefs'
 import { getUserResidency } from './db/profiles'
 import { getLessonProgressList } from './db/progress'
-import { getRecentSimulations, getSimulationByUserAndCase } from './db/simulations'
+import { getRecentSimulations, getSimulationByUserAndCase, countCompletedSimulations } from './db/simulations'
 import { getAllLessonsFlat, getDomainById } from './curriculum-data'
 import { getAllInteractiveSimulations } from './case-study-loader'
 import { getAllLearningPaths, getLearningPathByCaseId } from './learning-paths'
@@ -164,12 +164,43 @@ function getFirstYear2Module(): { domain: string; module: string; lesson: string
  * Returns primary recommendation and up to 2 alternates
  */
 export async function getSmartRecommendations(userId: string): Promise<RecommendationWithAlternates> {
-  // Get user's current residency
+  // Get user's current residency (includes focusCompetency from onboarding)
   const residencyResult = await getUserResidency(userId).catch(() => null)
-  const userResidency = residencyResult ? { currentResidency: residencyResult.currentResidency } : { currentResidency: 1 }
+  const userResidency = residencyResult 
+    ? { currentResidency: residencyResult.currentResidency, focusCompetency: residencyResult.focusCompetency } 
+    : { currentResidency: 1, focusCompetency: null }
 
   // Get user's curriculum progress
   const lessonProgress = await getLessonProgressList(userId)
+
+  // RULE -1: Onboarding first-login override (highest priority)
+  // If user has focusCompetency from onboarding and has zero progress, override with foundational lesson
+  if (userResidency.focusCompetency) {
+    const lessonCount = lessonProgress.length
+    const simulationCount = await countCompletedSimulations(userId).catch(() => 0)
+    
+    if (lessonCount === 0 && simulationCount === 0) {
+      const foundationalLesson = getFoundationalLessonForDomain(userResidency.focusCompetency)
+      if (foundationalLesson) {
+        const domain = getDomainById(userResidency.focusCompetency)
+        const competencyName = domain?.title || userResidency.focusCompetency
+        const lessonId = `${foundationalLesson.domain}-${foundationalLesson.module}-${foundationalLesson.lesson}`
+        
+        return {
+          primary: {
+            type: 'curriculum',
+            id: lessonId,
+            title: foundationalLesson.title,
+            reason: 'Your first clear step, based on your onboarding assessment.',
+            url: foundationalLesson.url,
+            competencyName,
+            residencyYear: userResidency.currentResidency,
+          },
+          alternates: [],
+        }
+      }
+    }
+  }
 
   // Get recently touched content (last 7 days) for cooldown
   const sevenDaysAgo = new Date()

@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import OpenAI from 'openai'
 import { TokenTracker } from './token-tracker'
+import { enhanceLessonWithAI } from './ai-quality-enhancer'
 
 export interface LessonStructure {
   moduleNumber: number
@@ -216,6 +217,15 @@ Use markdown formatting with proper headers, tables, lists, and emphasis. Make t
         throw new Error(`Provider ${options.provider} not configured or available`)
       }
 
+      // Quality enhancement cycle
+      try {
+        const lessonTitle = `${lesson.moduleNumber}.${lesson.lessonNumber}: ${lesson.lessonName}`
+        content = await enhanceLessonWithAI(content, lessonTitle)
+      } catch (error) {
+        console.warn(`Quality enhancement failed, using original: ${error}`)
+        // Continue with original content
+      }
+
       // Extract key takeaways from content
       const keyTakeaways = this.extractKeyTakeaways(content)
       
@@ -371,6 +381,8 @@ export const DEFAULT_MODELS = {
     'o3-mini': 'o3-mini (10M tokens/day)',
   },
   gemini: {
+    'gemini-2.5-pro': 'Gemini 2.5 Pro (Default)',
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
     'gemini-1.5-pro-latest': 'Gemini 1.5 Pro (Latest)',
     'gemini-1.5-flash-latest': 'Gemini 1.5 Flash (Fast)',
     'gemini-pro': 'Gemini Pro',

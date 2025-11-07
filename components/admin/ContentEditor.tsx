@@ -21,17 +21,17 @@ import { queryKeys } from '@/lib/queryKeys'
 import { createClient } from '@/lib/supabase/client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { toast } from 'sonner'
 
 interface ContentEditorProps {
   contentType: 'article' | 'case'
   mode: 'create' | 'edit'
   contentId?: string
+  onClose?: () => void // Optional callback for modal close
 }
 
-export default function ContentEditor({ contentType, mode, contentId }: ContentEditorProps) {
+export default function ContentEditor({ contentType, mode, contentId, onClose }: ContentEditorProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const supabase = createClient()
@@ -73,22 +73,95 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
     enabled: mode === 'edit' && !!contentId,
   })
 
+  // Track if we've already loaded data to prevent re-processing
+  const hasLoadedRef = useRef<string | null>(null)
+  
   useEffect(() => {
     if (contentData) {
       const data = contentData as any
+      const dataKey = contentType === 'article' 
+        ? `article-${data.article?.id || 'new'}`
+        : `case-${data.case?.id || 'new'}`
+      
+      // Skip if we've already processed this data
+      if (hasLoadedRef.current === dataKey) {
+        return
+      }
+      
       if (contentType === 'article' && data.article) {
         const article = data.article as any
-        setTitle(article.title)
-        setCompetencyId(article.competencyId)
+        setTitle(article.title || '')
+        setCompetencyId(article.competencyId || '')
         setContent(article.content || '')
-        setStatus(article.status)
+        setStatus(article.status || 'draft')
+        hasLoadedRef.current = dataKey
       } else if (data.case) {
         const caseItem = data.case as any
-        setTitle(caseItem.title)
+        setTitle(caseItem.title || '')
         setBriefingDoc(caseItem.briefingDoc || '')
-        setDatasets(caseItem.datasets ? JSON.stringify(caseItem.datasets, null, 2) : '')
-        setRubric(caseItem.rubric ? JSON.stringify(caseItem.rubric, null, 2) : '')
-        setStatus(caseItem.status)
+        
+        // Handle datasets - could be object, string, or null
+        if (caseItem.datasets) {
+          try {
+            let parsed: any
+            if (typeof caseItem.datasets === 'string') {
+              // If it's already a string, try to parse it first
+              const trimmed = caseItem.datasets.trim()
+              // Remove any leading non-JSON characters (like "1" or other prefixes)
+              const jsonStart = trimmed.indexOf('{')
+              if (jsonStart > 0) {
+                parsed = JSON.parse(trimmed.substring(jsonStart))
+              } else {
+                parsed = JSON.parse(trimmed)
+              }
+            } else {
+              // It's already an object
+              parsed = caseItem.datasets
+            }
+            const datasetsStr = JSON.stringify(parsed, null, 2)
+            // Only update if different to prevent loops
+            setDatasets(prev => prev !== datasetsStr ? datasetsStr : prev)
+          } catch (e) {
+            // If parsing fails, use empty string
+            console.warn('Failed to parse datasets:', e)
+            setDatasets('')
+          }
+        } else {
+          setDatasets('')
+        }
+        
+        // Handle rubric - could be object, string, or null
+        if (caseItem.rubric) {
+          try {
+            let parsed: any
+            if (typeof caseItem.rubric === 'string') {
+              // If it's already a string, try to parse it first
+              const trimmed = caseItem.rubric.trim()
+              // Remove any leading non-JSON characters
+              const jsonStart = trimmed.indexOf('{')
+              if (jsonStart > 0) {
+                parsed = JSON.parse(trimmed.substring(jsonStart))
+              } else {
+                parsed = JSON.parse(trimmed)
+              }
+            } else {
+              // It's already an object
+              parsed = caseItem.rubric
+            }
+            const rubricStr = JSON.stringify(parsed, null, 2)
+            // Only update if different to prevent loops
+            setRubric(prev => prev !== rubricStr ? rubricStr : prev)
+          } catch (e) {
+            // If parsing fails, use empty string
+            console.warn('Failed to parse rubric:', e)
+            setRubric('')
+          }
+        } else {
+          setRubric('')
+        }
+        
+        setStatus(caseItem.status || 'draft')
+        hasLoadedRef.current = dataKey
       }
     }
   }, [contentData, contentType])
@@ -150,18 +223,50 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
         let parsedDatasets = null
         let parsedRubric
 
-        if (datasets) {
-          try {
-            parsedDatasets = JSON.parse(datasets)
-          } catch (e) {
-            throw new Error('Invalid JSON in datasets field')
+        // Datasets is optional - only validate if provided and not empty
+        if (datasets && datasets.trim()) {
+          const trimmed = datasets.trim()
+          // Skip validation if it's placeholder text
+          const isPlaceholder = trimmed.includes('"financials"') && trimmed.includes('"revenue": 10000000')
+          if (!isPlaceholder) {
+            try {
+              parsedDatasets = JSON.parse(trimmed)
+            } catch (e) {
+              const errorMsg = e instanceof Error ? e.message : 'Unknown error'
+              // Extract position for better error message
+              const positionMatch = errorMsg.match(/position (\d+)/)
+              if (positionMatch) {
+                const pos = parseInt(positionMatch[1], 10)
+                const lines = trimmed.substring(0, pos).split('\n')
+                const line = lines.length
+                const col = lines[lines.length - 1].length + 1
+                throw new Error(`Invalid JSON in datasets field at line ${line}, column ${col}: ${errorMsg}`)
+              }
+              throw new Error(`Invalid JSON in datasets field: ${errorMsg}`)
+            }
           }
         }
 
+        // Rubric is required
+        if (!rubric || !rubric.trim()) {
+          throw new Error('Rubric is required')
+        }
+
         try {
-          parsedRubric = JSON.parse(rubric)
+          const trimmed = rubric.trim()
+          parsedRubric = JSON.parse(trimmed)
         } catch (e) {
-          throw new Error('Invalid JSON in rubric field')
+          const errorMsg = e instanceof Error ? e.message : 'Unknown error'
+          const positionMatch = errorMsg.match(/position (\d+)/)
+          if (positionMatch) {
+            const pos = parseInt(positionMatch[1], 10)
+            const trimmed = rubric.trim()
+            const lines = trimmed.substring(0, pos).split('\n')
+            const line = lines.length
+            const col = lines[lines.length - 1].length + 1
+            throw new Error(`Invalid JSON in rubric field at line ${line}, column ${col}: ${errorMsg}`)
+          }
+          throw new Error(`Invalid JSON in rubric field: ${errorMsg}`)
         }
 
         const caseData = {
@@ -191,15 +296,21 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
     if (saveMutation.isSuccess) {
       queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
       queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['admin-content'] })
       toast.success(`${contentType === 'article' ? 'Article' : 'Case'} ${mode === 'create' ? 'created' : 'updated'} successfully`)
-      import('@/lib/utils/redirect-helpers').then(({ safeRedirectAfterMutation }) => {
-        safeRedirectAfterMutation(router, '/admin/content')
-      })
+      // Close modal if onClose callback provided, otherwise navigate
+      if (onClose) {
+        setTimeout(() => onClose(), 500)
+      } else {
+        import('@/lib/utils/redirect-helpers').then(({ safeRedirectAfterMutation }) => {
+          safeRedirectAfterMutation(router, '/admin/content')
+        })
+      }
     }
     if (saveMutation.isError) {
       toast.error(saveMutation.error instanceof Error ? saveMutation.error.message : 'Failed to save content')
     }
-  }, [saveMutation.isSuccess, saveMutation.isError, saveMutation.error, contentType, mode, queryClient, router])
+  }, [saveMutation.isSuccess, saveMutation.isError, saveMutation.error, contentType, mode, queryClient, router, onClose])
 
   const handleSave = () => {
     saveMutation.mutate()
@@ -230,17 +341,23 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {mode === 'create' ? 'Create' : 'Edit'} {contentType === 'article' ? 'Article' : 'Case'}
-          </h1>
-          <p className="mt-2 text-gray-600">
-            {contentType === 'article' ? 'Add content to the competency library' : 'Create a business case simulation'}
-          </p>
+    <div className="space-y-4">
+      {/* Header - Compact for modal */}
+      {!onClose && (
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {mode === 'create' ? 'Create' : 'Edit'}{' '}
+              <span suppressHydrationWarning>
+                {contentType === 'article' ? 'Article' : 'Case'}
+              </span>
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {contentType === 'article' ? 'Add content to the competency library' : 'Create a business case simulation'}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Common Fields */}
       <Card>
@@ -409,12 +526,15 @@ export default function ContentEditor({ contentType, mode, contentId }: ContentE
 
       {/* Actions */}
       <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={() => router.push('/admin/content')}
-        >
-          Cancel
-        </Button>
+        {onClose && (
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={saving}
+          >
+            Cancel
+          </Button>
+        )}
         <Button onClick={handleSave} disabled={saving || validationErrors.length > 0}>
           {saving ? 'Saving...' : mode === 'create' ? 'Create' : 'Save Changes'}
         </Button>

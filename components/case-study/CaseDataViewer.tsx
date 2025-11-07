@@ -3,9 +3,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import SlidesRenderer from '@/components/admin/renderers/SlidesRenderer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useCaseFile } from '@/hooks/useCaseFile'
 import { AlertCircle, Building2, FileText, TrendingUp } from 'lucide-react'
+import Papa from 'papaparse'
 
 interface CaseDataViewerProps {
   fileIds: string[]
@@ -52,19 +54,52 @@ export default function CaseDataViewer({ fileIds, className = '' }: CaseDataView
     }
 
     // Handle CSV data (financial data)
-    if (file.fileType === 'FINANCIAL_DATA' && Array.isArray(file.content)) {
-      const data = file.content as any[]
-      if (data.length === 0) return <div>No data available</div>
+    if (file.fileType === 'FINANCIAL_DATA') {
+      let data: any[] = []
+      
+      // If content is already parsed array, use it
+      if (Array.isArray(file.content)) {
+        data = file.content
+      }
+      // If content is CSV string, parse it
+      else if (typeof file.content === 'string') {
+        try {
+          const parsed = Papa.parse(file.content, {
+            header: true,
+            skipEmptyLines: true,
+            transformHeader: (header) => header.trim()
+          })
+          data = parsed.data as any[]
+        } catch (parseError) {
+          return (
+            <div className="text-red-600 p-4 bg-red-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4" />
+                <span className="font-medium">Error Parsing CSV</span>
+              </div>
+              <p className="text-sm">{String(parseError)}</p>
+            </div>
+          )
+        }
+      }
+      
+      if (data.length === 0) {
+        return <div className="text-neutral-500 p-4">No data available</div>
+      }
 
-      const headers = Object.keys(data[0])
+      const headers = Object.keys(data[0] || {})
+      
+      if (headers.length === 0) {
+        return <div className="text-neutral-500 p-4">No columns found in data</div>
+      }
       
       return (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border border-neutral-300">
+          <table className="w-full border-collapse border border-neutral-300 text-sm">
             <thead>
               <tr className="bg-neutral-100">
                 {headers.map((header) => (
-                  <th key={header} className="border border-neutral-300 px-3 py-2 text-left font-medium text-neutral-900">
+                  <th key={header} className="border border-neutral-300 px-3 py-2 text-left font-medium text-neutral-900 whitespace-nowrap">
                     {header}
                   </th>
                 ))}
@@ -75,7 +110,7 @@ export default function CaseDataViewer({ fileIds, className = '' }: CaseDataView
                 <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-neutral-50'}>
                   {headers.map((header) => (
                     <td key={header} className="border border-neutral-300 px-3 py-2 text-neutral-800">
-                      {row[header]}
+                      {row[header] || ''}
                     </td>
                   ))}
                 </tr>
@@ -84,6 +119,11 @@ export default function CaseDataViewer({ fileIds, className = '' }: CaseDataView
           </table>
         </div>
       )
+    }
+
+    // Handle PRESENTATION_DECK (Marp slides)
+    if (file.fileType === 'PRESENTATION_DECK' && typeof file.content === 'string') {
+      return <SlidesRenderer content={file.content} />
     }
 
     // Handle text content (memos, reports)

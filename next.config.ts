@@ -79,6 +79,17 @@ const nextConfig: NextConfig = {
       /node_modules\/@sentry/,
     ]
     
+    // For client-side builds, ignore Node.js built-in modules that are dynamically imported
+    if (!isServer) {
+      config.resolve = config.resolve || {}
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      }
+      
+    }
     
     return config
   },

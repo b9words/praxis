@@ -3,8 +3,8 @@
  * All article database operations go through here
  */
 
-import { dbCall, assertFound, isColumnNotFoundError } from './utils'
 import type { Prisma } from '@prisma/client'
+import { assertFound, dbCall, isColumnNotFoundError } from './utils'
 
 export interface ArticleFilters {
   status?: string
@@ -17,6 +17,7 @@ export interface CreateArticleData {
   content?: string | null
   description?: string | null
   status?: string
+  published?: boolean
   storagePath?: string | null
   metadata?: Record<string, any>
   createdBy: string
@@ -28,6 +29,7 @@ export interface UpdateArticleData {
   content?: string | null
   description?: string | null
   status?: string
+  published?: boolean
   storagePath?: string | null
   metadata?: Record<string, any>
   updatedBy: string
@@ -56,6 +58,11 @@ export async function listArticles(filters: ArticleFilters = {}) {
   
   if (filters.competencyId) {
     where.competencyId = filters.competencyId
+  }
+
+  // For public queries, only show published content unless explicitly requesting all
+  if (filters.status !== 'all' && !filters.status) {
+    where.published = true
   }
 
   return dbCall(async (prisma) => {
@@ -92,6 +99,41 @@ export async function getArticleById(id: string) {
  */
 export async function createArticle(data: CreateArticleData) {
   return dbCall(async (prisma) => {
+    // Handle user FK references - set to null if empty string or invalid
+    const createdBy = data.createdBy && data.createdBy.trim() ? data.createdBy : null
+    const updatedBy = data.updatedBy && data.updatedBy.trim() ? data.updatedBy : null
+    
+    // If user IDs provided, verify they exist before creating
+    if (createdBy) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: createdBy },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[createArticle] User ${createdBy} not found, setting createdBy/updatedBy to null`)
+          return prisma.article.create({
+            data: {
+              competencyId: data.competencyId,
+              title: data.title,
+              content: data.content ?? null,
+              description: data.description ?? null,
+              status: data.status ?? 'draft',
+              published: data.published ?? false,
+              storagePath: data.storagePath ?? null,
+              metadata: data.metadata ?? {},
+              createdBy: null,
+              updatedBy: null,
+            },
+            include: defaultInclude,
+          })
+        }
+      } catch (err) {
+        console.warn('[createArticle] Failed to verify user, setting createdBy/updatedBy to null:', err)
+        // Fall through to create with null
+      }
+    }
+    
     return prisma.article.create({
       data: {
         competencyId: data.competencyId,
@@ -99,10 +141,11 @@ export async function createArticle(data: CreateArticleData) {
         content: data.content ?? null,
         description: data.description ?? null,
         status: data.status ?? 'draft',
+        published: data.published ?? false,
         storagePath: data.storagePath ?? null,
         metadata: data.metadata ?? {},
-        createdBy: data.createdBy,
-        updatedBy: data.updatedBy,
+        createdBy,
+        updatedBy,
       },
       include: defaultInclude,
     })
@@ -117,6 +160,26 @@ export async function updateArticle(id: string, data: UpdateArticleData) {
   assertFound(existing, 'Article')
 
   return dbCall(async (prisma) => {
+    // Handle user FK reference - set to null if empty string or invalid
+    let updatedBy = data.updatedBy && data.updatedBy.trim() ? data.updatedBy : null
+    
+    // If user ID provided, verify it exists before updating
+    if (updatedBy) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: updatedBy },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[updateArticle] User ${updatedBy} not found, setting updatedBy to null`)
+          updatedBy = null
+        }
+      } catch (err) {
+        console.warn('[updateArticle] Failed to verify user, setting updatedBy to null:', err)
+        updatedBy = null
+      }
+    }
+    
     return prisma.article.update({
       where: { id },
       data: {
@@ -124,9 +187,10 @@ export async function updateArticle(id: string, data: UpdateArticleData) {
         ...(data.content !== undefined && { content: data.content }),
         ...(data.description !== undefined && { description: data.description }),
         ...(data.status !== undefined && { status: data.status }),
+        ...(data.published !== undefined && { published: data.published }),
         ...(data.storagePath !== undefined && { storagePath: data.storagePath }),
         ...(data.metadata !== undefined && { metadata: data.metadata }),
-        updatedBy: data.updatedBy,
+        updatedBy,
       },
       include: defaultInclude,
     })
@@ -156,6 +220,25 @@ export async function bulkUpdateArticleStatus(
   updatedBy: string
 ) {
   return dbCall(async (prisma) => {
+    // Verify user exists before bulk updating
+    let verifiedUpdatedBy: string | null = updatedBy && updatedBy.trim() ? updatedBy : null
+    
+    if (verifiedUpdatedBy) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: verifiedUpdatedBy },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[bulkUpdateArticleStatus] User ${verifiedUpdatedBy} not found, setting updatedBy to null`)
+          verifiedUpdatedBy = null
+        }
+      } catch (err) {
+        console.warn('[bulkUpdateArticleStatus] Failed to verify user, setting updatedBy to null:', err)
+        verifiedUpdatedBy = null
+      }
+    }
+    
     return prisma.article.updateMany({
       where: {
         id: {
@@ -164,7 +247,7 @@ export async function bulkUpdateArticleStatus(
       },
       data: {
         status,
-        updatedBy,
+        updatedBy: verifiedUpdatedBy,
       },
     })
   })
@@ -178,17 +261,37 @@ export async function bulkCreateArticles(
   userId: string
 ) {
   return dbCall(async (prisma) => {
+    // Verify user exists before bulk creating
+    let verifiedUserId: string | null = userId && userId.trim() ? userId : null
+    
+    if (verifiedUserId) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: verifiedUserId },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[bulkCreateArticles] User ${verifiedUserId} not found, setting createdBy/updatedBy to null`)
+          verifiedUserId = null
+        }
+      } catch (err) {
+        console.warn('[bulkCreateArticles] Failed to verify user, setting createdBy/updatedBy to null:', err)
+        verifiedUserId = null
+      }
+    }
+    
     return prisma.article.createMany({
       data: articles.map((article) => ({
         title: article.title,
         content: article.content ?? null,
         competencyId: article.competencyId,
         status: article.status ?? 'draft',
+        published: article.published ?? false,
         storagePath: article.storagePath ?? null,
         metadata: article.metadata ?? {},
         description: article.description ?? null,
-        createdBy: userId,
-        updatedBy: userId,
+        createdBy: verifiedUserId,
+        updatedBy: verifiedUserId,
       })),
     })
   })
@@ -204,7 +307,7 @@ export async function getResidencyArticles(residencyYear: number) {
         competency: {
           residencyYear,
         },
-        status: 'published',
+        published: true,
       },
       select: {
         id: true,
@@ -220,7 +323,7 @@ export async function getRecentArticles(days: number = 30) {
   return dbCall(async (prisma) => {
     return prisma.article.findMany({
       where: {
-        status: 'published',
+        published: true,
         createdAt: {
           gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000),
         },
@@ -249,7 +352,7 @@ export async function countArticlesForResidency(residencyYear: number) {
         competency: {
           residencyYear,
         },
-        status: 'published',
+        published: true,
       },
     })
   }).catch(() => 0)
@@ -262,7 +365,7 @@ export async function findArticleByStoragePath(pattern: string) {
   return dbCall(async (prisma) => {
     return prisma.article.findFirst({
       where: {
-        status: 'published',
+        published: true,
         storagePath: {
           contains: pattern,
         },
@@ -288,13 +391,32 @@ export async function bulkUpdateArticleStatuses(
   updatedBy: string
 ) {
   return dbCall(async (prisma) => {
+    // Verify user exists before bulk updating
+    let verifiedUpdatedBy: string | null = updatedBy && updatedBy.trim() ? updatedBy : null
+    
+    if (verifiedUpdatedBy) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: verifiedUpdatedBy },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[bulkUpdateArticleStatuses] User ${verifiedUpdatedBy} not found, setting updatedBy to null`)
+          verifiedUpdatedBy = null
+        }
+      } catch (err) {
+        console.warn('[bulkUpdateArticleStatuses] Failed to verify user, setting updatedBy to null:', err)
+        verifiedUpdatedBy = null
+      }
+    }
+    
     return prisma.article.updateMany({
       where: {
         id: { in: articleIds },
       },
       data: {
         status,
-        updatedBy,
+        updatedBy: verifiedUpdatedBy,
       },
     })
   })

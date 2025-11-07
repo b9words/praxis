@@ -301,7 +301,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
       try {
         const anyCases = await prisma.$queryRaw`
           SELECT id FROM cases 
-          WHERE status = 'published'::text OR status IS NULL
+          WHERE (status = 'published'::text OR status IS NULL) AND (published = true OR published IS NULL)
           LIMIT 5
         ` as any[]
         
@@ -354,7 +354,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
           }
           
           const newArticle = await prisma.$queryRaw`
-            INSERT INTO articles (id, competency_id, title, description, content, status, metadata, created_by, updated_by, created_at, updated_at)
+            INSERT INTO articles (id, competency_id, title, description, content, status, published, metadata, created_by, updated_by, created_at, updated_at)
             VALUES (
               gen_random_uuid(),
               ${competencyId}::uuid,
@@ -362,6 +362,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
               ${articleInfo.description}::text,
               ${`# ${articleInfo.title}\n\n${articleInfo.description}\n\n## Overview\n\nThis article covers fundamental concepts in ${articleInfo.competencyName.toLowerCase()}. You'll learn key frameworks and mental models used by top executives.\n\n## Key Concepts\n\n- Core principles and frameworks\n- Real-world applications\n- Common pitfalls to avoid\n- Strategic implications\n\n## Practice Exercises\n\nApply these concepts in the case simulations to develop your executive decision-making skills.`}::text,
               'published'::text,
+              true::boolean,
               '{}'::jsonb,
               ${userId}::uuid,
               ${userId}::uuid,
@@ -401,7 +402,7 @@ export async function seedComprehensiveData(userId: string, email?: string) {
       try {
         const anyArticles = await prisma.$queryRaw`
           SELECT id FROM articles 
-          WHERE status = 'published'::text OR status IS NULL
+          WHERE (status = 'published'::text OR status IS NULL) AND (published = true OR published IS NULL)
           LIMIT 8
         ` as any[]
         

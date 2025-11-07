@@ -1,0 +1,128 @@
+{
+  "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762260374886",
+  "version": "1.0",
+  "title": "The 'Two-Pizza Team' Re-Org",
+  "description": "ConnectSphere, a hyper-growth SaaS company, is drowning in its own success. Product velocity has plummeted due to a bloated matrix structure. As the new Chief Product Officer, you have 90 days to design and present a radical restructuring plan to restore agility before a potential IPO.",
+  "competencies": [
+    "Organizational Design",
+    "Change Management",
+    "Stakeholder Management",
+    "Executive Communication"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_org_chart_1",
+      "fileName": "ConnectSphere_Org_Chart.json",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "{\"employeeId\": \"001\", \"name\": \"Anya Sharma\", \"title\": \"CEO\", \"directReports\": [{\"employeeId\": \"100\", \"name\": \"[Your Name]\", \"title\": \"CPO\", \"directReports\": [...]}]}"
+      }
+    },
+    {
+      "fileId": "cf_survey_results_2",
+      "fileName": "P&E_Employee_Survey_Results.csv",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "department,tenure_months,rating_collaboration,rating_decision_speed,comment\nCore Product,6,4,2,\"I spend 20 hours a week in sync meetings.\"\nPlatform Engineering,120,3,4,\"Process is slow but it prevents outages.\"\nMobile,18,2,1,\"Feels like I need 5 VPs to approve a button color change.\""
+      }
+    },
+    {
+      "fileId": "cf_qbr_data_3",
+      "fileName": "Quarterly_Business_Review_Data.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "quarter,revenue_growth_qoq,p&e_headcount,p&e_op_ex_millions,avg_time_to_market_days,key_features_shipped\n2022-Q1,15,450,15,35,25\n2022-Q2,14,600,20,48,22\n2022-Q3,12,800,28,65,18\n2022-Q4,11,1000,35,90,15\n2023-Q1,9,1150,40,125,12\n2023-Q2,8,1200,42,150,9"
+      }
+    },
+    {
+      "fileId": "cf_chen_memo_4",
+      "fileName": "Memo_David_Chen_Scaling_Excellence.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "## SUBJECT: A Proposal for Scaling Engineering Excellence\n\n**TO:** Former CPO\n**CC:** Anya Sharma, CEO\n\nI am writing to address the growing concerns about our development velocity. While the desire for speed is understandable, framing this as a structural problem is a misdiagnosis. The issue is not our matrix organization, which ensures quality and consistency; it's a chronic underinvestment in the foundational platforms and tools that enable scaled development.\n\nBreaking our organization into small, autonomous 'squads' would be a catastrophic mistake. It would lead to rampant technical debt, duplicated work, and a chaotic user experience. Instead, I propose we double down on what works: creating more specialized, centralized 'horizontal' teams for SRE, Security, and Core Infrastructure. This will create true leverage, not chaos."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_diagnosis",
+      "title": "Stage 1: The First 30 Days - Diagnosis & Alliance Building",
+      "description": "Your first month is critical for gathering data and political capital. Define your diagnostic approach to build a credible foundation for your plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the 'Diagnosis & Discovery' section of your 100-Day Plan. Detail your priorities for the first 30 days. Justify your chosen approach by weighing the trade-offs between a quantitative deep dive (analyzing data), a broad listening tour (1-on-1s), and securing executive alignment. How will you balance these to build a complete picture and gain early support?",
+        "context": "You are 3 weeks into your new role as CPO at ConnectSphere. Your calendar is swamped, and the CEO is pressing for quick action. You have access to the case files but must decide how to prioritize your own time to form a robust, data-backed, and politically viable perspective on the problem.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_restructure_model",
+      "title": "Stage 2: The Core Restructuring Choice",
+      "description": "Based on your diagnosis, you must now choose the fundamental model for the re-org. This is the heart of your plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the 'Proposed Organizational Model' section of your 100-Day Plan. Propose one of the following core strategies: a 'Big Bang' re-org, a contained 'Pilot Program', or a 'Phased Rollout'. Justify your choice using data from the case files and your Stage 1 diagnosis. Your proposal must include a high-level description of the new team structure and explicitly address the primary risks of your chosen path and how you will mitigate them.",
+        "context": "You've completed your initial diagnosis. The data confirms the slowdown, and your conversations reveal widespread frustration but also deep skepticism from senior leaders like David Chen. The CEO is pushing for a bold, decisive move. You must now commit to a specific path.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_communication_plan",
+      "title": "Stage 3: The Communication & Rollout Plan",
+      "description": "An organizational design is only as good as its implementation. Plan the announcement and manage the change.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the 'Communication & Change Management' section of your 100-Day Plan. Detail your strategy for announcing and rolling out the new structure. How will you manage key stakeholders like David Chen (skeptic), Anya Sharma (impatient CEO), and Sarah Jenkins (risk-averse CFO)? Specify the sequence of communications (e.g., exec pre-brief, director offsite, all-hands) and the key messages for each audience to mitigate anxiety and build momentum.",
+        "context": "Your chosen model is finalized, but word is getting out. Rumors are spreading, and David Chen has voiced his concerns to other leaders. A poorly managed announcement could doom the entire project before it begins. Your communication strategy must be flawless.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the coherence, feasibility, and strategic alignment of the proposed restructuring model. Assesses the ability to design a system that solves the core problem (speed) while managing inherent trade-offs (e.g., technical debt, duplicated effort).",
+        "scoringGuide": {
+          "1": "Presents a generic 'squad' model without addressing ConnectSphere's specific challenges (e.g., the platform team's role). The plan is superficial and fails to articulate how the new structure will achieve the desired outcomes.",
+          "3": "Proposes a solid, well-reasoned structure. The plan shows awareness of the trade-offs but may lack detailed mechanisms for cross-team coordination or governance. It's a good theoretical plan with some practical gaps.",
+          "5": "Designs a sophisticated, principle-based model tailored to ConnectSphere. The plan explicitly addresses complex issues like platform stability and career pathing, including clear governance and communication protocols for the new system."
+        }
+      },
+      {
+        "competencyName": "Change Management",
+        "description": "Assesses the quality of the rollout and communication plan. Evaluates the ability to anticipate resistance, build buy-in, and manage the human element of a large-scale organizational change.",
+        "scoringGuide": {
+          "1": "The plan is purely logistical and top-down, ignoring the cultural and emotional impact. It fails to anticipate resistance and is likely to be met with confusion and hostility.",
+          "3": "The plan includes standard change management practices like a communication cascade and Q&A sessions. It's competent but may not be sufficient to win over deep-seated skepticism.",
+          "5": "Presents a proactive, multi-faceted change strategy. The plan is empathetic, tailored to different audiences, and co-opts key influencers. It clearly articulates the 'why' behind the change to build trust."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the ability to identify, understand, and influence key stakeholders with competing interests. Assesses how well the plan addresses the motivations and concerns of the CEO, CFO, and VP of Platform Engineering.",
+        "scoringGuide": {
+          "1": "Ignores or dismisses the valid concerns of key stakeholders. The plan either capitulates entirely to the most vocal dissenter or alienates powerful allies, making implementation impossible.",
+          "3": "Acknowledges stakeholder concerns but addresses them superficially. The plan makes reasonable compromises but may miss opportunities to turn skeptics into supporters.",
+          "5": "Demonstrates a masterful understanding of the political landscape. The final plan cleverly integrates stakeholder feedback, addressing their core needs without compromising the strategic objective."
+        }
+      },
+      {
+        "competencyName": "Executive Communication",
+        "description": "Assesses the clarity, structure, and persuasiveness of the written 100-day plan. Evaluates whether the document is credible, compelling, and appropriate for an executive and board-level audience.",
+        "scoringGuide": {
+          "1": "The plan is disorganized, poorly written, and full of jargon. It lacks a clear narrative and fails to inspire confidence.",
+          "3": "The plan is clearly written and well-structured. It presents the information logically but may lack a strong, persuasive narrative.",
+          "5": "The plan is written with exceptional clarity, precision, and conviction. It tells a compelling story, anticipates questions, and uses data effectively to justify its recommendations."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

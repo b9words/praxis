@@ -1,0 +1,187 @@
+{
+  "caseId": "cs_arena_1_2_the_integration_hardware_meets_software_1762366774070",
+  "version": "1.0",
+  "title": "The Integration: Hardware Meets Software",
+  "description": "Titan Dynamics, a legacy industrial giant, has acquired Aether AI, an agile software startup, to lead its digital transformation. As the new GM, you must design a 100-day integration plan that merges two polar-opposite cultures without destroying the value you just paid a premium for.",
+  "competencies": [
+    "Organizational Design",
+    "Stakeholder Management",
+    "Change Leadership",
+    "Strategic Rationale"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "org_charts_1",
+      "fileName": "org_charts.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for organizational charts of Titan Dynamics' legacy engineering division and Aether AI's flat startup structure]"
+      }
+    },
+    {
+      "fileId": "memos_1",
+      "fileName": "conflicting_memos.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for two conflicting memos: one from Frank Vogel (SVP Eng, Titan) advocating for process and control, and one from Dr. Lena Petrova (Founder, Aether) advocating for autonomy and creativity]"
+      }
+    },
+    {
+      "fileId": "culture_report_1",
+      "fileName": "cultural_assessment_summary.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for a one-page summary from an external consultancy highlighting the extreme cultural differences between Titan (Hierarchy/Market) and Aether (Adhocracy/Clan)]"
+      }
+    },
+    {
+      "fileId": "financials_1",
+      "fileName": "financial_data.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for CSV data showing key financials. Highlights include Titan's profitability vs. Aether's growth but cash burn, Aether's 40% higher engineering salaries, and a mandated 25% SG&A synergy target]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_setting_the_tone",
+      "title": "Day 1-30: Setting the Tone",
+      "description": "Your first task is to address the 150 employees of the former Aether AI in an all-hands meeting. Your message will set the tone for the entire integration. Draft the key talking points for your speech, considering the options below as potential themes.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft a 3-paragraph summary of your opening speech to the Aether AI team. Your goal is to build trust and set expectations without causing panic or alienating your new parent company stakeholders. What is your central message?",
+        "context": "Rumors are swirling about layoffs, bureaucracy, and cultural clashes. The Aether AI team is skeptical and anxious. Your speech is the first critical step in winning their hearts and minds.",
+        "options": [
+          {
+            "id": "theme_one_titan",
+            "title": "Theme: The 'One Titan' Message",
+            "description": "Emphasize unity, shared processes, and the benefits of integrating into the larger, stable Titan family. This approach would please Titan leadership but may alarm the Aether team."
+          },
+          {
+            "id": "theme_autonomous_innovation",
+            "title": "Theme: The 'Autonomous Innovation' Message",
+            "description": "Emphasize protecting Aether's unique culture and its role as an independent engine for the future. This would reassure the Aether team but raise red flags for Titan's CFO and engineering leads."
+          },
+          {
+            "id": "theme_best_of_both",
+            "title": "Theme: The 'Best of Both Worlds' Message",
+            "description": "Acknowledge the differences and promise a collaborative process to build a new, hybrid model together. This is a balanced approach but risks creating prolonged uncertainty."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_structural_dilemma",
+      "title": "Day 31-60: The Structural Dilemma",
+      "description": "Based on your initial observations and the data provided, you must now decide on the fundamental organizational structure for the new 'Titan Intelligence' division.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a 1-page memo to the CEO outlining your proposed organizational structure. Justify your choice by referencing the case files and explicitly addressing the trade-offs between speed, scale, innovation, and synergy.",
+        "context": "This is the most critical decision of your 100-day plan. Your choice will directly impact talent retention, product development speed, and your ability to meet financial targets. Frank Vogel, Lena Petrova, and Ingrid Larsen are all waiting for your decision.",
+        "options": [
+          {
+            "id": "model_full_integration",
+            "title": "Model: Full Integration",
+            "description": "Dissolve Aether AI as a separate entity. Its engineers are embedded into existing Titan hardware teams under Titan engineering managers. Optimizes for synergy and control, but high risk of talent flight."
+          },
+          {
+            "id": "model_autonomous_skunkworks",
+            "title": "Model: Autonomous Skunkworks",
+            "description": "Keep Aether AI structurally separate. It reports to you as a single unit, with Lena Petrova as its functional head, retaining its own processes. Optimizes for innovation and talent retention, but low synergy and potential for creating a silo."
+          },
+          {
+            "id": "model_hybrid_platform",
+            "title": "Model: Hybrid 'Platform'",
+            "description": "Create new, mission-oriented teams with a mix of Titan and Aether personnel (e.g., a 'Smart Excavator' team). A complex but potentially powerful model that forces collaboration but has high management overhead."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_operating_model",
+      "title": "Day 61-90: Defining the Operating Model",
+      "description": "With a structure chosen, you must now decide on the contentious operational policies that will govern how the new division works day-to-day.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft two policy statements for your integration plan: one for software development methodology and one for compensation philosophy. For each, explain the strategic rationale and how you will manage the rollout and potential fallout.",
+        "context": "These policies are where the cultural clash becomes real. Your engineering teams are deadlocked on 'Agile vs. Waterfall,' and the pay disparity between Aether and Titan engineers is a ticking time bomb.",
+        "options": [
+          {
+            "id": "policy_standardize",
+            "title": "Policy Set: Standardize & Control",
+            "description": "Mandate Titan's 'Stage-Gate' Waterfall process for all projects and move all Aether employees to the standard Titan salary bands immediately."
+          },
+          {
+            "id": "policy_preserve",
+            "title": "Policy Set: Protect & Preserve",
+            "description": "Allow teams to choose their own methodology (Agile vs. Waterfall) and grandfather Aether's higher salary bands for existing staff, using Titan bands only for new hires."
+          },
+          {
+            "id": "policy_invent",
+            "title": "Policy Set: Invent & Unify",
+            "description": "Create a new, standardized Hybrid-Agile process for everyone and create a new, high-tech talent compensation model for the entire division, raising some Titan salaries and adjusting Aether's model."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_4_final_plan",
+      "title": "Day 100: The Executive Committee Presentation",
+      "description": "Synthesize your decisions from the previous stages into a final, comprehensive 100-Day Integration Plan for the CEO and Executive Committee.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Produce a 2-page executive summary of your 100-Day Integration Plan. The summary must include: 1) Your vision for the 'Titan Intelligence' division, 2) The chosen organizational structure and operating model, 3) A high-level implementation timeline for the first year, and 4) A risk assessment and mitigation plan that addresses key stakeholder concerns.",
+        "context": "This is your final deliverable. The board needs to see a coherent, defensible strategy that proves the $800M acquisition will generate value. Your plan must be clear, concise, and compelling.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Assesses the user's ability to design an effective organizational structure that balances competing strategic priorities (speed vs. scale, innovation vs. efficiency).",
+        "scoringGuide": {
+          "1": "Chooses a structure based on a single factor (e.g., cost-cutting only) with no justification for the trade-offs.",
+          "3": "Selects a viable structure (e.g., Hybrid) and provides a reasonable but generic rationale for why it might work.",
+          "5": "Articulates a clear, nuanced choice of structure that directly addresses the core tension (speed vs. scale) and justifies the choice using data from the case files."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the user's ability to understand and navigate the conflicting interests of key stakeholders (Vogel, Petrova, Larsen) in their plan.",
+        "scoringGuide": {
+          "1": "Plan completely ignores or alienates one key stakeholder (e.g., 'Frank is wrong, we'll ignore him').",
+          "3": "Acknowledges the stakeholders' conflicting desires but offers a compromise that may not be strategically sound.",
+          "5": "Plan explicitly addresses the core concerns of all three stakeholders, offering a path forward that aligns their interests or explains how dissent will be managed."
+        }
+      },
+      {
+        "competencyName": "Change Leadership",
+        "description": "Measures the user's ability to go beyond the org chart and articulate a plan for managing the human side of change, including communication, culture, and vision.",
+        "scoringGuide": {
+          "1": "Focuses only on the 'boxes and lines' of the org chart. The plan lacks any element of communication, cultural integration, or vision.",
+          "3": "Includes basic change management steps like a communication plan but lacks specificity or a compelling vision.",
+          "5": "Creates a holistic plan that integrates structure, process, AND culture. Articulates a compelling vision for the 'new' division and includes concrete actions to build trust."
+        }
+      },
+      {
+        "competencyName": "Strategic Rationale",
+        "description": "Assesses the coherence of the overall plan and whether the user's tactical decisions (structure, policy) are clearly linked to the overarching strategic goal of market leadership.",
+        "scoringGuide": {
+          "1": "Decisions appear reactive and tactical, with no clear link to the overall business goal of leapfrogging competitors.",
+          "3": "Final plan is logical but fails to articulate a strong, overarching strategy that connects the dots between the choices made.",
+          "5": "The final 100-Day Plan tells a coherent strategic story. Each decision (communication, structure, policy) clearly supports the long-term goal of market leadership."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

@@ -100,6 +100,7 @@ async function syncMarkdownArticle(supabase: any, storagePath: string, content: 
           description,
           metadata,
           status: frontmatter.status || 'draft',
+          published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false),
           updated_at: new Date().toISOString()
         })
         .eq('id', existing.id)
@@ -125,6 +126,7 @@ async function syncMarkdownArticle(supabase: any, storagePath: string, content: 
           storage_path: storagePath,
           metadata,
           status: frontmatter.status || 'draft',
+          published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false),
           content: null // Content is in storage
         })
         .select('id')
@@ -180,6 +182,7 @@ async function syncJsonCase(supabase: any, storagePath: string, content: string)
           description,
           metadata,
           status: caseData.status || 'draft',
+          published: caseData.published ?? (caseData.status === 'published' ? true : false),
           updated_at: new Date().toISOString()
         })
         .eq('id', existing.id)
@@ -204,6 +207,7 @@ async function syncJsonCase(supabase: any, storagePath: string, content: string)
           storage_path: storagePath,
           metadata,
           status: caseData.status || 'draft',
+          published: caseData.published ?? (caseData.status === 'published' ? true : false),
           briefing_doc: null // Content is in storage
         })
         .select('id')

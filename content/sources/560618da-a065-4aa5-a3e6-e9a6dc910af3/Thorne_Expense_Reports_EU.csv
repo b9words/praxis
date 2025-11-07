@@ -1,0 +1,19 @@
+ReportID,EmployeeName,EmployeeID,SubmissionDate,ExpenseDate,Merchant,Category,Amount,Currency,Description,ApprovalStatus,Approver
+RPT-EU-24011,Alex Thorne,E7884,2023-01-20,2023-01-18,Lufthansa,Travel,1150.00,EUR,"Return flight, FRA-MAD for client kickoff",Approved,Frank Miller
+RPT-EU-24012,Alex Thorne,E7884,2023-01-20,2023-01-19,Restaurante Botin,Meals,315.50,EUR,Dinner with Telefonica procurement team,Approved,Frank Miller
+RPT-EU-24025,Alex Thorne,E7884,2023-02-15,2023-02-10,GVA Strategic Consulting,Consulting Services,9850.00,EUR,"Market access advisory for Port of Antwerp deal",Approved,Frank Miller
+RPT-EU-24026,Alex Thorne,E7884,2023-02-28,2023-02-25,Hilton Brussels Grand Place,Lodging,870.00,EUR,3 nights for EU Commission meetings,Approved,Frank Miller
+RPT-EU-24033,Alex Thorne,E7884,2023-03-18,2023-03-15,Air France,Travel,980.00,EUR,"Flight, PAR-BER for internal QBR",Approved,Frank Miller
+RPT-EU-24041,Alex Thorne,E7884,2023-04-12,2023-04-05,Beyer Chronometrie AG,Gifts,8500.00,EUR,Corporate gifts for Q2 client appreciation,Approved,Frank Miller
+RPT-EU-24042,Alex Thorne,E7884,2023-04-29,2023-04-28,Vapiano,Meals,185.00,EUR,Lunch with Berlin sales team,Approved,Frank Miller
+RPT-EU-24058,Alex Thorne,E7884,2023-05-22,2023-05-20,Le Ciel de Paris Restaurant,Entertainment,4200.00,EUR,"Client dinner with Ministry of Infrastructure officials",Approved,Frank Miller
+RPT-EU-24059,Alex Thorne,E7884,2023-05-22,2023-05-21,Sixt Rent a Car,Travel,410.00,EUR,Car rental for Paris client meetings,Approved,Frank Miller
+RPT-EU-24067,Alex Thorne,E7884,2023-06-19,2023-06-12,Berlin Gateway Partners,Consulting Services,12500.00,EUR,Due diligence support for Deutsche Telekom contract,Approved,Frank Miller
+RPT-EU-24071,Alex Thorne,E7884,2023-07-05,2023-07-01,Salesforce.com,Software,2500.00,EUR,Annual license renewal for EU sales team,Approved,Frank Miller
+RPT-EU-24085,Alex Thorne,E7884,2023-08-10,2023-08-08,American Express,Miscellaneous,5000.00,EUR,Purchase of pre-paid gift cards for promotional event,Approved,Frank Miller
+RPT-EU-24086,Alex Thorne,E7884,2023-08-25,2023-08-22,Staples,Office Supplies,345.80,EUR,Supplies for the Munich regional office,Approved,Frank Miller
+RPT-EU-24094,Alex Thorne,E7884,2023-09-14,2023-09-11,GVA Strategic Consulting,Consulting Services,9900.00,EUR,"Phase 2 advisory for Port of Antwerp logistics contract",Approved,Frank Miller
+RPT-EU-24102,Alex Thorne,E7884,2023-10-18,2023-10-16,KLM,Travel,1450.00,EUR,"Business class, AMS-FCO for energy sector summit",Approved,Frank Miller
+RPT-EU-24115,Alex Thorne,E7884,2023-11-20,2023-11-15,Cartier,Gifts,7200.00,EUR,Year-end high-value client relationship gifts,Approved,Frank Miller
+RPT-EU-24116,Alex Thorne,E7884,2023-11-20,2023-11-18,Rome Cavalieri,Lodging,1150.00,EUR,"2 nights for ENI client summit",Approved,Frank Miller
+RPT-EU-24121,Alex Thorne,E7884,2023-12-11,2023-12-05,Berlin Gateway Partners,Consulting Services,14800.00,EUR,Final success fee for Deutsche Telekom contract win,Approved,Frank Miller

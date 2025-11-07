@@ -1,0 +1,130 @@
+{
+  "caseId": "cs_arena_1_10_the_technical_debt_default_1762259224176",
+  "version": "1.0",
+  "title": "The Technical Debt Default",
+  "description": "As the new CTO of ConnectSphere, a rapidly growing but unstable SaaS company, you're caught between an engineering team demanding a six-month halt to fix the platform and a product team with a roadmap promising millions in new revenue. You must use data to make a high-stakes investment case to the CEO, reframing technical debt from an engineering problem into a critical financial liability.",
+  "competencies": [
+    "Operational Excellence",
+    "Strategic Communication",
+    "Data-Driven Decision Making",
+    "Stakeholder Management"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_eng_data_22a",
+      "fileName": "engineering_metrics_dashboard.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for 18 months of engineering ticket data. Columns: month, ticket_type (Feature, Bug, Chore), tickets_resolved, avg_hours_to_resolve, critical_incidents_reported. Data will show rising avg_hours_to_resolve for Bugs and declining Feature tickets_resolved.]"
+      }
+    },
+    {
+      "fileId": "cf_prod_roadmap_22b",
+      "fileName": "q3_q4_product_roadmap.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for Markdown-formatted product roadmap from Brenda Stone. Will include high-impact features like 'AI Co-pilot' with projected ARR and a note about sales commitments.]"
+      }
+    },
+    {
+      "fileId": "cf_kpi_summary_22c",
+      "fileName": "company_kpis.json",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for JSON object with company metrics. Keys: monthly_arr_trend, monthly_churn_rate_percent (showing a recent spike), rd_budget_monthly (flat), and a cfo_memo freezing the R&D budget.]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_crisis_response",
+      "title": "Stage 1: The Immediate Crisis",
+      "description": "A critical bug has taken down a key feature for a dozen enterprise clients. The Head of Product, Brenda, wants to ignore it to stay on track for a sales demo. The VP of Engineering, Alex, wants to pull everyone onto the bug immediately. They are both looking to you for the final call.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft a brief email response to both Brenda Stone and Alex Chen outlining your immediate resource allocation plan for the next 48 hours. Justify your decision, acknowledging their competing priorities.",
+        "context": "Brenda's email: 'We need to ignore this for now and keep the 'AI Co-pilot' team on track for the sales demo next week.'\nAlex's email: 'This is exactly what I'm talking about. We need to pull everyone onto this bug now.'",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_elevator_pitch",
+      "title": "Stage 2: The Elevator Pitch",
+      "description": "In the weekly leadership meeting, the CEO, Sarah, has heard rumors of a potential engineering 'slowdown' to address technical issues. She turns to you, looking skeptical, and asks for a justification.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Sarah says: 'I need to understand this. Give me the 30-second elevator pitch. Why would we stop shipping valuable product for six months?' Your response must be three clear, concise bullet points that frame the business case for 'Project Bedrock,' avoiding any technical jargon.",
+        "context": "Your VP of Engineering has formally proposed 'Project Bedrock,' a six-month plan to re-architect the core platform, which involves a near-total freeze on new feature development. The CEO is non-technical and highly focused on top-line growth metrics.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_data_request",
+      "title": "Stage 3: The Data-Backed Argument",
+      "description": "Your pitch has intrigued the CEO, but she remains unconvinced. She needs quantitative proof that this is a real financial threat and not just an engineering preference.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Sarah messages you: 'Brenda just showed me the roadmap—it projects $5M in new ARR. You're asking me to risk that. I need a quantitative case. Analyze the provided Case Files and send me a summary of the three most compelling data points that prove this is a real financial threat.'",
+        "context": "You have access to the Engineering Metrics Dashboard, the Product Roadmap, and the Financial & Operational Summary. You must synthesize information from these documents to build your argument.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_final_memo",
+      "title": "Stage 4: The Final Recommendation",
+      "description": "The time for discussion is over. The Q3 planning cycle is imminent, and the CEO requires your official, final recommendation for the R&D organization for the next two quarters.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a formal, one-page memo addressed to the CEO (Sarah Jenkins) and Head of Product (Brenda Stone). Your memo must present your official proposal for the next six months of R&D investment. Make a clear, data-driven business case and be explicit about the risks of both action and inaction. This is the document that will be taken to the board.",
+        "context": "This is your final opportunity to secure buy-in for 'Project Bedrock.' Your memo must be persuasive, professional, and grounded in the financial reality of the company. It needs to align engineering health with long-term business success.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Operational Excellence",
+        "description": "Evaluates the ability to connect technical issues to core business operations and financial health.",
+        "scoringGuide": {
+          "1": "Frames technical debt as a purely technical problem. Focuses on code quality, developer happiness, and uses engineering jargon.",
+          "3": "Connects technical debt to business outcomes like churn and customer complaints, but struggles to quantify the financial impact.",
+          "5": "Frames technical debt as a quantifiable financial liability on the balance sheet. Articulates the compounding 'interest payments' in terms of wasted R&D budget, lost revenue, and constrained future growth."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Assesses the ability to synthesize quantitative and qualitative data from multiple sources to build a compelling, evidence-based argument.",
+        "scoringGuide": {
+          "1": "Relies on anecdotes and qualitative arguments ('the team is burned out'). Ignores or misinterprets the provided data files.",
+          "3": "Pulls one or two key data points (e.g., 'churn is up') to support the argument, but doesn't connect them into a causal chain.",
+          "5": "Synthesizes data from all three files to create a unified, predictive model. For example: 'Our R&D spend on bug fixes has grown 150% YoY, which correlates directly with the recent 2.5% spike in churn. At this rate, bug fixes will consume our entire feature budget by Q4, making the product roadmap impossible.'"
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Measures the ability to tailor a message to a specific executive audience, translating complex topics into clear business terms.",
+        "scoringGuide": {
+          "1": "Uses technical jargon, blames other departments, and presents the decision as an ultimatum ('we must stop everything now'). The tone is adversarial.",
+          "3": "Translates the technical need into basic business terms (e.g., 'we need to fix things to serve customers better'). Presents a clear problem/solution narrative.",
+          "5": "Builds a powerful business case that frames the investment as an *enabler* of future growth, not a cost. The narrative is persuasive, forward-looking, and tailored to the CEO's focus on long-term value creation."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the ability to understand, acknowledge, and align the competing motivations of different stakeholders.",
+        "scoringGuide": {
+          "1": "Dismisses the concerns of other stakeholders (e.g., 'Product's roadmap is unrealistic'). The proposal is one-sided and likely to create conflict.",
+          "3": "Acknowledges the validity of other stakeholders' goals (e.g., 'I understand we need to hit our revenue targets').",
+          "5": "Demonstrates deep empathy for stakeholder pressures (e.g., product's sales commitments, CEO's board pressure). Frames the solution as a shared path to success that helps everyone achieve their goals in the long run."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

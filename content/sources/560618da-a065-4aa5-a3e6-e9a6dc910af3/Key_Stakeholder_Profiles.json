@@ -1,0 +1,165 @@
+[
+  {
+    "name": "Eleanor Vance",
+    "title": "Chief Executive Officer",
+    "role": "As CEO, Eleanor is ultimately responsible for the company's overall performance, strategy, and public image. She has championed the company's aggressive international expansion, with the European division being a cornerstone of her celebrated growth strategy.",
+    "power": "high",
+    "influence": "high",
+    "concerns": [
+      "Significant, immediate drop in stock price upon any public disclosure.",
+      "Investigation becoming a major distraction that causes the company to miss quarterly earnings.",
+      "Irreparable reputational damage with key enterprise customers.",
+      "Personal liability and the potential for forced resignation.",
+      "The scandal derailing a major acquisition currently in due diligence."
+    ],
+    "motivations": [
+      "Containing the problem quickly and with minimal public fanfare.",
+      "Protecting the growth narrative she has sold to Wall Street.",
+      "Maintaining a perception of strong, decisive leadership.",
+      "Isolating the issue to a single 'bad apple' to prevent a wider inquiry.",
+      "Getting back to 'business as usual' as fast as possible."
+    ],
+    "likely_objections": [
+      "\"Are we absolutely sure this isn't just a disgruntled employee trying to cause trouble?\"",
+      "\"A full-blown external investigation will paralyze the entire sales organization with fear.\"",
+      "\"We cannot let this leak. We need to control the narrative before the media does.\""
+    ],
+    "department": "Executive Office",
+    "background": "Known as a hard-charging, 'growth-at-all-costs' leader. She is highly charismatic and has a very close working relationship with the SVP of Global Sales."
+  },
+  {
+    "name": "David Chen",
+    "title": "Chief Financial Officer",
+    "role": "The CFO is responsible for all financial operations, reporting integrity, and internal controls. A relatively new hire (18 months), he is known for being meticulous, risk-averse, and a stickler for process, having come from a highly regulated banking background.",
+    "power": "high",
+    "influence": "medium",
+    "concerns": [
+      "The need to restate prior period earnings if revenues are deemed illegitimate.",
+      "The scale of potential fines from the SEC and Department of Justice under the FCPA.",
+      "Revealing a material weakness in internal controls over financial reporting (a SOX 404 violation).",
+      "The high, unbudgeted cost of retaining top-tier forensic accounting and legal firms.",
+      "The risk of a credit rating downgrade."
+    ],
+    "motivations": [
+      "Quantifying the full, potential financial exposure immediately.",
+      "Ensuring absolute compliance with all regulatory disclosure requirements.",
+      "Protecting the integrity of the company's financial statements.",
+      "Ring-fencing the problem to prove it was a control failure, not a cultural one.",
+      "Preserving his own professional reputation for financial probity."
+    ],
+    "likely_objections": [
+      "\"We must engage a 'Big Four' forensic team immediately; our internal audit is not equipped for this.\"",
+      "\"What is the materiality of the contracts in question? We need to know if an 8-K filing is required.\"",
+      "\"We have to freeze all payments from that regional cost center until we can verify their legitimacy.\""
+    ],
+    "department": "Finance"
+  },
+  {
+    "name": "Maria Flores",
+    "title": "General Counsel",
+    "role": "As the company's chief lawyer, Maria advises the board and management on all legal matters, litigation, and regulatory risk. Her primary function is to protect the company and its directors from legal liability.",
+    "power": "medium",
+    "influence": "high",
+    "concerns": [
+      "Waiving attorney-client privilege by mishandling the investigation.",
+      "Failure to issue a proper litigation hold, leading to spoliation of evidence.",
+      "The risk of shareholder derivative lawsuits against the board of directors.",
+      "Potential for criminal, not just civil, liability for the company and individuals.",
+      "Navigating conflicting US and European privacy laws regarding employee data."
+    ],
+    "motivations": [
+      "Controlling the entire investigation process under legal privilege.",
+      "Hiring specialized outside counsel with FCPA expertise to lead the response.",
+      "Minimizing the creation of documents that could be used against the company in court.",
+      "Ensuring all communication with regulators is handled exclusively by the legal department.",
+      "Crafting a defensible narrative of a swift, thorough, and appropriate response."
+    ],
+    "likely_objections": [
+      "\"No one is to speak with the employee in question. All communication goes through legal.\"",
+      "\"This investigation must be directed by a special committee of the board to maintain privilege.\"",
+      "\"Stop putting things in email. We need to discuss this verbally.\""
+    ],
+    "department": "Legal"
+  },
+  {
+    "name": "James 'Jim' O'Malley",
+    "title": "SVP, Global Sales",
+    "role": "Jim is an old-school sales leader who built the company's salesforce from the ground up. He is responsible for the company's entire global revenue target and is the direct manager of the accused Head of European Sales, whom he personally recruited and mentored.",
+    "power": "medium",
+    "influence": "medium",
+    "concerns": [
+      "The European division missing its annual quota, which would cause the entire company to miss its target.",
+      "A massive drop in morale and high turnover within his sales organization.",
+      "Losing the key government contracts at the center of the allegation.",
+      "Being personally implicated for 'failure to supervise' his subordinate.",
+      "The investigation creating a culture of fear and risk-aversion that stifles sales."
+    ],
+    "motivations": [
+      "Defending his star performer and protege.",
+      "Finding an alternative explanation that clears his division of wrongdoing (e.g., a competitor smear campaign).",
+      "Maintaining 'business as usual' to keep the sales pipeline flowing.",
+      "Preventing 'corporate' from meddling in what he sees as regional business practices.",
+      "Protecting his own substantial bonus, which is tied to the global sales number."
+    ],
+    "likely_objections": [
+      "\"Klaus is one of our best. This is a character assassination by someone he fired for poor performance.\"",
+      "\"If you suspend him, you're telling the whole team we don't have their backs. It's a death sentence for morale.\"",
+      "\"You don't understand. That's just the cost of doing business in that part of the world. It's relationship-building.\""
+    ],
+    "department": "Sales"
+  },
+  {
+    "name": "Anya Sharma",
+    "title": "VP, Internal Audit",
+    "role": "Anya leads the Internal Audit function and reports directly to the Audit Committee of the board. Her team is tasked with providing independent assurance on the company's internal controls and risk management processes. She is a consummate professional focused on process and evidence.",
+    "power": "low",
+    "influence": "medium",
+    "concerns": [
+      "The Internal Audit team lacking the specific forensic accounting and data analysis skills required.",
+      "Being pressured by management or legal to narrow the scope or reach a certain conclusion.",
+      "Maintaining the independence and integrity of her function throughout the process.",
+      "Gaining access to all necessary documents and personnel without obstruction.",
+      "The personal career risk if the audit is seen as a 'whitewash' or a 'witch hunt'."
+    ],
+    "motivations": [
+      "Conducting a by-the-book, evidence-based investigation.",
+      "Following the established investigation protocol without deviation.",
+      "Providing the Audit Committee (her direct boss) with unvarnished, objective facts.",
+      "Upholding the standards of the Institute of Internal Auditors (IIA).",
+      "Using the investigation to demonstrate the value of her team to the board."
+    ],
+    "likely_objections": [
+      "\"We need a formal, written mandate from the Audit Committee to proceed.\"",
+      "\"Our current budget does not cover the necessary digital forensic tools for this kind of work.\"",
+      "\"Legal is trying to restrict our access to certain executive mailboxes by citing privilege.\""
+    ],
+    "department": "Internal Audit"
+  },
+  {
+    "name": "Dr. Kenji Tanaka",
+    "title": "Lead Independent Director",
+    "role": "As the Lead Independent Director, Dr. Tanaka is the designated leader of the board's non-employee directors. A former business school dean and an expert in corporate governance, his primary focus is on the board's fiduciary duty to shareholders.",
+    "power": "medium",
+    "influence": "high",
+    "concerns": [
+      "The board failing in its duty of oversight.",
+      "The investigation not being truly independent from the CEO and management team.",
+      "Personal legal liability for all board members if negligence is proven.",
+      "The long-term erosion of shareholder trust and value.",
+      "The appearance of a conflict of interest if the CEO, who is close to the sales team, leads the response."
+    ],
+    "motivations": [
+      "Protecting the interests of the company's shareholders above all else.",
+      "Ensuring a completely independent investigation, likely overseen by a special committee of the board.",
+      "Holding the senior management team fully accountable for any control failures.",
+      "Demanding full transparency from the CEO and General Counsel to the board.",
+      "Preserving the board's reputation for strong governance."
+    ],
+    "likely_objections": [
+      "\"This matter must be run by a special committee of independent directors, not by management.\"",
+      "\"Is the CEO's relationship with the sales leadership too close for her to be objective here?\"",
+      "\"The external law firm hired for this must report solely to the committee, not the General Counsel.\""
+    ],
+    "department": "Board of Directors"
+  }
+]

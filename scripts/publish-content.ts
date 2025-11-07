@@ -87,7 +87,7 @@ async function publishByPath(type: 'article' | 'case', storagePath: string) {
   }
   const { error: updateError } = await supabase
     .from(tableName)
-    .update({ status: 'published' })
+    .update({ status: 'published', published: true })
     .eq('id', record.id)
   
   if (updateError) {
@@ -161,7 +161,7 @@ async function publishById(type: 'article' | 'case', id: string) {
   }
   const { error: updateError } = await supabase
     .from(tableName)
-    .update({ status: 'published' })
+    .update({ status: 'published', published: true })
     .eq('id', record.id)
   
   if (updateError) {

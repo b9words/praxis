@@ -632,3 +632,4 @@ INSERT INTO public.competencies (id, name, description, parent_id, level) VALUES
   ('55555555-5555-5555-5555-555555555554', 'Performance Management', 'Feedback and evaluation systems', '55555555-5555-5555-5555-555555555551', 'micro_skill'),
   ('55555555-5555-5555-5555-555555555556', 'Budget & Headcount Planning', 'Resource allocation and planning', '55555555-5555-5555-5555-555555555551', 'micro_skill');
 
+

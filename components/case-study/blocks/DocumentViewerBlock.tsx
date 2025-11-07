@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import LoadingSkeleton from '@/components/ui/loading-skeleton'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import SlidesRenderer from '@/components/admin/renderers/SlidesRenderer'
 import { useCaseFile } from '@/hooks/useCaseFile'
 import { AlertCircle, Building2, FileText, TrendingUp } from 'lucide-react'
 import Papa from 'papaparse'
@@ -144,7 +145,12 @@ export default function DocumentViewerBlock({
       )
     }
 
-    // Handle text content (memos, reports, presentations)
+    // Handle PRESENTATION_DECK (Marp slides)
+    if (file.fileType === 'PRESENTATION_DECK' && typeof file.content === 'string') {
+      return <SlidesRenderer content={file.content} />
+    }
+
+    // Handle text content (memos, reports, other markdown)
     if (typeof file.content === 'string') {
       // Check if it's markdown (ends with .md or contains markdown syntax)
       const isMarkdown = file.fileName.endsWith('.md') || 

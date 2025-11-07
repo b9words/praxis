@@ -1,0 +1,157 @@
+{
+  "caseId": "cs_arena_3_2_the_dividend_vs_buyback_debate_1762418067411",
+  "version": "1.0",
+  "title": "The Dividend vs. Buyback Debate",
+  "description": "As CEO of Pinnacle Manufacturing, you're sitting on $1.2B in cash. Your risk-averse CFO is pushing for a quarterly dividend, but you believe a flexible share buyback is the superior path to long-term value. You must critique his proposal and build a compelling, data-driven alternative before the next board meeting.",
+  "competencies": [
+    "Capital Allocation Strategy",
+    "Financial Acumen",
+    "Strategic Communication & Persuasion",
+    "Stakeholder Management"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_deck_01",
+      "fileName": "Project_Bedrock_Dividend_Proposal.pptx",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_data_02",
+      "fileName": "PMI_Financials_5YR.xlsx",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_report_03",
+      "fileName": "Analyst_Commentary_Digest.pdf",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_memo_04",
+      "fileName": "Email_from_CFO_Frank_Valenti.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_press_05",
+      "fileName": "Catalyst_Investors_Public_Letter.md",
+      "fileType": "PRESS_RELEASE",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_stakeholders_06",
+      "fileName": "Key_Players.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_critique",
+      "title": "Stage 1: Critique the Core Premise",
+      "description": "Review the CFO's executive summary and key argument slides. Your task is to add comments that challenge the fundamental assumptions of his 'dividend-first' strategy.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Focus your critique on Slides 2-4 of the 'Project Bedrock' deck. Add comments that identify the strategic blind spots in the CFO's argument. Question the wisdom of a rigid dividend policy given the market environment and the activist investor pressure. What unaddressed risks and missed opportunities does his plan create?",
+        "context": "Your CFO, Frank Valenti, has just sent you his draft board presentation proposing a significant quarterly dividend. He is confident this is the right move, framing it as a signal of stability. However, you are concerned it's a defensive, unimaginative move that squanders a strategic opportunity.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_financial_deconstruction",
+      "title": "Stage 2: Dismantle the Financial Case",
+      "description": "Analyze the financial justification slides in the CFO's deck. Use the provided financial data to add specific, quantitative critiques.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Turn to Slides 5-7 of the 'Project Bedrock' deck, which detail the financial impact. Using the 'PMI_Financials_5YR.xlsx' file, add comments that systematically dismantle his financial arguments. Focus on the tax inefficiency of dividends, the inflexibility compared to buybacks, and how his plan ignores the company's current valuation (P/E, FCF Yield). Your comments should be backed by specific data points.",
+        "context": "Frank's financial case rests on affordability and the appeal to income investors. Your analysis suggests this view is incomplete and fails to consider the primary goal: maximizing long-term value per share. It's time to introduce data that supports a more value-oriented approach.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_build_the_alternative",
+      "title": "Stage 3: Construct the Buyback Proposal",
+      "description": "Insert new slides into the presentation that outline a compelling, data-driven share repurchase program.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Your task is to insert 3 new slides after Slide 7. These slides must constitute a complete, alternative proposal for a value-based share buyback program. \n\nSlide 8 (New): **'The Strategic Case for Share Repurchases'** - Argue why buybacks offer superior flexibility, tax efficiency, and signaling power. \n\nSlide 9 (New): **'Proposed Buyback Program Architecture'** - Define the program's size (e.g., $500M), mechanics (e.g., Open Market Repurchase), and duration. \n\nSlide 10 (New): **'Value-Based Execution'** - Crucially, define the metrics (e.g., 'execute opportunistically when P/E ratio is below 15x') that will govern the program's execution to ensure it's accretive to shareholder value.",
+        "context": "Having critiqued the dividend plan, you must now present a superior alternative. This is your opportunity to demonstrate strategic foresight and financial acumen, shifting the conversation from 'returning cash' to 'intelligently investing in our own undervalued stock'.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_memo_to_the_chair",
+      "title": "Stage 4: Finalize the Executive Narrative",
+      "description": "Draft the definitive executive summary for your revised deck, which will serve as the basis for your pre-briefing memo to the Board Chair.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Review your entire revised presentation, including your critiques and new slides. Now, rewrite Slide 2, the 'Executive Summary'. This new summary must persuasively articulate why your proposed buyback strategy is superior to the original dividend plan. It needs to be concise, data-driven, and anticipate the Board's questions. This text will be the core of your argument when you pre-brief the Board Chair, Sarah Jennings.",
+        "context": "Your case is built. The final step before engaging stakeholders is to crystallize your argument into a powerful, compelling narrative. The Board Chair values clear, decisive, and well-reasoned recommendations. Your new executive summary is your one-page pitch.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Capital Allocation Strategy",
+        "description": "Evaluates the user's ability to choose and defend the optimal capital return method to maximize long-term, per-share value.",
+        "scoringGuide": {
+          "1": "Defaults to the CFO's dividend plan or proposes a buyback without a clear strategic rationale.",
+          "3": "Correctly identifies that buybacks are more flexible and tax-efficient but fails to link the strategy to the company's specific valuation or strategic goals.",
+          "5": "Proposes a sophisticated, value-based buyback program (e.g., opportunistic execution based on intrinsic value metrics) and clearly articulates how it maximizes per-share value over the long term while preserving strategic flexibility."
+        }
+      },
+      {
+        "competencyName": "Financial Acumen",
+        "description": "Assesses the user's ability to use financial data and valuation metrics to build a quantitative case for their recommendation.",
+        "scoringGuide": {
+          "1": "Misinterprets data from the financial statements or makes fundamental errors in comparing the financial impact of dividends and buybacks.",
+          "3": "Correctly identifies basic advantages (e.g., tax efficiency) but does not use specific metrics from the case file to quantify the argument.",
+          "5": "Expertly uses the provided financial data (P/E, FCF yield, balance sheet capacity) to build a compelling quantitative case, justifying the size, timing, and execution triggers of the proposed buyback program."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication & Persuasion",
+        "description": "Measures the user's ability to structure a compelling narrative and communicate it effectively to a senior executive audience.",
+        "scoringGuide": {
+          "1": "Critiques are unprofessional or unclear. The new slides and summary are a simple data dump without a compelling narrative.",
+          "3": "The new slides are factually correct but lack a persuasive story. The executive summary is clear but not compelling or memorable.",
+          "5": "The critique of the CFO's deck is constructive and logical. The new slides and final summary tell a powerful, concise story about value creation, flexibility, and confidence, directly addressing the board's likely concerns and motivations."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the user's ability to frame their proposal in a way that aligns key stakeholders (CFO, Board Chair, Activist Investor).",
+        "scoringGuide": {
+          "1": "The tone of the critique and proposal is likely to alienate the CFO and does not consider the perspectives of the Board Chair or activist.",
+          "3": "The proposal is logically sound but is not framed in a way that actively builds a coalition or manages potential dissent from the CFO.",
+          "5": "The final recommendation is framed as a collaborative search for the best outcome, respecting the CFO's intent while correcting his course, and tailored to appeal to both the activist's desire for action and the Chair's need for prudence and strong governance."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

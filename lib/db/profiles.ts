@@ -163,7 +163,7 @@ export async function getUserResidency(userId: string) {
   return dbCall(async (prisma) => {
     return prisma.userResidency.findUnique({
       where: { userId },
-      select: { currentResidency: true },
+      select: { currentResidency: true, focusCompetency: true },
     })
   })
 }
@@ -189,17 +189,24 @@ export async function getUserResidencyFull(userId: string) {
 /**
  * Upsert user residency
  */
-export async function upsertUserResidency(userId: string, currentResidency: number) {
+export async function upsertUserResidency(
+  userId: string,
+  currentResidency: number,
+  focusCompetency?: string | null
+) {
   return dbCall(async (prisma) => {
+    const updateData: any = { currentResidency }
+    const createData: any = { userId, currentResidency }
+
+    if (focusCompetency !== undefined) {
+      updateData.focusCompetency = focusCompetency
+      createData.focusCompetency = focusCompetency
+    }
+
     return prisma.userResidency.upsert({
       where: { userId },
-      update: {
-        currentResidency,
-      },
-      create: {
-        userId,
-        currentResidency,
-      },
+      update: updateData,
+      create: createData,
     })
   })
 }

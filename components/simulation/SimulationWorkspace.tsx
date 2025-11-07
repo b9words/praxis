@@ -1,6 +1,6 @@
 'use client'
 
-import CaseFileViewer from '@/components/simulation/CaseFileViewer'
+import UniversalAssetViewer from '@/components/simulation/UniversalAssetViewer'
 import DecisionWorkspace from '@/components/simulation/DecisionWorkspace'
 import NeedARefresher from '@/components/simulation/NeedARefresher'
 import ErrorState from '@/components/ui/error-state'
@@ -15,6 +15,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import Link from 'next/link'
+import { ChevronRight, Home } from 'lucide-react'
+import { Progress } from '@/components/ui/progress'
 
 interface SimulationWorkspaceProps {
   caseItem: any
@@ -83,7 +86,7 @@ export default function SimulationWorkspace({
     return {
       title: caseItem.title,
       description: caseItem.description || '',
-      briefing: parseCaseBriefing(caseItem.briefing_doc),
+      briefing: parseCaseBriefing(caseItem.briefingDoc || caseItem.briefing_doc),
       datasets: caseItem.datasets,
       challenges: [{
         id: 'decision-1',
@@ -107,7 +110,8 @@ export default function SimulationWorkspace({
   }, [caseItem, simulation, userId, isLoading])
 
   // Parse case structure for briefing doc (backward compatibility)
-  const caseStructure = caseData?.briefing || parseCaseBriefing(caseItem.briefing_doc)
+  const briefingDoc = caseItem.briefingDoc || caseItem.briefing_doc || null
+  const caseStructure = caseData?.briefing || parseCaseBriefing(briefingDoc)
   
   // Get decision points from case data
   const decisionPoints: DecisionPoint[] = (caseData?.challenges as DecisionPoint[]) || [
@@ -309,10 +313,54 @@ export default function SimulationWorkspace({
   const recommendedLessons = (caseItem as any).recommendedLessons || []
   const showNeedARefresher = competencies.length > 0 && recommendedLessons.length > 0
 
+  // Calculate progress
+  const totalDecisionPoints = decisionPoints.length
+  const currentProgress = state.currentDecisionPoint
+  const progressPercentage = totalDecisionPoints > 0 ? (currentProgress / totalDecisionPoints) * 100 : 0
+
   return (
-    <ResizablePanelGroup direction="horizontal" className="h-full">
-      {/* LEFT PANEL: Case Files & Data */}
-      <ResizablePanel defaultSize={40} minSize={30} maxSize={60}>
+    <div className="h-full flex flex-col">
+      {/* HEADER: Title, Breadcrumb, and Progress */}
+      <div className="border-b border-gray-200 bg-white px-6 py-4">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 uppercase tracking-wide">
+          <Link href="/dashboard" className="hover:text-gray-700 font-medium flex items-center gap-1">
+            <Home className="h-3 w-3" />
+            Dashboard
+          </Link>
+          <ChevronRight className="h-3 w-3" />
+          <Link href="/simulations" className="hover:text-gray-700 font-medium">
+            Simulations
+          </Link>
+          <ChevronRight className="h-3 w-3" />
+          <span className="text-gray-700 font-medium">{caseData?.title || caseItem.title}</span>
+        </div>
+
+        {/* Title and Progress */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">{caseData?.title || caseItem.title}</h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Decision {currentProgress + 1} of {totalDecisionPoints}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-48">
+              <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                <span>Progress</span>
+                <span>{Math.round(progressPercentage)}%</span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN CONTENT: Resizable Panels */}
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          {/* LEFT PANEL: Case Files & Data (60% default for 3:2 ratio) */}
+          <ResizablePanel defaultSize={60} minSize={30} maxSize={70}>
         <div className="h-full flex flex-col overflow-auto">
           {/* Need a Refresher? component */}
           {showNeedARefresher && (
@@ -326,28 +374,31 @@ export default function SimulationWorkspace({
           )}
           {/* Case Files */}
           <div className="flex-1 overflow-auto">
-            <CaseFileViewer
-              briefingDoc={caseItem.briefing_doc}
-              datasets={caseItem.datasets}
-            />
+      <UniversalAssetViewer
+        briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
+        datasets={caseItem.datasets}
+        caseFiles={caseItem.files}
+      />
           </div>
         </div>
       </ResizablePanel>
 
-      <ResizableHandle withHandle />
+          <ResizableHandle withHandle />
 
-      {/* RIGHT PANEL: Decision Workspace */}
-      <ResizablePanel defaultSize={60}>
-        <DecisionWorkspace
-          decisionPoints={decisionPoints}
-          personas={caseStructure?.keyStakeholders || []}
-          currentIndex={state.currentDecisionPoint}
-          decisions={state.decisions}
-          onDecisionComplete={handleDecisionComplete}
-          onComplete={handleComplete}
-          softPaywallEnabled={softPaywallEnabled}
-        />
-      </ResizablePanel>
-    </ResizablePanelGroup>
+          {/* RIGHT PANEL: Decision Workspace (40% default for 3:2 ratio) */}
+          <ResizablePanel defaultSize={40} minSize={30} maxSize={70}>
+            <DecisionWorkspace
+              decisionPoints={decisionPoints}
+              personas={caseStructure?.keyStakeholders || []}
+              currentIndex={state.currentDecisionPoint}
+              decisions={state.decisions}
+              onDecisionComplete={handleDecisionComplete}
+              onComplete={handleComplete}
+              softPaywallEnabled={softPaywallEnabled}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+    </div>
   )
 }

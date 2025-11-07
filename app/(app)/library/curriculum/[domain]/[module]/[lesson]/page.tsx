@@ -1,7 +1,7 @@
 import BookmarkButton from '@/components/library/BookmarkButton'
 import CaseStudyCard from '@/components/library/CaseStudyCard'
 import LessonViewTracker from '@/components/library/LessonViewTracker'
-import ProgressTracker from '@/components/library/ProgressTracker'
+import LessonDomainCompletionHandler from '@/components/library/LessonDomainCompletionHandler'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
@@ -552,13 +552,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
               />
             )}
 
-            {/* Progress Tracker */}
+            {/* Progress Tracker with Domain Completion Handler */}
             {user && (
-              <ProgressTracker
+              <LessonDomainCompletionHandler
                 userId={user.id}
                 domainId={domainId}
                 moduleId={moduleId}
                 lessonId={lessonId}
+                domainTitle={displayDomainTitle}
                 initialProgress={currentProgress?.progress_percentage || 0}
                 initialStatus={(currentProgress?.status as 'not_started' | 'in_progress' | 'completed') || 'not_started'}
                 initialTimeSpent={currentProgress?.time_spent_seconds || 0}

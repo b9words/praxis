@@ -3,8 +3,8 @@
  * All simulation database operations go through here
  */
 
-import { dbCall, assertFound, isColumnNotFoundError } from './utils'
 import type { Prisma } from '@prisma/client'
+import { assertFound, dbCall, isColumnNotFoundError } from './utils'
 
 export interface SimulationFilters {
   userId?: string
@@ -123,6 +123,24 @@ export async function createSimulation(data: {
   }
 
   return dbCall(async (prisma) => {
+    // Verify user exists before creating simulation (userId is required, cannot be null)
+    if (data.userId && data.userId.trim()) {
+      try {
+        const userExists = await prisma.profile.findUnique({
+          where: { id: data.userId },
+          select: { id: true },
+        })
+        if (!userExists) {
+          console.warn(`[createSimulation] User ${data.userId} not found, simulation creation will fail with FK error`)
+          // Note: We don't set userId to null because simulations MUST have a valid user
+          // This will cause a foreign key constraint error, which is the correct behavior
+        }
+      } catch (err) {
+        console.warn('[createSimulation] Failed to verify user:', err)
+        // Continue - FK constraint will catch invalid user
+      }
+    }
+    
     return prisma.simulation.create({
       data: {
         userId: data.userId,

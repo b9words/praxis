@@ -18,7 +18,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 import type { User } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
-import { BarChart3, BookOpen, Target } from 'lucide-react'
+import { BarChart3, BookOpen, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
@@ -73,6 +73,12 @@ export default function Navbar({ user, profile }: NavbarProps) {
       label: 'Simulations',
       icon: Target,
       description: userProgress ? `${userProgress.simulationsCompleted} completed` : 'Simulation scenarios'
+    },
+    {
+      href: '/community',
+      label: 'Network',
+      icon: Users,
+      description: 'Connect with peers'
     },
   ]
 

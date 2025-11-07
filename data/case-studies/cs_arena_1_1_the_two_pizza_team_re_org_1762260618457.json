@@ -1,0 +1,125 @@
+{
+  "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762260618457",
+  "version": "1.0",
+  "title": "The 'Two-Pizza Team' Re-Org at ScaleGrid",
+  "description": "ScaleGrid, a high-growth B2B SaaS company, is drowning in its own success. The once-nimble product development engine is now a sclerotic bureaucracy. As the newly hired Chief Product Officer, your mandate is to restructure the 1,200-person Product & Engineering organization to restore its speed and agility before a new competitor eats your lunch.",
+  "competencies": [
+    "Organizational Design",
+    "Stakeholder Management",
+    "Change Leadership",
+    "Data-Driven Decision Making"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_org_chart_sg_q3",
+      "fileName": "scalegrid_org_chart_q3.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[CSV data showing a complex matrix structure. Will contain columns: employee_id, name, title, department, sub_department, manager_id, project_initiative_id. An engineer will have a manager_id in the Engineering org but also a project_initiative_id in the Product org, demonstrating the 'two bosses' problem.]"
+      }
+    },
+    {
+      "fileId": "cf_employee_survey_h1",
+      "fileName": "employee_engagement_survey_h1.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Markdown report summarizing survey results with critically low scores for 'Pace of Decision Making' and 'Ability to Make an Impact'. Includes curated, conflicting qualitative comments from engineers decrying bureaucracy and directors defending process for quality control.]"
+      }
+    },
+    {
+      "fileId": "cf_pne_financials_8q",
+      "fileName": "product_engineering_kpis_8quarters.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[CSV data showing rising headcount and budget by ~15% per quarter, while 'features_shipped' has remained flat and 'avg_cycle_time_days' has risen from 90 to 270 over the last 8 quarters.]"
+      }
+    },
+    {
+      "fileId": "cf_ceo_mandate_memo",
+      "fileName": "memo_from_ceo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Confidential email from the CEO to the user. It will outline the mandate to 'fix our product engine' but also contain political warnings: '...remember that David and his team built this company, you'll need them on side...' and '...make sure this re-org doesn't disrupt Q4 revenue goals...']"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_diagnosis_and_alliances",
+      "title": "Stage 1: Diagnosis & Initial Strategy (Days 1-30)",
+      "description": "Your first month on the job. Analyze the provided data to formulate your initial diagnosis of the root causes and outline a strategy for building early alliances with key, and potentially resistant, stakeholders.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "As the new Chief Product Officer, you must create the first section of your 100-Day Plan. **Write a 1-page memo to the CEO outlining your diagnosis of the core organizational issues and your strategy for the first 30 days.** Your memo must:\n1.  Synthesize evidence from the provided case files (Financials, Survey, Org Chart) to define the problem.\n2.  Detail your specific plan for engaging with David Chen (VP Eng) and Maria Flores (Head of New Products) to build momentum for change.",
+        "context": "You've been on the job for one week at ScaleGrid. The CEO has given you her full political backing to 'break some glass' but warned you to be mindful of legacy leadership and cultural inertia. Your first task is to absorb the data and formulate a clear starting position."
+      }
+    },
+    {
+      "stageId": "stage_2_architectural_design",
+      "title": "Stage 2: The New Organizational Blueprint (Days 31-60)",
+      "description": "Based on your diagnosis, it's time to design the new organizational structure. This is the core strategic decision of your plan and must balance the need for speed with the reality of the existing business and leadership team.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You are 30 days in. It's time to propose a new organizational structure. **Create the second section of your 100-Day Plan: a 2-page proposal for the new organizational model.** Your proposal must include:\n1.  A clear rationale for your chosen model (e.g., Pure 'Two-Pizza Teams', Hybrid Model, Value-Stream Alignment, etc.).\n2.  A high-level diagram illustrating the new reporting lines and team structure.\n3.  An analysis of the primary risks (e.g., technical fragmentation, political backlash) and how you will mitigate them, specifically addressing the concerns of David Chen (VP Eng) and Liam O'Connell (CFO).",
+        "context": "Your initial diagnosis has confirmed that the matrix structure is the root cause of the slowdown. The CEO is expecting a bold, data-backed proposal that she can support at the board level. Your key VPs are anxious to see which direction you will take."
+      }
+    },
+    {
+      "stageId": "stage_3_implementation_and_communication",
+      "title": "Stage 3: The Implementation & Communication Plan (Days 61-90)",
+      "description": "An organizational design is only as good as its implementation. Now, you must create a detailed plan for the rollout that manages the human side of this massive change, anticipates resistance, and builds excitement for the future state.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The CEO has approved your proposed structure in principle. **Write the final section of your 100-Day Plan: a detailed communication and implementation roadmap.** This document must specify:\n1.  Your chosen rollout strategy (e.g., 'Big Bang', Phased Rollout) and a justification for your choice.\n2.  A timeline for the first 90 days of implementation, including key milestones.\n3.  A draft of the key messages for the all-hands meeting announcing the change, designed to inspire confidence and minimize employee anxiety.",
+        "context": "The organization is rife with rumors about a major re-org. Your communication strategy will determine whether the change is embraced or rejected by the very people you need to execute it. This is your chance to lead from the front."
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the quality and feasibility of the proposed organizational structure and its alignment with the company's strategic goals.",
+        "scoringGuide": {
+          "1": "Proposes a generic, one-size-fits-all model without referencing specific bottlenecks from the case files. The plan ignores the company's unique context and constraints.",
+          "3": "Selects a reasonable structure but fails to articulate a strong, data-driven rationale. The plan lacks detail on how teams will be formed, governed, and measured.",
+          "5": "Articulates a clear, sophisticated rationale for a structure that directly solves for the decision-making bottlenecks. The design cleverly balances trade-offs and includes specifics on team mission, governance, and success metrics."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the ability to identify key stakeholders, understand their motivations, and develop a strategy to gain their buy-in.",
+        "scoringGuide": {
+          "1": "Ignores or antagonizes key stakeholders like David Chen or Liam O'Connell. Makes decisions in a vacuum, leading to a plan that would be dead on arrival.",
+          "3": "Acknowledges stakeholder concerns but is largely reactive. The plan placates them but doesn't actively leverage their expertise or build genuine buy-in for the change.",
+          "5": "Proactively frames the change in terms of each stakeholder's motivations (stability for David, speed for Maria, ROI for Liam). Co-opts them into the process, turning potential blockers into allies."
+        }
+      },
+      {
+        "competencyName": "Change Leadership",
+        "description": "Measures the quality of the communication and implementation plan, focusing on the ability to lead people through uncertainty.",
+        "scoringGuide": {
+          "1": "The rollout and communication plan is unclear, top-down, and likely to cause fear and confusion. Fails to create a compelling narrative for the change.",
+          "3": "Provides a basic, logical communication plan (e.g., 'an all-hands meeting'). It lacks empathy and fails to anticipate second-order effects like employee anxiety or rumors.",
+          "5": "Creates a sophisticated, multi-stage communication plan that is clear, empathetic, and inspiring. It anticipates resistance, builds a coalition of champions, and creates a clear 'What's in it for me?' for employees."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Evaluates the ability to synthesize quantitative and qualitative data from the case files to build a compelling argument for change.",
+        "scoringGuide": {
+          "1": "Makes broad assertions without referencing specific evidence from the case files. The diagnosis and recommendations feel based on opinion rather than fact.",
+          "3": "References data points from the files but does not effectively connect them to form a cohesive argument. The data is used as decoration, not as the foundation of the strategy.",
+          "5": "Skillfully weaves quantitative (financials, cycle time) and qualitative (survey comments, CEO memo) data together to build an undeniable case for their proposed changes at every stage."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

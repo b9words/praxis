@@ -1,9 +1,58 @@
 import { Button } from '@/components/ui/button'
 import { cache, CacheTags } from '@/lib/cache'
-import fs from 'fs'
+import { listCases } from '@/lib/db/cases'
 import { ArrowRight, BookOpen, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
-import path from 'path'
+
+/**
+ * Strip markdown formatting and truncate text for preview
+ */
+function stripMarkdownAndTruncate(text: string, maxLength: number = 150): string {
+  if (!text) return ''
+  
+  // Remove markdown headers
+  let cleaned = text.replace(/^#{1,6}\s+/gm, '')
+  
+  // Remove bold/italic
+  cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1')
+  cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1')
+  cleaned = cleaned.replace(/__([^_]+)__/g, '$1')
+  cleaned = cleaned.replace(/_([^_]+)_/g, '$1')
+  
+  // Remove links but keep text
+  cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+  
+  // Remove code blocks
+  cleaned = cleaned.replace(/```[\s\S]*?```/g, '')
+  cleaned = cleaned.replace(/`([^`]+)`/g, '$1')
+  
+  // Remove images
+  cleaned = cleaned.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '')
+  
+  // Remove list markers
+  cleaned = cleaned.replace(/^[\s]*[-*+]\s+/gm, '')
+  cleaned = cleaned.replace(/^[\s]*\d+\.\s+/gm, '')
+  
+  // Remove blockquotes
+  cleaned = cleaned.replace(/^>\s+/gm, '')
+  
+  // Clean up whitespace
+  cleaned = cleaned.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
+  
+  // Truncate
+  if (cleaned.length <= maxLength) {
+    return cleaned
+  }
+  
+  // Truncate at word boundary
+  const truncated = cleaned.substring(0, maxLength)
+  const lastSpace = truncated.lastIndexOf(' ')
+  return lastSpace > 0 
+    ? truncated.substring(0, lastSpace) + '...'
+    : truncated + '...'
+}
+
+export const dynamic = 'force-dynamic'
 
 interface CaseStudyMeta {
   caseId: string
@@ -16,36 +65,20 @@ interface CaseStudyMeta {
 
 async function getAllCaseStudies(): Promise<CaseStudyMeta[]> {
   try {
-    const caseStudiesDir = path.join(process.cwd(), 'data', 'case-studies')
+    // Load from database - only published cases
+    const cases = await listCases({})
     
-    if (!fs.existsSync(caseStudiesDir)) {
-      return []
-    }
-
-    const files = fs.readdirSync(caseStudiesDir).filter(file => file.endsWith('.json'))
-    
-    const caseStudies: CaseStudyMeta[] = []
-
-    for (const file of files) {
-      try {
-        const filePath = path.join(caseStudiesDir, file)
-        const fileContents = fs.readFileSync(filePath, 'utf8')
-        const data = JSON.parse(fileContents)
-        
-        caseStudies.push({
-          caseId: data.caseId,
-          title: data.title,
-          description: data.description,
-          competencies: data.competencies || [],
-          estimatedDuration: data.estimatedDuration,
-          difficulty: data.difficulty
-        })
-      } catch (error) {
-        console.error(`Error loading case study ${file}:`, error)
+    return cases.map((c) => {
+      const metadata = c.metadata as any || {}
+      return {
+        caseId: metadata.caseId || c.id,
+        title: c.title,
+        description: c.description || '',
+        competencies: metadata.competencies || c.competencies?.map(cc => cc.competency.name) || [],
+        estimatedDuration: c.estimatedMinutes,
+        difficulty: (c.difficulty || 'intermediate') as 'beginner' | 'intermediate' | 'advanced'
       }
-    }
-
-    return caseStudies
+    })
   } catch (error) {
     console.error('Error loading case studies:', error)
     return []
@@ -142,8 +175,8 @@ export default async function CaseStudiesPage() {
                         <h3 className="text-base font-medium text-neutral-900 mb-2 leading-tight">
                           {caseStudy.title}
                         </h3>
-                        <p className="text-sm text-neutral-600 leading-relaxed">
-                          {caseStudy.description}
+                        <p className="text-sm text-neutral-600 leading-relaxed line-clamp-3">
+                          {stripMarkdownAndTruncate(caseStudy.description, 200)}
                         </p>
                       </div>
                       
@@ -186,7 +219,7 @@ export default async function CaseStudiesPage() {
                       </div>
                       
                       <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
-                        <Link href={`/library/case-studies/${caseStudy.caseId}`}>
+                        <Link href={`/simulations/${caseStudy.caseId}/brief`}>
                           Start Case
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>

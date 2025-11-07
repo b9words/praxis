@@ -1,0 +1,146 @@
+{
+  "caseId": "cs_arena_3_3_the_activist_s_ultimatum_1762417021132",
+  "version": "1.0",
+  "title": "The Activist's Ultimatum",
+  "description": "You are the CEO of Veridian Dynamics, a diversified industrial conglomerate whose stock has been underperforming. You've just received a private letter from an aggressive activist investor demanding you spin off a major division within 30 days or face a public proxy fight to oust you and the board. You have 24 hours to analyze the threat and prepare a confidential briefing for an emergency board meeting.",
+  "competencies": [
+    "Capital Allocation Strategy",
+    "Strategic Communication",
+    "Stakeholder Management",
+    "Decision-Making Under Pressure"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_vu_letter_01",
+      "fileName": "Vanguard_Capital_Ultimatum_Letter.md",
+      "fileType": "LEGAL_DOCUMENT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "file_shareholder_rpt_02",
+      "fileName": "VDN_Shareholder_Base_Analysis.csv",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "file_unison_model_03",
+      "fileName": "Project_Unison_Financial_Model.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "file_cfo_memo_04",
+      "fileName": "Memo_from_CFO_Anya_Sharma.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "file_division_head_email_05",
+      "fileName": "Email_from_Frank_Costello.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "file_stakeholder_profiles_06",
+      "fileName": "Key_Actor_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_threat_assessment_1",
+      "title": "Threat Assessment & Triage",
+      "description": "First, you must develop a clear-eyed view of the situation. Synthesize the activist's letter and the shareholder base analysis to form an initial assessment of the threat.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a 1-2 paragraph summary assessing the credibility and severity of Vanguard Capital's threat. Based on their letter and Veridian's shareholder composition, how likely are they to succeed in a proxy fight? What is your initial framing of this problem: is it a financial engineering problem, a strategic negotiation, or a corporate governance battle?",
+        "context": "Damien Hawke's letter is on your desk. You know his reputation for being relentless. Your Investor Relations team has just sent over the latest analysis of your shareholder base. Your first task is to decide just how much leverage Hawke actually has.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_options_analysis_2",
+      "title": "Strategic Options Analysis",
+      "description": "With a clear view of the threat, you must now evaluate your potential paths forward. Analyze the conflicting inputs from your CFO and your Appliances Division Head to weigh the pros and cons of each strategic option.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a balanced analysis of the three core strategic options: FIGHT, NEGOTIATE, or CAPITULATE (agree to the spin-off). For each option, summarize the primary quantitative argument (using the CFO's model) and the primary qualitative risk (using the stakeholder memos). Which path presents the most significant risk to your leadership, and which presents the most risk to the company's long-term health?",
+        "context": "Your inbox contains two diametrically opposed views. Your CFO, Anya Sharma, has provided a financial model that, on paper, shows the potential value unlocked by a spin-off but warns of massive execution risk. Meanwhile, Frank Costello, head of the targeted division, has sent a passionate plea highlighting the intangible synergies and cultural damage the spin-off would cause.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_board_briefing_3",
+      "title": "Recommendation & Board Briefing",
+      "description": "The time for analysis is over. You must now make a decision and prepare to convince your board. Draft the executive summary of the confidential briefing document you will present at tomorrow morning's emergency meeting.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft the 3-paragraph executive summary for your confidential board briefing. \n\n**Paragraph 1: The Situation.** Succinctly summarize Hawke's demand and your assessment of the threat. \n**Paragraph 2: The Recommendation.** State your recommended path (Fight, Negotiate, or Capitulate) and provide the single most compelling reason for your choice, integrating both financial and strategic logic. \n**Paragraph 3: Next Steps.** Outline the immediate, concrete actions you and the board must take in the next 72 hours to execute your chosen strategy.",
+        "context": "You are walking into the boardroom tomorrow morning. The board chair, Eleanor Vance, expects a clear, decisive, and well-reasoned plan. Your career, and the future of Veridian Dynamics, depends on your ability to project confidence and control in this briefing.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Capital Allocation Strategy",
+        "description": "Assesses the ability to make a sound decision about the company's structure and assets to maximize long-term shareholder value, weighing financial metrics against strategic goals.",
+        "scoringGuide": {
+          "1": "Recommendation is purely reactive (e.g., 'we must fight because he's a bully') and ignores the financial data and trade-offs. Fails to articulate any value-creation thesis.",
+          "3": "Acknowledges the financial trade-offs but the recommendation is not strongly supported by a synthesis of the qualitative and quantitative evidence. The chosen path feels more like a compromise than a conviction.",
+          "5": "Recommendation clearly articulates how the chosen path (Fight, Negotiate, or Capitulate) will create the most sustainable, long-term shareholder value, masterfully blending financial logic from the model with strategic risks and opportunities."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Assesses the ability to craft a persuasive, clear, and confident message for a high-stakes audience (the Board of Directors) under pressure.",
+        "scoringGuide": {
+          "1": "The board briefing is unclear, panicked, defensive, or overly aggressive. It fails to build a confident case and would likely cause the board to lose faith in the CEO's leadership.",
+          "3": "The briefing presents the facts clearly but lacks a compelling narrative. The recommendation is stated but not persuasively 'sold' to the board, leaving room for doubt.",
+          "5": "The briefing is structured, persuasive, and decisive. It frames the recommendation proactively, anticipates board concerns, and outlines a clear, confidence-inspiring plan of action that galvanizes support."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the ability to analyze the motivations and biases of key stakeholders and incorporate those considerations into a robust strategic plan.",
+        "scoringGuide": {
+          "1": "Dismisses the concerns of key stakeholders (e.g., calls the division head 'emotional' or the activist 'a criminal'). Fails to consider second-order effects of the decision on people and relationships.",
+          "3": "Acknowledges the different stakeholder perspectives but does not integrate them into a cohesive plan. The chosen path alienates at least one key party unnecessarily.",
+          "5": "The final recommendation and next steps include a clear plan for managing and communicating with all key stakeholders (the board, employees, the activist, and other investors) to mitigate risk and build alignment."
+        }
+      },
+      {
+        "competencyName": "Decision-Making Under Pressure",
+        "description": "Assesses the ability to rapidly synthesize complex, conflicting information under a tight deadline to make a reasoned and defensible judgment.",
+        "scoringGuide": {
+          "1": "The analysis is superficial, and the recommendation feels like a gut reaction to the immediate pressure. Fails to see beyond the 30-day deadline and panics.",
+          "3": "The analysis is logical but 'plays it safe.' The recommendation avoids the hardest parts of the dilemma rather than confronting them directly.",
+          "5": "Demonstrates exceptional composure. The recommendation is a decisive, well-reasoned judgment made after rapidly synthesizing complex financial, strategic, and interpersonal data under extreme time pressure."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

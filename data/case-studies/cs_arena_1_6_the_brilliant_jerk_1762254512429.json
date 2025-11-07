@@ -1,0 +1,130 @@
+{
+  "caseId": "cs_arena_1_6_the_brilliant_jerk_1762254512429",
+  "version": "1.0",
+  "title": "The Brilliant Jerk",
+  "description": "You are the new VP of Engineering at Innovatec Solutions, a high-growth SaaS company. Your top priority is the launch of 'Project Meridian,' but its lead architect, Alex Mercer, is a brilliant but toxic employee whose behavior is driving away talent. You must create a 100-day plan to resolve this dilemma without derailing the company's most critical project.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Stakeholder Management",
+    "Risk Assessment & Mitigation",
+    "Decisive Communication"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_brilliant_jerk_perf_data_01",
+      "fileName": "performance_data.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Employee_Name,Role,Team,Quarterly_Code_Commits,Features_Shipped,Closed_Bug_Tickets,360_Collaboration_Score\nAlex Mercer,Lead Architect,Meridian,982,12,154,1.2\nSarah Jenkins,Senior Engineer,Meridian,310,4,68,4.5\nMichael Chen,Senior Engineer,Meridian,295,3,71,4.2\nEmily Rodriguez,Mid-Level Engineer,Meridian,250,2,55,3.9\nDavid Lee,Mid-Level Engineer,Meridian,STATUS_RESIGNED,210,2,48,3.5\nJessica Williams,Junior Engineer,Meridian,STATUS_RESIGNED,180,1,35,4.1"
+      }
+    },
+    {
+      "fileId": "cf_brilliant_jerk_hr_report_02",
+      "fileName": "hr_report.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "### CONFIDENTIAL HR MEMORANDUM\n\n**TO:** VP of Engineering\n**FROM:** Sarah Chen, HR Business Partner\n**DATE:** [Current Date]\n**SUBJECT:** URGENT: Retention Risk and Hostile Work Environment Concerns in Project Meridian Team\n\nThis memo summarizes findings from two recent exit interviews (David Lee, Jessica Williams) and one informal complaint regarding the conduct of Alex Mercer, Lead Architect on Project Meridian.\n\n**Key Themes from Exit Interviews:**\n- Both departing employees cited Alex Mercer's behavior as the primary reason for their resignation.\n- Specific examples include 'public shaming of ideas during code review,' 'hoarding of critical architectural information,' and a 'consistently dismissive and belittling attitude' in team meetings.\n- Both expressed that they felt unable to learn or contribute effectively in such an environment, despite their respect for Alex's technical skills.\n\n**Informal Complaint Summary:**\n- An active engineer on the Meridian team (name withheld) has reported feeling intimidated by Alex and is actively avoiding asking questions for fear of being 'made to feel stupid in front of the team.'\n\n**Recommendation:**\nHR strongly recommends immediate intervention. We advise implementing a formal Performance Improvement Plan (PIP) for Alex Mercer, focusing exclusively on behavioral and communication competencies. Failure to act decisively poses a significant ongoing flight risk to the team and exposes Innovatec to potential legal liability for fostering a hostile work environment."
+      }
+    },
+    {
+      "fileId": "cf_brilliant_jerk_cto_memo_03",
+      "fileName": "cto_memo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "**From:** David Reed (CTO) <d.reed@innovatec.com>\n**To:** [User Name] <user@innovatec.com>\n**Subject:** Welcome! Let's hit the ground running on Meridian\n\nWelcome to the team! I am incredibly excited to have you on board. As you know, the successful launch of Project Meridian is the single most important objective for the company over the next two quarters. Your leadership is critical to getting us across the finish line.\n\nPlease take this first week to get the lay of the land, but I need us to sync early next week to review the revised project plan.\n\nP.S. Make sure you connect with Alex Mercer ASAP. He just had a massive breakthrough on the data ingestion module that single-handedly put us back on track to hit our Q3 beta target. He's the key to this whole thing. Whatever you do, keep him happy and productive."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "bj_stage_1_diagnosis",
+      "title": "Stage 1: Triage & Diagnosis",
+      "description": "Develop a 30-day discovery plan to understand the full scope of the problem.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "It's your first week. You've reviewed the org chart, project status, and the attached case files. Your first task is to create a 30-day discovery plan. Whom do you meet with, in what order, and what are the 3 key questions you will ask each stakeholder (Alex, Sarah, David, and a 'skip-level' meeting with two of Alex's direct reports)?",
+        "context": "You are under immense pressure to get the Meridian project back on track, but the HR report and performance data suggest a deep cultural problem centered around your most critical engineer. Your initial actions will set the tone for your leadership and could either stabilize or inflame the situation.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "bj_stage_2_intervention",
+      "title": "Stage 2: The Intervention Plan",
+      "description": "Design the critical feedback conversation with Alex Mercer.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You've completed your discovery. The situation is exactly as you feared: Alex's technical value is immense, and his cultural cost is severe. You must now structure and script the critical feedback conversation with Alex. You must define: 1) The three non-negotiable behavioral changes required (with specific examples). 2) How you will redefine 'performance' to include team health metrics. 3) The clear, time-bound consequences if these changes are not met.",
+        "context": "This is the most crucial conversation you will have. Your goal is not to win an argument, but to create clarity and establish new standards of accountability. The CTO, David Reed, is expecting you to 'handle' Alex without disrupting the timeline.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "bj_stage_3_contingency",
+      "title": "Stage 3: The Contingency Build",
+      "description": "Prepare for the worst-case scenario: Alex's departure.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Alex's reaction to your intervention was defensive. He has not explicitly rejected your terms, but his behavior has not improved, and you believe the risk of his departure (or termination) is now 50/50. The CTO is demanding your 100-day plan. Your task is to write the 'Contingency' section of this plan. It must detail the operational steps to mitigate his departure, including knowledge transfer protocols, a 'Plan B' for the Meridian architecture, and a communication plan for both the team and the CTO.",
+        "context": "Your ability to present a credible contingency plan is the only way to get the CTO's buy-in for taking a hard line with Alex. A weak plan will force you to back down, destroying your credibility with the team. A strong plan shows you are managing risk, not just personnel.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "bj_stage_4_final_plan",
+      "title": "Stage 4: The Final 100-Day Plan",
+      "description": "Synthesize your work into a final memo for the CTO.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Synthesize your work from the previous stages into a final, concise 2-page 'First 100 Days Plan' memo to David Reed (CTO). The memo must outline your complete strategy, integrating your diagnosis, intervention plan, and contingency plan. Your goal is to secure his support by demonstrating that your approach is the best way to manage the total risk to the Project Meridian launch.",
+        "context": "This artifact is the culmination of your analysis. It must be strategic, data-informed, and decisive. It needs to reassure your boss that you have a firm grip on both the technical and cultural challenges facing your division.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "Assesses the ability to define performance beyond just technical output, incorporating behavior and team impact, and to take decisive action on underperformance against those standards.",
+        "scoringGuide": {
+          "1": "Fails to address the behavioral issues directly, focusing only on technical output. Proposes vague, ineffective solutions like 'coaching' without clear metrics or consequences.",
+          "3": "Correctly identifies the behavioral problem but creates a plan with unclear consequences, ambiguous metrics, or an overly long timeline for improvement.",
+          "5": "Creates a plan with specific, measurable, non-negotiable behavioral standards and clear, time-bound consequences for failure. Redefines 'high performance' for the entire team."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Measures the ability to understand and navigate the competing priorities of different stakeholders (CTO, HR, team members) to achieve a strategic objective.",
+        "scoringGuide": {
+          "1": "Capitulates entirely to the CTO's demands, ignoring the HR/team risk. Alternatively, alienates the CTO by ignoring his primary goal of launching the project on time.",
+          "3": "Acknowledges the conflict between stakeholders but fails to propose a solution that effectively navigates both concerns, leading to a suboptimal compromise.",
+          "5": "Develops a plan that reframes the problem for the CTO, showing how addressing the cultural risk is the best strategy to de-risk the project launch in the long term, thereby aligning stakeholders."
+        }
+      },
+      {
+        "competencyName": "Risk Assessment & Mitigation",
+        "description": "Evaluates the ability to identify, assess, and create credible, detailed plans to mitigate critical project and personnel risks.",
+        "scoringGuide": {
+          "1": "Ignores or downplays the risk of Alex leaving or being fired. The plan lacks any form of contingency, essentially gambling on a positive outcome.",
+          "3": "Acknowledges the risk of Alex's departure, but the contingency plan is superficial and lacks detail (e.g., 'we will hire a new architect').",
+          "5": "Builds a detailed, credible, and actionable contingency plan covering knowledge transfer, technical succession, team morale, and timeline adjustments. The plan demonstrates a proactive approach to risk management."
+        }
+      },
+      {
+        "competencyName": "Decisive Communication",
+        "description": "Assesses the quality and clarity of communication plans, particularly in high-stakes, conflict-ridden situations. This includes both the planned conversation with the employee and the strategic memo to leadership.",
+        "scoringGuide": {
+          "1": "The planned communication with Alex is soft, apologetic, or avoids the core conflict. The memo to the CTO is unclear or indecisive.",
+          "3": "The communication plan is direct but lacks empathy or fails to connect the required behavioral changes to broader business and team impact.",
+          "5": "The communication plan is clear, firm, and professional. It frames required changes in terms of team success and company values, and the leadership memo is persuasive and well-structured."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

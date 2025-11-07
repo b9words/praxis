@@ -1,0 +1,139 @@
+{
+  "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762269848976",
+  "version": "1.0",
+  "title": "The 'Two-Pizza Team' Re-Org",
+  "description": "ConnectSphere, a high-growth SaaS company, is facing a crisis of scale. As the new Chief Product Officer, you must overhaul the bloated Product & Engineering organization to reignite innovation before the company's competitive edge is lost forever.",
+  "competencies": [
+    "Organizational Design",
+    "Change Management",
+    "Stakeholder Influence",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_org_chart_csv_01",
+      "fileName": "current_org_chart.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "EmployeeID,Name,Title,Department,Sub_Department,ManagerID,Dotted_Line_ManagerID\nE1001,Anya Sharma,CEO,Executive,,,\nE2001,David Chen,CFO,Executive,E1001,\nE3001,Marcus Thorne,VP of Engineering,Engineering,,E1001,\nE3002,Sarah Lee,Director of Engineering,Engineering,Platform,E3001,\nE3003,Mike Brown,Engineering Manager,Engineering,Mobile,E3002,P5002\nE4001,You,Chief Product Officer,Product,,E1001,\nE4002,Jane Doe,Director of Product,Product,Growth,E4001,\nE4003,Peter Jones,Product Manager,Product,Growth,E4002,P5003\n..."
+      }
+    },
+    {
+      "fileId": "file_survey_results_md_02",
+      "fileName": "quarterly_employee_survey_summary.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "## Q3 Employee Survey Summary (Product & Engineering)\n\n**eNPS Score:** -25 (down from +15 year-over-year)\n\n### Key Themes from Verbatim Comments:\n\n*   **Decision Paralysis:** \"I spend 80% of my week in 'alignment meetings'. We talk about work more than we do it.\"\n*   **Dependency Hell:** \"My team can't ship a simple button change without getting sign-off from three other teams. It's demoralizing.\"\n*   **Conflicting Priorities:** \"I have five 'priority-one' projects from three different VPs. If everything is a priority, nothing is.\"\n*   **Lack of Autonomy:** \"We are treated like a feature factory. We don't have ownership; we are just given tickets to complete.\""
+      }
+    },
+    {
+      "fileId": "file_kpi_dashboard_csv_03",
+      "fileName": "rd_performance_dashboard.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Quarter,Headcount_Product,Headcount_Eng,R&D_OpEx,Features_Shipped,ARR_Growth_Rate\nQ3 2021,50,150,12000000,45,0.25\nQ4 2021,65,200,15000000,48,0.22\nQ1 2022,80,250,19000000,51,0.18\nQ2 2022,120,400,25000000,55,0.15\nQ3 2022,150,500,32000000,53,0.11\nQ4 2022,180,620,38000000,54,0.08"
+      }
+    },
+    {
+      "fileId": "file_conflicting_memos_md_04",
+      "fileName": "conflicting_memos.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "### Memo 1\n**TO:** all-company@connectsphere.com\n**FROM:** Anya Sharma, CEO\n**SUBJECT:** Welcoming our new CPO and our Next Chapter of Innovation!\n\nTeam,\n\nPlease join me in giving a massive welcome to our new Chief Product Officer! They join us with a mandate to help us reclaim our Day 1 agility. We need to break down silos, empower our teams, and dramatically increase the speed at which we deliver value to our customers. I have tasked them with presenting a bold plan to do just that. Let's get back to building!\n\n-- Anya\n\n### Memo 2\n**TO:** eng-leadership@connectsphere.com\n**FROM:** Marcus Thorne, VP of Engineering\n**SUBJECT:** Thoughts on Scaling with Discipline\n\nLeaders,\n\nAs we prepare to welcome new leadership, I want to reinforce the principles that have allowed us to scale. Our current matrix structure, while complex, ensures technical consistency and quality across our platform. I caution against the allure of 'agile fads' that can lead to technical fragmentation and chaos. Stability and discipline are not the enemies of speed; they are its foundation. Let's ensure we preserve what works as we evolve.\n\n-- Marcus"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_diagnosis",
+      "title": "Stage 1: The First 30 Days - Diagnosis & Alliance Building",
+      "description": "Your first month on the job. You need to understand the root cause of the slowdown and build the political capital for the tough changes ahead. Your initial analysis will form the problem statement of your 100-day plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Based on your review of the case files and stakeholder personas, write the introduction to your 100-day plan. It must clearly define: \n1. The core problem at ConnectSphere, using data from the provided files to support your diagnosis. \n2. Your high-level vision for the future state of the P&E organization. \n3. A stakeholder analysis outlining the primary concerns of the CEO, CFO, and VP of Engineering, and how your plan will need to address them.",
+        "context": "You've just started as CPO. The CEO expects a bold plan, the CFO is watching the budget, and the VP of Engineering is defensive of the current structure. Your actions in this first month will set the tone for your entire tenure.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_architecture",
+      "title": "Stage 2: The New Architecture - Designing for Autonomy",
+      "description": "You've completed your diagnosis. Now, you must design the new organizational structure. This will be the 'what' of your plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Design the new organizational model for the 800-person P&E organization. Your blueprint must specify: \n1. **Team Topology:** How will teams be structured (e.g., by product feature, customer journey, technical component)? Justify your choice. \n2. **Management Layer:** What is the new role of existing Engineering/Product Managers? \n3. **Shared Services:** How will you handle platform engineering, SRE, and design systems? Are they centralized 'enabling teams' or fully embedded? Defend your model.",
+        "context": "This is the most critical decision. A structure optimized purely for speed might create the technical chaos Marcus fears, while one optimized for stability could fail to solve the core problem Anya hired you to fix. You must balance these competing concerns.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_rollout",
+      "title": "Stage 3: The Implementation Plan - Managing the Change",
+      "description": "An elegant design on paper is useless without a brilliant execution strategy. This section of your plan details the 'how' and 'when'.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Develop the implementation and communication plan for your re-org. You must: \n1. **Choose a Rollout Model:** Select 'Big Bang', 'Pilot Program', or 'Cascading Rollout' and provide a strong justification for your choice. \n2. **Create a High-Level Timeline:** Outline the key milestones for the first 100 days. \n3. **Draft a Communication Plan:** Detail key messages for the executive team, managers, and individual contributors, anticipating and addressing their anxieties.",
+        "context": "The VP of Eng is concerned about disruption. The CEO wants to see immediate results. Your rollout strategy must navigate these conflicting pressures while minimizing fear and uncertainty across the 800-person organization.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_operating_system",
+      "title": "Stage 4: The New Operating System - Aligning Autonomy with Strategy",
+      "description": "Autonomous teams can descend into chaos without a strong system for alignment. This final section defines how the new organization will measure success.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Finalize your 100-day plan by defining the new operating system. You must specify: \n1. **A New Goal-Setting Process:** Describe how you will use a framework like OKRs to connect team autonomy to strategic business objectives. \n2. **Success Metrics:** Define the 3-4 key metrics (e.g., Lead Time for Change, Employee eNPS, R&D Efficiency) you will use to prove to the board and the CFO that the transformation is working.",
+        "context": "The CFO, David Chen, will only be convinced by data. This part of your plan must show him how you will measure the ROI of this massive organizational change and hold the new teams accountable for business results.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Assesses the quality and coherence of the proposed organizational structure, including team topology, management roles, and coordination mechanisms.",
+        "scoringGuide": {
+          "1": "Proposes a simple re-org chart but fails to define roles, responsibilities, or mechanisms for cross-team coordination.",
+          "3": "Designs logical 'two-pizza teams' but leaves critical questions about the management layer and shared services unanswered.",
+          "5": "Creates a holistic system design: defines team topology, clarifies the role of management, and provides a clear model for handling dependencies. The design explicitly optimizes for flow and autonomy."
+        }
+      },
+      {
+        "competencyName": "Change Management",
+        "description": "Evaluates the user's plan for implementing the change, communicating it effectively, and mitigating the human and operational risks involved.",
+        "scoringGuide": {
+          "1": "The plan is simply to announce the new structure in an email, ignoring the human element of change.",
+          "3": "Includes a basic communication plan but is reactive and lacks tailored messaging for different audiences (execs, managers, ICs).",
+          "5": "Develops a proactive, multi-stage communication plan with clear messaging for all audiences. The plan anticipates resistance, creates feedback loops, and provides support for displaced roles."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Influence",
+        "description": "Measures the ability to anticipate, understand, and address the competing needs and concerns of key stakeholders (CEO, CFO, VP Eng) in the final plan.",
+        "scoringGuide": {
+          "1": "The final plan ignores the stated concerns of the CFO (cost), VP Eng (stability), and CEO (speed).",
+          "3": "The plan acknowledges stakeholder concerns but does not substantively address them in its design or rollout strategy.",
+          "5": "The plan is explicitly designed to gain buy-in. It includes a business case for the CFO, a stability plan for the VP Eng (e.g., phased rollout, clear role for tech leads), and a velocity forecast for the CEO."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Assesses the ability to connect the organizational re-design to measurable business outcomes and establish a system for ongoing alignment and performance measurement.",
+        "scoringGuide": {
+          "1": "The re-org is presented as an end in itself ('we need to be more agile') without connecting it to business goals.",
+          "3": "The plan connects the re-org to high-level goals like 'shipping faster' but lacks specific, measurable metrics.",
+          "5": "The plan includes a new goal-setting process (e.g., OKRs) and success metrics that directly link team autonomy to strategic business outcomes (e.g., lead time for change, customer satisfaction, R&D efficiency)."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

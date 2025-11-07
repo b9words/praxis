@@ -81,11 +81,11 @@ export const getCachedCompetencies = cache(
   async () => {
     const { prisma } = await import('./prisma/server')
     return withConnectionRetry(async () => {
-      return prisma.competency.findMany({
-        orderBy: [
-          { level: 'asc' },
-          { displayOrder: 'asc' },
-        ],
+    return prisma.competency.findMany({
+      orderBy: [
+        { level: 'asc' },
+        { displayOrder: 'asc' },
+      ],
       })
     })
   },
@@ -104,11 +104,11 @@ export function getCachedArticle(articleId: string) {
     async () => {
       const { prisma } = await import('./prisma/server')
       return withConnectionRetry(async () => {
-        return prisma.article.findUnique({
-          where: { id: articleId },
-          include: {
-            competency: true,
-          },
+      return prisma.article.findUnique({
+        where: { id: articleId },
+        include: {
+          competency: true,
+        },
         })
       })
     },
@@ -126,19 +126,8 @@ export function getCachedArticle(articleId: string) {
 export function getCachedCase(caseId: string) {
   return cache(
     async () => {
-      const { prisma } = await import('./prisma/server')
-      return withConnectionRetry(async () => {
-        return prisma.case.findUnique({
-          where: { id: caseId },
-          include: {
-            competencies: {
-              include: {
-                competency: true,
-              },
-            },
-          },
-        })
-      })
+      const { getCaseByIdWithCompetencies } = await import('./db/cases')
+      return getCaseByIdWithCompetencies(caseId)
     },
     ['case', caseId],
     {

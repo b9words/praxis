@@ -1,0 +1,147 @@
+{
+  "caseId": "cs_arena_1_11_the_okr_cascade_1762415157302",
+  "version": "1.0",
+  "title": "The OKR Cascade",
+  "description": "ConnectSphere Inc., a rapidly growing SaaS company, is struggling with strategic alignment after a disappointing quarter. As Chief of Staff, you have 72 hours to critique a new, misaligned OKR presentation deck before it's presented to the entire company, potentially cementing another quarter of confusion.",
+  "competencies": [
+    "Operational Excellence",
+    "Systems Thinking",
+    "Influence & Strategic Communication"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cf_okr_deck_v3_01",
+      "fileName": "Q3_OKR_Draft_v3.ppt",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_ceo_memo_02",
+      "fileName": "Memo_Q3_Kickoff.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_pulse_survey_03",
+      "fileName": "Q2_Pulse_Survey_Summary.pdf",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_q2_financials_04",
+      "fileName": "Q2_Performance_Review.xls",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_stakeholders_05",
+      "fileName": "stakeholder_profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_org_chart_06",
+      "fileName": "org_chart.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_analysis",
+      "title": "Stage 1: Initial Diagnosis",
+      "description": "Begin by reviewing the CEO's main objective slide in the context of the supporting documents. Your task is to form an initial hypothesis about the core problem at ConnectSphere.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Review the main Company Objective slide in the draft deck (`Q3_OKR_Draft_v3.ppt`). Using the context from the CEO's memo (`Memo_Q3_Kickoff.md`), the employee survey (`Q2_Pulse_Survey_Summary.pdf`), and the financial data (`Q2_Performance_Review.xls`), add comments to this slide. Does the proposed objective truly address the root problems of declining NRR and internal confusion, or is it a vanity metric?",
+        "context": "You've just received the case files from the CEO's Executive Assistant. The all-hands meeting is in 72 hours. This is your first look at the leadership team's proposed strategy.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_departmental_critique",
+      "title": "Stage 2: Identifying the Conflicts",
+      "description": "Dive deep into the departmental OKRs to find the specific points of misalignment and conflicting incentives.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Now, analyze the departmental OKR slides for Sales, Marketing, and Engineering in the deck. Your task is to critique each one. Leave specific, actionable comments that identify where departmental Key Results are in direct conflict with each other (e.g., Sales' goal to sell a new plan vs. Engineering's goal to reduce tech debt), where KRs are unmeasurable, or where they fail to support the overall company objective you analyzed in Stage 1.",
+        "context": "With 48 hours to go, your initial analysis suggests the top-line objective may be flawed. Now you need to find the specific misalignments at the departmental level that are causing the strategic drift.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_navigating_pushback",
+      "title": "Stage 3: Managing Stakeholder Pushback",
+      "description": "Your critique has been shared and has generated pushback from key VPs. You must now help the CEO frame the problem constructively.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Your critique has been shared. You immediately receive forwarded emails from Mark (Sales) and Javi (Marketing) arguing that your suggestions will 'add bureaucracy and slow us down.' The CEO wants to add a new 'Alignment Principles' slide to the deck to address their concerns before an emergency meeting. Critique this new slide she's drafted. Add comments to help her refine the language to be firm and clear about the problem without alienating her team.",
+        "context": "The clock is ticking - only 24 hours remain. The VPs are defensive. Your ability to influence is being tested. Your feedback on this slide will determine whether the upcoming emergency meeting is productive or a disaster.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_final_recommendation",
+      "title": "Stage 4: Proposing the Solution",
+      "description": "After successfully convincing the CEO, your final task is to propose a new, unified set of OKRs that resolves the conflicts.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "The emergency meeting was a success, and the CEO has tasked you with drafting the final, unified company OKR for Q3. On the final slide provided, write a new Company Objective and 3-4 supporting Key Results that all departments can rally behind. Use the comment feature to justify each KR, explaining how it resolves the previous conflicts and aligns Sales, Marketing, and Engineering toward a single, measurable, outcome-based goal.",
+        "context": "It's 12 hours before the all-hands meeting. This is the final step. The artifact you produce on this slide will be the core of the strategy presented to the entire company.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Operational Excellence",
+        "description": "Assesses the ability to identify misaligned operational goals, critique weak metrics, and propose concrete, measurable, and interconnected Key Results.",
+        "scoringGuide": {
+          "1": "Fails to identify major conflicts between departmental KRs. Accepts vanity metrics (e.g., 'increase MQLs') at face value without questioning their impact on business outcomes.",
+          "3": "Identifies the most obvious conflicts (e.g., Sales wanting new features vs. Engineering wanting stability). Suggests making existing KRs more measurable but doesn't challenge their underlying assumptions.",
+          "5": "Identifies subtle, second-order conflicts (e.g., Marketing's MQL goal inflates CAC for Sales). Proposes shared, outcome-based KRs that force cross-functional collaboration (e.g., a joint Sales/Marketing KR for 'Pipeline Value at 25% conversion')."
+        }
+      },
+      {
+        "competencyName": "Systems Thinking",
+        "description": "Evaluates the ability to see the organization as an interconnected system and articulate how actions in one department create consequences (positive or negative) in others.",
+        "scoringGuide": {
+          "1": "Views each department's OKRs in isolation. Fails to connect the proposed goals to the company's poor performance data (low NRR, high CAC).",
+          "3": "Explains how one department's actions will negatively impact another (e.g., 'Signing bad-fit customers will increase support tickets and harm NRR').",
+          "5": "Articulates the entire causal chain of the misaligned system, connecting the financial data (low NRR) to the survey data (employee confusion) and the flawed OKR deck (conflicting incentives), explaining how the proposed OKRs created the negative business outcomes."
+        }
+      },
+      {
+        "competencyName": "Influence & Strategic Communication",
+        "description": "Measures the ability to deliver critical feedback constructively, persuade stakeholders, and frame recommendations in a compelling, strategic narrative.",
+        "scoringGuide": {
+          "1": "Critique is purely negative, overly aggressive, or vague. The feedback is likely to alienate stakeholders and create defensiveness.",
+          "3": "Critique is polite and logical but lacks a strong, persuasive point of view. The final recommendation is sound but uninspired, unlikely to generate excitement or true alignment.",
+          "5": "Critique is sharp but constructive, framing feedback around shared company success. Response to pushback is firm, principled, and focuses the CEO on the core issue. The final recommendation is a compelling and unifying strategic narrative that is easy to understand and rally behind."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

@@ -106,6 +106,7 @@ async function importArticles() {
           .update({
             content,
             status: frontmatter.status || 'draft',
+            published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false),
             updated_at: new Date().toISOString()
           })
           .eq('id', existing.id)
@@ -125,7 +126,8 @@ async function importArticles() {
             title: frontmatter.title,
             competency_id: frontmatter.competency,
             content,
-            status: frontmatter.status || 'draft'
+            status: frontmatter.status || 'draft',
+            published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false)
           })
 
         if (error) {
@@ -287,6 +289,7 @@ async function importCases() {
             slug: slug,
             briefing_doc: content,
             status: frontmatter.status || 'draft',
+            published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false),
             year: frontmatter.year,
             order: frontmatter.order,
             updated_at: new Date().toISOString()
@@ -308,6 +311,7 @@ async function importCases() {
             slug: slug,
             briefing_doc: content,
             status: frontmatter.status || 'draft',
+            published: frontmatter.published ?? (frontmatter.status === 'published' ? true : false),
             year: frontmatter.year,
             order: frontmatter.order
           })
@@ -372,6 +376,7 @@ async function importCases() {
         description: caseData.description || '',
         briefing_doc: JSON.stringify(caseData), // Store full JSON as briefing_doc
         status: 'published' as const,
+        published: true,
         difficulty: (caseData.difficulty || 'intermediate').toLowerCase() as 'beginner' | 'intermediate' | 'advanced',
         estimated_minutes: caseData.estimatedDuration || 120,
         storage_path: storagePath,

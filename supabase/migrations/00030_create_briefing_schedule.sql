@@ -29,3 +29,4 @@ CREATE POLICY "Service role has full access to briefing_schedule"
   USING (true)
   WITH CHECK (true);
 
+

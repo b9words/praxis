@@ -26,6 +26,7 @@ import {
   syncFileMetadata,
   uploadToStorage,
 } from './generate-shared'
+import { enhanceLessonWithAI } from '../lib/ai-quality-enhancer'
 
 const TARGET_WORD_COUNT = { min: 1800, max: 2400 }
 const REQUIRED_SECTIONS = [
@@ -424,6 +425,16 @@ async function generateLesson(options: GenerateOptions = {}) {
   console.log('✍️  Generating full lesson content (section-by-section)...')
   let content = await generateFullLesson(lesson, outline, coreValues, testMode)
   console.log('✅ Content generated\n')
+  
+  // Quality enhancement cycle
+  console.log('✨ Enhancing lesson quality...')
+  try {
+    content = await enhanceLessonWithAI(content, lesson.lessonTitle)
+    console.log('✅ Quality enhancement complete\n')
+  } catch (error) {
+    console.warn(`⚠️  Quality enhancement failed, using original: ${error}`)
+    console.warn('   Continuing with original lesson content...\n')
+  }
   
   // Validate with comprehensive checks
   let wordCount = countWords(content)

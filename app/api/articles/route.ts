@@ -1,5 +1,5 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { cache, CacheTags } from '@/lib/cache'
+import { cache, CacheTags, revalidateCache } from '@/lib/cache'
 import { listArticles, createArticle } from '@/lib/db/articles'
 import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
@@ -74,6 +74,11 @@ export async function POST(request: NextRequest) {
       createdBy: user.id,
       updatedBy: user.id,
     })
+
+    // Revalidate caches
+    await revalidateCache(CacheTags.ARTICLES)
+    await revalidateCache('admin')
+    await revalidateCache('content')
 
     return NextResponse.json({ article }, { status: 201 })
   } catch (error: any) {

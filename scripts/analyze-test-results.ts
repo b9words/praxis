@@ -38,13 +38,13 @@ class GeminiTestAnalyzer {
   private model: any
 
   constructor() {
-    const apiKey = process.env.GOOGLE_AI_API_KEY
+    const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {
-      throw new Error('GOOGLE_AI_API_KEY environment variable is required')
+      throw new Error('GEMINI_API_KEY environment variable is required')
     }
     
     this.genAI = new GoogleGenerativeAI(apiKey)
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-pro' })
   }
 
   /**

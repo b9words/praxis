@@ -1,10 +1,22 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+export type CaseFileType = 
+  | 'MEMO' 
+  | 'FINANCIAL_DATA' 
+  | 'REPORT' 
+  | 'PRESENTATION_DECK' 
+  | 'LEGAL_DOCUMENT'
+  | 'ORG_CHART'
+  | 'STAKEHOLDER_PROFILES'
+  | 'MARKET_DATASET'
+  | 'PRESS_RELEASE'
+  | 'INTERNAL_MEMO'
+
 export interface CaseStudyFile {
   fileId: string
   fileName: string
-  fileType: 'MEMO' | 'FINANCIAL_DATA' | 'REPORT' | 'PRESENTATION_DECK' | 'LEGAL_DOCUMENT'
+  fileType: CaseFileType
   source: {
     type: 'STATIC' | 'REMOTE_CSV' | 'REMOTE_PDF' | 'REMOTE_API' | 'REFERENCE'
     content?: string

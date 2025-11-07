@@ -43,6 +43,7 @@ export interface DashboardData {
     totalSimulations: number
   } | null
   currentStreak: number
+  longestStreak: number
   recentActivities: Array<{
     id: string
     type: 'article' | 'simulation'
@@ -659,8 +660,9 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     .slice(0, 5)
 
-  // Calculate learning streak
+  // Calculate learning streak (current and longest)
   let currentStreak = 0
+  let longestStreak = 0
   if (allProgress.length > 0) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -675,10 +677,29 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
         })
     )
 
+    // Calculate current streak
     let checkDate = new Date(today)
     while (completedDates.has(checkDate.getTime())) {
       currentStreak++
       checkDate.setDate(checkDate.getDate() - 1)
+    }
+
+    // Calculate longest streak (sort dates from oldest to newest)
+    const sortedDates = Array.from(completedDates).sort((a, b) => a - b)
+    if (sortedDates.length > 0) {
+      let maxStreak = 1
+      let currentRun = 1
+      
+      for (let i = 1; i < sortedDates.length; i++) {
+        const daysDiff = (sortedDates[i] - sortedDates[i - 1]) / (1000 * 60 * 60 * 24)
+        if (daysDiff === 1) {
+          currentRun++
+          maxStreak = Math.max(maxStreak, currentRun)
+        } else {
+          currentRun = 1
+        }
+      }
+      longestStreak = maxStreak
     }
   }
 
@@ -686,6 +707,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     recommendation: recommendationResult,
     residencyData,
     currentStreak,
+    longestStreak,
     recentActivities,
     aggregateScores: aggregateScoresResult,
     jumpBackInItems,

@@ -9,12 +9,13 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
-import { Loader2, CheckCircle, Circle, Sparkles, Settings, Download, Eye } from 'lucide-react'
+import { Loader2, CheckCircle, Circle, Sparkles, Settings, Download, Eye, FolderOpen } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { fetchJson } from '@/lib/api'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
+import { useQueryClient, useQuery } from '@tanstack/react-query'
+import CaseAssetsManager from './CaseAssetsManager'
+import { Checkbox } from '@/components/ui/checkbox'
 
 interface Arena {
   id: string
@@ -47,9 +48,9 @@ interface GeneratedCase {
     title: string
     description: string
     rubric: any
-    briefingDoc: null
+    briefingDoc: string | null
     datasets: any
-    storagePath: string
+    storagePath?: string | null // Deprecated - cases are now in DB
     difficulty: string
     estimatedMinutes: number
     prerequisites: any[]
@@ -72,13 +73,13 @@ interface GenerationProgress {
 
 export default function CaseBlueprintsPanel() {
   const queryClient = useQueryClient()
-  const router = useRouter()
   const [taxonomy, setTaxonomy] = useState<{ arenas: Arena[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   
   // Selection state
   const [selectedBlueprints, setSelectedBlueprints] = useState<Set<string>>(new Set())
+  const [selectedCompetencyIds, setSelectedCompetencyIds] = useState<Set<string>>(new Set())
   
   // Filters
   const [arenaFilter, setArenaFilter] = useState<string>('all')
@@ -101,8 +102,8 @@ export default function CaseBlueprintsPanel() {
   
   // Config
   const [config, setConfig] = useState({
-    provider: 'openai' as 'openai' | 'gemini',
-    model: 'gpt-4o-mini',
+    provider: 'gemini' as 'openai' | 'gemini',
+    model: 'gemini-1.5-flash-latest', // Fastest model for testing - use -latest suffix for v1beta API
     includeVisualizations: false,
     includeMermaidDiagrams: false,
     targetWordCount: 2000,
@@ -112,26 +113,22 @@ export default function CaseBlueprintsPanel() {
   // Preview state
   const [previewCase, setPreviewCase] = useState<GeneratedCase | null>(null)
   const [previewOpen, setPreviewOpen] = useState(false)
+  
+  // Assets manager state
+  const [assetsManagerOpen, setAssetsManagerOpen] = useState(false)
+  const [assetsManagerCaseId, setAssetsManagerCaseId] = useState<string | null>(null)
 
-  // Bulk save mutation
-  const bulkSaveMutation = useMutation({
-    mutationFn: (cases: Array<Omit<GeneratedCase['caseData'], 'competencyIds'> & { competencyIds?: string[] }>) =>
-      fetchJson('/api/cases/bulk', {
-        method: 'POST',
-        body: { cases },
-      }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      toast.success(`Saved ${variables.length} case${variables.length !== 1 ? 's' : ''} to database!`)
-      setProgress(prev => ({ ...prev, results: [] }))
-      // Reload existing cases to update status
-      loadExistingCases()
-      // Refresh the page to show new cases in the Cases tab
-      router.refresh()
+  // Cases are automatically saved during generation, so no bulk save mutation needed
+
+  // Fetch competencies for selection
+  const { data: competencies = [] } = useQuery({
+    queryKey: ['admin-content', 'competencies'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/content/competencies', { cache: 'no-store' })
+      if (!res.ok) throw new Error('Failed to fetch competencies')
+      return res.json()
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Failed to save to database')
-    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   useEffect(() => {
@@ -139,9 +136,10 @@ export default function CaseBlueprintsPanel() {
     loadExistingCases()
   }, [])
 
+
   async function loadTaxonomy() {
     try {
-      const response = await fetch('/api/case-taxonomy')
+      const response = await fetch('/api/case-taxonomy', { cache: 'no-store' })
       if (!response.ok) throw new Error('Failed to load taxonomy')
       const data = await response.json()
       setTaxonomy(data)
@@ -160,18 +158,22 @@ export default function CaseBlueprintsPanel() {
         const data = await response.json()
         const existing = new Set<string>()
         if (data.cases) {
-          // Extract blueprint IDs from case storage paths or titles
+          // Extract blueprint IDs from case metadata (cases are now in DB)
           data.cases.forEach((caseItem: any) => {
-            if (caseItem.storagePath) {
-              // Try to extract blueprint ID from path
-              const match = caseItem.storagePath.match(/cs_([^\/]+)/)
+            // Check metadata for blueprintId
+            if (caseItem.metadata?.blueprintId) {
+              existing.add(caseItem.metadata.blueprintId)
+            }
+            // Also check metadata.caseId (from generation)
+            if (caseItem.metadata?.caseId) {
+              // Extract blueprint ID from caseId format: cs_blueprintId_timestamp
+              const match = caseItem.metadata.caseId.match(/^cs_([^_]+)/)
               if (match) {
                 existing.add(match[1])
               }
             }
-            // Also check if title contains blueprint info
+            // Fallback: check title (heuristic)
             if (caseItem.title) {
-              // This is a heuristic - may need adjustment based on actual data
               const blueprintId = caseItem.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')
               existing.add(blueprintId)
             }
@@ -305,6 +307,9 @@ export default function CaseBlueprintsPanel() {
         }))
 
         try {
+          // Prepare competency IDs to associate with the case
+          const competencyIdsArray = Array.from(selectedCompetencyIds)
+          
           const response = await fetch('/api/content-generation/generate-case', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -312,6 +317,7 @@ export default function CaseBlueprintsPanel() {
               arenaId: arena.id,
               competencyName: competency.name,
               blueprintId: blueprint.id,
+              competencyIds: competencyIdsArray.length > 0 ? competencyIdsArray : undefined, // Optional - only send if selected
               options: {
                 provider: config.provider,
                 model: config.model,
@@ -323,32 +329,106 @@ export default function CaseBlueprintsPanel() {
             }),
           })
 
-          if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Generation failed')
+          // Parse response once
+          let responseData: any
+          try {
+            responseData = await response.json()
+          } catch (parseError) {
+            // If JSON parsing fails, throw error with status info
+            const error = new Error(response.statusText || `HTTP ${response.status}: Invalid response`)
+            ;(error as any).response = response
+            throw error
           }
 
-          const data = await response.json()
+          if (!response.ok) {
+            // Extract error details from failed response
+            const errorMessage = responseData.error || 'Generation failed'
+            const errorDetails = responseData.details || ''
+            
+            // Throw error with details attached
+            const error = new Error(errorMessage)
+            ;(error as any).details = errorDetails
+            ;(error as any).response = response
+            throw error
+          }
+
+          // Use parsed response data
+          const data = responseData
+          // Ensure caseId is a string (not an object)
+          const caseIdString = typeof data.caseId === 'string' ? data.caseId : String(data.caseId || '')
+          
           results.push({ 
             blueprintId, 
-            caseId: data.caseId, 
+            caseId: caseIdString, 
             success: true,
             caseData: data.caseData || undefined,
             // Store full case JSON for preview
             fullCase: data.case || undefined
           })
+        } catch (err: any) {
+          // Extract detailed error information from API response
+          let errorMessage = 'Generation failed'
+          let errorDetails = err?.details || ''
           
-          // Trigger asset list refresh
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('case-generated', { detail: { caseId: data.caseId } }))
+          // If we have a response object, try to extract error details
+          // Note: Response body can only be read once, so if we already read it, use attached details
+          if (err?.details) {
+            // Details already attached from the error we threw
+            errorDetails = err.details
+          } else if (err?.response) {
+            // Response exists but body not yet read - try to read it
+            try {
+              // Check if response body has been consumed
+              const clonedResponse = err.response.clone ? err.response.clone() : err.response
+              const errorData = await clonedResponse.json().catch(() => null)
+              if (errorData?.error) {
+                errorMessage = errorData.error
+                errorDetails = errorData.details || ''
+              } else {
+                errorMessage = err.response.statusText || errorMessage
+              }
+            } catch {
+              // If JSON parsing fails, use status text
+              errorMessage = err.response.statusText || errorMessage
+            }
+          } else if (err instanceof Error) {
+            errorMessage = err.message
+            // Use attached details if available
+            if ((err as any).details) {
+              errorDetails = (err as any).details
+            }
           }
-        } catch (err) {
-          const errorMessage = err instanceof Error ? err.message : 'Generation failed'
-          results.push({ blueprintId, caseId: '', success: false })
+          
+          const fullErrorMessage = errorDetails 
+            ? `${errorMessage}: ${errorDetails}`
+            : errorMessage
+          
+          // Check if this is a duplicate error - mark as skipped rather than failed
+          const isDuplicate = errorMessage?.includes('already exists') || errorDetails?.includes('already exists') || errorDetails?.includes('blueprint ID')
+          
+          results.push({ 
+            blueprintId, 
+            caseId: '', 
+            success: false, 
+            error: isDuplicate ? `Skipped: ${errorDetails || errorMessage}` : fullErrorMessage 
+          })
           setProgress(prev => ({
             ...prev,
-            errors: [...prev.errors, `${blueprint.title}: ${errorMessage}`]
+            errors: [...prev.errors, `${blueprint.title}: ${isDuplicate ? 'Skipped (already exists)' : fullErrorMessage}`]
           }))
+          
+          // Show toast with appropriate severity
+          if (isDuplicate) {
+            toast.warning(`${blueprint.title}: Already exists`, {
+              description: errorDetails || 'This case was already generated previously.',
+              duration: 4000,
+            })
+          } else {
+            toast.error(`${blueprint.title}: ${errorMessage}`, {
+              description: errorDetails || undefined,
+              duration: 5000,
+            })
+          }
         }
 
         // Small delay between generations
@@ -365,11 +445,53 @@ export default function CaseBlueprintsPanel() {
       }))
 
       const successCount = results.filter(r => r.success).length
+      const failedResults = results.filter(r => !r.success)
+      const skippedCount = failedResults.filter(r => r.error?.includes('Skipped') || r.error?.includes('already exists')).length
+      const failedCount = failedResults.length - skippedCount
+      
       if (successCount > 0) {
         toast.success(`Generated ${successCount} case${successCount !== 1 ? 's' : ''} successfully!`)
+        // Invalidate admin-content queries to refresh the main content table
+        queryClient.invalidateQueries({ queryKey: ['admin-content'] })
+        
+        // Auto-open assets manager for the first successfully generated case
+        const firstSuccess = results.find(r => r.success && r.caseId)
+        if (firstSuccess && firstSuccess.caseId) {
+          // Normalize caseId - ensure it's a string and not [object Object]
+          let caseIdStr: string | null = null
+          if (typeof firstSuccess.caseId === 'string') {
+            caseIdStr = firstSuccess.caseId.trim()
+            if (caseIdStr === '[object Object]' || caseIdStr === 'object Object') {
+              caseIdStr = null
+            }
+          } else if (typeof firstSuccess.caseId === 'object' && firstSuccess.caseId !== null && 'id' in firstSuccess.caseId) {
+            // If it's an object with id, extract it
+            const objId = (firstSuccess.caseId as any).id
+            if (typeof objId === 'string') {
+              caseIdStr = objId.trim()
+            }
+          } else {
+            // Try to convert to string
+            const converted = String(firstSuccess.caseId).trim()
+            if (converted && converted !== '[object Object]' && converted !== 'object Object') {
+              caseIdStr = converted
+            }
+          }
+          
+          if (caseIdStr) {
+            // Small delay to ensure UI is ready
+            setTimeout(() => {
+              setAssetsManagerCaseId(caseIdStr!)
+              setAssetsManagerOpen(true)
+            }, 300)
+          }
+        }
       }
-      if (results.some(r => !r.success)) {
-        toast.error(`Failed to generate ${results.filter(r => !r.success).length} case${results.filter(r => !r.success).length !== 1 ? 's' : ''}`)
+      if (skippedCount > 0) {
+        toast.warning(`Skipped ${skippedCount} case${skippedCount !== 1 ? 's' : ''} (already exist)`)
+      }
+      if (failedCount > 0) {
+        toast.error(`Failed to generate ${failedCount} case${failedCount !== 1 ? 's' : ''}`)
       }
 
       // Reload existing cases
@@ -385,46 +507,7 @@ export default function CaseBlueprintsPanel() {
     }
   }
 
-  const handleSaveToDatabase = async () => {
-    if (progress.results.length === 0) {
-      toast.error('No generated cases to save')
-      return
-    }
-
-    // Filter to only successful cases with caseData
-    const casesToSave = progress.results
-      .filter((r): r is GeneratedCase & { caseData: NonNullable<GeneratedCase['caseData']> } => 
-        r.success && !!r.caseData
-      )
-      .map((result) => {
-        const { caseData } = result
-        // Resolve competency IDs from competency names
-        // For now, we'll try to fetch competency IDs from the API
-        // The metadata contains competencyName, so we'll need to resolve it
-        return {
-          title: caseData.title,
-          description: caseData.description,
-          rubric: caseData.rubric,
-          briefingDoc: caseData.briefingDoc,
-          datasets: caseData.datasets,
-          storagePath: caseData.storagePath,
-          difficulty: caseData.difficulty,
-          estimatedMinutes: caseData.estimatedMinutes,
-          prerequisites: caseData.prerequisites,
-          metadata: caseData.metadata,
-          status: caseData.status,
-          // competencyIds will be resolved server-side if needed
-          competencyIds: caseData.competencyIds || [],
-        }
-      })
-
-    if (casesToSave.length === 0) {
-      toast.error('No valid cases to save')
-      return
-    }
-
-    bulkSaveMutation.mutate(casesToSave)
-  }
+  // Removed handleSaveToDatabase - cases are automatically saved during generation
 
   const exportResults = () => {
     if (progress.results.length === 0) {
@@ -443,6 +526,9 @@ export default function CaseBlueprintsPanel() {
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }
+
+  // Determine if generation should be disabled
+  const generationDisabled = selectedBlueprints.size === 0 || progress.isGenerating
 
   if (loading) {
     return (
@@ -525,7 +611,7 @@ export default function CaseBlueprintsPanel() {
         </div>
 
         {/* Selection Actions */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={selectAllFiltered}>
             Select All ({filteredBlueprints.length})
           </Button>
@@ -536,6 +622,62 @@ export default function CaseBlueprintsPanel() {
             Deselect All
           </Button>
         </div>
+
+        {/* Competency Selection */}
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Link to Competencies (Optional)</CardTitle>
+            <CardDescription className="text-xs">
+              Select competencies to associate with generated cases. Leave empty to skip association.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+              {competencies.length === 0 ? (
+                <p className="text-xs text-gray-500">Loading competencies...</p>
+              ) : (
+                competencies.map((comp: any) => (
+                  <div key={comp.id} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`comp-${comp.id}`}
+                      checked={selectedCompetencyIds.has(comp.id)}
+                      onCheckedChange={(checked) => {
+                        const newSet = new Set(selectedCompetencyIds)
+                        if (checked) {
+                          newSet.add(comp.id)
+                        } else {
+                          newSet.delete(comp.id)
+                        }
+                        setSelectedCompetencyIds(newSet)
+                      }}
+                    />
+                    <Label
+                      htmlFor={`comp-${comp.id}`}
+                      className="text-sm cursor-pointer flex-1"
+                    >
+                      {comp.name}
+                      {comp.level && (
+                        <span className="text-xs text-gray-500 ml-2">({comp.level})</span>
+                      )}
+                    </Label>
+                  </div>
+                ))
+              )}
+            </div>
+            {selectedCompetencyIds.size > 0 && (
+              <div className="mt-3 pt-3 border-t">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedCompetencyIds(new Set())}
+                  className="text-xs"
+                >
+                  Clear Selection ({selectedCompetencyIds.size})
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Blueprint List */}
         {loadingCases ? (
@@ -709,17 +851,54 @@ export default function CaseBlueprintsPanel() {
           </DialogContent>
         </Dialog>
 
+        {/* Assets Manager Dialog */}
+        {assetsManagerOpen && assetsManagerCaseId && (
+          <Dialog open={assetsManagerOpen} onOpenChange={(open) => {
+            if (!open) {
+              setAssetsManagerOpen(false)
+              setAssetsManagerCaseId(null)
+            }
+          }}>
+            <DialogContent className="w-full sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+              <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
+                <DialogTitle className="text-lg">Case Assets</DialogTitle>
+                <DialogDescription>
+                  View and manage assets for this case study. Assets are automatically loaded from the database.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex-1 overflow-y-auto px-6 py-4">
+                <CaseAssetsManager 
+                  initialCaseId={assetsManagerCaseId}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
         {/* Generation Results */}
         {progress.results.length > 0 && (
           <Card className="mt-4 border-green-200 bg-green-50/50">
             <CardHeader>
               <CardTitle className="text-lg">Generation Complete</CardTitle>
               <CardDescription>
-                {progress.results.filter(r => r.success).length} of {progress.results.length} case{progress.results.length !== 1 ? 's' : ''} generated successfully
+                {(() => {
+                  const successCount = progress.results.filter(r => r.success).length
+                  const skippedCount = progress.results.filter(r => !r.success && (r.error?.includes('Skipped') || r.error?.includes('already exists'))).length
+                  const failedCount = progress.results.filter(r => !r.success && !r.error?.includes('Skipped') && !r.error?.includes('already exists')).length
+                  const parts: string[] = []
+                  if (successCount > 0) parts.push(`${successCount} generated`)
+                  if (skippedCount > 0) parts.push(`${skippedCount} skipped`)
+                  if (failedCount > 0) parts.push(`${failedCount} failed`)
+                  return parts.join(', ') || 'No results'
+                })()} of {progress.results.length} case{progress.results.length !== 1 ? 's' : ''}
+                <span className="block mt-1 text-xs text-gray-600">
+                  Note: Cases are automatically saved to the database upon successful generation.
+                </span>
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
+                {/* Show successful results */}
                 {progress.results.filter(r => r.success).map((result) => {
                   const { blueprint, arena, competency } = filteredBlueprints.find(
                     ({ blueprint: bp }) => bp.id === result.blueprintId
@@ -751,19 +930,40 @@ export default function CaseBlueprintsPanel() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {result.fullCase && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setPreviewCase(result)
-                              setPreviewOpen(true)
-                            }}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Preview
-                          </Button>
-                        )}
+                            {result.fullCase && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setPreviewCase(result)
+                                    setPreviewOpen(true)
+                                  }}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Preview
+                                </Button>
+                                {result.caseId && typeof result.caseId === 'string' && result.caseId.trim() && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      // Ensure caseId is a string before passing
+                                      const caseIdStr = String(result.caseId).trim()
+                                      if (caseIdStr) {
+                                        setAssetsManagerCaseId(caseIdStr)
+                                        setAssetsManagerOpen(true)
+                                      } else {
+                                        toast.error('Case ID is missing or invalid')
+                                      }
+                                    }}
+                                  >
+                                    <FolderOpen className="h-4 w-4 mr-1" />
+                                    View Assets
+                                  </Button>
+                                )}
+                              </>
+                            )}
                         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">
                           ✓ Generated
                         </Badge>
@@ -772,35 +972,46 @@ export default function CaseBlueprintsPanel() {
                   )
                 })}
                 
-                {progress.errors.length > 0 && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
-                    <p className="font-medium text-sm text-red-900 mb-2">Errors:</p>
-                    <ul className="text-xs text-red-700 space-y-1">
-                      {progress.errors.map((error, idx) => (
-                        <li key={idx}>• {error}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {/* Show skipped results (duplicates) */}
+                {progress.results.filter(r => !r.success && (r.error?.includes('Skipped') || r.error?.includes('already exists'))).map((result) => {
+                  const { blueprint } = filteredBlueprints.find(
+                    ({ blueprint: bp }) => bp.id === result.blueprintId
+                  ) || { blueprint: null }
+                  
+                  return (
+                    <div key={result.blueprintId} className="flex items-center justify-between p-3 bg-yellow-50 rounded border border-yellow-200">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{blueprint?.title || result.blueprintId}</p>
+                        <p className="text-xs text-yellow-700 mt-1">{result.error || 'Already exists'}</p>
+                      </div>
+                      <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                        ⚠ Skipped
+                      </Badge>
+                    </div>
+                  )
+                })}
+                
+                {/* Show failed results (actual errors) */}
+                {progress.results.filter(r => !r.success && !r.error?.includes('Skipped') && !r.error?.includes('already exists')).map((result) => {
+                  const { blueprint } = filteredBlueprints.find(
+                    ({ blueprint: bp }) => bp.id === result.blueprintId
+                  ) || { blueprint: null }
+                  
+                  return (
+                    <div key={result.blueprintId} className="flex items-center justify-between p-3 bg-red-50 rounded border border-red-200">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{blueprint?.title || result.blueprintId}</p>
+                        <p className="text-xs text-red-700 mt-1">{result.error || 'Generation failed'}</p>
+                      </div>
+                      <Badge variant="outline" className="bg-red-100 text-red-700 border-red-300">
+                        ✗ Failed
+                      </Badge>
+                    </div>
+                  )
+                })}
 
                 <div className="flex gap-2 pt-2">
-                  <Button 
-                    onClick={handleSaveToDatabase} 
-                    className="flex items-center gap-2"
-                    disabled={bulkSaveMutation.isPending}
-                  >
-                    {bulkSaveMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        Save to Database
-                      </>
-                    )}
-                  </Button>
+                  {/* Cases are automatically saved during generation - no manual save needed */}
                   <Button variant="outline" onClick={exportResults} className="flex items-center gap-2">
                     <Download className="w-4 h-4" />
                     Export JSON
@@ -810,6 +1021,7 @@ export default function CaseBlueprintsPanel() {
             </CardContent>
           </Card>
         )}
+
 
         {/* Selection Summary */}
         <div className="p-4 bg-blue-50 rounded-lg">
@@ -829,8 +1041,13 @@ export default function CaseBlueprintsPanel() {
             </div>
             <Button
               onClick={handleGenerate}
-              disabled={selectedBlueprints.size === 0 || progress.isGenerating}
+              disabled={generationDisabled}
               className="bg-blue-600 hover:bg-blue-700"
+              title={
+                selectedBlueprints.size === 0
+                  ? 'Please select at least one blueprint to generate'
+                  : undefined
+              }
             >
               {progress.isGenerating ? (
                 <>

@@ -1,0 +1,137 @@
+{
+  "caseId": "cs_arena_1_7_the_compensation_committee_1762411567999",
+  "version": "1.0",
+  "title": "The Compensation Committee",
+  "description": "As COO of Apex Digital, you must challenge a short-sighted executive bonus plan proposed by HR. The plan prioritizes revenue growth above all else, ignoring rising customer churn and engineer attrition that threaten the company's long-term health. Your task is to analyze the data, propose a more balanced incentive structure, and persuade a skeptical CEO to change course before the next board meeting.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Strategic Thinking",
+    "Influence & Persuasion",
+    "Data-Driven Decision Making"
+  ],
+  "estimatedDuration": 90,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_comp_proposal_deck_01",
+      "fileName": "CHRO_Comp_Proposal_Q1.pptx",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for 10-slide presentation deck from Sarah Chen (CHRO). Key slide proposes an 80% Revenue Growth / 20% EBITDA margin split for the executive bonus pool. Includes slides with generic market data supporting simple compensation structures.]"
+      }
+    },
+    {
+      "fileId": "cf_performance_data_02",
+      "fileName": "Apex_Q3_Performance_Data.xlsx",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for spreadsheet with 3 years of quarterly data. Shows: slowing revenue growth, rising Customer Acquisition Cost (CAC), declining LTV:CAC ratio, accelerating customer churn from 8% to 15% YoY, and increased voluntary senior engineer attrition.]"
+      }
+    },
+    {
+      "fileId": "cf_ceo_memo_03",
+      "fileName": "CEO_Urgent_Memo_Q3_Earnings.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for a company-wide memo from CEO David Miller after the earnings miss. Tone is urgent, demanding a return to 'hitting our numbers' and 're-accelerating growth,' providing context for his short-term bias.]"
+      }
+    },
+    {
+      "fileId": "cf_exit_interview_summary_04",
+      "fileName": "HR_Exit_Interview_Themes_Summary.pdf",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for a 2-page PDF summarizing exit interviews with senior engineers. Key themes are burnout, frustration with product quality, and a culture that values shipping features over stability.]"
+      }
+    },
+    {
+      "fileId": "cf_stakeholder_briefs_05",
+      "fileName": "Key_Stakeholder_Briefs.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": "[Placeholder for JSON object containing detailed profiles, motivations, biases, and goals for Sarah Chen (CHRO), David Miller (CEO), and Eleanor Vance (Board Member).]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_critique_proposal",
+      "title": "Stage 1: Critique the Initial Proposal",
+      "description": "You've just received the draft compensation proposal from Sarah Chen, the CHRO. Your first step is to analyze her presentation deck in light of the other data you have. Identify the strategic flaws and unsupported assumptions in her plan.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Review Sarah's presentation, `CHRO_Comp_Proposal_Q1.pptx`. Your task is to critique the deck directly. Leave comments on the slides identifying the strategic flaws in her proposal. Pinpoint specific data from the `Apex_Q3_Performance_Data.xlsx` and `HR_Exit_Interview_Themes_Summary.pdf` that contradict her assumptions and highlight the risks of an 80/20 revenue/profit-focused bonus plan.",
+        "context": "The board meeting is in three weeks, and the Compensation Committee is expecting a final proposal by the end of next week. Sarah is looking for feedback by the end of this week. Your critique will form the basis of your argument for a different approach.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_formulate_alternative",
+      "title": "Stage 2: Formulate the Alternative",
+      "description": "Critiquing the plan isn't enough; you need to propose a concrete, superior alternative. Now, you will structure a 'Balanced Scorecard' approach that aligns executive incentives with the long-term health of the company.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Draft a 1-page memo outlining a 'Balanced Scorecard' bonus structure for the executive team. Your memo should be structured as a response to the prompt below. In your response, you must define 3-5 specific, measurable KPIs, assign a weight to each, and provide a clear, data-driven rationale for how each KPI addresses the issues found in the case files and drives long-term value.",
+        "context": "Your audience for this memo is initially the CEO and CHRO. It must be persuasive, data-driven, and sophisticated enough to eventually be presented to Eleanor Vance and the Compensation Committee. A plan with vague goals will be rejected.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_plan_persuasion",
+      "title": "Stage 3: The Persuasion Plan",
+      "description": "You have your alternative plan. Now comes the most critical part: persuading the key stakeholders. You must craft a communication strategy that acknowledges their pressures while making a compelling case for your more nuanced approach.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Write a concise email to Sarah Chen (CHRO) and David Miller (CEO). The goal is not to attack Sarah's work but to open a collaborative discussion and win their support for your Balanced Scorecard. Your email must empathetically acknowledge the pressure for financial results while using data from the case files to make a compelling case for why your balanced approach is the only sustainable way to achieve their goals. Frame your proposal as a strategic improvement, not just a criticism.",
+        "context": "David (CEO) is under intense pressure from the market and wants a plan that signals a focus on hitting financial targets. Sarah (CHRO) wants a simple, defensible plan. Your email must navigate these biases carefully to be successful.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "Assesses the ability to design incentive systems that drive desired behaviors and support long-term organizational health.",
+        "scoringGuide": {
+          "1": "Accepts the HR proposal with minor tweaks or criticizes it without offering a concrete, workable alternative.",
+          "3": "Proposes adding one non-financial metric but fails to justify it with a strong, data-driven business case from the provided files.",
+          "5": "Designs a comprehensive 'Balanced Scorecard' that links specific, measurable, non-financial KPIs (e.g., NPS, engineer retention, product stability) directly to the long-term financial health and strategy of the business."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Evaluates the ability to identify second-order consequences of decisions and connect operational details to high-level business strategy.",
+        "scoringGuide": {
+          "1": "Focuses exclusively on the fairness of the bonus plan to executives, missing the wider strategic implications.",
+          "3": "Recognizes the proposed plan is short-sighted but struggles to articulate the specific second-order effects on the business.",
+          "5": "Clearly articulates how the proposed incentive structure creates a vicious cycle (pressure for revenue -> poor quality -> customer churn -> higher sales costs -> more pressure for revenue) and how the alternative creates a virtuous one."
+        }
+      },
+      {
+        "competencyName": "Influence & Persuasion",
+        "description": "Measures the ability to tailor communication to a specific audience, build consensus, and advocate for a position effectively.",
+        "scoringGuide": {
+          "1": "Writes a blunt, critical email that alienates the CHRO and CEO, likely causing them to become defensive.",
+          "3": "Makes a logical case but fails to tailor the message to the specific motivations and pressures of the CEO and CHRO.",
+          "5": "Crafts a persuasive, empathetic message that acknowledges the CEO's short-term pressures while framing the balanced approach as the *only* sustainable path to achieving his long-term goals, positioning the change as a collaborative improvement."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Assesses the ability to synthesize qualitative and quantitative information to build a compelling, evidence-based argument.",
+        "scoringGuide": {
+          "1": "Relies on vague statements like 'this will hurt morale' without citing specific evidence from the case files.",
+          "3": "Cites one or two data points from the case files but fails to connect them into a cohesive narrative.",
+          "5": "Masterfully synthesizes quantitative data (churn, LTV:CAC) with qualitative data (exit interview themes) to build an irrefutable, evidence-based argument for change."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

@@ -50,6 +50,7 @@ export default async function DashboardPage() {
       recommendation={dashboardData.recommendation}
       residencyData={dashboardData.residencyData}
       currentStreak={dashboardData.currentStreak}
+      longestStreak={dashboardData.longestStreak}
       recentActivities={dashboardData.recentActivities}
       aggregateScores={dashboardData.aggregateScores}
       jumpBackInItems={dedupeContent(dashboardData.jumpBackInItems)}

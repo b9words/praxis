@@ -1,6 +1,7 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { updateProfile, ensureProfileExists } from '@/lib/db/profiles'
+import { updateProfile, ensureProfileExists, upsertUserResidency } from '@/lib/db/profiles'
 import { AppError } from '@/lib/db/utils'
+import { getDomainById } from '@/lib/curriculum-data'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -20,9 +21,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate competencyId is a valid domainId
+    const domain = getDomainById(competencyId)
+    if (!domain) {
+      return NextResponse.json(
+        { error: 'Invalid competencyId: domain not found' },
+        { status: 400 }
+      )
+    }
+
     // Update user's profile with onboarding data
-    // Store strategic objective in bio field (or create a dedicated field if needed)
-    // For now, we'll use a JSON structure in bio or store it separately
+    // Store strategic objective in bio field
     try {
       await updateProfile(user.id, {
         bio: strategicObjective,
@@ -41,10 +50,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Store onboarding metadata (could be in a separate table or JSON field)
-    // For now, we'll store it in user metadata or create a dedicated onboarding table
-    // Since we don't have an onboarding table, we'll store it as metadata that can be retrieved later
-    // The competency selection can be used to set the user's initial focus domain
+    // Set user residency to Year 1 and store focus competency
+    await upsertUserResidency(user.id, 1, competencyId)
 
     return NextResponse.json({ 
       success: true,

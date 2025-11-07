@@ -2,17 +2,26 @@ import { Button } from '@/components/ui/button'
 import { completeCurriculumData, getCurriculumStats } from '@/lib/curriculum-data'
 import { listArticles } from '@/lib/db/articles'
 import { cache, CacheTags } from '@/lib/cache'
+import { getCurrentUser } from '@/lib/auth/get-user'
+import { getUserRole } from '@/lib/auth/middleware-helpers'
 import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CurriculumLibraryPage() {
+  const user = await getCurrentUser()
+  let isAdmin = false
+  if (user) {
+    const userRole = await getUserRole(user.id)
+    isAdmin = userRole === 'admin'
+  }
+
   // Cache curriculum structure (24h revalidate)
   const getCachedCurriculumData = cache(
     async () => {
       // Try to load curriculum structure from database with error handling
       let articlesFromDb: any[] = []
       try {
-        const articles = await listArticles({ status: 'published' })
+        const articles = await listArticles({})
         articlesFromDb = articles
           .filter(article => article.storagePath !== null)
           .map(article => ({
@@ -231,9 +240,11 @@ export default async function CurriculumLibraryPage() {
                 <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">
                   <Link href="/residency">View Learning Paths</Link>
                 </Button>
-                <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
-                  <Link href="/admin/content/generate">Generate Content</Link>
-                </Button>
+                {isAdmin && (
+                  <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+                    <Link href="/admin/content/generate">Generate Content</Link>
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -1,0 +1,268 @@
+{
+  "caseId": "cs_arena_1_5_the_a_team_budget_1762242659741",
+  "version": "1.0",
+  "title": "The A-Team Budget: Engineering Headcount Allocation at Aether Innovations",
+  "description": "You are the VP of Engineering at Aether Innovations, a high-growth AI/ML SaaS company. With a fixed budget for 20 new engineering hires, you must navigate intense internal politics to allocate resources across three critical projects, each championed by a powerful VP with conflicting demands. Your decision will shape the company's future and test your strategic, analytical, and leadership skills.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Strategic Resource Allocation",
+    "Cross-functional Collaboration & Influence",
+    "Analytical Decision-Making",
+    "Communication & Justification"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_project_chimera_brief",
+      "fileName": "Project_Chimera_Brief.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_PROJECT_CHIMERA_BRIEF]"
+      }
+    },
+    {
+      "fileId": "file_project_pegasus_brief",
+      "fileName": "Project_Pegasus_Brief.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_PROJECT_PEGASUS_BRIEF]"
+      }
+    },
+    {
+      "fileId": "file_project_hydra_brief",
+      "fileName": "Project_Hydra_Brief.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_PROJECT_HYDRA_BRIEF]"
+      }
+    },
+    {
+      "fileId": "file_dr_aris_thorne_profile",
+      "fileName": "Dr_Aris_Thorne_Profile.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_DR_ARIS_THORNE_PROFILE]"
+      }
+    },
+    {
+      "fileId": "file_elena_petrova_profile",
+      "fileName": "Elena_Petrova_Profile.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_ELENA_PETROVA_PROFILE]"
+      }
+    },
+    {
+      "fileId": "file_ben_carter_profile",
+      "fileName": "Ben_Carter_Profile.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_BEN_CARTER_PROFILE]"
+      }
+    },
+    {
+      "fileId": "file_financial_snapshot_csv",
+      "fileName": "Financial_Snapshot.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_FINANCIAL_SNAPSHOT_CSV]"
+      }
+    },
+    {
+      "fileId": "file_cfo_memo_fy25",
+      "fileName": "CFO_Memo_FY25.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_CFO_MEMO_FY25]"
+      }
+    },
+    {
+      "fileId": "file_ceo_strategic_priorities",
+      "fileName": "CEO_Strategic_Priorities.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_CEO_STRATEGIC_PRIORITIES]"
+      }
+    },
+    {
+      "fileId": "file_pegasus_team_stress_alert",
+      "fileName": "Pegasus_Team_Stress_Alert.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_PEGASUS_TEAM_STRESS_ALERT]"
+      }
+    },
+    {
+      "fileId": "file_aris_competitor_analysis",
+      "fileName": "Aris_Competitor_Analysis.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_ARIS_COMPETITOR_ANALYSIS]"
+      }
+    },
+    {
+      "fileId": "file_user_feedback_hydra",
+      "fileName": "User_Feedback_Hydra.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "[PLACEHOLDER_CONTENT_FOR_USER_FEEDBACK_HYDRA]"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_strategic_framing",
+      "title": "Stage 1: Initial Strategic Prioritization",
+      "description": "You've been given the initial project briefs and an overview of Aether Innovations' strategic goals. Before diving deeper into the data or stakeholder meetings, you must establish your overarching strategic lens for this critical headcount allocation. Your chosen approach will guide your subsequent investigation and final decision.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Review the initial documents. How will you frame your strategic approach to this critical headcount allocation? Select the primary lens through which you will evaluate the competing project demands.",
+        "context": "Aether Innovations is at a critical juncture, balancing the need for foundational R&D, scaling current revenue-generating products, and expanding its platform for future growth. The Board and lead investors are demanding clear progress on specific growth targets and efficiency metrics. The 20 new engineering hires represent a significant, yet limited, investment.",
+        "options": [
+          {
+            "id": "opt_s1_long_term_vision",
+            "title": "Long-Term Vision Focus",
+            "description": "Prioritize projects that promise significant future market disruption and proprietary IP growth, even if immediate ROI or client demands are less clear. This approach emphasizes Aether's future competitive advantage."
+          },
+          {
+            "id": "opt_s1_short_term_revenue",
+            "title": "Short-Term Revenue Focus",
+            "description": "Emphasize projects with clear, immediate revenue generation, client retention, and market viability. This approach ensures current financial health and validates existing product-market fit."
+          },
+          {
+            "id": "opt_s1_balanced_growth",
+            "title": "Balanced Growth & Stability",
+            "description": "Seek to allocate resources across projects to ensure both current operational stability (scalability, efficiency) and future potential (innovation, market expansion), aiming to hedge overall risk and deliver incremental value."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_stakeholder_strategy",
+      "title": "Stage 2: Stakeholder Engagement & Data Deep Dive Strategy",
+      "description": "You now need to engage with Dr. Thorne, Elena Petrova, and Ben Carter. Each VP leads a critical project and brings a distinct leadership style and set of priorities. Your approach to these meetings is crucial for gathering vital information, understanding underlying tensions, and preparing for the politically charged allocation decision. This stage is about defining your meeting strategy.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "You've scheduled one-on-one meetings with each VP. Based on their profiles and project briefs, how will you strategically approach these conversations to extract crucial information, understand their perspectives, and prepare for the difficult allocation decision? Select your primary engagement strategy.",
+        "context": "The internal political landscape is sensitive. VPs are highly invested in their projects. You need to gather data to support your final allocation while also managing relationships to mitigate fallout. Review all provided case files to inform your strategy.",
+        "options": [
+          {
+            "id": "opt_s2_data_driven",
+            "title": "Data-Driven Interrogation",
+            "description": "Focus on rigorously challenging each VP's financial projections, market assumptions, and risk assessments with hard data. Your primary goal is to identify objective strengths and weaknesses based on numbers."
+          },
+          {
+            "id": "opt_s2_empathetic_collaboration",
+            "title": "Empathetic Understanding & Collaboration",
+            "description": "Prioritize understanding each VP's underlying motivations, team challenges, and long-term vision. Seek areas for potential compromise, cross-functional synergies, or shared resource benefits, fostering a collaborative spirit."
+          },
+          {
+            "id": "opt_s2_political_navigation",
+            "title": "Strategic Political Navigation",
+            "description": "Assess each VP's internal influence, political capital, and potential for conflict. Tailor your questions to understand their 'non-negotiables' and 'leverage points,' aiming to manage expectations and minimize post-decision fallout."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_allocation_justification",
+      "title": "Stage 3: Headcount Allocation & Justification (Core Task)",
+      "description": "You have gathered all necessary information and determined your strategic approach. Now, you must make the final, impactful decision: allocate the 20 new engineering hires across Project Chimera, Project Pegasus, and Project Hydra. Your choice must be justified in a comprehensive memo to the CEO, acknowledging trade-offs and addressing potential political fallout.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Allocate the 20 new engineering headcount slots across the three projects (Chimera, Pegasus, Hydra). You cannot exceed 20 hires. Select the overall allocation strategy that best aligns with your assessment, then prepare a comprehensive 2-page memo to the CEO justifying your final allocation, acknowledging the trade-offs made, and outlining your strategy for managing the political fallout with the affected VPs. Your memo must detail the exact headcount per project.",
+        "context": "This is the core of the challenge. Your decision will have significant strategic and political consequences. You must decide whether to concentrate resources, spread them out, or prioritize based on a specific leadership strength or project potential. Prepare for pushback and ensure your justification is airtight.",
+        "options": [
+          {
+            "id": "opt_s3_all_in_chimera",
+            "title": "All-In on Chimera (Innovation-Led)",
+            "description": "Allocate the majority of resources (e.g., 10-15 hires) to Dr. Thorne's Project Chimera, betting heavily on long-term disruptive innovation for future market dominance. This implies significant under-resourcing for others."
+          },
+          {
+            "id": "opt_s3_pegasus_first",
+            "title": "Pegasus First (Revenue-Led)",
+            "description": "Prioritize Elena Petrova's Project Pegasus (e.g., 10-15 hires) to secure immediate revenue, retain major clients, and validate existing product success. This might impact long-term innovation or platform stability."
+          },
+          {
+            "id": "opt_s3_hydra_for_scale",
+            "title": "Hydra for Scale (Platform-Led)",
+            "description": "Dedicate substantial resources (e.g., 8-12 hires) to Ben Carter's Project Hydra to ensure platform stability, improve scalability, reduce technical debt, and enable broader market reach. This prioritizes foundation over immediate growth spikes."
+          },
+          {
+            "id": "opt_s3_balanced_portfolio",
+            "title": "Balanced Portfolio",
+            "description": "Distribute resources across all three projects in a way that attempts to meet critical needs for each, hedging overall risk and ensuring incremental progress across multiple strategic fronts (e.g., 5-8 hires per project, with one potentially getting slightly more)."
+          },
+          {
+            "id": "opt_s3_leader_centric",
+            "title": "Leader-Centric Allocation",
+            "description": "Allocate the most significant share of resources to the project led by the VP you believe is the most effective leader, capable of delivering results even with limited resources, or the one whose leadership is most critical to retain."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "The ability to strategically allocate human capital based on project needs, leadership capabilities, and organizational health, while managing internal political dynamics and potential retention risks.",
+        "scoringGuide": {
+          "1": "Decisions are arbitrary or fail to consider the impact on team morale or retention. Demonstrates no understanding of leadership styles or project team health.",
+          "3": "Decisions generally consider project needs and some leadership aspects, but may miss opportunities for optimal talent deployment or neglect potential retention risks. Manages political dynamics reactively.",
+          "5": "Decisions strategically optimize human capital deployment, demonstrating deep insight into leadership strengths, team dynamics, and project requirements. Proactively addresses retention risks and deftly navigates internal politics to align teams."
+        }
+      },
+      {
+        "competencyName": "Strategic Resource Allocation",
+        "description": "The capacity to prioritize conflicting demands for limited resources by synthesizing diverse information, assessing risks/rewards, and aligning decisions with overarching business objectives.",
+        "scoringGuide": {
+          "1": "Allocation appears arbitrary, ignores key strategic objectives, or fails to acknowledge critical trade-offs. Resource distribution is likely to lead to sub-optimal outcomes across the board.",
+          "3": "Allocation is logical in some aspects but may overlook significant risks or opportunities. Shows an attempt to balance priorities but might lack full alignment with overarching strategic goals or a clear justification for trade-offs.",
+          "5": "Allocation is highly strategic, innovative, and deeply integrated with company-wide goals. Clearly prioritizes resources based on a robust assessment of risks, rewards, and strategic impact, explicitly acknowledging and justifying all trade-offs."
+        }
+      },
+      {
+        "competencyName": "Cross-functional Collaboration & Influence",
+        "description": "Skill in navigating complex inter-departmental politics, understanding stakeholder motivations, and communicating difficult decisions effectively to maintain productive relationships.",
+        "scoringGuide": {
+          "1": "Fails to anticipate political fallout or actively creates tension. Communication is dismissive or confrontational, likely damaging peer relationships and organizational cohesion.",
+          "3": "Shows some awareness of political dynamics but may struggle to mitigate fallout effectively. Communication is clear but lacks the persuasive nuance needed to maintain strong cross-functional relationships post-decision.",
+          "5": "Expertly navigates the political landscape, anticipating and mitigating risks. Communication is compelling, empathetic, and demonstrates exceptional executive judgment in managing expectations and preserving critical peer relationships."
+        }
+      },
+      {
+        "competencyName": "Analytical Decision-Making",
+        "description": "The ability to critically analyze quantitative financial data and qualitative organizational context to identify key trade-offs and make well-reasoned, data-informed choices under ambiguity.",
+        "scoringGuide": {
+          "1": "Over-relies on a single type of data (e.g., only financial, or only qualitative 'gut feel') ignoring contradictory evidence. Decisions lack a clear, data-backed rationale.",
+          "3": "Integrates both quantitative and qualitative data but may struggle to synthesize conflicting information effectively. Analysis supports the decision but may not fully explore alternative scenarios or latent risks.",
+          "5": "Demonstrates exceptional ability to synthesize complex quantitative and qualitative information, drawing insightful conclusions. Decisions are well-reasoned, evidence strong analytical rigor, and anticipate potential challenges with data-backed foresight."
+        }
+      },
+      {
+        "competencyName": "Communication & Justification",
+        "description": "Clarity, persuasiveness, and comprehensiveness of the final written recommendation and the accompanying rationale, demonstrating a strong executive presence.",
+        "scoringGuide": {
+          "1": "Memo is disorganized, unclear, overly emotional, or avoids addressing the core dilemma and its implications. Fails to provide a clear, logical explanation for the chosen allocation.",
+          "3": "Memo is structured and addresses most key aspects but may lack depth, persuasiveness, or full political awareness. Justification is logical but could be more robust or proactive in managing fallout.",
+          "5": "Memo is concise, compelling, and professional, directly addressing the CEO's implicit concerns. Eloquently articulates why decisions were made, acknowledges opportunity costs, and outlines concrete plans for managing expectations and supporting under-resourced VPs, demonstrating exceptional executive communication."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

@@ -313,6 +313,61 @@ export async function getPublicAccessStatus(
     caseId: string
   }
 ): Promise<PublicAccessStatus> {
+  // Check if user is admin - admins always have access
+  // Do this FIRST before any subscription checks
+  if (userId) {
+    let isAdmin = false
+    let roleCheckError = false
+    
+    try {
+      // First check user_metadata for role (useful for dev tools and faster)
+      const { createClient } = await import('@/lib/supabase/server')
+      const supabase = await createClient()
+      const { data: { user: supabaseUser } } = await supabase.auth.getUser()
+      const metadataRole = supabaseUser?.user_metadata?.role
+      if (metadataRole === 'admin') {
+        isAdmin = true
+      }
+      
+      // Then check database profile (only if metadata check didn't find admin)
+      if (!isAdmin) {
+        try {
+          const profile = await getProfileWithRole(userId)
+          if (profile && profile.role === 'admin') {
+            isAdmin = true
+          }
+        } catch (profileError) {
+          // If profile check fails (e.g., permission denied), mark as error
+          // We'll fail open in this case
+          roleCheckError = true
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[getPublicAccessStatus] Error checking profile role for user ${userId}:`, profileError)
+          }
+        }
+      }
+    } catch (error) {
+      // If metadata check fails, mark as error and fail open
+      roleCheckError = true
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[getPublicAccessStatus] Error checking admin role for user ${userId}:`, error)
+      }
+    }
+    
+    // If we confirmed user is admin, grant access
+    if (isAdmin) {
+      return { access: true }
+    }
+    
+    // If we couldn't verify role due to errors, fail open (allow access)
+    // This prevents blocking admins who might have permission issues
+    if (roleCheckError) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[getPublicAccessStatus] Could not verify role for user ${userId}, allowing access (fail open)`)
+      }
+      return { access: true }
+    }
+  }
+  
   // Check if user has active subscription
   if (userId) {
     const subscriptionStatus = await checkSubscription()

@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { fetchJson } from '@/lib/api'
 import { DEFAULT_MODELS, GeneratedLesson, GenerationOptions, LessonStructure } from '@/lib/content-generator'
-import { getAllLessonsFlat, completeCurriculumData } from '@/lib/curriculum-data'
+import { completeCurriculumData, getAllLessonsFlat } from '@/lib/curriculum-data'
 import { queryKeys } from '@/lib/queryKeys'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Circle, Download, Eye, Play, RefreshCw, Settings, Sparkles, X } from 'lucide-react'
@@ -37,8 +37,8 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
   
   // Configuration
   const [config, setConfig] = useState<GenerationOptions>({
-    provider: 'openai',
-    model: 'gpt-4o-mini', // Default to mini model for higher token limit
+    provider: 'gemini',
+    model: 'gemini-2.5-pro', // Default to Gemini 2.5 Pro
     includeVisualizations: true,
     includeMermaidDiagrams: true,
     targetWordCount: 2500,

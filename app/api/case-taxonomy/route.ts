@@ -40,11 +40,13 @@ export async function GET() {
       framework = JSON.parse(frameworkContent)
     }
     
-    return NextResponse.json({
+    const response = NextResponse.json({
       arenas: taxonomy.arenas || [],
       challengeTypeMap,
       framework
     })
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    return response
   } catch (error) {
     console.error('Error loading taxonomy:', error)
     return NextResponse.json(

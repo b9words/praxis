@@ -1,0 +1,119 @@
+{
+  "caseId": "cs_arena_2_12_the_best_of_both_leadership_team_1762277126971",
+  "version": "1.0",
+  "title": "The 'Best of Both' Leadership Team",
+  "description": "As the new CEO of Apex Momentum, a $4B entity formed by a 'merger of equals,' you must select your executive team from two pools of highly qualified, politically-backed candidates. Your choices will define the company's culture, appease a divided board, and determine whether the integration succeeds or fails.",
+  "competencies": [
+    "Post-Merger Integration (PMI)",
+    "Stakeholder Management",
+    "Executive Communication",
+    "Decision-Making Under Ambiguity"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_exec_dossier_01",
+      "fileName": "Executive_Dossier_Apex_Momentum.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "# Executive Dossier: Confidential\n\n**Candidate Profiles for Critical Roles: CFO, CTO, Global Head of Sales**\n\nThis document contains detailed profiles, performance metrics, and 360-degree feedback summaries for the six candidates being considered for the Apex Momentum executive leadership team. Review is restricted to the CEO and Board of Directors.\n\n*Content to be generated separately. Will include quantitative and qualitative data for 2x CFO, 2x CTO, and 2x Head of Sales candidates, highlighting cultural and performance differences between Apex Dynamics and Momentum Software legacy executives.*"
+      }
+    },
+    {
+      "fileId": "cf_merger_plan_02",
+      "fileName": "Project_Unity_Strategic_Plan.md",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": "# Project Unity: Merger Strategic Plan & Rationale\n\n**Investor Presentation Summary**\n\nThis document outlines the strategic rationale for the merger between Apex Dynamics and Momentum Software. It includes financial targets, key synergy goals ($150M cost savings), and the product integration roadmap. The core tension between cost discipline and rapid innovation is a central theme.\n\n*Content to be generated separately. Will include financial models, market analysis, and key integration milestones over the next 18 months.*"
+      }
+    },
+    {
+      "fileId": "cf_consultant_report_03",
+      "fileName": "Synergy_Consultants_Leadership_Assessment.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# MEMORANDUM\n\n**TO:** CEO, Apex Momentum\n**FROM:** Marcus Thorne, Lead Partner, Synergy Consultants\n**DATE:** [Current Date]\n**SUBJECT:** Objective Leadership Candidate Assessment & Recommendations\n\nThis report provides a data-driven analysis of the six leadership candidates. It includes a quantitative 'Candidate Scorecard' designed to identify the 'on-paper' optimal choice for each role based on our proprietary assessment criteria. We have also included our recommendation for the ideal leadership archetype for each function.\n\n*Content to be generated separately. The scorecards will present a deceptively simple, quantitative 'winner' for each role that may contradict the qualitative nuance in the Executive Dossier.*"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_setting_the_tone",
+      "title": "Stage 1: The First 24 Hours - Setting the Tone",
+      "description": "Your inbox is flooded with anxious emails from leaders on both sides of the former companies. The rumor mill is in overdrive. Your first act as CEO will set the tone for the entire integration. You must communicate your decision-making process immediately.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft a brief (150-200 word) memo to both legacy C-suite teams. Your memo must clearly state the timeline and process for selecting the new, unified leadership team. You must choose a path: a swift, decisive process this week OR a more deliberative 30-day assessment. Justify your chosen approach and how it will manage uncertainty and build trust.",
+        "context": "You are one week post-merger. No leadership decisions have been announced. Anxiety is high, and key talent is at risk of being poached. The Co-Chairs of the Board, David Chen (ex-Apex) and Dr. Elena Vasić (ex-Momentum), are watching your every move for signs of bias or indecision.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_the_critical_trio",
+      "title": "Stage 2: The Critical Trio Selection",
+      "description": "You have reviewed the candidate dossiers, the strategic plan, and the consultant's report. Now, you must make the most difficult decision of your career. The future of Apex Momentum rests on getting this leadership combination right.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write a confidential memo to the Board of Directors. Your memo must contain three sections:\n\n1.  **Final Selections:** Clearly state your chosen candidate for CFO, CTO, and Global Head of Sales.\n2.  **Strategic Justification:** For each choice, provide a detailed paragraph explaining your rationale. You must reference specific evidence from the case files (Executive Dossier, Strategic Plan, Consultant's Report) to defend your decision, demonstrating how your chosen team is best equipped to deliver both cost synergies and innovation.\n3.  **Risk Acknowledgment:** Briefly acknowledge the primary risk or trade-off associated with each of your selections and how you plan to mitigate it.",
+        "context": "The Board is split 50/50. David Chen is advocating for the stability of the Apex candidates, while Dr. Vasić is pushing for the innovative drive of the Momentum candidates. Your memo must be a masterclass in stakeholder management, using data and strategic logic to justify a balanced, defensible decision.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_the_announcement",
+      "title": "Stage 3: The Announcement & Transition Plan",
+      "description": "Your decisions are locked in. Now you must control the narrative and rally all 15,000 employees behind your new leadership team. This announcement is not just an update; it's the foundational communication for the new Apex Momentum culture.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the company-wide internal memo announcing the new leadership structure for the CFO, CTO, and Global Head of Sales roles. Your memo must accomplish four things:\n\n1.  **Announce the New Leaders:** Clearly and confidently introduce the chosen executives.\n2.  **Articulate the Vision:** Briefly connect your selections to the company's unified strategy of combining operational excellence with rapid innovation.\n3.  **Manage the Departures:** Gracefully and respectfully acknowledge the significant contributions of the three departing executives. Announce a generous transition package (a 'golden parachute') to ensure a smooth handover and goodwill.\n4.  **Inspire Confidence:** End on a forward-looking, inspiring note that addresses employee anxiety and signals the beginning of a new, unified chapter for Apex Momentum.",
+        "context": "This memo will be read by everyone from legacy Apex engineers to legacy Momentum salespeople. It will be scrutinized for any hint of a 'takeover.' Your language must be precise, empathetic, and strong to quell rumors and minimize the flight of key talent.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Post-Merger Integration (PMI)",
+        "description": "Assesses the user's ability to make leadership decisions that support the strategic goals of the merger, balancing the need for both stability (cost synergies) and growth (innovation) while intentionally shaping a new, unified corporate culture.",
+        "scoringGuide": {
+          "1": "Selects a team that is heavily biased towards one legacy company, ignoring the strategic plan's dual objectives. Choices signal a 'takeover,' increasing cultural friction and flight risk.",
+          "3": "Selects a mix of candidates but provides a weak justification for how the team will work together. The plan addresses either cost-cutting or innovation, but not both in a cohesive way.",
+          "5": "Selects a balanced team whose combined skills directly map to the strategic need for both synergy and innovation. The justification is explicit, thoughtful, and demonstrates a clear vision for creating a new, 'best of both' culture."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the user's skill in navigating the competing interests of a divided Board of Directors and other key influencers. A strong response demonstrates independent judgment informed by, but not beholden to, stakeholder pressure.",
+        "scoringGuide": {
+          "1": "Decisions and justifications clearly capitulate to the pressure of one Co-Chair (Chen or Vasić) or blindly follow the consultant's report without critical analysis.",
+          "3": "Acknowledges different stakeholder viewpoints but struggles to synthesize them into a coherent decision. The justification may appease one side while alienating the other.",
+          "5": "Demonstrates a masterful synthesis of all stakeholder inputs, resulting in an independent, well-defended decision. The justification memo is written skillfully to anticipate and proactively address the concerns of both Board factions."
+        }
+      },
+      {
+        "competencyName": "Executive Communication",
+        "description": "Measures the user's ability to craft clear, empathetic, and decisive communications for different audiences (executives, board, all employees) under high-pressure circumstances. Focuses on the quality of the written artifacts (memos).",
+        "scoringGuide": {
+          "1": "Memos are generic, poorly structured, or use language that is likely to create confusion or anxiety. The final announcement fails to inspire confidence or respectfully manage departures.",
+          "3": "Memos are factually correct but lack strategic framing or empathy. The announcement states the changes but does little to build morale or unify the company.",
+          "5": "Memos are clear, concise, and strategically framed. The final announcement is a model of executive communication: it builds confidence, handles exits with grace, and articulates a compelling vision for the future under the new team."
+        }
+      },
+      {
+        "competencyName": "Decision-Making Under Ambiguity",
+        "description": "Assesses the ability to make a sound decision when presented with incomplete and conflicting information. This involves synthesizing quantitative data (metrics) with qualitative data (360 reviews, cultural context) to justify a chosen path.",
+        "scoringGuide": {
+          "1": "Relies on a single data source (e.g., only the consultant's scorecard or only one candidate's resume) and ignores conflicting qualitative information. Fails to acknowledge the trade-offs of the decision.",
+          "3": "Attempts to use multiple data sources, but the connection between the data and the final decision is weak or unclear. Acknowledges risks but doesn't articulate them well.",
+          "5": "Effectively weaves together quantitative data, qualitative profiles, and strategic needs to build a robust, defensible argument. Explicitly acknowledges the risks and trade-offs inherent in their choices, showing sophisticated judgment."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

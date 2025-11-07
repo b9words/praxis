@@ -34,3 +34,4 @@ CREATE POLICY "Admins can view audit logs"
 -- Service role can insert audit logs (for server-side logging)
 -- Note: Service role bypasses RLS, so we don't need a policy for INSERT
 
+

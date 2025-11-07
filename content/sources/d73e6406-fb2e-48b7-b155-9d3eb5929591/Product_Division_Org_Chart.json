@@ -1,0 +1,179 @@
+{
+  "title": "Aperture Inc. - Product Division Organizational Chart",
+  "summary": "This document outlines the organizational structure for Aperture Inc.'s core Product Division, led by the VP of Product. The division is organized into four key functional pillars: Product Management, Core Engineering, UX/UI Design, and Data & Analytics. Decision-making is generally hierarchical within each pillar, with Directors and Managers holding significant operational authority. Cross-functional 'squads' are formed for specific projects (e.g., 'Project Nova'), but formal reporting lines remain within the functional departments, creating a matrix-style environment for individual contributors.",
+  "organization": [
+    {
+      "name": "Sarah Chen",
+      "title": "VP of Product",
+      "department": "Executive",
+      "role": "Executive",
+      "reportsTo": null,
+      "children": [
+        {
+          "name": "David Rodriguez",
+          "title": "Director, Product Management",
+          "department": "Product Management",
+          "role": "Management",
+          "reportsTo": "Sarah Chen",
+          "children": [
+            {
+              "name": "Emily White",
+              "title": "Senior Product Manager",
+              "department": "Product Management",
+              "role": "Individual Contributor",
+              "reportsTo": "David Rodriguez",
+              "children": []
+            },
+            {
+              "name": "Ben Carter",
+              "title": "Product Manager",
+              "department": "Product Management",
+              "role": "Individual Contributor",
+              "reportsTo": "David Rodriguez",
+              "children": []
+            },
+            {
+              "name": "Chloe Kim",
+              "title": "Product Manager",
+              "department": "Product Management",
+              "role": "Individual Contributor",
+              "reportsTo": "David Rodriguez",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Michael Ivanov",
+          "title": "Director, Engineering",
+          "department": "Engineering",
+          "role": "Management",
+          "reportsTo": "Sarah Chen",
+          "children": [
+            {
+              "name": "Frank Miller",
+              "title": "Engineering Manager, Team Helios",
+              "department": "Engineering",
+              "role": "Management",
+              "reportsTo": "Michael Ivanov",
+              "children": [
+                {
+                  "name": "Olivia Garcia",
+                  "title": "Senior Software Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Frank Miller",
+                  "children": []
+                },
+                {
+                  "name": "Leo Zhang",
+                  "title": "Software Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Frank Miller",
+                  "children": []
+                },
+                {
+                  "name": "Mia Williams",
+                  "title": "Software Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Frank Miller",
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Jessica Taylor",
+              "title": "Engineering Manager, Team Nova",
+              "department": "Engineering",
+              "role": "Management",
+              "reportsTo": "Michael Ivanov",
+              "children": [
+                {
+                  "name": "Sam Jones",
+                  "title": "Staff Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Jessica Taylor",
+                  "children": []
+                },
+                {
+                  "name": "Ava Brown",
+                  "title": "Software Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Jessica Taylor",
+                  "children": []
+                },
+                {
+                  "name": "Daniel Smith",
+                  "title": "Junior Software Engineer",
+                  "department": "Engineering",
+                  "role": "Individual Contributor",
+                  "reportsTo": "Jessica Taylor",
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Isabella Rossi",
+          "title": "UX/UI Design Manager",
+          "department": "Design",
+          "role": "Management",
+          "reportsTo": "Sarah Chen",
+          "children": [
+            {
+              "name": "Omar Badawi",
+              "title": "Senior UX Designer",
+              "department": "Design",
+              "role": "Individual Contributor",
+              "reportsTo": "Isabella Rossi",
+              "children": []
+            },
+            {
+              "name": "Grace Lee",
+              "title": "UI Designer",
+              "department": "Design",
+              "role": "Individual Contributor",
+              "reportsTo": "Isabella Rossi",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Kevin Hernandez",
+          "title": "Data & Analytics Manager",
+          "department": "Data & Analytics",
+          "role": "Management",
+          "reportsTo": "Sarah Chen",
+          "children": [
+            {
+              "name": "Jordan Miller",
+              "title": "Senior Data Analyst",
+              "department": "Data & Analytics",
+              "role": "Individual Contributor",
+              "reportsTo": "Kevin Hernandez",
+              "children": []
+            },
+            {
+              "name": "Priya Patel",
+              "title": "Data Analyst",
+              "department": "Data & Analytics",
+              "role": "Individual Contributor",
+              "reportsTo": "Kevin Hernandez",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "keyTakeaways": [
+    "The Engineering department under Michael Ivanov represents the largest headcount and budget center, with two distinct sub-teams ('Helios' and 'Nova') that may have differing strategic importance.",
+    "The Design and Data & Analytics teams are structured as small, centralized service groups. While lean, this creates a potential bottleneck and makes them critical dependencies for all product initiatives.",
+    "There is a notable layer of management (Directors and Managers) between the VP and the individual contributors, which could be a target for delayering or consolidation.",
+    "Key individuals, such as Staff Engineer Sam Jones or Senior UX Designer Omar Badawi, possess specialized skills that are vital to new initiatives, making their retention a high priority despite potentially high compensation."
+  ]
+}

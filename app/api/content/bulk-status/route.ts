@@ -6,6 +6,9 @@ import { logAdminAction } from '@/lib/admin/audit-log'
 import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
+export const revalidate = 0
+
 /**
  * POST /api/content/bulk-status
  * Bulk update status for articles and/or cases
@@ -120,7 +123,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    // No server cache - client queries will refetch automatically
+    const response = NextResponse.json({
       success: true,
       updated: {
         articles: updatedArticles,
@@ -128,6 +132,8 @@ export async function POST(request: NextRequest) {
         total: updatedArticles + updatedCases,
       },
     })
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+    return response
   } catch (error: any) {
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

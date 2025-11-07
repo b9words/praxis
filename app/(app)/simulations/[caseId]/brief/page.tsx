@@ -47,17 +47,19 @@ export default async function CaseBriefPage({ params }: { params: Promise<{ case
   if (!caseItem) {
     // Fallback if not found in cache
     caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
-    if (!caseItem || caseItem.status !== 'published') {
+    if (!caseItem || !caseItem.published) {
       notFound()
     }
   }
 
   // Cache user simulation status (5 minutes revalidate, userId in key)
+  // Use caseItem.id (UUID) for database lookups, but caseId (slug) for cache key
   const getCachedSimulationStatus = getCachedUserData(
     user.id,
     async () => {
       // Check if user has an in-progress simulation
-      const existingSimulation = await getSimulationByUserAndCase(user.id, caseId).catch(() => null)
+      // Use caseItem.id (UUID) instead of caseId (slug) for database lookup
+      const existingSimulation = await getSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
       return existingSimulation && existingSimulation.status === 'in_progress' ? existingSimulation : null
     },
     ['simulation', 'status', caseId],

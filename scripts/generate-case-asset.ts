@@ -8,10 +8,10 @@
  *   tsx scripts/generate-case-asset.ts --case-id cs_xxx --new --type FINANCIAL_DATA --file-name "Q1_2024_Financials.csv"
  */
 
-import { buildAssetGenerationPrompt } from '../lib/case-generation-prompts'
-import { generateWithAI } from './generate-shared'
 import fs from 'fs'
 import path from 'path'
+import { buildAssetGenerationPrompt } from '../lib/case-generation-prompts'
+import { generateWithAI } from './generate-shared'
 
 interface GenerateOptions {
   caseId: string
@@ -20,13 +20,189 @@ interface GenerateOptions {
   type?: string
   fileName?: string
   overwrite?: boolean
+  debug?: boolean
+}
+
+/**
+ * Validation result interface
+ */
+interface ValidationResult {
+  valid: boolean
+  errors: string[]
+  content?: string
+}
+
+/**
+ * Validate asset content based on file type (mirrors API validation)
+ */
+function validateAssetContent(
+  content: string,
+  fileType: string,
+  fileName: string
+): ValidationResult {
+  const errors: string[] = []
+  let cleanedContent = content.trim()
+
+  // Remove code fences if present
+  if (cleanedContent.startsWith('```')) {
+    const lines = cleanedContent.split('\n')
+    if (lines[0].startsWith('```')) {
+      lines.shift()
+    }
+    if (lines[lines.length - 1].trim() === '```') {
+      lines.pop()
+    }
+    cleanedContent = lines.join('\n').trim()
+  }
+
+  // Check for placeholders
+  if (/\bPlaceholder\b|\[Placeholder/i.test(cleanedContent)) {
+    errors.push('Content contains placeholder text')
+  }
+
+  // Type-specific validation
+  switch (fileType) {
+    case 'PRESENTATION_DECK': {
+      if (!/^---\s*\n[\s\S]*?\n---\s*\n/.test(cleanedContent)) {
+        errors.push('Missing Marp frontmatter')
+      }
+      const slideSeparators = (cleanedContent.match(/\n---\n/g) || []).length
+      if (slideSeparators < 7) {
+        errors.push(`Too few slides: found ${slideSeparators + 1}, need at least 8`)
+      } else if (slideSeparators > 11) {
+        errors.push(`Too many slides: found ${slideSeparators + 1}, need at most 12`)
+      }
+      break
+    }
+
+    case 'FINANCIAL_DATA': {
+      const lines = cleanedContent.split('\n').filter(line => line.trim())
+      if (lines.length < 13) {
+        errors.push(`Too few rows: found ${lines.length}, need at least 13`)
+      } else {
+        const header = lines[0]
+        if (!header.includes(',')) {
+          errors.push('CSV header missing or invalid')
+        } else {
+          const headerCols = header.split(',').length
+          if (headerCols < 2) {
+            errors.push('CSV header must have at least 2 columns')
+          }
+        }
+      }
+      break
+    }
+
+    case 'STAKEHOLDER_PROFILES': {
+      try {
+        const parsed = JSON.parse(cleanedContent)
+        if (!Array.isArray(parsed)) {
+          errors.push('Must be a top-level JSON array')
+        } else {
+          if (parsed.length < 3 || parsed.length > 6) {
+            errors.push(`Array length must be 3-6, found ${parsed.length}`)
+          }
+          parsed.forEach((item: any, idx: number) => {
+            if (!item.name || typeof item.name !== 'string') {
+              errors.push(`Item ${idx}: missing 'name' field`)
+            }
+            if (!item.title || typeof item.title !== 'string') {
+              errors.push(`Item ${idx}: missing 'title' field`)
+            }
+            if (!item.role || typeof item.role !== 'string') {
+              errors.push(`Item ${idx}: missing 'role' field`)
+            }
+            if (!Array.isArray(item.concerns) || item.concerns.length === 0) {
+              errors.push(`Item ${idx}: 'concerns' must be non-empty array`)
+            }
+            if (!Array.isArray(item.motivations) || item.motivations.length === 0) {
+              errors.push(`Item ${idx}: 'motivations' must be non-empty array`)
+            }
+          })
+        }
+      } catch (e) {
+        errors.push(`Invalid JSON: ${e instanceof Error ? e.message : 'parse error'}`)
+      }
+      break
+    }
+
+    case 'MARKET_DATASET': {
+      try {
+        const parsed = JSON.parse(cleanedContent)
+        if (!Array.isArray(parsed)) {
+          errors.push('Must be a JSON array')
+        } else {
+          if (parsed.length < 12) {
+            errors.push(`Array must have at least 12 items, found ${parsed.length}`)
+          }
+          parsed.forEach((item: any, idx: number) => {
+            if (typeof item !== 'object' || item === null) {
+              errors.push(`Item ${idx}: must be an object`)
+            } else {
+              const hasTimeKey = ['date', 'period', 'month', 'quarter', 'year'].some(
+                key => key in item
+              )
+              if (!hasTimeKey) {
+                errors.push(`Item ${idx}: missing time key`)
+              }
+              const numericKeys = Object.keys(item).filter(
+                k => typeof item[k] === 'number'
+              )
+              if (numericKeys.length < 2) {
+                errors.push(`Item ${idx}: must have at least 2 numeric keys`)
+              }
+            }
+          })
+        }
+      } catch (e) {
+        errors.push(`Invalid JSON: ${e instanceof Error ? e.message : 'parse error'}`)
+      }
+      break
+    }
+
+    case 'ORG_CHART': {
+      try {
+        const parsed = JSON.parse(cleanedContent)
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+          errors.push('Must be a JSON object (not array)')
+        } else {
+          if (!parsed.organization || !Array.isArray(parsed.organization)) {
+            errors.push("Missing or invalid 'organization' array")
+          }
+        }
+      } catch (e) {
+        errors.push(`Invalid JSON: ${e instanceof Error ? e.message : 'parse error'}`)
+      }
+      break
+    }
+
+    case 'REPORT':
+    case 'INTERNAL_MEMO':
+    case 'PRESS_RELEASE':
+    case 'LEGAL_DOCUMENT':
+    case 'MEMO': {
+      if (cleanedContent.length < 300) {
+        errors.push(`Content too short: ${cleanedContent.length} chars, need at least 300`)
+      }
+      if (!/#|##/.test(cleanedContent)) {
+        errors.push('Missing headings')
+      }
+      break
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    content: cleanedContent,
+  }
 }
 
 /**
  * Main generation function
  */
 async function generateAsset(options: GenerateOptions) {
-  const { caseId, fileId, new: isNew, type, fileName, overwrite = false } = options
+  const { caseId, fileId, new: isNew, type, fileName, overwrite = false, debug = false } = options
 
   console.log('📄 Case Asset Generation\n')
   console.log('========================\n')
@@ -130,19 +306,48 @@ async function generateAsset(options: GenerateOptions) {
   )
   console.log(`✅ Generated (${result.model})\n`)
 
+  // Validate content
+  const validation = validateAssetContent(result.content, asset.fileType, asset.fileName)
+  const finalContent = validation.content || result.content
+
+  if (!validation.valid) {
+    console.warn('⚠️  Validation warnings:')
+    validation.errors.forEach(err => console.warn(`   - ${err}`))
+    console.warn('   Continuing anyway...\n')
+  } else {
+    console.log('✅ Validation passed\n')
+  }
+
+  // Debug output
+  if (debug) {
+    console.log('📊 Debug Info:')
+    console.log(`   Model: ${result.model}`)
+    console.log(`   Content length: ${finalContent.length} chars`)
+    console.log(`   Validation: ${validation.valid ? 'PASS' : 'FAIL'}`)
+    console.log(`   Validation errors: ${validation.errors.length}`)
+    console.log(`   First 300 chars:`)
+    console.log('   ' + '─'.repeat(50))
+    console.log(finalContent.substring(0, 300).split('\n').map(line => `   ${line}`).join('\n'))
+    console.log('   ' + '─'.repeat(50))
+    console.log()
+  }
+
   // Determine file extension
   const isCSV = asset.fileType === 'FINANCIAL_DATA'
-  const ext = isCSV ? 'csv' : 'md'
+  const isJSON = asset.fileType === 'ORG_CHART' || asset.fileType === 'STAKEHOLDER_PROFILES' || asset.fileType === 'MARKET_DATASET'
+  const ext = isCSV ? 'csv' : isJSON ? 'json' : 'md'
   const sourcesDir = path.join(process.cwd(), 'content', 'sources', caseId)
   if (!fs.existsSync(sourcesDir)) {
     fs.mkdirSync(sourcesDir, { recursive: true })
   }
 
-  const finalFileName = asset.fileName.endsWith(ext) ? asset.fileName : `${asset.fileName}.${ext}`
+  // Normalize file extension
+  const baseName = asset.fileName.replace(/\.[^.]+$/, '')
+  const finalFileName = `${baseName}.${ext}`
   const filePath = path.join(sourcesDir, finalFileName)
 
   // Save file
-  fs.writeFileSync(filePath, result.content, 'utf-8')
+  fs.writeFileSync(filePath, finalContent, 'utf-8')
   console.log(`💾 Saved to ${filePath}\n`)
 
   // Update case JSON
@@ -180,6 +385,8 @@ for (let i = 0; i < args.length; i++) {
     i++
   } else if (args[i] === '--overwrite') {
     options.overwrite = true
+  } else if (args[i] === '--debug') {
+    options.debug = true
   }
 }
 

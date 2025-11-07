@@ -158,34 +158,38 @@ export default function CookieConsentBanner() {
 
   return (
     <>
-      {/* Consent Modal */}
+      {/* Consent Banner - Fixed to left side, non-blocking */}
       {showBanner && !showSettings && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4 sm:p-6">
-          <div className="bg-white rounded-none border border-neutral-200 shadow-lg max-w-2xl w-full">
-            <div className="p-6 space-y-4">
-              <h2 className="text-xl font-semibold text-neutral-900">Control Your Privacy</h2>
-              <p className="text-sm text-neutral-700 leading-relaxed">
-                We use cookies to analyze our marketing site performance. Essential cookies are required to use the site. 
-                You can accept all or customize your preferences.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        <div className="fixed left-4 bottom-4 z-50 max-w-sm">
+          <div className="bg-white rounded-none border border-neutral-200 shadow-lg">
+            <div className="p-4 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <h2 className="text-sm font-semibold text-neutral-900">Cookie Preferences</h2>
                 <button
-                  onClick={rejectAll}
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors rounded-none"
+                  onClick={() => setShowBanner(false)}
+                  className="text-neutral-400 hover:text-neutral-700 transition-colors flex-shrink-0"
+                  aria-label="Close"
                 >
-                  Reject All
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
+              </div>
+              <p className="text-xs text-neutral-600 leading-relaxed">
+                We use cookies to analyze our marketing site performance. Essential cookies are required.
+              </p>
+              <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setShowSettings(true)}
-                  className="px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors rounded-none"
+                  className="px-3 py-1.5 text-xs font-medium text-neutral-700 bg-white border border-neutral-300 hover:bg-neutral-50 transition-colors rounded-none flex-1"
                 >
                   Customize
                 </button>
                 <button
                   onClick={acceptAll}
-                  className="px-4 py-2 text-sm font-medium text-white bg-neutral-900 hover:bg-neutral-800 transition-colors rounded-none flex-1"
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-neutral-900 hover:bg-neutral-800 transition-colors rounded-none flex-1"
                 >
-                  Accept All
+                  Accept
                 </button>
               </div>
             </div>
@@ -193,9 +197,9 @@ export default function CookieConsentBanner() {
         </div>
       )}
 
-      {/* Settings Modal */}
+      {/* Settings Modal - Still modal but with less intrusive overlay */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-none border border-neutral-200 shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">

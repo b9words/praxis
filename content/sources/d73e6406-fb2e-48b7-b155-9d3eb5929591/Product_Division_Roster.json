@@ -1,0 +1,46 @@
+[
+  {"month": "2022-09", "revenue": 2510000, "cagr": 0.045, "customer_acquisition_cost": 5520, "net_dollar_retention": 1.15},
+  {"month": "2022-10", "revenue": 2595000, "cagr": 0.046, "customer_acquisition_cost": 5500, "net_dollar_retention": 1.16},
+  {"month": "2022-11", "revenue": 2680000, "cagr": 0.044, "customer_acquisition_cost": 5580, "net_dollar_retention": 1.15},
+  {"month": "2022-12", "revenue": 2795000, "cagr": 0.045, "customer_acquisition_cost": 5610, "net_dollar_retention": 1.14},
+  {"month": "2023-01", "revenue": 2880000, "cagr": 0.042, "customer_acquisition_cost": 5650, "net_dollar_retention": 1.14},
+  {"month": "2023-02", "revenue": 2960000, "cagr": 0.041, "customer_acquisition_cost": 5700, "net_dollar_retention": 1.13},
+  {"month": "2023-03", "revenue": 3035000, "cagr": 0.038, "customer_acquisition_cost": 5780, "net_dollar_retention": 1.13},
+  {"month": "2023-04", "revenue": 3100000, "cagr": 0.035, "customer_acquisition_cost": 5900, "net_dollar_retention": 1.12},
+  {"month": "2023-05", "revenue": 3150000, "cagr": 0.031, "customer_acquisition_cost": 6100, "net_dollar_retention": 1.11},
+  {"month": "2023-06", "revenue": 3185000, "cagr": 0.028, "customer_acquisition_cost": 6350, "net_dollar_retention": 1.10},
+  {"month": "2023-07", "revenue": 3205000, "cagr": 0.025, "customer_acquisition_cost": 6500, "net_dollar_retention": 1.09},
+  {"month": "2023-08", "revenue": 3215000, "cagr": 0.021, "customer_acquisition_cost": 6750, "net_dollar_retention": 1.08},
+  {"month": "2023-09", "revenue": 3220000, "cagr": 0.018, "customer_acquisition_cost": 7100, "net_dollar_retention": 1.06},
+  {"month": "2023-10", "revenue": 3210000, "cagr": 0.015, "customer_acquisition_cost": 7450, "net_dollar_retention": 1.05},
+  {"month": "2023-11", "revenue": 3195000, "cagr": 0.011, "customer_acquisition_cost": 7900, "net_dollar_retention": 1.03},
+  {"month": "2023-12", "revenue": 3180000, "cagr": 0.008, "customer_acquisition_cost": 8300, "net_dollar_retention": 1.02},
+  {"month": "2024-01", "revenue": 3150000, "cagr": 0.005, "customer_acquisition_cost": 8800, "net_dollar_retention": 1.01},
+  {"month": "2024-02", "revenue": 3110000, "cagr": 0.002, "customer_acquisition_cost": 9250, "net_dollar_retention": 1.00},
+  {"month": "2024-03", "revenue": 3060000, "cagr": -0.001, "customer_acquisition_cost": 9800, "net_dollar_retention": 0.99},
+  {"month": "2024-04", "revenue": 2995000, "cagr": -0.004, "customer_acquisition_cost": 10500, "net_dollar_retention": 0.98},
+  {"month": "2024-05", "revenue": 2940000, "cagr": -0.007, "customer_acquisition_cost": 11200, "net_dollar_retention": 0.98},
+  {"month": "2024-06", "revenue": 2870000, "cagr": -0.010, "customer_acquisition_cost": 11950, "net_dollar_retention": 0.97},
+  {"month": "2024-07", "revenue": 2815000, "cagr": -0.012, "customer_acquisition_cost": 12800, "net_dollar_retention": 0.96},
+  {"month": "2024-08", "revenue": 2750000, "cagr": -0.015, "customer_acquisition_cost": 13500, "net_dollar_retention": 0.95},
+  {
+    "meta": {
+      "revenue": {
+        "unit": "USD",
+        "description": "Total monthly recurring revenue for the Product Division."
+      },
+      "cagr": {
+        "unit": "percentage",
+        "description": "Competitor Average Growth Rate (CAGR), representing the blended month-over-month revenue growth of the top 3 market competitors."
+      },
+      "customer_acquisition_cost": {
+        "unit": "USD",
+        "description": "Blended Customer Acquisition Cost (CAC) across all marketing and sales channels."
+      },
+      "net_dollar_retention": {
+        "unit": "ratio",
+        "description": "Net Dollar Retention (NDR) rate. A value below 1.0 indicates that churn and downgrades are greater than expansion revenue from existing customers."
+      }
+    }
+  }
+]

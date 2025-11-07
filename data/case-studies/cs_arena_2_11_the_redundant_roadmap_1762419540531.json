@@ -1,0 +1,157 @@
+{
+  "caseId": "cs_arena_2_11_the_redundant_roadmap_1762419540531",
+  "version": "1.0",
+  "title": "The Redundant Roadmap",
+  "description": "As the CEO of Nexus Dynamics, you've just acquired a competitor, AgileFlow, creating a significant product overlap. The combined engineering team has proposed 'Project Unify,' an ambitious 18-month plan to merge both products. You suspect this is a strategic trap and must build a case to kill the project and forge a more decisive path forward.",
+  "competencies": [
+    "Post-Merger Integration (PMI)",
+    "Data-Driven Decision Making",
+    "Executive Communication & Influence",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 90,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "stakeholder_profiles_v1",
+      "fileName": "Stakeholder_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "project_unify_deck_v1",
+      "fileName": "Project_Unify_Vision_Deck.md",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "market_dataset_v1",
+      "fileName": "Customer_Segmentation_Revenue.json",
+      "fileType": "MARKET_DATASET",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "tech_review_report_v1",
+      "fileName": "Technical_Architecture_Review.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cro_memo_urgent_v1",
+      "fileName": "Memo_CRO_Market_Confusion.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cfo_memo_request_v1",
+      "fileName": "Memo_CFO_Financial_Projections_Request.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "org_chart_v1",
+      "fileName": "Combined_Engineering_Org_Chart.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_triage",
+      "title": "Stage 1: Initial Triage",
+      "description": "Formulate your initial hypothesis on the 'Project Unify' proposal.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You have just received the 'Project Unify' proposal. Based on your experience, you immediately sense this is a strategic trap. Before diving into the full case file, draft an initial hypothesis for your Red Team analysis. What are the two biggest unexamined risks in this 'merge' strategy?",
+        "context": "Your inbox contains the optimistic 'Project Unify' presentation deck from your new co-head of Product & Engineering, Anya Sharma. The plan promises the 'best of both worlds,' but your gut tells you it's a recipe for a bloated, unfocused product that pleases no one.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_building_the_case",
+      "title": "Stage 2: Building the Case",
+      "description": "Use the case file data to build your argument and secure a key ally.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "After reviewing the complete Case File, your concerns are confirmed. The data shows the two customer bases are distinct and their needs are contradictory. Draft a 1-page memo to your CFO, Maria Flores, summarizing the three most damning data points that prove 'Project Unify' is a financial and strategic dead end. Your goal is to secure her as your primary ally.",
+        "context": "The data is clear: Taskmaster serves high-ACV enterprise clients who need power, while FlowBoard serves high-volume SMBs who need simplicity. The technical review confirms a merge would be a nightmare, and the sales team is already reporting market confusion. You need to distill this into a powerful argument for your most pragmatic executive.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_defining_the_alternative",
+      "title": "Stage 3: Defining the Alternative",
+      "description": "Move from criticism to leadership by proposing a decisive new strategy.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "It's not enough to criticize; you must lead. It's time to formalize your alternative. Write a directive outlining your 'Pick a Winner' strategy. You must:\n1. Declare which product (Taskmaster or FlowBoard) will be the sole go-forward platform.\n2. Provide a three-point rationale for your choice, citing specific data from the case file.\n3. Define the high-level plan for the 'loser' product (e.g., managed decline, maintenance mode, open-sourcing).",
+        "context": "With your CFO aligned, you now have the support to challenge the consensus. The engineering and product teams are waiting for a clear direction. A vague response will lead to paralysis; a decisive one will create conflict but ultimately provide clarity.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_final_recommendation",
+      "title": "Stage 4: The Red Team Memo",
+      "description": "Synthesize your analysis into a final, board-level recommendation.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Synthesize all your work into a formal, 2-page Red Team memorandum addressed to the Board of Directors. This document must be the final artifact that kills 'Project Unify.' It must concisely (1) expose the fatal flaws of the merge strategy, (2) present your 'Pick a Winner' decision as the only viable path to long-term value creation, and (3) outline the execution risks of your plan and your high-level mitigation strategy.",
+        "context": "This is the final step. Your memo will be distributed to the board ahead of the next meeting. It needs to be irrefutable, professional, and demonstrate clear-eyed leadership. The success of your signature acquisition, and your credibility as CEO, hang in the balance.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Post-Merger Integration (PMI)",
+        "description": "Assesses the ability to navigate the strategic complexities of product portfolio rationalization after an acquisition.",
+        "scoringGuide": {
+          "1": "Accepts the flawed 'Project Unify' premise and focuses on making minor adjustments, failing to address the core strategic conflict and prioritizing consensus over value creation.",
+          "3": "Recognizes the flaws in the merge plan but struggles to make a hard choice, instead proposing a 'study it further' or 'phased integration' approach that delays the inevitable.",
+          "5": "Immediately identifies the 'synergy' trap, correctly diagnoses the product/market mismatch, and makes a swift, well-justified 'pick a winner' decision."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Evaluates the ability to synthesize quantitative and qualitative data to build a compelling, evidence-based argument.",
+        "scoringGuide": {
+          "1": "Ignores or misinterprets key data from the case files, relying instead on gut feel or the emotional arguments presented by stakeholders.",
+          "3": "Cites the correct data but fails to weave it into a compelling narrative, simply listing facts rather than building a persuasive case.",
+          "5": "Expertly synthesizes the quantitative (customer dataset) and qualitative (CRO's email, technical report) data to build an irrefutable argument that supports the strategic choice."
+        }
+      },
+      {
+        "competencyName": "Executive Communication & Influence",
+        "description": "Measures the clarity, persuasiveness, and strategic positioning of the written artifacts, especially the final board memo.",
+        "scoringGuide": {
+          "1": "The memo is unfocused, overly technical, or defensive. It fails to make a clear recommendation or leaves the board with more questions than answers.",
+          "3": "The memo states the recommendation clearly but lacks persuasive punch and fails to fully address the 'human' side of the change (e.g., impact on teams, customers).",
+          "5": "The final Red Team memo is clear, concise, and powerfully argued. It anticipates objections, speaks the language of the board (value, risk, ROI), and inspires confidence in the chosen direction."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

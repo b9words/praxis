@@ -12,6 +12,7 @@ import {
   Settings,
   BarChart3,
   Route,
+  Mail,
 } from 'lucide-react'
 
 const navigation = [
@@ -62,9 +63,15 @@ const navigation = [
     children: [
       { name: 'Notifications', href: '/admin/system/notifications' },
       { name: 'Send Emails', href: '/admin/system/notifications/manage' },
+      { name: 'Automated Emails', href: '/admin/system/emails' },
       { name: 'Token Usage', href: '/admin/system/token-usage' },
       { name: 'Briefing Schedule', href: '/admin/briefing' },
     ],
+  },
+  {
+    name: 'Email Campaigns',
+    href: '/admin/emails',
+    icon: Mail,
   },
 ]
 

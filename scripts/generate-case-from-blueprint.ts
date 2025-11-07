@@ -10,6 +10,7 @@
 
 import { buildCaseOutlinePrompt, buildCaseGenerationPrompt } from '../lib/case-generation-prompts'
 import { generateWithAI, uploadToStorage, syncFileMetadata, generateAndUploadThumbnail, isSupabaseAvailable } from './generate-shared'
+import { enhanceCaseStudyWithAI, enhanceAllCaseStudyAssets } from '../lib/ai-quality-enhancer'
 import fs from 'fs'
 import path from 'path'
 
@@ -134,6 +135,20 @@ async function generateCaseFromBlueprint(options: GenerateOptions) {
   if (estimatedDuration) caseData.estimatedDuration = estimatedDuration
   caseData.status = 'draft'
   caseData.caseId = finalCaseId
+
+  // Quality enhancement cycle
+  console.log('\n✨ Enhancing case study quality...')
+  try {
+    caseData = await enhanceCaseStudyWithAI(caseData)
+    console.log('✅ Case study structure enhanced\n')
+    
+    // Enhance all asset files
+    caseData = await enhanceAllCaseStudyAssets(caseData)
+    console.log('✅ Quality enhancement complete\n')
+  } catch (error) {
+    console.warn(`⚠️  Quality enhancement failed, using original: ${error}`)
+    console.warn('   Continuing with original case study...\n')
+  }
 
   // Save to data/case-studies
   const outputPath = path.join(process.cwd(), 'data', 'case-studies', `${finalCaseId}.json`)

@@ -1,0 +1,139 @@
+[
+  {
+    "name": "Anya Sharma",
+    "title": "Chief Financial Officer",
+    "department": "Finance",
+    "role": "As CFO, Anya is the ultimate authority on the company's financial health. She initiated the headcount reduction mandate based on board pressure and falling revenue projections. Her primary lens is the P&L statement.",
+    "power": "high",
+    "influence": "high",
+    "concerns": [
+      "Missing quarterly earnings targets.",
+      "High operational burn rate.",
+      "The cost of severance packages impacting cash flow.",
+      "Shareholder and board perception of the company.",
+      "Ensuring the cuts are deep enough to avoid a second round."
+    ],
+    "motivations": [
+      "Achieving the mandated 15% opex reduction.",
+      "Improving EBITDA margins before the next earnings call.",
+      "Demonstrating decisive fiscal discipline.",
+      "Freeing up capital for strategic investments.",
+      "A clean, swift, one-time reduction."
+    ],
+    "likely_objections": [
+      "\"Your proposed list doesn't meet the full savings target.\"",
+      "\"Keeping this higher-salaried individual negates the savings from two junior roles.\"",
+      "\"The justification for retaining this team seems sentimental, not financial.\""
+    ],
+    "background": "A 15-year finance veteran with a background in private equity, Anya is known for her unsentimental, data-driven approach to management. She joined two years ago to bring fiscal discipline to the company."
+  },
+  {
+    "name": "David Chen",
+    "title": "Chief Technology Officer",
+    "department": "Engineering",
+    "role": "David oversees the entire product and engineering organization. He is deeply concerned about how these cuts will affect the product roadmap, technical debt, and the ability to retain top engineering talent.",
+    "power": "high",
+    "influence": "medium",
+    "concerns": [
+      "Losing engineers with unique 'tribal knowledge' of legacy systems.",
+      "Critical delay of 'Project Chimera,' the next flagship product.",
+      "A decline in code quality and system stability.",
+      "Competitors poaching disillusioned 'survivor' employees.",
+      "The inability to hire for key roles in the next 18 months."
+    ],
+    "motivations": [
+      "Protecting his most productive '10x' engineers.",
+      "Maintaining velocity on the product roadmap.",
+      "Ensuring the long-term architectural integrity of the platform.",
+      "Keeping engineering morale as high as possible.",
+      "Preserving R&D capacity for future innovation."
+    ],
+    "likely_objections": [
+      "\"Cutting this person creates a single point of failure in our core infrastructure.\"",
+      "\"This list is too heavy on senior engineers; we're losing a decade of experience.\"",
+      "\"You are gutting the team responsible for our highest-margin product.\""
+    ]
+  },
+  {
+    "name": "Maria Flores",
+    "title": "Chief Human Resources Officer",
+    "department": "Human Resources",
+    "role": "Maria is responsible for the people-side of the business, from legal compliance to company culture. She views the layoffs through the lens of risk, fairness, and long-term employer reputation.",
+    "power": "medium",
+    "influence": "high",
+    "concerns": [
+      "Legal risk of disparate impact claims (e.g., age, gender, race).",
+      "Severe damage to employee morale and trust in leadership.",
+      "Negative press and Glassdoor reviews harming future recruitment.",
+      "The communication plan for both departing and remaining employees.",
+      "Ensuring the process is perceived as fair and defensible."
+    ],
+    "motivations": [
+      "Executing a legally compliant, by-the-book process.",
+      "Mitigating risk of wrongful termination lawsuits.",
+      "Preserving the company's core cultural values.",
+      "Providing support for both departing and remaining staff.",
+      "Maintaining a consistent and objective selection rationale."
+    ],
+    "likely_objections": [
+      "\"This selection pool has a clear adverse impact on a protected class.\"",
+      "\"The business justification for eliminating this specific role isn't documented well enough.\"",
+      "\"We haven't considered the downstream cultural impact of letting this person go.\""
+    ]
+  },
+  {
+    "name": "Ben Carter",
+    "title": "VP of Sales",
+    "department": "Sales",
+    "role": "Ben runs the sales division and is fixated on hitting his quarterly and annual revenue targets. He is terrified of losing salespeople who manage key customer relationships, regardless of their performance scores.",
+    "power": "medium",
+    "influence": "medium",
+    "concerns": [
+      "Losing representatives who control major client accounts.",
+      "Disruption to the sales pipeline in the middle of a quarter.",
+      "Competitors seeing the cuts as a sign of weakness.",
+      "Remaining salespeople becoming fearful and distracted.",
+      "Fairly re-distributing accounts and territories."
+    ],
+    "motivations": [
+      "Protecting his highest revenue-generating salespeople.",
+      "Minimizing disruption to Q4 sales targets.",
+      "Maintaining key customer relationships at all costs.",
+      "Showing stability to the market.",
+      "Keeping the morale and 'hunter' mentality of his team intact."
+    ],
+    "likely_objections": [
+      "\"If you cut Sarah, we lose the 'Big Whale' account. It's a $5M risk.\"",
+      "\"His performance score is low, but he's the only one with a relationship at XYZ Corp.\"",
+      "\"How am I supposed to hit my number with a 15% smaller team?\""
+    ],
+    "background": "A classic 'player-coach' sales leader who came up through the ranks. Ben values relationships and revenue above all else and is skeptical of metrics he can't tie directly to a closed deal."
+  },
+  {
+    "name": "Lena Petrova",
+    "title": "Senior Project Manager, Special Projects",
+    "department": "Operations",
+    "role": "Lena is a highly respected individual contributor who manages a critical cross-functional project. She has no formal authority but huge informal influence because she knows who actually does the work and how the systems truly operate.",
+    "power": "low",
+    "influence": "high",
+    "concerns": [
+      "Losing the 'unsung heroes' who are the glue of her project.",
+      "Knowledge silos being created by sudden departures.",
+      "Overloading the remaining team members with the work of the departed.",
+      "Her critical project missing its non-negotiable deadline.",
+      "The breakdown of informal communication networks."
+    ],
+    "motivations": [
+      "Protecting her key project contributors, regardless of title.",
+      "Delivering her project on time and under budget.",
+      "Maintaining team cohesion and productivity through the turmoil.",
+      "Ensuring a smooth knowledge transfer from anyone who is let go.",
+      "Advocating for the quiet but essential team members."
+    ],
+    "likely_objections": [
+      "\"Javier's performance reviews don't look great, but he's the only one who knows how the old billing system talks to the new API.\"",
+      "\"Her official title is 'coordinator,' but she does the work of three people. Cutting her is a huge net loss.\"",
+      "\"The remaining team will burn out in a month if they have to absorb all this work.\""
+    ]
+  }
+]

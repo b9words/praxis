@@ -1,0 +1,177 @@
+{
+  "caseId": "cs_arena_1_3_the_remote_work_reset_1762367772074",
+  "version": "1.0",
+  "title": "The Remote Work Reset",
+  "description": "Nexus Dynamics, a high-growth SaaS company, is failing its 'flexible hybrid' work model, creating a two-tiered culture and tanking morale. As Chief People Officer, you must help the CEO navigate a radical pivot to a 'remote-first' culture by crafting the script for the critical all-hands announcement.",
+  "competencies": [
+    "Organizational Design",
+    "Strategic Communication",
+    "Stakeholder Management",
+    "Change Leadership"
+  ],
+  "estimatedDuration": 90,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cf_nps_survey_q3_2023",
+      "fileName": "eNPS_Survey_Q3.csv",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "EmployeeID,Department,Location_Status,Tenure_Months,eNPS_Score,Comment_Theme,Comment_Text\nND001,Engineering,Remote,38,9,Culture,\"Best decision we ever made. I can focus and deliver without the office noise.\"\nND002,Sales,Hybrid,45,4,Career,\"I feel like I have to be in the office to get noticed. All the big deals are celebrated by the people physically there.\"\nND003,Engineering,Remote,26,3,Communication,\"My manager is in the office and I get decisions secondhand through Slack. I feel completely out of the loop.\"\nND004,Marketing,Hybrid,18,5,Belonging,\"The office is a ghost town most days, but then a random Tuesday is packed. There's no predictability and it feels like two separate companies.\"\nND005,Engineering,Remote,50,10,Culture,\"Remote-first is the future. I'm glad Nexus is embracing it, but the hybrid mess is painful.\"\nND006,Sales,Hybrid,33,2,Career,\"I was explicitly told in my performance review that my lack of 'face time' with leadership was limiting my career progression.\"\nND007,Product,Remote,12,4,Communication,\"Key product decisions are happening in hallway chats at HQ. By the time I see the notes, it's too late to have any real input.\"\nND008,Finance,Hybrid,60,6,Culture,\"I appreciate the flexibility, but I miss the spontaneous collaboration. The best ideas still happen spontaneously at the coffee machine.\""
+      }
+    },
+    {
+      "fileId": "cf_project_velocity_q3_2023",
+      "fileName": "Project_Velocity_Data_Q3.json",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "{\n  \"Project_Phoenix_Launch\": {\n    \"Lead_Department\": \"Marketing\",\n    \"Involved_Teams\": [\"Marketing\", \"Sales\", \"Engineering\"],\n    \"Team_Distribution_Ratio (In-Office/Remote)\": \"80/20\",\n    \"Time_In_Review_Cycle_Days\": 4.5,\n    \"On_Time_Delivery_Rate\": 0.85\n  },\n  \"Project_Titan_Refactor\": {\n    \"Lead_Department\": \"Engineering\",\n    \"Involved_Teams\": [\"Engineering\", \"Product\"],\n    \"Team_Distribution_Ratio (In-Office/Remote)\": \"10/90\",\n    \"Time_In_Review_Cycle_Days\": 8.2,\n    \"On_Time_Delivery_Rate\": 0.98\n  },\n  \"Project_Odyssey_Integration\": {\n    \"Lead_Department\": \"Sales\",\n    \"Involved_Teams\": [\"Sales\", \"Engineering\", \"Finance\"],\n    \"Team_Distribution_Ratio (In-Office/Remote)\": \"50/50\",\n    \"Time_In_Review_Cycle_Days\": 11.5,\n    \"On_Time_Delivery_Rate\": 0.65\n  }\n}"
+      }
+    },
+    {
+      "fileId": "cf_cfo_memo_remote_first",
+      "fileName": "Memo_from_CFO.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "**MEMORANDUM**\n\n**TO:** Chief People Officer\n**FROM:** David Chen, CFO\n**DATE:** October 26, 2023\n**SUBJECT:** Urgent Reconsideration: Financial and Cultural Implications of the Remote-First Mandate\n\nI am writing to formally object to the proposed 'remote-first' mandate and, in particular, the 'no executive offices' policy. I believe this is a reactive, emotionally-driven decision that ignores critical data and risks significant long-term damage.\n\nMy primary concerns are as follows:\n\n1.  **Financial Irresponsibility:** We have an $8M remaining liability on our 10-year HQ lease. Abandoning this investment is fiscally reckless. The cost of flying teams in for quarterly on-sites will likely negate any real estate savings.\n\n2.  **Erosion of Innovation:** You can't schedule serendipity. Key features for our 'Odyssey' and 'Phoenix' products originated from spontaneous whiteboard conversations between teams at HQ. Shifting to a fully remote, asynchronous model will sterilize our creative process and slow our innovation velocity.\n\n3.  **Performative Symbolism:** Forcing executives out of their offices is a symbolic stunt that degrades leadership authority and creates logistical chaos for those of us who handle sensitive, confidential information daily. It will be seen as performative, not substantive, by the rank-and-file.\n\nI urge you to advise the CEO to delay this announcement and form a cross-functional task force to find a data-driven compromise that preserves a significant office presence."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_message_framing",
+      "title": "Stage 1: Message Framing",
+      "description": "Before writing the full script, CEO Anya Sharma wants to align on the core narrative. The tone of this announcement is critical. As her CPO, you must advise her on the central theme that will be most effective in uniting the company.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Review the case files. Based on the data and stakeholder perspectives, which central theme should anchor the CEO's speech? Justify your choice in 1-2 paragraphs, explaining why it's the most effective option and what risks it mitigates.",
+        "context": "The company is anxious and divided. Remote workers feel disenfranchised, while some in-office employees and leaders fear losing the collaborative culture they value. Your choice of theme will set the tone for the entire transition and determine whether the message lands as a unifying vision or a divisive mandate.",
+        "options": [
+          {
+            "id": "option_1a_fixing_broken",
+            "title": "\"Fixing What's Broken\"",
+            "description": "A transparent and vulnerable approach. Openly admit the hybrid experiment failed, validate the pain employees have felt, and explain *why* this reset is necessary for the health of the company."
+          },
+          {
+            "id": "option_1b_next_evolution",
+            "title": "\"The Next Evolution\"",
+            "description": "A positive, forward-looking vision. Frame this as a natural and deliberate step in the company's growth and maturity, focusing on the future benefits of attracting global talent and increasing operational effectiveness."
+          },
+          {
+            "id": "option_1c_return_to_fairness",
+            "title": "\"A Return to Fairness\"",
+            "description": "An equity-focused message. Center the decision on the core value of creating a level playing field for every employee to succeed, regardless of their physical location."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_stakeholder_management",
+      "title": "Stage 2: Stakeholder Management",
+      "description": "The CFO's memo represents significant resistance from a key leader. How you handle his objections—particularly his attack on the 'no exec offices' policy—will be a crucial test of your change leadership strategy.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "David Chen (CFO) has sent you a blistering memo calling the 'no exec offices' policy 'performative and costly.' How do you advise Anya to address this sentiment in her speech? Write a 1-2 paragraph justification for your chosen approach.",
+        "context": "Ignoring the CFO's concerns could signal that leadership is not open to feedback, potentially creating a powerful internal adversary. However, conceding too much could dilute the power and symbolism of the change. Your advice will shape how the leadership team is perceived.",
+        "options": [
+          {
+            "id": "option_2a_acknowledge_reframe",
+            "title": "Acknowledge & Reframe",
+            "description": "Advise Anya to explicitly mention the leadership team giving up their offices, framing it not as a punishment, but as a necessary and visible act of commitment to the new 'one company, one experience' principle."
+          },
+          {
+            "id": "option_2b_hold_the_line",
+            "title": "Hold the Line",
+            "description": "Advise Anya to keep the message high-level and visionary. Do not mention the offices specifically in the all-hands, and handle executive objections in a separate, closed-door leadership meeting to maintain a united front."
+          },
+          {
+            "id": "option_2c_address_the_data",
+            "title": "Address the Data Directly",
+            "description": "Advise Anya to counter the CFO's financial and innovation arguments directly but respectfully in the speech, using data from the case files to show that the hybrid model is what's truly 'costly' to productivity and talent retention."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_defining_new_norms",
+      "title": "Stage 3: Defining New Norms",
+      "description": "To make the change tangible and credible, the announcement can't just be about vision; it must include a concrete example of how things will change. This 'cornerstone policy' will signal what 'remote-first' truly means at Nexus.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The script needs to move from 'why' to 'how.' Anya will announce one cornerstone policy that exemplifies the 'remote-first' mindset. Which of these should she highlight as the first, most important new norm? Justify your recommendation in 1-2 paragraphs.",
+        "context": "The chosen policy will be heavily scrutinized. It needs to be impactful enough to demonstrate real change, but practical enough to be implemented quickly. This choice will be the first proof point that the company is serious about its new operating model.",
+        "options": [
+          {
+            "id": "option_3a_async_default",
+            "title": "\"Asynchronous by Default\"",
+            "description": "Announce a new communication protocol where Slack/email is the default and meetings are the exception, with mandatory agendas and post-meeting summaries stored centrally. This directly addresses the 'out of the loop' feeling."
+          },
+          {
+            "id": "option_3b_quarterly_onsites",
+            "title": "\"Purposeful In-Person Connection\"",
+            "description": "Announce a significant new budget for teams to meet in person for 3-4 days each quarter for strategy and bonding. This reassures those who fear losing all human connection and counters the 'serendipity' argument."
+          },
+          {
+            "id": "option_3c_redesigned_ladders",
+            "title": "\"Location-Agnostic Performance\"",
+            "description": "Announce a full-scale, immediate review and redesign of performance management and promotion criteria to be location-agnostic and explicitly reward remote collaboration skills. This directly addresses career progression fears."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_4_final_deliverable",
+      "title": "Stage 4: The Final Deliverable",
+      "description": "It's time to bring it all together. Based on your decisions, you will now write the full script for CEO Anya Sharma's all-hands address. This is the ultimate artifact that will determine the success or failure of this critical organizational reset.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Write the full 750-1000 word script for CEO Anya Sharma's all-hands address. The script must incorporate your chosen narrative from Stage 1, your stakeholder strategy from Stage 2, and the cornerstone policy from Stage 3. It should be authentic to a CEO's voice—clear, compelling, and empathetic—while decisively setting the new direction for Nexus Dynamics.",
+        "context": "The entire company is waiting. Rumors are swirling. Your script needs to cut through the noise, acknowledge the challenges, and paint an inspiring and credible picture of the future. The goal is to leave the team feeling not anxious, but aligned, understood, and motivated for the change ahead."
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Assesses the ability to connect a high-level strategic shift to the tangible systems, principles, and behaviors needed to make it successful.",
+        "scoringGuide": {
+          "1": "The script simply announces the policy change without explaining the underlying system or principles that will change.",
+          "3": "The script connects the remote-first policy to specific new behaviors and processes (e.g., communication norms).",
+          "5": "The script articulates a compelling vision of *how* the organization will operate differently, linking the structural change to business outcomes like speed and talent attraction."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Evaluates the ability to craft a clear, empathetic, and persuasive narrative that motivates and aligns a diverse audience during a period of uncertainty.",
+        "scoringGuide": {
+          "1": "The message is dry, robotic, or uses corporate jargon. It feels like a top-down mandate and fails to connect emotionally.",
+          "3": "The script is clear, well-structured, and empathetic. It states the 'what' and the 'why' effectively.",
+          "5": "The script tells a powerful story, acknowledges the difficulty of the change, and inspires a sense of shared purpose and excitement for the future."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Measures the skill of anticipating, acknowledging, and addressing the concerns of key groups to build consensus and mitigate resistance.",
+        "scoringGuide": {
+          "1": "The script ignores or dismisses the valid concerns of key groups (e.g., the CFO, those who value office life).",
+          "3": "The script acknowledges different perspectives and shows empathy for the sense of loss some employees might feel.",
+          "5": "The script validates the concerns of skeptics (like the CFO) and masterfully reframes their arguments within the larger strategic context, making them feel heard even while driving the change forward."
+        }
+      },
+      {
+        "competencyName": "Change Leadership",
+        "description": "Assesses the ability to frame a difficult transition in a way that builds momentum, establishes a clear vision, and inspires confidence in leadership.",
+        "scoringGuide": {
+          "1": "The script focuses heavily on the problems of the past and comes across as apologetic or uncertain.",
+          "3": "The script balances the rationale for the change with a positive vision for the future.",
+          "5": "The script frames the difficult change as a courageous and necessary step, establishing a clear, inspiring vision and creating palpable momentum for the transition ahead."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

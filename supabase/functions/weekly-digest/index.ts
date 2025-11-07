@@ -190,7 +190,7 @@ serve(async (req) => {
         const { data: recommendedLessons } = await supabaseAdmin
           .from('articles')
           .select('id, title')
-          .eq('status', 'published')
+          .eq('published', true)
           .limit(2)
 
         const recommendedContent = (recommendedLessons || []).map((lesson: any) => ({

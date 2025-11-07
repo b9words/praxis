@@ -14,6 +14,7 @@ interface ProgressTrackerProps {
   initialStatus?: 'not_started' | 'in_progress' | 'completed'
   initialTimeSpent?: number
   initialScrollPosition?: number
+  onDomainCompleted?: (data: { domainId: string }) => void
 }
 
 export default function ProgressTracker({
@@ -24,7 +25,8 @@ export default function ProgressTracker({
   initialProgress = 0,
   initialStatus = 'not_started',
   initialTimeSpent = 0,
-  initialScrollPosition
+  initialScrollPosition,
+  onDomainCompleted,
 }: ProgressTrackerProps) {
   const [progress, setProgress] = useState(initialProgress)
   const [status, setStatus] = useState<'not_started' | 'in_progress' | 'completed'>(initialStatus)
@@ -123,6 +125,16 @@ export default function ProgressTracker({
         
         // Track lesson completion
         trackEvents.lessonCompleted(lessonId, domainId, moduleId, userId)
+        
+        // Show success toast
+        toast.success('Lesson Completed!', {
+          description: 'Your progress has been saved.',
+        })
+        
+        // Trigger domain completion modal if domain was completed
+        if (result.domainCompleted && onDomainCompleted) {
+          onDomainCompleted({ domainId })
+        }
       } else {
         toast.error('Failed to mark lesson as completed')
       }
@@ -130,7 +142,7 @@ export default function ProgressTracker({
       console.error('Error marking lesson as completed:', error)
       toast.error('Failed to mark lesson as completed')
     }
-  }, [domainId, moduleId, lessonId, userId])
+  }, [domainId, moduleId, lessonId, userId, onDomainCompleted])
 
   // Track last saved progress to avoid unnecessary saves
   const lastSavedProgressRef = useRef(initialProgress)

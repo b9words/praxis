@@ -23,6 +23,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { getAllLessonsFlat } from '../lib/curriculum-data'
 import { articleExists, caseExists, generateAndUploadThumbnail, generateWithAI, getCoreValuesPrompt, isSupabaseAvailable, syncFileMetadata, uploadToStorage } from './generate-shared'
+import { enhanceCaseStudyWithAI, enhanceAllCaseStudyAssets } from '../lib/ai-quality-enhancer'
 
 interface GenerateOptions {
   domain?: string
@@ -478,6 +479,20 @@ async function generateCase(options: GenerateOptions = {}) {
     const safeModule = lesson.moduleId.replace(/[^a-z0-9]/g, '_')
     const safeLesson = lesson.lessonId.replace(/[^a-z0-9]/g, '_')
     caseData.caseId = `cs_${safeDomain}_${safeModule}_${safeLesson}`
+  }
+  
+  // Quality enhancement cycle
+  console.log('\n✨ Enhancing case study quality...')
+  try {
+    caseData = await enhanceCaseStudyWithAI(caseData)
+    console.log('✅ Case study structure enhanced\n')
+    
+    // Enhance all asset files
+    caseData = await enhanceAllCaseStudyAssets(caseData)
+    console.log('✅ Quality enhancement complete\n')
+  } catch (error) {
+    console.warn(`⚠️  Quality enhancement failed, using original: ${error}`)
+    console.warn('   Continuing with original case study...\n')
   }
   
   // Validate

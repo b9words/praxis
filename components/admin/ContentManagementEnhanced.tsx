@@ -358,15 +358,7 @@ export default function ContentManagementEnhanced({ articles, cases }: ContentMa
                         >
                           Preview
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                        >
-                          <Link href={`/admin/content/edit/${item.id}?type=${item.type}`}>
-                            Edit
-                          </Link>
-                        </Button>
+                        {/* Edit button removed - use details drawer instead */}
                       </div>
                     </td>
                   </tr>

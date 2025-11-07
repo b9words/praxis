@@ -1,0 +1,157 @@
+{
+  "caseId": "cs_arena_1_16_the_founder_s_mess_1762414625045",
+  "version": "1.0",
+  "title": "The Founder's Mess",
+  "description": "As the new CEO of Momentum Machines, you've inherited a stagnating core business and a dozen expensive 'moonshot' projects championed by the founder, who is now your Chairman. Your first board meeting is in 10 days, and you must intervene to critique a dangerously optimistic draft presentation, forcing a strategic shift before it's too late.",
+  "competencies": [
+    "Leading a Turnaround",
+    "Financial Acumen",
+    "Strategic Thinking",
+    "Stakeholder Management"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_mmch_deck_01",
+      "fileName": "Q3_Board_Meeting_Draft_v2.pptx",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_mmch_financials_02",
+      "fileName": "Momentum_Machines_Financials_Q2.xlsx",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_mmch_memo_vance_03",
+      "fileName": "Welcome_from_Alex_Vance.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_mmch_email_chen_04",
+      "fileName": "(Email) Fwd_ URGENT - Another Key Account at Risk.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_mmch_stakeholders_05",
+      "fileName": "key_leaders.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_mmch_orgchart_06",
+      "fileName": "reporting_structure.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_diagnosis",
+      "title": "Stage 1: Challenge the Narrative",
+      "description": "Review the opening slides of the draft board deck. Your first task is to challenge the overly optimistic narrative and force the team to acknowledge the reality of the situation.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "The first three slides of the deck paint a rosy picture of 'disruptive innovation.' Leave comments on these slides that directly challenge this framing. Use the financial data and the COO's email to ground your critique in reality and set a new, more urgent tone.",
+        "context": "You've reviewed all the case files and formed your initial diagnosis: the company is funding a speculative future by starving its profitable present. The draft deck completely ignores this tension.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_2_moonshot_filter",
+      "title": "Stage 2: Impose Financial Rigor",
+      "description": "The middle section of the deck proudly lists the 12 'Momentum X' moonshot projects with visionary descriptions but no financial grounding. Your task is to apply a rigorous financial and strategic filter.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "On the slides detailing the Momentum X projects, leave comments demanding specific financial metrics (e.g., TAM, projected ROI, required capex, path to commercialization). Your critique should make it clear that a 'list' of projects is unacceptable and that a disciplined portfolio approach is required. Explicitly state that continuing to fund all 12 projects is not an option.",
+        "context": "You've successfully challenged the initial narrative. Now you must dismantle the core of the flawed strategy: the undisciplined funding of the founder's pet projects.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_3_core_business_reinvestment",
+      "title": "Stage 3: Champion the Core Business",
+      "description": "The deck dedicates only two slides to the core 'Optimizer' business, treating it as a stable but uninteresting cash cow. You need to elevate its importance and make a case for reinvestment.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "Critique the slides on the 'Optimizer' division. Demand a detailed plan for growth, not just maintenance. Ask for specific proposals on where to reinvest the capital freed up from cutting Momentum X projects. Reference the COO's email about competitive threats to add urgency.",
+        "context": "Having forced a hard look at the R&D burn, you must now pivot the conversation towards rebuilding the company's economic engine. This is your chance to show your COO, David Chen, that you are his ally.",
+        "options": []
+      }
+    },
+    {
+      "stageId": "stage_4_set_new_direction",
+      "title": "Stage 4: Define the Path Forward",
+      "description": "Your critique is nearly complete. The final step is to provide a clear, forward-looking mandate that summarizes your expectations and sets the agenda for the pre-board meeting.",
+      "challengeType": "BOARD_DECK_CRITIQUE",
+      "challengeData": {
+        "prompt": "On the final 'Summary & Next Steps' slide, add a concluding comment that synthesizes your critique. It should firmly state the need to shut down at least half the Momentum X projects, outline the principles for a new 'Project Gateway' evaluation framework, and redirect the team's focus to a revised presentation that prioritizes the profitable growth of the core business.",
+        "context": "You've systematically dismantled the old strategy. Your final comment must not only summarize the required changes but also demonstrate decisive leadership and establish your authority as the new CEO.",
+        "options": []
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Leading a Turnaround",
+        "description": "Assesses the user's ability to diagnose the core problem, challenge the status quo, and decisively set a new strategic direction.",
+        "scoringGuide": {
+          "1": "Critique is timid, suggesting only minor edits. Avoids direct confrontation with the existing strategy and fails to call for project cuts.",
+          "3": "Clearly identifies the need to cut projects and refocus on the core business. Leaves direct, challenging comments on the deck.",
+          "5": "Not only demands cuts but also introduces a clear, logical framework for making those decisions. The critique is structured, decisive, and effectively resets the company's strategic direction."
+        }
+      },
+      {
+        "competencyName": "Financial Acumen",
+        "description": "Measures the user's ability to use financial data to analyze performance and justify strategic decisions.",
+        "scoringGuide": {
+          "1": "Ignores the provided financial data. Comments are purely qualitative and do not reference the P&L or cash burn.",
+          "3": "References the high cash burn from Momentum X and the profitability of the core business in comments. Asks for financial projections.",
+          "5": "Uses specific figures from the financial data to quantify the problem and justify the critique (e.g., 'Momentum X is burning $40M a quarter while the core business's margins have shrunk by 5%')."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Evaluates the user's ability to see the bigger picture, balance short- and long-term priorities, and articulate a coherent strategy.",
+        "scoringGuide": {
+          "1": "Focuses only on cost-cutting. Fails to articulate a vision for reinvesting in the core business or a method for R&D evaluation.",
+          "3": "Proposes a balanced strategy of cutting moonshots *and* reinvesting the savings into the core Optimizer division.",
+          "5": "Articulates a clear strategic filter for capital allocation. The critique lays the groundwork for a robust framework that links all R&D efforts back to the company's core strengths and customer needs."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the user's ability to communicate difficult decisions in a way that is firm yet professional, anticipating and managing political dynamics.",
+        "scoringGuide": {
+          "1": "Comments are overly aggressive, personal, or passive-aggressive, likely to alienate the team and incite a rebellion.",
+          "3": "Communication is professional, direct, and focused on the business issues rather than on people.",
+          "5": "Critique is masterfully crafted. It is firm and non-negotiable on the new direction but frames the change in a way that respects past efforts while focusing the team on a viable future, building credibility and authority."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}

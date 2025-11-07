@@ -8,7 +8,12 @@ import { CaseStructure, Persona } from '@/types/simulation.types'
  * #### Key Stakeholders
  * #### The Decision Point(s)
  */
-export function parseCaseBriefing(markdown: string): CaseStructure | null {
+export function parseCaseBriefing(markdown: string | null | undefined): CaseStructure | null {
+  // Handle null/undefined/empty markdown
+  if (!markdown || typeof markdown !== 'string') {
+    return null
+  }
+  
   const sections: Record<string, string> = {}
   
   // Split by h4 headings

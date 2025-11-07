@@ -35,13 +35,23 @@ export default function StructuredJsonEditor({
   const viewRef = useRef<EditorView | null>(null)
   const [jsonError, setJsonError] = useState<string | null>(null)
   const [isValid, setIsValid] = useState(true)
+  const isUpdatingFromProp = useRef(false) // Flag to prevent infinite loops
+
+  // Helper to check if content matches placeholder
+  const isPlaceholder = (content: string) => {
+    if (!content || !placeholder) return false
+    return content.trim() === placeholder.trim() || content.trim() === ''
+  }
 
   // Initialize CodeMirror
   useEffect(() => {
     if (!editorRef.current || viewRef.current) return
 
+    // Use empty string if value is empty, not placeholder
+    const initialContent = value && value.trim() ? value : ''
+
     const state = EditorState.create({
-      doc: value || placeholder,
+      doc: initialContent,
       extensions: [
         lineNumbers(),
         highlightActiveLineGutter(),
@@ -62,17 +72,24 @@ export default function StructuredJsonEditor({
         // JSON validation is handled manually via JSON.parse
         EditorState.tabSize.of(2),
         EditorView.updateListener.of((update) => {
-          if (update.docChanged) {
+          if (update.docChanged && !isUpdatingFromProp.current) {
             const newValue = update.state.doc.toString()
-            onChange(newValue)
+            // Only call onChange if it's not placeholder content and not from prop update
+            if (!isPlaceholder(newValue)) {
+              onChange(newValue)
+            } else {
+              onChange('')
+            }
 
-            // Validate JSON
+            // Validate JSON - skip if empty or placeholder
             try {
-              if (newValue.trim()) {
-                JSON.parse(newValue)
+              const trimmed = newValue.trim()
+              if (trimmed && !isPlaceholder(trimmed)) {
+                JSON.parse(trimmed)
                 setJsonError(null)
                 setIsValid(true)
               } else {
+                // Empty or placeholder - valid state (no error)
                 setJsonError(null)
                 setIsValid(true)
               }
@@ -81,6 +98,10 @@ export default function StructuredJsonEditor({
               setIsValid(false)
             }
           }
+        }),
+        // Custom placeholder extension
+        EditorView.contentAttributes.of({
+          'data-placeholder': value && value.trim() ? '' : placeholder,
         }),
         EditorView.theme({
           '&': {
@@ -129,27 +150,42 @@ export default function StructuredJsonEditor({
 
   // Update editor content when value prop changes (but not from user typing)
   useEffect(() => {
-    if (viewRef.current && value !== viewRef.current.state.doc.toString()) {
-      const transaction = viewRef.current.state.update({
-        changes: { from: 0, to: viewRef.current.state.doc.length, insert: value || placeholder },
-      })
-      viewRef.current.dispatch(transaction)
+    if (viewRef.current) {
+      const currentContent = viewRef.current.state.doc.toString()
+      const newContent = value && value.trim() ? value : ''
+      // Only update if content actually changed
+      if (currentContent !== newContent) {
+        isUpdatingFromProp.current = true // Set flag to prevent onChange from firing
+        const transaction = viewRef.current.state.update({
+          changes: { from: 0, to: viewRef.current.state.doc.length, insert: newContent },
+        })
+        viewRef.current.dispatch(transaction)
+        // Reset flag after a short delay to allow transaction to complete
+        setTimeout(() => {
+          isUpdatingFromProp.current = false
+        }, 0)
+      }
     }
-  }, [value, placeholder])
+  }, [value])
 
   // Validate initial value
   useEffect(() => {
-    if (value) {
+    const trimmed = value?.trim() || ''
+    if (trimmed && !isPlaceholder(trimmed)) {
       try {
-        JSON.parse(value)
+        JSON.parse(trimmed)
         setJsonError(null)
         setIsValid(true)
       } catch (e) {
         setJsonError(e instanceof Error ? e.message : 'Invalid JSON')
         setIsValid(false)
       }
+    } else {
+      // Empty or placeholder - valid state
+      setJsonError(null)
+      setIsValid(true)
     }
-  }, [value])
+  }, [value, placeholder])
 
   return (
     <div className="space-y-2">
@@ -159,7 +195,14 @@ export default function StructuredJsonEditor({
           {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
         </div>
       )}
-      <div ref={editorRef} className="border border-gray-200 rounded-lg overflow-hidden" />
+      <div className="relative">
+        <div ref={editorRef} className="border border-gray-200 rounded-lg overflow-hidden" />
+        {(!value || !value.trim()) && placeholder && (
+          <div className="absolute top-4 left-4 pointer-events-none text-muted-foreground text-sm font-mono whitespace-pre opacity-60">
+            {placeholder}
+          </div>
+        )}
+      </div>
       {jsonError && (
         <Alert className="border-red-200 bg-red-50">
           <div className="flex items-start gap-2">

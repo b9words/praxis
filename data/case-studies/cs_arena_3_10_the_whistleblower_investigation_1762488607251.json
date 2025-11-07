@@ -1,0 +1,388 @@
+{
+  "caseId": "cs_arena_3_10_the_whistleblower_investigation_1762488607251",
+  "version": "1.0",
+  "title": "The Whistleblower Investigation",
+  "description": "### Executive Summary\n\nThis case study places you in the role of the Chair of the Board's Audit Committee at Aetheria Dynamics (NASDAQ: AETD), a major telecommunications infrastructure company. You have just received a credible, anonymous whistleblower email alleging that the company's star performer, the Head of European Sales, has been systematically bribing public officials to secure lucrative contracts. With the company's stock price heavily dependent on this division's growth, you are immediately caught between your fiduciary duty to investigate thoroughly and immense pressure from the CEO to handle the situation quietly and avoid disrupting business. You must navigate a political minefield, direct a complex forensic investigation with ambiguous early evidence, and make a series of high-stakes decisions that will determine the legal, financial, and reputational fate of the entire corporation. Your ultimate task is to uncover the truth and present a definitive, evidence-backed recommendation to the full board, shaping the company's response to a potentially existential crisis.\n\n### Company Context\n\nAetheria Dynamics (NASDAQ: AETD) is a global leader in the telecommunications infrastructure sector, with a market capitalization of $20 billion and annual revenues of $5 billion. For three decades, Aetheria has been a pillar of the industry, manufacturing and deploying the critical hardware—5G radio units, fiber-optic switches, and network routers—that underpins modern communication. The company employs 12,000 people worldwide, with major R&D and manufacturing hubs in North America and a significant sales and operations presence in Europe and the Asia-Pacific region. As a mature, publicly-traded entity, Aetheria is under constant pressure from Wall Street to deliver consistent quarterly growth. However, its core North American market has become saturated, with major carriers having largely completed their 5G build-outs. This has led to flat domestic revenues and intense shareholder demand for new growth engines. The board and the CEO, Julian Vance, have staked the company's future on aggressive international expansion, promising investors that emerging markets are the key to unlocking new value.\n\n### Current Situation and Dilemma\n\nThe company's strategic pivot to international markets has yielded spectacular results in one key region: Europe. The European division, led by the charismatic and relentlessly effective Marcus Thorne, has become the undisputed crown jewel of Aetheria. Over the past 24 months, while other divisions have stagnated, Thorne's team has posted record-breaking numbers, culminating in a landmark €500 million contract to build out the national 5G network for a developing EU nation. This single deal was the centerpiece of the last earnings call, sending AETD's stock soaring and cementing CEO Julian Vance's reputation as a turnaround artist. Thorne is celebrated internally as a hero who gets results in difficult markets. The central dilemma strikes when an anonymous email arrives in your inbox, forwarded from the company's confidential ethics hotline. The message is short, specific, and chilling: it alleges that Thorne's success is a sham, built on a foundation of systematic bribery funneled through a shell consulting firm named 'Solstice Consulting'. The email claims a final, large payment is scheduled within 30 days to secure the last phase of the landmark contract. You are now the sole possessor of a piece of information that could unravel the company's biggest success story and potentially implicate senior leadership. The central tension is your unavoidable duty to investigate versus the immense institutional pressure to protect the company's golden goose.\n\n### Decision Alternatives and Constraints\n\nThroughout the investigation, you will be presented with a series of critical choices, each with significant trade-offs. Your initial decision is how to even begin. Do you collaborate with a success-at-all-costs CEO who wants to bury the issue, or do you immediately assert the Audit Committee's authority by engaging external counsel, risking a political war? As the investigation proceeds, you must decide its scope: a narrow, surgical strike that is fast but might miss a wider conspiracy, or a comprehensive deep-dive that is legally defensible but will paralyze the European division and alert potential wrongdoers. You will be forced to interpret ambiguous evidence—suspicious payments and coded emails that lack a definitive 'smoking gun'—and decide whether to act decisively by suspending a key executive or proceed covertly to gather more concrete proof. Your power as an independent director is your primary tool, but it is not absolute. You cannot unilaterally fire employees; your authority lies in investigation, oversight, and formal recommendations to a board that may be divided and a CEO who is deeply invested in the status quo. You are constrained by time, a finite budget for external experts, and the ever-present risk of leaks to the press.\n\n### Risks and Implications\n\nThe stakes are astronomical. A misstep in the investigation could be catastrophic. If you move too slowly or appear to be part of a cover-up, you and the entire board could face shareholder lawsuits and regulatory action from the Department of Justice (DOJ) and the SEC for violating the Foreign Corrupt Practices Act (FCPA). The potential penalties include hundreds of millions of dollars in fines, the imposition of a corporate monitor, and even criminal charges for executives. Conversely, a full-blown, public investigation that ultimately proves the allegations false could still cause irreparable damage. It could derail the European division's momentum, crater the stock price, destroy Marcus Thorne's career, and lead to a loss of confidence in the CEO's leadership. Every decision you make—from the initial response to the final communication strategy—carries the risk of triggering one of these disastrous outcomes. Your challenge is to navigate this minefield, balancing legal duty, ethical responsibility, and strategic business imperatives to protect the long-term health of Aetheria Dynamics.",
+  "competencies": [
+    "Risk Management & Governance",
+    "Ethical Judgment",
+    "Decision-Making Under Ambiguity",
+    "Stakeholder Management",
+    "Evidence Synthesis",
+    "Strategic Foresight",
+    "Crisis Communication",
+    "Analytical Rigor"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_whistleblower_email_01",
+      "fileName": "URGENT_Ethics_Hotline_Submission.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_fcpa_summary_02",
+      "fileName": "FCPA_Compliance_Guide_Summary.md",
+      "fileType": "LEGAL_DOCUMENT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_aetheria_org_chart_03",
+      "fileName": "Aetheria_Global_Org_Chart.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_stakeholder_profiles_04",
+      "fileName": "Key_Stakeholder_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_sales_dashboard_05",
+      "fileName": "Regional_Sales_Performance.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_expense_reports_06",
+      "fileName": "Thorne_Expense_Reports_EU.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_email_excerpts_07",
+      "fileName": "Thorne_Email_Excerpts.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_response",
+      "title": "Stage 1: The First 48 Hours - Immediate Response",
+      "description": "The anonymous whistleblower email is sitting in your inbox. It's specific, credible, and implicates the company's most valuable division and executive. The clock is ticking, and your initial moves will set the tone for the entire investigation and signal your intentions to other key stakeholders. The CEO, Julian Vance, wants an urgent 'chat' to align on a strategy, while the General Counsel, Anika Sharma, is likely advocating for a formal, by-the-book process. Your actions in this stage are critical to preserving evidence, establishing the independence of the Audit Committee, and managing the internal political dynamics before they spiral out of control. Your task is to decide on the immediate first step and draft the initial communication that will formally kick off the company's response, defining the path forward.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The whistleblower email is in your inbox. The General Counsel is waiting for your direction, and the CEO wants to 'chat' before you do anything. What is your immediate first action to secure the situation and establish a proper governance framework for the investigation? Your artifact for this stage is a draft of the initial email you will send to both the CEO and General Counsel outlining your mandated first step and the immediate plan for the next 72 hours. This document will establish the authority and direction of the investigation from the outset.",
+        "context": "You are the Chair of the Board's Audit Committee. This position grants you board-mandated authority to oversee internal controls and compliance, independent of the CEO. The CEO, Julian Vance, is highly protective of Marcus Thorne and is motivated by maintaining the company's growth narrative and stock price. The General Counsel, Anika Sharma, is extremely risk-averse and will prioritize protecting the company from legal liability above all else. The whistleblower email specifically mentions a final payment is due in 30 days, creating immense time pressure. Your first move must balance the need for speed, confidentiality, and asserting your committee's independent authority.",
+        "options": [
+          {
+            "id": "opt_1a_contain_control",
+            "title": "Contain & Control: Immediately Engage External Counsel",
+            "description": "You immediately contact the company's preferred external law firm, a specialist in FCPA investigations, and formally engage them on behalf of the Audit Committee. You then instruct the CEO and GC that all communication regarding this matter is privileged and must cease until counsel is fully briefed. This move decisively asserts the Audit Committee's independence and protects attorney-client privilege from the start. However, it will likely be viewed as an aggressive, unilateral action by the CEO, potentially creating a hostile relationship and signaling a lack of trust right from the beginning."
+          },
+          {
+            "id": "opt_1b_collaborate_internally",
+            "title": "Collaborate Internally: Form a Joint Strategy",
+            "description": "You schedule an immediate, confidential meeting with both the CEO and the General Counsel to discuss the allegation and form a joint plan. This approach fosters alignment and presents a united front, which can be crucial for a smooth investigation. However, it risks allowing the growth-focused CEO to influence the process, potentially advocating for a slower, less disruptive, or internally-led investigation. This collaboration could compromise the independence of the audit and create the appearance that management, not the board, is controlling the inquiry."
+          },
+          {
+            "id": "opt_1c_quiet_surveillance",
+            "title": "Quiet Surveillance: Covertly Preserve Evidence",
+            "description": "Before engaging anyone, you send a confidential, carefully worded directive to the Chief Information Officer—a trusted executive who reports to the CEO but has a dotted line to your committee—to immediately and covertly implement a litigation hold on Marcus Thorne's digital communications (emails, messages, files). This ensures no evidence is deleted before the formal investigation begins. While it secures invaluable, untainted data, this action carries significant risk. If discovered, it could be perceived as 'spying' and could completely destroy trust with the executive team, while also potentially violating internal protocols if not handled perfectly."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_scoping_investigation",
+      "title": "Stage 2: Scoping the Investigation",
+      "description": "You have successfully engaged external counsel from a top-tier law firm. The initial preservation of evidence is underway. Now, you must make a critical decision that will define the trajectory, cost, and speed of the entire process: the scope of the investigation. The law firm has presented three distinct options for Phase 1 of the forensic audit, each with major trade-offs between speed, cost, thoroughness, and disruption. The CEO is pushing for the fastest, most limited option to minimize operational impact, while the General Counsel is advocating for the most comprehensive approach to ensure maximum legal defensibility. Your decision will directly impact what evidence is found and how credible the investigation will be in the eyes of the board and potentially, regulators. Your task is to approve the official scope and justify it to the board.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "External counsel has presented three potential scopes for Phase 1 of the forensic investigation. Your choice will be formalized in the engagement letter and will dictate the actions for the next 30-60 days. Which scope do you approve, and why? Your artifact is a formal memo to the full Board of Directors outlining your chosen scope, the rationale behind your decision, its estimated cost and timeline, and how it balances the competing needs for speed, thoroughness, and business continuity. This memo must justify your approach as the most prudent path forward.",
+        "context": "The company has an approved budget of $1 million for the initial phase, but this can be expanded with full board approval. Marcus Thorne's European division is in the middle of closing its quarterly numbers, and any significant disruption could impact reported earnings. There is a palpable sense of anxiety among the leadership team, and rumors may begin to spread if the investigation is too broad or visible. Your decision must be documented and defensible, as it will be heavily scrutinized if the investigation's outcome is challenged later.",
+        "options": [
+          {
+            "id": "opt_2a_surgical_strike",
+            "title": "The 'Surgical Strike'",
+            "description": "This approach narrowly focuses only on the specific allegations in the whistleblower email. The audit will be limited to Thorne’s expense reports, all payments made to 'Solstice Consulting,' and his emails related to the 'Balkans Gateway Project.' This is the fastest and least expensive option (~$250k), minimizing disruption. However, it risks missing a wider pattern of behavior. If bribery is systemic, this narrow scope will not find it, potentially leading to a flawed conclusion that underestimates the problem and exposes the company to future liability."
+          },
+          {
+            "id": "opt_2b_comprehensive_review",
+            "title": "The 'Comprehensive Review'",
+            "description": "This is a full, top-to-bottom audit of the entire European division's financials for the last 24 months. It includes forensic analysis of all major contracts, vendor payments, and extensive interviews with Thorne's entire leadership team. This is the most thorough and legally defensible approach (~$1.5M+), ensuring no stone is left unturned. However, it is slow, expensive, and extremely disruptive. It will effectively signal to the entire division that they are under investigation, potentially causing panic, damaging morale, and alerting any potential co-conspirators."
+          },
+          {
+            "id": "opt_2c_data_first_forensics",
+            "title": "The 'Data-First Forensics'",
+            "description": "This option begins with a wide but covert e-discovery and data analytics sweep of all European leadership communications and payment systems before any interviews are conducted. The goal is to find digital evidence and patterns of corruption first, using keywords, payment analysis, and communication mapping. This tech-forward approach (~$750k) can uncover hidden connections without alerting personnel. The main risk is that data without context can be misleading, and it may delay the crucial 'human intelligence' gathering from interviews, giving people time to align their stories."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_ambiguous_evidence",
+      "title": "Stage 3: Interpreting Ambiguous Evidence",
+      "description": "Phase 1 of the investigation is complete, and the results are inconclusive. The forensic audit has not uncovered a 'smoking gun'—there is no email from Marcus Thorne explicitly stating, 'I am bribing an official.' However, the report from external counsel details a disturbing pattern of red flags: multiple large, round-number payments to 'Solstice Consulting' against vague statements of work; Thorne's expense reports showing lavish 'government liaison meetings' with no attendees listed; and emails where he uses coded language like 'securing local support' and 'special handling fees.' When presented with this evidence in a formal interview, Thorne was calm and dismissive, calling them standard 'costs of doing business in a complex region.' You are now at a critical juncture where you must interpret this ambiguous evidence and recommend a concrete action to the board.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The initial report is in. There is strong circumstantial evidence but no definitive proof of wrongdoing. Marcus Thorne denies everything. The CEO is now arguing to conclude the investigation and implement new training. What do you recommend to the board as the immediate next step? Your artifact for this stage is the 'Preliminary Investigation Findings Memo'. This memo must summarize the ambiguous evidence, interpret its potential significance, and formally recommend one of the three options below as the official next step for the investigation.",
+        "context": "The pressure to conclude the investigation is immense. The European division's performance is beginning to suffer due to the distraction, and the legal fees are mounting. The CEO is framing this as a 'witch hunt' based on a disgruntled employee's email. However, the external counsel advises that ignoring these red flags constitutes a significant legal risk. Your recommendation will likely be the deciding vote in a divided board, pitting the desire for business continuity against the demands of fiduciary duty.",
+        "options": [
+          {
+            "id": "opt_3a_place_on_leave",
+            "title": "Place Thorne on Administrative Leave",
+            "description": "Based on the pattern of serious red flags, you recommend placing Marcus Thorne on paid administrative leave, effective immediately, pending further investigation. This action protects the integrity of the investigation by preventing any potential evidence tampering or witness intimidation. It sends a strong signal that the board takes the allegations seriously. However, it effectively convicts Thorne in the court of public opinion, tips him off fully, and could trigger a wrongful termination lawsuit if he is ultimately exonerated. It would also decapitate the leadership of your most important division."
+          },
+          {
+            "id": "opt_3b_continue_covertly",
+            "title": "Continue Covertly and Deepen Scope",
+            "description": "You recommend that the investigation should continue covertly without confronting Thorne further at this time. You authorize Phase 2, which would involve seeking legal authority to subpoena the bank records of 'Solstice Consulting' to trace the flow of funds. This approach allows for a deeper, more fact-based investigation that could lead to conclusive evidence. The major drawbacks are that it is a slow, legally complex process that requires significant additional funds and time, all while leaving a potentially corrupt executive in a position of power."
+          },
+          {
+            "id": "opt_3c_warn_and_monitor",
+            "title": "Issue a Warning and Enhance Controls",
+            "description": "You conclude that while Thorne's record-keeping is poor, there is insufficient evidence to prove wrongdoing. You recommend formally closing the active investigation, issuing a written warning to Thorne about compliance protocols, and implementing stricter, mandatory compliance controls and transaction monitoring for the entire European division. This option avoids major disruption and satisfies the CEO. However, it carries the massive risk that you are ignoring a real crime, which, if later discovered by authorities, would make the board and the company look complicit in a cover-up."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_4_smoking_gun",
+      "title": "Stage 4: The Smoking Gun",
+      "description": "Your decision to continue the investigation covertly has paid off. After months of deep forensic analysis and following the money trail, external counsel has found it: the smoking gun. While analyzing the laptop of a junior marketing staffer who supported Thorne, the forensics team recovered a deleted calendar invitation. The invitation details a 'Project Gateway Finalization Dinner' between Thorne, the principal of 'Solstice Consulting,' and the spouse of a key government official responsible for awarding the €500M contract. Two days after the dinner, wire transfer records—obtained via subpoena—show a €150,000 payment from Solstice Consulting to a real estate entity secretly owned by that same spouse. You now have a clear, documented timeline of a corrupt payment. The ambiguity is gone. The crime is real. You must now make your definitive recommendation to the full board.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "You now possess clear and convincing evidence of bribery. The time for deliberation is over; the time for decisive action has come. What is your definitive recommendation to the full Board of Directors on how to proceed? Your artifact is a formal 'Recommendation Memo to the Board of Directors.' This two-page memo must state the conclusion that a violation of the FCPA has occurred, present a concise timeline of the incriminating evidence, and recommend one of the three courses of action below as the company's official response.",
+        "context": "The atmosphere in the boardroom is incredibly tense. The CEO, Julian Vance, is shaken, his star performer exposed as a criminal. The General Counsel, Anika Sharma, is advising that the company's actions from this moment forward will determine the severity of the inevitable government penalty. There is no longer any question of *if* there is a problem, only how the company will deal with it. Your recommendation will set the course for the most difficult period in the company's history.",
+        "options": [
+          {
+            "id": "opt_4a_self_report",
+            "title": "Immediate Self-Report to the DOJ",
+            "description": "You recommend the company immediately self-disclose the findings of the internal investigation to the Department of Justice (DOJ) and the Securities and Exchange Commission (SEC). This path maximizes the potential for cooperation credit, which can lead to significantly reduced fines and a more lenient settlement, such as a deferred prosecution agreement. However, it guarantees a painful, public, and multi-year process under the supervision of federal prosecutors. It is an admission of guilt that gives up all control over the outcome."
+          },
+          {
+            "id": "opt_4b_terminate_contain",
+            "title": "Terminate & Contain",
+            "description": "You recommend immediately terminating Thorne for cause, clawing back his compensation, and implementing a complete overhaul of internal compliance systems. The goal is to quietly clean house and remediate the problem internally, with the hope that the crime is never discovered by external authorities. This avoids immediate public fallout and regulatory scrutiny. However, this action constitutes a cover-up. If the scheme is ever discovered (e.g., through a different whistleblower), the penalties for the company and board would be exponentially more severe for obstructing justice."
+          },
+          {
+            "id": "opt_4c_negotiate_resignation",
+            "title": "Negotiate a Quiet Resignation",
+            "description": "You recommend confronting Thorne with the evidence and negotiating a quiet, immediate resignation in exchange for his full cooperation in an internal clean-up. This approach might allow the company to quietly unwind the problematic contract and remediate without immediately triggering a public crisis. It is a middle ground that seems less confrontational. However, it is ethically questionable, legally perilous, and does not fulfill the likely requirement to report a known felony. It's a gamble that his cooperation is enough to contain the damage, which is far from certain."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_5_crisis_management",
+      "title": "Stage 5: Crisis Management and Communication",
+      "description": "The board has accepted your recommendation to self-report to the authorities. The DOJ and SEC have been formally notified and have opened their own investigations. The situation has now escalated from an internal crisis to a public one. A reporter from The Wall Street Journal, who has sources inside the DOJ, has just called the General Counsel asking for comment on an 'impending FCPA investigation at Aetheria Dynamics.' A story is imminent. The company has lost control of the narrative. You must now, as a key board leader, help craft the external and internal communications strategy to manage the fallout, reassure investors, and maintain employee morale. The company's reputation and market value hang in the balance.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The news is about to break. You have one chance to frame the narrative. What external and internal communications strategy do you recommend the company adopt immediately? Your artifact for this stage is a two-part document: 1) A draft of the official public Press Release the company will issue, and 2) A draft of the internal All-Hands Memo the CEO will send to all employees. These documents must reflect your chosen communication strategy and strike the right tone of accountability, transparency, and forward-looking stability.",
+        "context": "Major institutional investors are calling, demanding answers. Employees are scared for their jobs and the company's future. Customers are questioning the company's integrity. Your communication strategy needs to address all these audiences simultaneously. A misstep could send the stock into a freefall and trigger a mass employee exodus. The goal is to demonstrate that leadership is in control of a difficult situation and has a clear plan to move forward.",
+        "options": [
+          {
+            "id": "opt_5a_proactive_transparency",
+            "title": "Proactive Transparency",
+            "description": "Recommend issuing a comprehensive press release immediately, acknowledging the internal investigation, the self-reporting to authorities, and the termination of the executive involved. The CEO will also hold an all-hands meeting to explain the situation directly to employees. This approach allows the company to take control of the narrative, demonstrating accountability and transparency. However, it invites intense, immediate scrutiny and provides a detailed roadmap for competitors and prosecutors. It is a high-risk, high-reward strategy for building long-term trust."
+          },
+          {
+            "id": "opt_5b_reactive_containment",
+            "title": "Reactive Containment",
+            "description": "Recommend a minimalist approach. The official public stance is 'no comment on pending legal matters.' Internally, a vague memo is sent out announcing 'leadership changes in the European division' and reinforcing the company's commitment to its code of conduct. This strategy minimizes the amount of information released, giving the legal team maximum flexibility. However, it creates an information vacuum that will be filled by damaging media speculation, rumors, and employee anxiety, making the company appear secretive and guilty."
+          },
+          {
+            "id": "opt_5c_investor_focused",
+            "title": "Investor-Focused Communication",
+            "description": "Recommend a sequenced strategy. First, the CEO and CFO will privately brief the company's top five institutional investors to manage their reaction and secure their support. Only after this is done will the company issue a minimal press release to the public. This prioritizes the stakeholders who have the most impact on the stock price. The primary risk is that news of the private briefings could leak, creating the perception that the company is catering to Wall Street while keeping employees and the public in the dark, which can be a PR nightmare."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_6_remediation",
+      "title": "Stage 6: Remediation and Governance Overhaul",
+      "description": "Six months have passed. The company has navigated the initial storm, and while the government investigation is ongoing, the immediate crisis is contained. Marcus Thorne has been terminated, and an interim leader is in place for the European division. Now, as Chair of the Audit Committee, your final and most crucial duty is to ensure this can never happen again. You must recommend structural, cultural, and procedural changes to the board that address the root causes of the compliance failure. This remediation plan will not only be presented to the board but will also be a key element in demonstrating to the DOJ that the company has reformed itself, which is critical for securing a favorable settlement. Your legacy at the company will be defined by the strength and foresight of this plan.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "The immediate crisis is contained, but the underlying vulnerabilities that allowed it to happen remain. What is the centerpiece of your remediation plan to present to the board and, ultimately, to the Department of Justice? Your artifact for this final stage is a presentation deck (submitted as a structured memo) outlining your proposed Remediation Plan. It must identify the root causes of the failure and detail the specific, actionable, and measurable steps the company will take to rebuild its compliance and governance framework.",
+        "context": "The board is looking for a plan that is both robust enough to satisfy regulators and practical enough to implement without crippling the company's ability to compete in global markets. There is a debate internally: was this a case of one 'bad apple' (Marcus Thorne), or is there a systemic cultural problem where growth is valued more than integrity? Your plan must implicitly answer this question. It must be more than just 'more training'; it must represent a fundamental shift in how the company operates.",
+        "options": [
+          {
+            "id": "opt_6a_centralize_control",
+            "title": "Centralize Control and Approvals",
+            "description": "Your plan's centerpiece is a structural reorganization. You recommend disbanding the autonomous regional structure and centralizing all major contract approvals, high-risk payments, and compliance oversight at the corporate HQ. A new central 'Deal Desk' must approve all contracts over €1M. This ensures maximum control and oversight from corporate legal and finance. However, this will be perceived as a bureaucratic bottleneck by regional sales teams, potentially slowing down business, disempowering local leaders, and hurting the company's agility in fast-moving markets."
+          },
+          {
+            "id": "opt_6b_tech_and_training",
+            "title": "Technology and Training Overhaul",
+            "description": "Your plan focuses on systems and skills. You recommend a major investment in a new AI-based transaction monitoring system that can flag suspicious payments and vendor relationships in real-time. This is coupled with mandatory, recurring, and scenario-based anti-corruption training for the entire global sales force, with certification required. This is a less operationally disruptive approach that scales well. The risk is that it addresses the symptoms, not the underlying culture. Bad actors can often find ways around even the most sophisticated systems if the incentives are wrong."
+          },
+          {
+            "id": "opt_6c_leadership_and_incentives",
+            "title": "Leadership and Cultural Change",
+            "description": "Your plan targets the root cause: culture. You recommend appointing a new, high-profile Chief Compliance Officer who reports directly to the Audit Committee, not the CEO. Critically, you propose redesigning the executive bonus structure, tying a significant portion (e.g., 30%) of leadership bonuses directly to quantifiable ethics and compliance metrics, not just financial results. This addresses the 'growth at all costs' mentality. However, this approach can be seen as 'soft,' its ROI is hard to measure, and it will face fierce resistance from executives whose compensation is affected."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Risk Management & Governance",
+        "description": "Assesses the ability to identify, evaluate, and mitigate legal, financial, and reputational risks while operating within a sound corporate governance framework and fulfilling fiduciary duties.",
+        "scoringGuide": {
+          "Unsatisfactory": "Consistently makes decisions that expose the company to unacceptable legal or reputational risk. Fails to recognize or uphold the independent role of the Audit Committee and fiduciary duty to shareholders.",
+          "Developing": "Identifies the most obvious risks but struggles to balance competing legal, financial, and operational pressures, often deferring to the CEO's preferences over sound governance principles.",
+          "Proficient": "Consistently follows a sound governance process, making defensible choices at each stage that appropriately balance risk mitigation with business continuity. Upholds the committee's independence.",
+          "Exemplary": "Proactively identifies second-order risks and designs systemic solutions. Uses the governance framework not just as a defensive tool, but as a strategic asset to build long-term corporate resilience and integrity."
+        }
+      },
+      {
+        "competencyName": "Ethical Judgment",
+        "description": "Evaluates the ability to recognize and navigate complex ethical dilemmas, prioritizing integrity and corporate responsibility over short-term business interests or personal convenience.",
+        "scoringGuide": {
+          "Unsatisfactory": "Chooses options that are clearly unethical, such as participating in a cover-up, or prioritizes protecting executives over the duties owed to shareholders and the public.",
+          "Developing": "Recognizes ethical dilemmas but tends to choose the path of minimum resistance, often conflating 'legal compliance' with 'ethical responsibility' without considering the broader implications.",
+          "Proficient": "Consistently chooses the ethically sound path, even when it is operationally or financially painful, and can clearly articulate the ethical principles guiding their decisions.",
+          "Exemplary": "Not only makes ethical choices but also uses them as an opportunity to shape and reinforce a culture of integrity, influencing other stakeholders to align around a strong ethical framework."
+        }
+      },
+      {
+        "competencyName": "Decision-Making Under Ambiguity",
+        "description": "Assesses the ability to make sound, reasoned decisions in the face of incomplete, conflicting, or inconclusive information, and to adapt as new evidence emerges.",
+        "scoringGuide": {
+          "Unsatisfactory": "Is paralyzed by the lack of perfect information or jumps to conclusions based on weak evidence. Fails to distinguish between circumstantial and conclusive proof.",
+          "Developing": "Makes decisions but relies heavily on the opinions of others (e.g., CEO, GC) without forming an independent assessment of the ambiguous data. Struggles to move forward without a 'smoking gun'.",
+          "Proficient": "Logically weighs ambiguous evidence, acknowledges evidentiary gaps, and makes reasoned, risk-adjusted decisions at each stage, clearly justifying the chosen path based on the available facts.",
+          "Exemplary": "Triangulates quantitative, qualitative, and human intelligence to form a nuanced and evolving hypothesis. Comfortably adapts the investigative strategy as new information emerges, turning ambiguity into a path for further inquiry."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the ability to understand and manage the motivations, biases, and objectives of key stakeholders (CEO, GC, Board) to build consensus or neutralize opposition for a necessary course of action.",
+        "scoringGuide": {
+          "Unsatisfactory": "Alienates key stakeholders through poor communication, fails to understand their motivations, or is easily manipulated by stronger personalities like the CEO.",
+          "Developing": "Manages some stakeholder relationships adequately but struggles to influence those with opposing views, often leading to compromises that weaken the investigation's integrity.",
+          "Proficient": "Effectively anticipates stakeholder concerns and strategically communicates to build consensus around difficult decisions, successfully navigating the political landscape to achieve objectives.",
+          "Exemplary": "Masterfully influences all stakeholders, including the CEO and the full board, to align them around a difficult but necessary course of action, transforming their initial resistance into support."
+        }
+      },
+      {
+        "competencyName": "Evidence Synthesis",
+        "description": "Assesses the ability to analyze and connect disparate pieces of information—financial data, emails, reports, and human testimony—to form a coherent and accurate narrative of events.",
+        "scoringGuide": {
+          "Unsatisfactory": "Misses key clues in the provided data and documents. Fails to see the patterns connecting various pieces of evidence.",
+          "Developing": "Identifies individual suspicious data points (e.g., a large payment) but fails to connect them into a logical timeline or a coherent narrative of misconduct.",
+          "Proficient": "Accurately pieces together the timeline of events by correctly connecting financial data, coded emails, and investigative reports to build a strong, evidence-based case.",
+          "Exemplary": "Synthesizes disparate information to not only build the timeline but also to understand the 'how' and 'why'—the motive, means, and methods of the bad actor—and identifies the systemic failures that enabled the conduct."
+        }
+      },
+      {
+        "competencyName": "Strategic Foresight",
+        "description": "Evaluates the ability to think beyond the immediate crisis and consider the second- and third-order consequences of each decision on the company's long-term future.",
+        "scoringGuide": {
+          "Unsatisfactory": "Focuses only on the immediate problem at each stage, failing to consider how today's decision will impact future options or the company's long-term standing.",
+          "Developing": "Understands the immediate consequences of a decision but does not proactively plan for the next steps in the process, often reacting to events rather than shaping them.",
+          "Proficient": "Consistently considers the second-order effects of each decision, such as the impact on stock price, employee morale, and regulatory relationships.",
+          "Exemplary": "Looks beyond the immediate crisis to the final stage of remediation from the very beginning, making early decisions that strategically set up a better long-term outcome with regulators, investors, and employees."
+        }
+      },
+      {
+        "competencyName": "Crisis Communication",
+        "description": "Assesses the ability to craft and direct a communication strategy during a crisis that balances transparency, legal risk, and the needs of various stakeholders (investors, employees, public).",
+        "scoringGuide": {
+          "Unsatisfactory": "Recommends a communication strategy that is chaotic, contradictory, or creates significant legal or reputational damage.",
+          "Developing": "Produces a generic or reactive communication plan that fails to control the narrative or adequately address the concerns of key stakeholders.",
+          "Proficient": "Develops a clear, coherent communication strategy and artifacts (press release, memo) that strike an appropriate tone and effectively manage the message.",
+          "Exemplary": "Crafts a masterful communication strategy that not only mitigates damage but also begins to rebuild trust, taking control of the narrative and turning a crisis into a moment of demonstrated accountability."
+        }
+      },
+      {
+        "competencyName": "Analytical Rigor",
+        "description": "Evaluates the ability to engage deeply with quantitative and qualitative data, apply logical reasoning, and avoid analytical biases to support evidence-based decision-making.",
+        "scoringGuide": {
+          "Unsatisfactory": "Misinterprets financial data or email evidence, relies on assumptions, and fails to apply a structured, analytical approach to the investigation.",
+          "Developing": "Understands the data at a surface level but doesn't probe deeply, potentially missing subtle patterns or accepting explanations (like Thorne's) at face value.",
+          "Proficient": "Demonstrates a methodical approach to analyzing the case files, correctly identifying key patterns in financial data and suspicious language in communications.",
+          "Exemplary": "Goes beyond just identifying patterns by quantifying risks and building a compelling, data-driven argument that leaves little room for doubt, effectively dismantling counter-arguments with facts and logic."
+        }
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "id": "ds_regional_financials",
+      "name": "Quarterly Regional Financial Performance",
+      "description": "Dataset showing key financial performance metrics, broken down by Aetheria's three main sales regions. This data is intended to quantify the outsized importance and performance of the European division, establishing the high stakes of the investigation.",
+      "timePeriod": "quarterly",
+      "rows": 24,
+      "metrics": [
+        "Quarter",
+        "Region",
+        "Revenue",
+        "GrossMargin",
+        "NewContractValue"
+      ],
+      "units": {
+        "Revenue": "USD Millions",
+        "GrossMargin": "Percentage",
+        "NewContractValue": "USD Millions"
+      }
+    },
+    {
+      "id": "ds_european_expenses",
+      "name": "European Division Vendor & Expense Payments",
+      "description": "A detailed log of vendor payments and expense report reimbursements for Marcus Thorne and his direct reports over the past 24 months. This dataset is designed for forensic analysis and contains multiple large, vaguely described payments to the shell firm 'Solstice Consulting'.",
+      "timePeriod": "monthly",
+      "rows": 32,
+      "metrics": [
+        "Date",
+        "Employee",
+        "VendorName",
+        "ExpenseCategory",
+        "Amount"
+      ],
+      "units": {
+        "Amount": "EUR"
+      }
+    },
+    {
+      "id": "ds_email_log",
+      "name": "Email Communication Summary (e-Discovery)",
+      "description": "A metadata summary from the initial e-discovery sweep, showing communication patterns. It flags emails between key individuals that contain suspicious keywords, allowing the user to understand the frequency and context of high-risk communications without reading every email.",
+      "timePeriod": "daily",
+      "rows": 28,
+      "metrics": [
+        "Date",
+        "Sender",
+        "Recipient",
+        "KeywordFlag",
+        "DomainType"
+      ],
+      "units": {
+        "KeywordFlag": "Text",
+        "DomainType": "Text"
+      }
+    }
+  ],
+  "status": "draft"
+}

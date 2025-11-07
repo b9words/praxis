@@ -1,0 +1,431 @@
+{
+  "caseId": "cs_arena_1_8_the_layoff_list_1762483614147",
+  "version": "1.0",
+  "title": "The Layoff List",
+  "description": "### Executive Summary\n\nAs the Vice President of Product at Innovatec Solutions, a high-growth B2B SaaS company, you are thrust into a leadership crucible. A sudden market downturn has led to a failed funding round and a board mandate for immediate profitability. Your mission is to execute a 15% reduction-in-force (RIF) within your 100-person division. This is not a simple performance-culling exercise; it is a complex strategic challenge requiring you to balance severe financial constraints, critical project continuity, legal risks, and the fragile morale of your team. You must navigate intense pressure from a cost-focused CFO, a project-protective VP of Engineering, and a process-driven Head of HR. Your final deliverable is a list of 15 names and a compelling memo to the CEO justifying your decisions, which will determine the future capabilities and culture of your organization.\n\n### Company Context\n\nInnovatec Solutions was, until recently, a poster child for the SaaS boom. Founded six years ago, the company developed a sophisticated enterprise platform for data analytics and workflow automation that found strong product-market fit in the financial services and logistics sectors. With a team of 500 employees, Innovatec successfully closed a significant Series C funding round 18 months ago, fueling an aggressive expansion strategy. Under the mantra of \"growth-at-all-costs,\" the company doubled its engineering and product teams to build out new product lines and explore experimental R&D projects. As VP of Product, you were instrumental in this expansion, hiring top talent and launching initiatives aimed at capturing new market segments. The culture was one of innovation, psychological safety, and ambitious bets on the future. Your division, composed of Product Managers, UX/UI Designers, and Market Researchers, became the creative engine of the company, working in tight-knit squads with their engineering counterparts to push the boundaries of the platform.\n\n### Current Situation and Dilemma\n\nThe macroeconomic environment has shifted with brutal speed. Rising interest rates and market volatility have frozen the venture capital landscape. Innovatec's planned Series D funding round, which was considered a formality just three months ago, has collapsed. The board's tone has changed overnight from exuberant expansion to urgent survival. The new mandate is unequivocal: achieve a positive cash flow within 12 months. The first and most painful step in this pivot is a company-wide 15% headcount reduction. The CEO has delegated the execution to division heads. You are now tasked with selecting 15 individuals from your 100-person team to be laid off. The central dilemma is not *who* is a low performer, but *what* the company is willing to sacrifice. Do you cut based on cost, pleasing the CFO but potentially losing key mid-level talent? Do you cut based on performance scores, satisfying HR's need for a defensible process but possibly eliminating promising new hires with lower tenure? Or do you make strategic cuts, shutting down non-core projects, which will anger your engineering partner and create significant operational disruption? Every choice carries a heavy cost.\n\n### Decision Alternatives and Constraints\n\nYou are operating under immense pressure and tight constraints. The list is due in two weeks, and the decisions are final. Your primary task is to navigate three competing philosophies for the reduction:\n\n1.  **The Cost-Based Cut (CFO's Preference):** This approach prioritizes meeting the financial target with the fewest layoffs by targeting the highest-salaried employees. While financially efficient, this risks decimating your senior talent, losing years of institutional knowledge, and creating a promotion vacuum.\n2.  **The Performance-Based Cut (HR's Preference):** This method relies on sorting the employee roster by the lowest historical performance review scores. It is legally defensible and appears objective, but it's a lagging indicator that fails to account for an employee's future potential, critical skills on new projects, or recent growth.\n3.  **The Strategy-Based Cut (Your Potential Path):** This involves aligning the layoffs with the company's new, narrower strategic focus on core, profitable products. This means potentially cutting entire teams—including high performers—who are working on \"experimental\" or \"growth\" initiatives. This is strategically sound but operationally disruptive and risks signaling that innovation is no longer valued.\n\nYou are constrained by the conflicting demands of your fellow executives, the need to avoid adverse impact litigation, and the knowledge that your remaining team's trust in your leadership hangs in the balance. You must weigh these alternatives to create a list that is not just financially compliant, but strategically sound and humanely considered.\n\n### Risks and Implications\n\nThe stakes are incredibly high. A poorly executed layoff will have cascading negative consequences. Operationally, cutting the wrong people could stall the development of your most important products, jeopardizing the very profitability you are trying to achieve. Culturally, if the process is perceived as unfair or political, the trust between employees and leadership will evaporate. The \"survivor syndrome\" could cripple the productivity and engagement of your remaining 85 team members, leading to a second wave of attrition as your best people leave voluntarily. Legally, a process that doesn't hold up to scrutiny could expose Innovatec to wrongful termination lawsuits. Your final list and justification memo are not just administrative tasks; they are artifacts that will define your legacy as a leader and set the trajectory for your division's recovery or its decline.",
+  "competencies": [
+    "Talent & Performance Management",
+    "Strategic Thinking",
+    "Decision Making Under Pressure",
+    "Financial Acumen",
+    "Stakeholder Management",
+    "Leadership Communication",
+    "Systems Thinking",
+    "Risk Mitigation"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_layoff_roster_01",
+      "fileName": "Product_Division_Roster.csv",
+      "fileType": "MARKET_DATASET",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_stratplan_02",
+      "fileName": "Innovatec_Q3_Strategic_Plan.pdf",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_cfomemo_03",
+      "fileName": "Memo_From_CFO_RIF_Mandate.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_orgchart_04",
+      "fileName": "Product_Division_Org_Chart.json",
+      "fileType": "ORG_CHART",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_stakeholders_05",
+      "fileName": "Key_Stakeholder_Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_vpeng_memo_06",
+      "fileName": "Email_From_VP_Engineering.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_layoff_engagement_07",
+      "fileName": "Q2_Engagement_Survey_Results.pdf",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_layoff_1_mandate",
+      "title": "Stage 1: The Mandate",
+      "description": "You have just walked out of a tense executive meeting where the CEO announced the 15% reduction-in-force. The mood in the office is anxious; rumors are already swirling. Your 100-person division is looking to you for cues. Your first move as a leader in this crisis is to manage the information vacuum. The message you send now will set the tone for the entire process, establishing the level of trust and transparency you will have with your team over the next two painful weeks. Any communication will be scrutinized, and silence is a message in itself. Your objective is to choose an initial communication strategy that balances the need for transparency with the risk of causing mass panic and a complete halt in productivity before you have a clear plan.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "You are back at your desk. Your team's Slack channels are buzzing with speculation. You know you need to address the division, but you don't have the final list of names or even the exact process figured out. What is your immediate message to your 100-person team? Your choice will shape their perception of your leadership through this crisis. Draft the internal communication that will be sent out in the next hour.",
+        "context": "The executive meeting concluded just 30 minutes ago. The CEO's message was stark: the market has turned, funding is gone, and survival requires immediate, deep cuts. You have been given full authority to select the 15 people from your division, but the final list isn't due for two weeks. The pressure is immense. Your direct reports are already sending you private messages asking what's going on. Doing nothing is not an option, as the silence will be filled with fear and speculation. Your task is to craft an initial message that stabilizes the team without making promises you can't keep or revealing sensitive information prematurely.",
+        "options": [
+          {
+            "id": "option_1a_transparency",
+            "title": "Radical Transparency",
+            "description": "Immediately send an email to the entire division confirming that a 15% layoff is coming. Explain the business rationale (failed funding, shift to profitability) and outline the timeline and process as you know it. This approach respects your team's intelligence and treats them like adults, potentially building long-term trust. However, it will also cause immediate and widespread anxiety, potentially paralyzing the team and leading some of your top performers to start looking for other jobs immediately."
+          },
+          {
+            "id": "option_1b_vague",
+            "title": "Vague Acknowledgment",
+            "description": "Send a carefully worded memo that acknowledges the challenging market conditions and the company's shift in strategy. Promise to share more details about what this means for the division in the coming days. This approach buys you time to formulate a plan and avoids causing mass panic. The risk is that it can be perceived as corporate jargon, insulting your team's intelligence and breeding mistrust. The ambiguity may fuel even more destructive rumors than the truth would."
+          },
+          {
+            "id": "option_1c_silence",
+            "title": "Strategic Silence & Manager Cascade",
+            "description": "You decide not to send a mass communication. Instead, you call an emergency meeting with your direct reports (your managers). You inform them of the situation in confidence and task them with maintaining team stability. You instruct them to say nothing to their teams until you have the final list. This approach contains the information to a smaller group and avoids a division-wide panic. However, it puts your managers in an impossible position and risks the news leaking in a much more chaotic and damaging way. If it leaks, you will be seen as secretive and untrustworthy."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_2_analysis",
+      "title": "Stage 2: First-Pass Analysis",
+      "description": "The Head of HR has just sent you the complete employee roster, a spreadsheet containing a dizzying amount of data: performance scores, compensation, tenure, project assignments, and qualitative manager feedback. This data is the raw material for your decision. Your objective in this stage is to establish the fundamental principle you will use to build your initial list of candidates for the RIF. This first cut is the most important, as it will anchor all subsequent discussions and negotiations. Choosing your primary sorting filter—be it cost, performance, or strategic alignment—is a strategic act that reveals your priorities. This initial list will serve as the baseline for the difficult refinements and stakeholder negotiations to come.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "With the employee dataset open on your screen, you must decide how to make your first cut. The sheer volume of data is overwhelming, but you need a logical starting point to create a manageable list of 20-25 potential candidates. What is the primary sorting filter you will apply to the data? This choice will define the entire character of your layoff plan and will be the first thing you must defend to the executive team.",
+        "context": "The spreadsheet represents 100 careers. You see names of people you hired, mentored, and celebrated. The CFO's memo about the required budget cut sits on your desk, a stark financial reminder. The company's new strategic plan, which designates certain projects as 'non-core', is also open. You know that HR will be looking for a process that is objective and defensible. Your choice of a primary filter is not just a data-sorting exercise; it's a declaration of your values as a leader and your interpretation of the company's needs in this moment of crisis. The initial list of 20-25 names will be your working draft for the next several days.",
+        "options": [
+          {
+            "id": "option_2a_cost",
+            "title": "Cost-Based Filter (The CFO's Way)",
+            "description": "You sort the entire roster by total compensation (salary + bonus), from highest to lowest. You select the highest-paid employees until you meet and slightly exceed the mandated budget reduction. This approach is financially surgical and reaches the target with the minimum number of impacted people. However, this will likely target your most senior, experienced staff, leading to a massive loss of institutional knowledge and leadership, potentially crippling the remaining team's ability to execute complex projects."
+          },
+          {
+            "id": "option_2b_performance",
+            "title": "Performance-Based Filter (HR's Way)",
+            "description": "You apply a filter to identify the 20-25 employees with the lowest 2-year average performance scores. This creates a list that appears objective and is highly defensible from a legal standpoint, as it's based on documented history. The significant risk is that performance scores are lagging indicators. This method may unfairly target new hires still ramping up, solid contributors on low-visibility projects, or those who may have had a single bad quarter but possess critical future-facing skills."
+          },
+          {
+            "id": "option_2c_strategy",
+            "title": "Strategy-Based Filter (The CEO's Way)",
+            "description": "You cross-reference the employee roster with the new strategic plan. You create a list comprised of all employees working on projects now designated as 'Experimental' or 'Non-Core'. This aligns the cuts directly with the company's future direction, sending a clear message about focus. The major drawback is that this may mean cutting entire teams of high performers who have done nothing wrong, which can be devastating for morale. It also assumes the strategic plan is perfectly correct, sacrificing all potential for future innovation outside the core."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_3_pressure",
+      "title": "Stage 3: Stakeholder Pressure Cooker",
+      "description": "You've circulated your 'first-pass' list (based on your chosen filter from Stage 2) to your key executive stakeholders—Anya (CFO), Ben (VP Eng), and Carla (Head of HR)—to solicit feedback. The response is immediate and intense. Each stakeholder views your list through their own lens, advocating fiercely for their priorities. Anya is concerned you haven't cut enough high-cost roles. Ben is furious that a product manager critical to his top engineering squad is on the list. Carla is flagging that your proposed cuts disproportionately affect a specific demographic group, creating a legal risk. Your objective is to manage this inbound pressure without letting your strategic process be derailed. How you handle this conflict will test your ability to influence, negotiate, and hold your ground.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Your inbox is a minefield of stakeholder feedback. The CFO is pushing for more cost savings, the VP of Engineering is protecting his key projects, and HR is waving a red flag about legal risks. It's clear that your initial list is not going to survive contact with reality. How do you approach this negotiation to refine your list while maintaining strategic integrity? Your next move determines whether you control the process or if the process controls you.",
+        "context": "Anya's email is blunt: 'This list leaves too much money on the table. We need to see more high salaries on here.' Ben's email is more emotional: 'You can't cut Michael. The 'Phoenix' project will grind to a halt. My best engineers will walk if he goes.' Carla's email is cautious: 'I've run a preliminary adverse impact analysis on your list. The numbers are concerning. We need to adjust to ensure we have a defensible position.' Trying to satisfy all of them seems impossible. You need a strategy to synthesize their valid, but competing, inputs.",
+        "options": [
+          {
+            "id": "option_3a_divide_conquer",
+            "title": "Divide and Conquer",
+            "description": "You schedule separate, one-on-one meetings with Anya, Ben, and Carla. In each meeting, you aim to understand their core needs and negotiate concessions. You might agree to swap a high-cost employee back onto the list for Anya in exchange for her support, or trade one of Ben's preferred PMs for another. This approach allows for nuanced negotiation and makes each stakeholder feel heard. However, it is time-consuming and risks you making a series of disconnected compromises that result in a final list that lacks any coherent strategic rationale."
+          },
+          {
+            "id": "option_3b_forge_consensus",
+            "title": "Force a Consensus",
+            "description": "You schedule a single, 90-minute meeting with all three stakeholders. You present your guiding principles and facilitate a debate to force a group decision on the trade-offs. The goal is to get them to see the problem from all sides and agree on a unified set of criteria. This can create buy-in and a shared sense of responsibility for the difficult choices. The great risk is that the meeting could devolve into a stalemate or a political battle, with the strongest personality dominating and forcing a suboptimal outcome."
+          },
+          {
+            "id": "option_3c_hold_firm",
+            "title": "Hold Firm and Justify",
+            "description": "You acknowledge their feedback via email but hold firm to your initial strategic approach. You inform them that you are the ultimate decision-maker for your division and will incorporate their input as you see fit, but the strategy-based framework is non-negotiable. You will make the final call and present them with a well-articulated justification. This demonstrates strong, decisive leadership and protects your strategic intent. However, it is a high-risk move that could alienate your executive peers, making them uncooperative and potentially leading them to challenge your final list with the CEO."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_4_untouchables",
+      "title": "Stage 4: Identifying the 'Untouchables'",
+      "description": "The process of focusing on who to cut is demoralizing and negative. After the stakeholder pressure of the last stage, you decide to reframe the problem. Instead of thinking about who to eliminate, you will first define who is absolutely essential to Innovatec's future. Your objective is to build a 'Protected List' of 10-15 individuals in your division who are non-negotiable assets. This inversion of the problem forces you to articulate what you value most and provides a solid core around which to build the new, smaller organization. Defining your 'untouchables' creates a strategic anchor and simplifies the final, painful decisions by clarifying who is left.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "The 'who to cut' list feels like a race to the bottom. To regain strategic clarity, you're flipping the script. You will create a 'Protected List' of the 10-15 people you would fight to the end to keep. What is the primary criterion you will use to identify these 'untouchables'? This decision will crystallize your vision for the future of the product organization.",
+        "context": "This exercise is about defining the future state of your team. Are you building around your top raw performers, regardless of their current role? Or are you protecting the specific people needed for your most critical products? Or is it the deep, institutional knowledge that is most irreplaceable? This 'Protected List' isn't just a thought exercise; it will become the foundation of your final recommendation. The names on this list will be spared, meaning the remaining cuts will have to come from the rest of the pool, making the final choices even harder but more focused.",
+        "options": [
+          {
+            "id": "option_4a_high_performers",
+            "title": "Protect the High Performers",
+            "description": "You identify the 10-15 individuals with the highest combined performance and potential scores, regardless of their current project or team. This philosophy is about retaining raw talent, assuming that A-players can adapt to any strategic pivot. This approach builds a team with a very high talent density. The risk is that these high performers may not have the specific skills or project knowledge needed for the company's immediate core priorities, and you might lose subject matter experts who are solid, if not stellar, performers."
+          },
+          {
+            "id": "option_4b_strategic_core",
+            "title": "Protect the Strategic Core",
+            "description": "You identify the individuals who are the linchpins of the top 2-3 projects designated as 'Core' in the new strategic plan. This list is built around ensuring the success of the company's most critical revenue-generating products. This is a pragmatic, business-focused approach. The downside is that you may end up protecting 'B-players' in critical roles over 'A-players' on less essential projects, potentially lowering the overall talent bar of the organization and sacrificing future innovation."
+          },
+          {
+            "id": "option_4c_knowledge_keepers",
+            "title": "Protect the Knowledge Keepers",
+            "description": "You identify the individuals with the most tenure and deepest institutional knowledge. These are the employees who understand the platform's history, the technical debt, and the key customer relationships. Protecting them ensures stability and continuity. However, this approach can lead to protecting incumbents who may be resistant to change, while sacrificing newer, more innovative talent who could be crucial for the company's adaptation and future growth."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_5_final_cuts",
+      "title": "Stage 5: Finalizing the List",
+      "description": "The moment of truth has arrived. You have your 'Protected List' and extensive analysis. Now you must finalize the list of 15 names. The remaining pool of employees consists of good people, solid performers, and valuable team members. There are no easy choices left. Your objective is to make the final, painful cuts by committing to a clear but difficult trade-off. Will you sacrifice an entire team for strategic clarity? Or will you spread the cuts thinly to minimize disruption to any single project? This decision will have the most direct and visible impact on your division's ability to operate post-layoff. This is where your principles are tested and the final die is cast.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "With your 'Protected List' locked in, you have a pool of candidates from which to select the final names. The easy cuts are gone. Every remaining choice involves a significant, painful trade-off. Which difficult cutting strategy will you employ to finalize your list of 15 employees? This decision will directly shape the operational reality of your division for the next 18 months.",
+        "context": "You have a list of roughly 30 employees who are not on your 'protected' list. You need to choose 15 of them. Among them is an 8-person team working on an innovative but non-core product. Others are mid-level product managers spread across various teams. Some are designers who are good, but not considered top-tier. Your final choice is a reflection of your management philosophy: do you believe in clean, surgical cuts even if they are deep, or in spreading the pain to keep all projects alive, even in a diminished capacity?",
+        "options": [
+          {
+            "id": "option_5a_cut_team",
+            "title": "Cut a Whole Team",
+            "description": "You decide to lay off the entire 8-person team working on 'Project Chimera,' an innovative but non-core product. You then select the final 7 individuals from the lowest performers on other teams. This provides a clean break, sends a clear strategic message, and avoids disrupting core teams. The major con is the massive loss of a specialized skill set and the devastating cultural signal that innovation projects are disposable, potentially chilling future risk-taking."
+          },
+          {
+            "id": "option_5b_peanut_butter",
+            "title": "Peanut Butter the Cuts",
+            "description": "You spread the 15 cuts as evenly as possible across all remaining teams and projects. Each team loses one or two people. This approach feels 'fairer' and avoids eliminating any single capability entirely. However, this 'death by a thousand cuts' approach degrades the capacity and velocity of every single project. It creates widespread disruption and forces every manager to deal with the aftermath, without providing any real strategic clarity."
+          },
+          {
+            "id": "option_5c_surgical_mix",
+            "title": "The Surgical Mix",
+            "description": "You create a complex, blended list. It includes a few high-cost but under-utilized senior employees, a handful of low performers from various teams, and several people from non-core projects (but not the whole team). This list is highly optimized but is also complex and difficult to explain. The rationale for each person's inclusion is unique, which can make the process feel opaque and political to the remaining team, even if it is strategically sound."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_6_justification",
+      "title": "Stage 6: Justifying to the CEO",
+      "description": "Your final list of 15 names is complete. The analysis is done, and the difficult choices have been made. However, your work is not over. The CEO has requested a 1-2 page memo justifying your decisions. This document is your opportunity to frame the narrative. It's not just a list of names; it's a strategic document that must articulate the logic behind your choices, demonstrate your command of the business, and present a clear plan for the future of your division. Your objective is to write a memo that builds confidence in your leadership, aligns the CEO with your strategy, and proves that you have managed this painful process with diligence, strategic foresight, and compassion.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "The final list of 15 employee IDs is locked. The CEO needs your justification memo by EOD. This is your chance to articulate the 'why' behind your agonizing decisions. How will you frame your memo to the CEO? The tone and focus of this document will heavily influence how your leadership is perceived and how much support you receive during the difficult rebuilding phase.",
+        "context": "The CEO is accountable to the board and needs to be confident that this RIF was executed strategically, not haphazardly. She will be looking for a clear connection between your cuts and the company's new 'path to profitability.' She also needs to be assured that you have considered the risks—to morale, to key projects, and to legal exposure. This memo is your final argument, your closing statement on the most difficult decision of your career. It must be logical, confident, and forward-looking.",
+        "options": [
+          {
+            "id": "option_6a_financial_frame",
+            "title": "Frame Around Financial Discipline",
+            "description": "Your memo leads with the numbers. You start by confirming that you have met the exact budget reduction target. You detail the cost savings achieved and emphasize how the new, leaner team structure is optimized for efficiency. This approach directly addresses the board's primary concern and positions you as a fiscally responsible operator. The risk is that it can sound cold and clinical, potentially making the CEO question your focus on the people and the long-term health of the team."
+          },
+          {
+            "id": "option_6b_strategic_frame",
+            "title": "Frame Around Strategic Realignment",
+            "description": "Your memo focuses on how the restructuring has created a product organization perfectly aligned with the new company strategy. You explain how the cuts in non-core areas will allow for intensified focus on the core, profitable products. You frame the RIF not as a reduction, but as a strategic sharpening of your division. This positions you as a strategic partner to the CEO. The potential downside is that it might gloss over the harsh financial realities and the immediate human impact."
+          },
+          {
+            "id": "option_6c_resilience_frame",
+            "title": "Frame Around Team Resilience and the Future",
+            "description": "Your memo acknowledges the difficulty of the decision but quickly pivots to the future. You spend the majority of the memo outlining your detailed plan for managing the remaining team—how you will re-recruit them, clarify roles, manage workloads, and rebuild morale. This proactive, forward-looking approach shows the CEO that you are already focused on the recovery. However, it might be perceived as avoiding a direct justification of the specific cuts you made, focusing on the effect rather than the cause."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_layoff_7_aftermath",
+      "title": "Stage 7: Managing the Aftermath",
+      "description": "The layoffs have been executed. The notifications are complete, and 15 of your colleagues are gone. A heavy quiet has fallen over the division. The remaining 85 employees are a mixture of relieved, guilty, and fearful. Morale is at rock bottom, and you can already see the strain on key projects as workloads shift and institutional knowledge gaps appear. Your leadership is more critical now than ever before. Your objective is to take the first decisive action to begin the rebuilding process. This first move will send a powerful signal to your team about what to expect from your leadership and what the 'new normal' will look like.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "It's the first Monday after the RIF. The atmosphere is toxic with grief and uncertainty. Your team is looking to you for a sign of what comes next. What is your first major action to begin rebuilding trust, focus, and momentum? This choice will set the tone for the long and difficult road to recovery.",
+        "context": "Productivity has plummeted. In your one-on-ones, your team members are expressing anxiety about their own jobs and sadness for their departed friends. They are questioning the company's vision and their place in it. You know you can't just pretend it's business as usual. You need a deliberate act of leadership to acknowledge the trauma and start shifting the team's focus from the past to the future. Do you focus on the people first, or the work? Do you talk, or do you act?",
+        "options": [
+          {
+            "id": "option_7a_vision",
+            "title": "Re-Recruit Your Team",
+            "description": "You schedule a mandatory 'divisional re-launch' town hall. The goal is to tackle the morale issue head-on. You plan to acknowledge the pain, restate the company's vision, and explain with passion why the new, focused strategy is the right one. You will explicitly re-recruit every person in the room, connecting their specific role to the future success of the company. This can be a powerful, inspiring moment. The risk is that if the delivery is not authentic or the message feels like corporate spin, it will backfire spectacularly and destroy what little trust you have left."
+          },
+          {
+            "id": "option_7b_work",
+            "title": "Focus on the Work",
+            "description": "You recognize that anxiety comes from uncertainty. Your first priority is to create clarity and psychological safety through action. You immediately initiate a series of workshops to re-scope all project roadmaps to reflect the new team size. You work with your managers to define achievable, short-term goals to create quick wins and build momentum. This practical approach shows respect for the team's workload and can be very grounding. The downside is that it can feel like you're ignoring the emotional elephant in the room, prioritizing tasks over people."
+          },
+          {
+            "id": "option_7c_listen",
+            "title": "Listen and Empathize",
+            "description": "You announce that for the next two weeks, your primary job is to listen. You clear your calendar and schedule a series of small-group and skip-level listening sessions. The agenda is open, designed for employees to voice their fears, frustrations, and concerns directly to you without judgment. This demonstrates empathy and can rebuild psychological safety. However, this period of listening can delay crucial decisions about the work itself, and if you don't act on the feedback you receive, it will be seen as performative and further erode trust."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Talent & Performance Management",
+        "description": "Assesses the ability to evaluate talent holistically, moving beyond simple metrics to understand an individual's total contribution, skills, and future potential in the context of the business's strategic needs.",
+        "scoringGuide": {
+          "Unsatisfactory": "Relies solely on a single, simplistic metric (e.g., only performance score or only salary) to make all decisions, ignoring critical context and creating a flawed, indefensible list.",
+          "Developing": "Uses a narrow combination of quantitative data (e.g., performance and compensation) but fails to incorporate qualitative factors like skills, project criticality, or manager feedback.",
+          "Proficient": "Considers multiple data points including performance, skills, and project alignment, but struggles to weigh them effectively, leading to some inconsistent or suboptimal choices.",
+          "Exemplary": "Synthesizes quantitative data (performance, compensation) and qualitative inputs (skills, potential, manager notes, strategic importance) to form a holistic, nuanced view of each individual's value and makes defensible, forward-looking talent decisions."
+        }
+      },
+      {
+        "competencyName": "Strategic Thinking",
+        "description": "Measures the ability to align painful short-term actions (layoffs) with the long-term health and strategic objectives of the organization, ensuring the remaining team is structured for future success.",
+        "scoringGuide": {
+          "Unsatisfactory": "Makes cuts that are completely disconnected from or actively undermine the company's stated strategic plan, preserving non-core functions while cutting critical ones.",
+          "Developing": "Acknowledges the strategic plan but makes choices that only partially align with it, resulting in a team that is not optimally structured for the new reality.",
+          "Proficient": "Ensures the final layoff list protects all 'Core' strategic projects and makes logical cuts to non-essential areas, demonstrating a solid understanding of the priorities.",
+          "Exemplary": "Actively uses the layoff as an opportunity to reshape the organization, creating a leaner, more focused team that is perfectly aligned with the new strategy and poised to execute effectively."
+        }
+      },
+      {
+        "competencyName": "Financial Acumen",
+        "description": "Evaluates the ability to understand and manage decisions based on their financial impact, meeting budgetary constraints while considering second-order economic effects.",
+        "scoringGuide": {
+          "Unsatisfactory": "Fails to meet the mandated budget reduction target or meets it in a way that creates obvious greater long-term costs (e.g., cutting an entire revenue-generating team).",
+          "Developing": "Meets the budget target but does not optimize for cost savings, for example by choosing a larger number of lower-paid employees over a smaller number of high-cost ones.",
+          "Proficient": "Meets the specified budget reduction target accurately and efficiently.",
+          "Exemplary": "Meets the budget target while also considering and articulating the second-order financial impacts, such as the cost of lost productivity, knowledge drain, and recruitment for backfills."
+        }
+      },
+      {
+        "competencyName": "Risk Mitigation",
+        "description": "Assesses the ability to identify, analyze, and proactively manage the multifaceted risks (legal, cultural, operational) associated with a major reduction-in-force.",
+        "scoringGuide": {
+          "Unsatisfactory": "Ignores obvious legal, cultural, and project-related risks, creating a plan that is highly vulnerable to lawsuits and operational failure.",
+          "Developing": "Identifies some of the primary risks (e.g., legal exposure) but does not have a clear or convincing plan to mitigate them effectively.",
+          "Proficient": "Creates a defensible list and process that minimizes legal exposure and considers the immediate impact on project timelines and team morale.",
+          "Exemplary": "Proactively manages legal, cultural, and operational risks with a clear, documented plan for both the RIF process and the critical aftermath, demonstrating foresight and control."
+        }
+      },
+      {
+        "competencyName": "Decision Making Under Pressure",
+        "description": "Measures the ability to make sound, logical, and timely decisions in a high-stakes, emotionally charged environment with incomplete information and competing stakeholder demands.",
+        "scoringGuide": {
+          "Unsatisfactory": "Is paralyzed by the pressure, making emotional decisions or constantly changing direction, leading to an incoherent and poorly justified final list.",
+          "Developing": "Makes decisions but is easily swayed by stakeholder pressure, resulting in a compromised plan that doesn't adhere to a consistent logic.",
+          "Proficient": "Maintains a consistent, logical framework for decision-making throughout the process, even when faced with significant pressure and emotional distress.",
+          "Exemplary": "Thrives under pressure, using the constraints to foster clarity and focus. Makes difficult trade-offs with confidence and decisiveness, grounded in a clear, strategic rationale."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the ability to navigate the competing interests of different executive stakeholders, influencing them towards a strategically sound outcome while maintaining productive relationships.",
+        "scoringGuide": {
+          "Unsatisfactory": "Completely capitulates to the loudest or most powerful stakeholder, leading to a biased and strategically flawed outcome.",
+          "Developing": "Attempts to appease all stakeholders by making small concessions to each, resulting in a watered-down, compromised final list that satisfies no one.",
+          "Proficient": "Effectively listens to and incorporates stakeholder feedback but makes a well-justified, independent final decision that prioritizes the organization's needs.",
+          "Exemplary": "Skillfully influences stakeholders, reframing the problem to help them see the bigger picture and aligning them around the most strategic, albeit difficult, solution."
+        }
+      },
+      {
+        "competencyName": "Leadership Communication",
+        "description": "Assesses the ability to communicate with clarity, empathy, and conviction during a crisis, managing the narrative and maintaining trust with both departing and remaining employees.",
+        "scoringGuide": {
+          "Unsatisfactory": "Communicates in a way that is confusing, dishonest, or overly clinical, destroying trust and exacerbating fear and anxiety within the team.",
+          "Developing": "Communicates with good intentions but fails to strike the right balance, being either too vague to be useful or too transparent as to be reckless.",
+          "Proficient": "Communicates clearly, respectfully, and with appropriate transparency at each stage of the process, maintaining a baseline of trust with the team.",
+          "Exemplary": "Crafts a compelling and compassionate narrative, balancing the harsh business realities with genuine empathy. Communication inspires confidence and provides psychological safety for the remaining team."
+        }
+      },
+      {
+        "competencyName": "Systems Thinking",
+        "description": "Measures the ability to see the layoff not as an isolated event, but as a complex change with second- and third-order effects on the entire organizational system, from culture to workflow to future hiring.",
+        "scoringGuide": {
+          "Unsatisfactory": "Focuses exclusively on the immediate task of producing a list of 15 names, with no consideration for the consequences.",
+          "Developing": "Considers the immediate, first-order impacts of the cuts, such as project delays and resource gaps.",
+          "Proficient": "Anticipates the second-order effects, such as 'survivor syndrome' and loss of morale, and develops a basic plan to address them post-RIF.",
+          "Exemplary": "Designs the entire process with the end-state in mind, considering the long-term, systemic impacts on culture, workload, institutional knowledge, and future employer brand."
+        }
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "id": "ds_layoff_employees_01",
+      "name": "Employee Performance & Compensation Data",
+      "description": "A complete roster of the 100 employees in the Product Division, including compensation, tenure, performance scores, and current project assignments.",
+      "timePeriod": "current",
+      "rows": 24,
+      "metrics": [
+        "EmployeeID",
+        "FullName",
+        "Role",
+        "Team",
+        "Salary",
+        "AnnualBonus",
+        "Tenure_Years",
+        "Performance_Score_2YR_Avg",
+        "Potential_Score",
+        "Key_Skills",
+        "Current_Project_ID",
+        "Manager_Qualitative_Notes"
+      ],
+      "units": {
+        "Salary": "USD",
+        "AnnualBonus": "USD",
+        "Tenure_Years": "years",
+        "Performance_Score_2YR_Avg": "scale_1_to_5",
+        "Potential_Score": "scale_1_to_5"
+      }
+    },
+    {
+      "id": "ds_layoff_projects_02",
+      "name": "Project Portfolio Data",
+      "description": "A list of all active projects within the Product & Engineering organizations, detailing their strategic importance, budget, and assigned headcount.",
+      "timePeriod": "annual",
+      "rows": 16,
+      "metrics": [
+        "Project_ID",
+        "Project_Name",
+        "Strategic_Tier",
+        "Assigned_Headcount_Product",
+        "Assigned_Headcount_Eng",
+        "Annual_Budget"
+      ],
+      "units": {
+        "Assigned_Headcount_Product": "headcount",
+        "Assigned_Headcount_Eng": "headcount",
+        "Annual_Budget": "USD"
+      }
+    },
+    {
+      "id": "ds_layoff_financials_03",
+      "name": "Product Division Financials",
+      "description": "A time-series summary of the Product Division's P&L over the past eight quarters, showing rising costs and increasing net burn.",
+      "timePeriod": "quarterly",
+      "rows": 32,
+      "metrics": [
+        "Quarter",
+        "Revenue_Attributed",
+        "Total_Operating_Costs",
+        "Headcount_Salary_Costs",
+        "Headcount_Bonus_Costs",
+        "Net_Burn"
+      ],
+      "units": {
+        "Revenue_Attributed": "USD",
+        "Total_Operating_Costs": "USD",
+        "Headcount_Salary_Costs": "USD",
+        "Headcount_Bonus_Costs": "USD",
+        "Net_Burn": "USD"
+      }
+    }
+  ],
+  "status": "draft"
+}

@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { getCurrentUser } from '@/lib/auth/get-user'
+import { getUserRole } from '@/lib/auth/middleware-helpers'
 import { getDomainById } from '@/lib/curriculum-data'
 import { getAllUserProgress } from '@/lib/progress-tracking'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
@@ -29,18 +30,37 @@ export default async function DomainPage({ params }: DomainPageProps) {
   // Get user progress if logged in (2 minutes revalidate, userId in key)
   const user = await getCurrentUser()
   let userProgress: Map<string, any> = new Map()
+  let isAdmin = false
 
   if (user) {
+    const userRole = await getUserRole(user.id)
+    isAdmin = userRole === 'admin'
+    // Cache user progress (2 minutes revalidate)
+    // Wrap in a function that ensures Map is preserved
     const getCachedUserProgress = getCachedUserData(
       user.id,
-      () => getAllUserProgress(user.id),
+      async () => {
+        const progress = await getAllUserProgress(user.id)
+        // Convert Map to array of entries for caching, then reconstruct Map
+        // This ensures the cache can serialize/deserialize properly
+        return Array.from(progress.entries())
+      },
       ['progress', 'all'],
       {
         tags: [CacheTags.USER_PROGRESS],
         revalidate: 120, // 2 minutes
       }
     )
-    userProgress = await getCachedUserProgress()
+    
+    const cachedProgressEntries = await getCachedUserProgress()
+    
+    // Reconstruct Map from cached entries
+    if (Array.isArray(cachedProgressEntries)) {
+      userProgress = new Map(cachedProgressEntries)
+    } else {
+      // Fallback: ensure it's at least an empty Map
+      userProgress = new Map()
+    }
   }
 
   // Calculate progress per module
@@ -108,9 +128,11 @@ export default async function DomainPage({ params }: DomainPageProps) {
                 <Play className="h-5 w-5 mr-2" />
                 Start Learning Path
               </Button>
-              <Button variant="outline" size="lg" asChild className="border-gray-300 hover:border-gray-400 rounded-none">
-                <Link href={`/admin/content/generate?domain=${domainId}`}>Generate Content</Link>
-              </Button>
+              {isAdmin && (
+                <Button variant="outline" size="lg" asChild className="border-gray-300 hover:border-gray-400 rounded-none">
+                  <Link href={`/admin/content/generate?domain=${domainId}`}>Generate Content</Link>
+                </Button>
+              )}
             </div>
           </div>
 

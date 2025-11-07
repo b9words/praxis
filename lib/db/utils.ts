@@ -30,11 +30,50 @@ export class AppError extends Error {
  * Repository functions should handle these gracefully by catching and retrying
  * with explicit select statements
  */
+/**
+ * Ensure Prisma client has all required models
+ * If caseFile model is missing, try to regenerate and reload
+ */
+function ensurePrismaModels(prismaClient: typeof prisma): typeof prisma {
+  // Runtime check for caseFile model
+  if (!prismaClient.caseFile) {
+    console.warn('[dbCall] Prisma client missing caseFile model - attempting to reload...')
+    try {
+      // Try to re-import a fresh PrismaClient
+      const { PrismaClient } = require('@prisma/client')
+      const freshClient = new PrismaClient({
+        errorFormat: 'minimal',
+        log: [],
+      })
+      if (freshClient.caseFile) {
+        console.log('[dbCall] Fresh Prisma client has caseFile model')
+        return freshClient as typeof prisma
+      }
+    } catch (reloadError) {
+      console.error('[dbCall] Failed to reload Prisma client:', reloadError)
+    }
+    throw new AppError(
+      'Prisma client missing caseFile model. Please run: npx prisma generate',
+      500,
+      'PRISMA_MODEL_MISSING'
+    )
+  }
+  return prismaClient
+}
+
 export async function dbCall<T>(
   fn: (p: typeof prisma) => Promise<T>
 ): Promise<T> {
   try {
-    return await withConnectionRetry(() => fn(prisma), {
+    // Ensure prisma is available and has all models
+    if (!prisma) {
+      throw new Error('Prisma client not initialized')
+    }
+    
+    // Ensure required models exist
+    const verifiedPrisma = ensurePrismaModels(prisma)
+    
+    return await withConnectionRetry(() => fn(verifiedPrisma), {
       maxRetries: 3,
       retryDelay: 150,
       exponentialBackoff: true,

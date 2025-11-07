@@ -45,8 +45,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/apply" className="text-sm text-neutral-400 hover:text-white transition-colors">
-                  Apply
+                <Link href="/ledger" className="text-sm text-neutral-400 hover:text-white transition-colors">
+                  The Ledger
                 </Link>
               </li>
               <li>

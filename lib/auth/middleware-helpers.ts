@@ -22,12 +22,20 @@ export async function getUserRole(userId: string): Promise<UserRole | null> {
       .from('profiles')
       .select('role')
       .eq('id', userId)
-      .single()
+      .maybeSingle() // Use maybeSingle instead of single to handle missing rows gracefully
 
     if (error) {
       // Log error in development for debugging
       if (process.env.NODE_ENV === 'development') {
-        console.error(`[getUserRole] Error fetching role for user ${userId}:`, error.message)
+        console.error(`[getUserRole] Error fetching role for user ${userId}:`, error.message, error)
+      }
+      // For permission errors, return null instead of throwing
+      // This allows middleware to fail open and not block access
+      if (error.message?.includes('permission denied') || error.code === 'PGRST301' || error.code === '42501') {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[getUserRole] Permission denied for user ${userId}, returning null (fail open)`)
+        }
+        return null
       }
       return null
     }

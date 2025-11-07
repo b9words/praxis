@@ -19,6 +19,7 @@ export async function GET(
       return NextResponse.json({ error: 'Case not found' }, { status: 404 })
     }
 
+    // Return case directly from DB (briefingDoc, datasets, rubric are now stored in DB)
     return NextResponse.json({ case: caseItem })
   } catch (error) {
     const { normalizeError } = await import('@/lib/api/route-helpers')
@@ -71,6 +72,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { requireRole } = await import('@/lib/auth/authorize')
+    await requireRole(['editor', 'admin'])
     
     const { id } = await params
 
@@ -79,7 +82,7 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json({ error: error.message }, { status: error.message === 'Unauthorized' ? 401 : 403 })
     }
     if (error instanceof AppError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

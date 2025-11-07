@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Anya Sharma",
+    "role": "Chief Executive Officer (CEO)",
+    "perspective": "Strongly opposes the 18-month 'Project Chimera' merge plan. Believes it's a classic case of trying to please everyone and ending up with a bloated, unfocused product that satisfies no one. Advocates for a decisive, albeit painful, strategy to select one product as the 'winner' and create a clear migration path for the other, even if it means short-term customer churn.",
+    "key_concerns": [
+      "Losing market leadership during the 18-month development limbo.",
+      "Alienating both loyal customer bases simultaneously.",
+      "Massive engineering resource drain with high risk of delays and budget overruns.",
+      "Ending up with a 'Frankenstein' product that lacks a clear identity and value proposition."
+    ],
+    "motivation": "Long-term market dominance and shareholder value. Prefers short-term pain for long-term strategic clarity."
+  },
+  {
+    "name": "Ben Carter",
+    "role": "Chief Technology Officer (CTO)",
+    "perspective": "The primary architect and champion of the 'Project Chimera' merge plan. Genuinely believes that combining the best features of both 'Momentum' (our product) and 'Velocity' (acquired product) will create an unbeatable platform. Sees it as a fascinating and necessary technical challenge.",
+    "key_concerns": [
+      "Losing valuable IP and engineering talent from the acquired team if their product is sunsetted.",
+      "Technical debt from maintaining two separate codebases long-term.",
+      "The perceived 'waste' of discarding a perfectly good technology stack.",
+      "Maintaining team morale by creating a unified, collaborative project."
+    ],
+    "motivation": "Technical excellence, innovation, and building a 'perfect' product. Wants to keep his newly combined engineering team happy and engaged."
+  },
+  {
+    "name": "Maria Flores",
+    "role": "Chief Financial Officer (CFO)",
+    "perspective": "Extremely skeptical of Project Chimera's 18-month timeline and budget. Views it as an open-ended R&D project with an unclear ROI. Leans towards the CEO's 'pick a winner' strategy as it's more financially predictable, but wants a data-driven analysis of churn risk vs. long-term development costs.",
+    "key_concerns": [
+      "The projected $15M integration budget, which she believes is underestimated by at least 30%.",
+      "The opportunity cost of tying up the entire engineering team for 18 months.",
+      "The financial impact of a dip in sales from both products due to market uncertainty.",
+      "Lack of clear financial KPIs for the merged product's success."
+    ],
+    "motivation": "Fiscal responsibility, predictability, and maximizing return on invested capital (ROIC). Hates ambiguity and open-ended financial commitments."
+  },
+  {
+    "name": "David Chen",
+    "role": "VP of Sales (Original Company - 'Momentum' Product)",
+    "perspective": "Fiercely protective of the 'Momentum' customer base, which consists mainly of large enterprise clients who value stability. He is terrified that a merged product will introduce bugs, change workflows, and cause his biggest accounts to look at competitors. He's heard from his team that 20% of his pipeline is on hold pending a clear product direction.",
+    "key_concerns": [
+      "Losing major enterprise accounts due to uncertainty.",
+      "Sales team confusion and inability to sell a 'future' product.",
+      "Forced migration alienating his most profitable, long-term customers.",
+      "The new product being too influenced by 'Velocity's' SMB-focused features."
+    ],
+    "motivation": "Hitting his quarterly sales targets, protecting his team's commissions, and maintaining long-standing customer relationships."
+  },
+  {
+    "name": "Sarah Jenkins",
+    "role": "VP of Sales (Acquired Company - 'Velocity' Product)",
+    "perspective": "Believes the 'Velocity' product is technically superior and has a more passionate user community, albeit in the mid-market space. She sees the acquisition as a chance for 'Velocity' to get the resources it needs to dominate. She would be devastated if 'Velocity' were sunsetted and sees the merge as the only acceptable compromise.",
+    "key_concerns": [
+      "Breaking promises made to 'Velocity' customers at the time of the acquisition.",
+      "Massive customer churn if they are forced to migrate to the 'clunky' Momentum platform.",
+      "Losing the brand loyalty and community 'Velocity' has built over years.",
+      "Her sales team, experts in 'Velocity', becoming redundant."
+    ],
+    "motivation": "Championing the product and team she helped build. Ensuring the legacy of 'Velocity' continues and its customer base is respected."
+  }
+]

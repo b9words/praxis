@@ -2,7 +2,10 @@
 async function getGenerationUtils() {
   const scriptPath = path.join(process.cwd(), 'execemy', 'scripts', 'generate-shared.ts')
   const module = await import(scriptPath)
-  return { generateWithAI: module.generateWithAI, getCoreValuesPrompt: module.getCoreValuesPrompt }
+  return { 
+    generateWithAI: module.generateWithAI, 
+    getCoreValuesPrompt: module.getCoreValuesPrompt
+  }
 }
 
 import fs from 'fs'
@@ -269,6 +272,17 @@ export async function POST(request: NextRequest) {
     }
 
     caseData.status = 'draft'
+    
+    // Quality enhancement cycle
+    try {
+      const { enhanceCaseStudyWithAI, enhanceAllCaseStudyAssets } = await import('@/lib/ai-quality-enhancer')
+      caseData = await enhanceCaseStudyWithAI(caseData)
+      caseData = await enhanceAllCaseStudyAssets(caseData)
+    } catch (error) {
+      console.warn(`Quality enhancement failed, using original: ${error}`)
+      // Continue with original case study
+    }
+    
     const validation = validateCaseJSON(caseData)
     if (!validation.valid) {
       return NextResponse.json(

@@ -1,0 +1,167 @@
+{
+  "caseId": "cs_arena_1_3_the_remote_work_reset_1762242076493",
+  "version": "1.0",
+  "title": "The Remote Work Reset: Navigating Nexus Innovations' Cultural Divide",
+  "description": "After a successful period of mandatory remote work, Nexus Innovations' hybrid model has led to declining productivity and a divisive 'two-tier' culture. As CPO, you must craft a pivotal all-hands announcement from CEO Evelyn Chen, transitioning the company to a remote-first operating model and rallying the workforce.",
+  "competencies": [
+    "Organizational Design",
+    "Strategic Communication",
+    "Change Management",
+    "Stakeholder Management",
+    "Data-Driven Decision Making"
+  ],
+  "estimatedDuration": 180,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "file_employee_survey",
+      "fileName": "Employee_Sentiment_Survey_Results_Mar_2023.json",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER_FOR_JSON_EMPLOYEE_SURVEY_CONTENT"
+      }
+    },
+    {
+      "fileId": "file_productivity_data",
+      "fileName": "Q1_2023_Productivity_Metrics_Analysis.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER_FOR_CSV_PRODUCTIVITY_DATA_CONTENT"
+      }
+    },
+    {
+      "fileId": "file_memo_exec_summary",
+      "fileName": "CEO_Mandate_and_Executive_Reactions_Memo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "PLACEHOLDER_FOR_MARKDOWN_MEMO_CONTENT"
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_assessment",
+      "title": "Stage 1: Initial Assessment & Empathy Mapping",
+      "description": "Before drafting any communication, you need to deeply internalize the current state of employee sentiment and objective performance at Nexus Innovations. This requires a thorough review of the provided data.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Review the provided 'Employee Survey' and 'Productivity Data'. What are the top 3-5 critical pain points and underlying causes that must be addressed in the CEO's communication? How would you characterize the core emotional state of the workforce? Submit a brief analysis (e.g., a bulleted summary and a short paragraph on employee sentiment).",
+        "context": "Nexus Innovations' hybrid model has resulted in a 'two-tier' culture, declining morale, and a significant drop in key performance indicators over the past 12 months. The CEO has made a decisive call to transition to a remote-first operating model.",
+        "options": [
+          {
+            "id": "option_1_1",
+            "title": "Analyze Employee Survey for Qualitative Insights",
+            "description": "Focus on open comments and satisfaction ratings to understand emotional state."
+          },
+          {
+            "id": "option_1_2",
+            "title": "Review Productivity Data for Quantitative Trends",
+            "description": "Identify specific metrics showing decline during the hybrid period."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_framing",
+      "title": "Stage 2: Strategic Framing & Executive Alignment",
+      "description": "Having understood the current reality, your next task is to strategically frame the 'remote-first' decision. This involves addressing both the failures of the hybrid model and the concerns of key stakeholders, while leveraging the symbolic act of repurposing executive offices.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Review the CEO's mandate and the summary of initial executive reactions in the provided 'Memo'. Develop a strategic narrative outline (e.g., a concise memo or presentation slide) for the remote-first announcement. This outline should cover: the core message, key strategic pillars, how past failures will be addressed without blame, and how the executive office repurposing will be framed to build trust and commitment.",
+        "context": "The CEO's decision for a remote-first model is final, and all executive private offices will be repurposed. Key stakeholders like Marcus Thorne (Head of Sales) and Dr. Anya Sharma (CTO) have distinct concerns and expectations that need to be addressed in the messaging.",
+        "options": [
+          {
+            "id": "option_2_1",
+            "title": "Outline the narrative acknowledging hybrid failures.",
+            "description": "Focus on the 'why' behind the shift without blaming individuals."
+          },
+          {
+            "id": "option_2_2",
+            "title": "Address executive concerns and frame office repurposing.",
+            "description": "Integrate leadership buy-in and the symbolic gesture effectively."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_script_drafting",
+      "title": "Stage 3: Drafting the CEO's Town Hall Script",
+      "description": "With all insights gathered and the strategic narrative shaped, it's time to craft the pivotal communication. This script must be inspiring, empathetic, and clear, designed to unite the company and launch a successful remote-first culture.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Draft the complete script for CEO Evelyn Chen's all-hands meeting. The script must be inspiring, empathetic, and clear. It needs to: 1. Acknowledge the challenges and failures of the hybrid model. 2. Explain the 'why' behind the remote-first decision, referencing data and internal feedback. 3. Lay out the new principles of Nexus Innovations' remote-first culture. 4. Address the repurposing of executive offices as a commitment to equity. 5. Provide clear next steps and communication protocols. 6. Reassure employees about support, career opportunities, and the company's future.",
+        "context": "This announcement is arguably the most critical cultural reset Nexus Innovations has faced. The communication must reverse negative momentum and build buy-in across all levels of the organization.",
+        "options": [
+          {
+            "id": "option_3_1",
+            "title": "Begin drafting the CEO's speech.",
+            "description": "Focus on opening with empathy and acknowledging challenges."
+          },
+          {
+            "id": "option_3_2",
+            "title": "Integrate new remote-first principles.",
+            "description": "Clearly define new cultural norms and operational guidelines."
+          },
+          {
+            "id": "option_3_3",
+            "title": "Conclude with next steps and a call to action.",
+            "description": "Ensure a clear path forward and inspire confidence."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Organizational Design",
+        "description": "Evaluates the ability to define and communicate a coherent organizational structure and culture for optimal performance within a remote-first model.",
+        "scoringGuide": {
+          "1": "Script lacks a clear vision for the remote-first model; fails to articulate new cultural principles or proposes solutions that perpetuate old problems (e.g., vague expectations).",
+          "3": "Outlines basic remote-first principles and expectations; shows awareness of some organizational challenges but lacks depth in defining the new operational culture.",
+          "5": "Presents a comprehensive, well-structured remote-first framework; proactively defines new norms, collaboration methods, and cultural cornerstones; demonstrates a deep understanding of how to build a unified, high-performing remote culture that leverages the unique benefits of remote work."
+        }
+      },
+      {
+        "competencyName": "Strategic Communication",
+        "description": "Assesses the skill in crafting clear, compelling, and empathetic messages to drive complex organizational change.",
+        "scoringGuide": {
+          "1": "Script is vague, overly corporate, or lacks genuine empathy; fails to clearly explain the 'why' behind the change; uses accusatory language or vague platitudes, potentially worsening morale.",
+          "3": "Explains the decision clearly but struggles to connect with employees emotionally; offers some rationale but misses opportunities for inspiration or reassurance; message feels somewhat generic.",
+          "5": "Script is highly articulate, empathetic, and inspiring; clearly explains the rationale, benefits, and challenges of remote-first; effectively addresses past failures without blame; uses persuasive language to motivate employees toward the new vision and fosters a sense of shared purpose."
+        }
+      },
+      {
+        "competencyName": "Change Management",
+        "description": "Measures the ability to anticipate resistance, build buy-in, and guide an organization through significant transitions.",
+        "scoringGuide": {
+          "1": "Communication is reactive; ignores potential resistance or negative emotions; provides no actionable next steps or support mechanisms for the transition.",
+          "3": "Acknowledges change will be difficult; provides some initial steps but lacks a clear roadmap or strong, sustained reassurance about the transition process.",
+          "5": "Proactively addresses anticipated resistance, fear, and uncertainty; outlines clear, phased next steps, support systems, and a timeline for the transition; inspires confidence in the organization's ability to navigate the change successfully and emerge stronger."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Evaluates the capacity to address diverse needs and concerns of different groups within the organization effectively.",
+        "scoringGuide": {
+          "1": "Fails to address the specific concerns of key groups (e.g., sales, engineering, mid-level employees); message feels tone-deaf to different perspectives, potentially alienating critical segments.",
+          "3": "Makes an effort to speak to different groups but doesn't fully reconcile conflicting interests or provide tailored reassurance; message might feel generic or oversimplified.",
+          "5": "Skillfully weaves in considerations for all key stakeholders; explicitly addresses concerns about fairness, collaboration, career progression, and leadership commitment; builds a sense of shared purpose and demonstrates an understanding of the diverse impacts across the organization."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Decision Making",
+        "description": "Assesses the integration of quantitative and qualitative data to inform strategic messaging and justification.",
+        "scoringGuide": {
+          "1": "Script lacks any reference to supporting data (employee survey, productivity metrics) or makes unsubstantiated claims; relies purely on anecdote or CEO's personal opinion.",
+          "3": "Mentions data points (e.g., 'our surveys show...') but doesn't integrate them deeply into the narrative or fully justify the 'why' effectively; feels like a superficial mention.",
+          "5": "Seamlessly integrates quantitative and qualitative data (survey results, productivity metrics) to objectively justify the remote-first decision; uses data to demonstrate the hybrid model's failings and the tangible benefits/potential of the new remote-first approach, lending credibility and authority to the message."
+        }
+      }
+    ]
+  },
+  "status": "draft"
+}
