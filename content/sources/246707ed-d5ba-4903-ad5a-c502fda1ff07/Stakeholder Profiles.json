@@ -1,0 +1,164 @@
+[
+  {
+    "name": "Elias Vance",
+    "title": "Managing Partner, Titan Capital & Board Member",
+    "role": "Represents the largest institutional investor on the board. He is a member of the Ethics Committee primarily to ensure that ethical considerations do not unduly hinder shareholder value creation. His primary fiduciary duty is to his firm's limited partners, demanding aggressive growth and quarterly returns.",
+    "power": "high",
+    "influence": "high",
+    "concerns": [
+      "Missing Q3 revenue targets",
+      "Stock price stagnation",
+      "Competitors capturing the government-tech market",
+      "Activist investor pressure over slow growth",
+      "Perception of the board as being 'anti-business'"
+    ],
+    "motivations": [
+      "Maximizing shareholder return above all else",
+      "Securing a multi-year, high-margin contract",
+      "Demonstrating market leadership in the lucrative AI sector",
+      "Achieving a significant stock price increase before year-end",
+      "Locking in a flagship government client as a reference"
+    ],
+    "likely_objections": [
+      "'Ethical hand-wringing' is costing us a landmark deal.",
+      "We can't be held responsible for how a client uses our product; that's their liability.",
+      "The reputational risk is theoretical and manageable; the revenue is real and immediate."
+    ],
+    "background": "A 25-year veteran of private equity with a reputation for ruthless efficiency and a focus on financial engineering. Sees ethical debates as a cost center."
+  },
+  {
+    "name": "Judge Anika Sharma (Ret.)",
+    "title": "Independent Director & Chair of the Ethics Committee",
+    "role": "A retired federal appellate judge serving as an independent director. She brings a rigorous, legalistic framework to ethical questions, focusing on precedent, liability, and governance. Her role is to ensure the company's decisions can withstand future legal and regulatory scrutiny.",
+    "power": "medium",
+    "influence": "high",
+    "concerns": [
+      "Potential for aiding unconstitutional surveillance",
+      "Corporate liability in cases of AI misuse or algorithmic bias",
+      "Lack of clear legal precedent for AI accountability",
+      "Setting a dangerous industry standard that invites regulation",
+      "Scrutiny from the Department of Justice and the FTC"
+    ],
+    "motivations": [
+      "Establishing strong, defensible governance policies",
+      "Protecting the company and the board from future litigation",
+      "Upholding principles of due process and constitutional fairness",
+      "Crafting a 'best-in-class' AI ethics framework that becomes a model",
+      "Ensuring any decision is meticulously documented and legally sound"
+    ],
+    "likely_objections": [
+      "The proposed indemnification clauses are insufficient to protect us from gross negligence claims.",
+      "What is our legal exposure if the AI is proven to have a systemic bias in court?",
+      "This decision could expose the entire board to personal liability under derivative lawsuits."
+    ],
+    "background": "Served 15 years on the U.S. Court of Appeals, known for her meticulous opinions on technology and civil liberties cases."
+  },
+  {
+    "name": "Dr. Lena Petrova",
+    "title": "External Ethics Advisor, Human Rights Foundation",
+    "role": "An internationally recognized expert on technology and human rights, invited to advise the committee. She has no formal power but carries significant moral authority and influence in the public sphere, especially with socially responsible investors. Her purpose is to be the voice for potentially impacted communities.",
+    "power": "low",
+    "influence": "high",
+    "concerns": [
+      "The technology's use against marginalized communities and protestors",
+      "The weaponization of facial recognition by authoritarian regimes",
+      "The chilling effect on free speech and association",
+      "Inherent algorithmic bias leading to false arrests and convictions",
+      "The irreversible societal impact of mass surveillance infrastructure"
+    ],
+    "motivations": [
+      "Preventing the deployment of technology she deems fundamentally harmful",
+      "Advocating for a human-rights-first approach to innovation",
+      "Holding corporations accountable for their social and ethical impact",
+      "Championing a complete ban or strict moratorium on facial recognition for law enforcement",
+      "Raising public awareness about the dangers of surveillance AI"
+    ],
+    "likely_objections": [
+      "Any 'safeguards' are merely ethics-washing and will inevitably be bypassed.",
+      "Profit can never be the justification for enabling potential human rights violations.",
+      "This technology is fundamentally flawed and dangerous; the only ethical choice is not to sell it."
+    ],
+    "background": "Former lead researcher at a global human rights NGO and author of the influential book 'The Algorithmic Panopticon'."
+  },
+  {
+    "name": "Marcus Thorne",
+    "title": "SVP, Global Government Sales",
+    "role": "Heads the sales division focused on public sector contracts and is responsible for meeting aggressive revenue targets. He sees the law enforcement contract as a 'whale' that could make or break the fiscal year. He views extensive ethical debates as a direct roadblock to closing critical, time-sensitive deals.",
+    "power": "medium",
+    "influence": "medium",
+    "department": "Sales",
+    "concerns": [
+      "Losing the deal to a less-scrupulous competitor",
+      "Missing the quarterly sales quota by a massive margin",
+      "The sales team's morale and commissions if the deal is rejected",
+      "The long sales cycle for this government contract being completely wasted",
+      "The signal a 'no' sends to other potential government clients"
+    ],
+    "motivations": [
+      "Closing the largest deal in the company's history",
+      "Exceeding revenue targets and securing a large personal and team bonus",
+      "Establishing a strategic foothold in the lucrative government sector",
+      "Gaining a powerful competitive advantage and case study",
+      "Being seen as a 'rainmaker' within the executive team"
+    ],
+    "likely_objections": [
+      "If we don't sell it to them, a competitor will, and their tech has more documented bias.",
+      "We are a technology provider, not the world's police; our role ends at the point of sale.",
+      "The client has provided written assurance that they will use it responsibly."
+    ]
+  },
+  {
+    "name": "Dr. Anya Sharma",
+    "title": "Principal Research Scientist, AI Labs",
+    "role": "The brilliant lead scientist behind the facial recognition algorithm. She is deeply proud of the technical achievement but increasingly alarmed by its potential applications. She feels a strong sense of personal responsibility for her creation and the impact it could have on society.",
+    "power": "low",
+    "influence": "medium",
+    "department": "Research & Development",
+    "concerns": [
+      "Her work being used to cause harm or injustice",
+      "The known accuracy limitations with women and ethnic minorities",
+      "The 'black box' nature of the algorithm making misuse difficult to audit",
+      "A public backlash tarnishing her scientific reputation and that of her lab",
+      "An exodus of talent from her team if the company proceeds"
+    ],
+    "motivations": [
+      "Ensuring her technology is used for verifiably positive outcomes",
+      "Advocating for strong technical guardrails, such as 'explainable AI' and bias audits",
+      "Maintaining the scientific integrity and ethical reputation of her lab",
+      "Preventing the perversion of her research into a tool of oppression",
+      "Publishing research on ethical AI development"
+    ],
+    "likely_objections": [
+      "The system is not robust enough to prevent misuse; the error bars are too high for this use case.",
+      "The accuracy metrics for the target demographics are below our own internal ethical threshold.",
+      "We cannot technically guarantee that a client won't disable or bypass the safeguards we build in."
+    ]
+  },
+  {
+    "name": "Javier Rossi",
+    "title": "Chief Financial Officer",
+    "role": "As CFO, Javier is responsible for the financial health and risk management of the company. He is caught between the enormous, high-margin revenue from the deal and the potentially catastrophic financial risk from lawsuits, fines, and brand damage. He is a pragmatist focused on long-term, sustainable enterprise value.",
+    "power": "high",
+    "influence": "medium",
+    "department": "Finance",
+    "concerns": [
+      "The financial impact of a major public scandal on our stock price",
+      "Potential for multi-billion dollar class-action lawsuits",
+      "The unbudgeted cost of regulatory compliance and potential fines",
+      "A negative impact on our ESG rating, affecting investment from major funds",
+      "Shareholder lawsuits for failing to disclose material risks"
+    ],
+    "motivations": [
+      "Achieving predictable, long-term revenue growth",
+      "Maintaining a strong, defensible balance sheet",
+      "Improving operating margins with high-value contracts",
+      "Accurately pricing and mitigating all identifiable financial risks",
+      "Protecting and growing long-term enterprise value"
+    ],
+    "likely_objections": [
+      "Has legal quantified the maximum potential financial liability here? I need a number.",
+      "The projected revenue, however large, does not justify the unquantifiable tail risk to the entire enterprise.",
+      "What is the projected financial cost of the reputational damage on our consumer-facing businesses?"
+    ]
+  }
+]

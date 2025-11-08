@@ -109,6 +109,9 @@ export default function CaseBlueprintsPanel() {
     targetWordCount: 2000,
     tone: 'professional' as 'professional' | 'academic' | 'conversational'
   })
+  
+  // Thumbnail generation option
+  const [skipThumbnail, setSkipThumbnail] = useState<boolean>(false)
 
   // Preview state
   const [previewCase, setPreviewCase] = useState<GeneratedCase | null>(null)
@@ -318,6 +321,7 @@ export default function CaseBlueprintsPanel() {
               competencyName: competency.name,
               blueprintId: blueprint.id,
               competencyIds: competencyIdsArray.length > 0 ? competencyIdsArray : undefined, // Optional - only send if selected
+              skipThumbnail: skipThumbnail,
               options: {
                 provider: config.provider,
                 model: config.model,
@@ -611,16 +615,28 @@ export default function CaseBlueprintsPanel() {
         </div>
 
         {/* Selection Actions */}
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={selectAllFiltered}>
-            Select All ({filteredBlueprints.length})
-          </Button>
-          <Button variant="outline" size="sm" onClick={selectOnlyMissing}>
-            Select Missing Only
-          </Button>
-          <Button variant="outline" size="sm" onClick={deselectAll}>
-            Deselect All
-          </Button>
+        <div className="flex gap-2 flex-wrap items-center justify-between">
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" size="sm" onClick={selectAllFiltered}>
+              Select All ({filteredBlueprints.length})
+            </Button>
+            <Button variant="outline" size="sm" onClick={selectOnlyMissing}>
+              Select Missing Only
+            </Button>
+            <Button variant="outline" size="sm" onClick={deselectAll}>
+              Deselect All
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="skipThumbnail"
+              checked={skipThumbnail}
+              onCheckedChange={setSkipThumbnail}
+            />
+            <Label htmlFor="skipThumbnail" className="text-sm cursor-pointer">
+              Skip Thumbnail
+            </Label>
+          </div>
         </div>
 
         {/* Competency Selection */}

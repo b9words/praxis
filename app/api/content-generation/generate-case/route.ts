@@ -520,6 +520,7 @@ interface GenerateCaseRequest {
   difficulty?: 'beginner' | 'intermediate' | 'advanced'
   estimatedDuration?: number
   competencyIds?: string[] // Optional: competency IDs to associate with the case
+  skipThumbnail?: boolean // Optional: skip thumbnail generation
 }
 
 /**
@@ -999,9 +1000,9 @@ Return the complete, expanded, HBR-quality case JSON.`
     const localCasePath = path.join(dataDir, `${finalCaseId}.json`)
     fs.writeFileSync(localCasePath, JSON.stringify(caseData, null, 2), 'utf-8')
 
-    // Generate thumbnail (optional, non-blocking)
+    // Generate thumbnail (optional, non-blocking) - skip if requested
     let thumbnailUrl: string | null = null
-    if (dbCaseId && isSupabaseAvailable()) {
+    if (!body.skipThumbnail && dbCaseId && isSupabaseAvailable()) {
       try {
         await generateAndUploadThumbnail(
           dbCaseId,

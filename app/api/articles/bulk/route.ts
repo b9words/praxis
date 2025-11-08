@@ -25,14 +25,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Articles array required' }, { status: 400 })
     }
 
-    const created = await bulkCreateArticles(articles, user.id)
+    const result = await bulkCreateArticles(articles, user.id)
+
+    console.log(`[articles/bulk] Created ${result.count} articles, attempted ${articles.length}`)
+    if (result.failures && result.failures.length > 0) {
+      console.warn(`[articles/bulk] ${result.failures.length} articles failed to create`)
+    }
 
     // Revalidate caches
     await revalidateCache(CacheTags.ARTICLES)
     await revalidateCache('admin')
     await revalidateCache('content')
 
-    return NextResponse.json({ success: true, count: created.count }, { status: 201 })
+    return NextResponse.json({ 
+      success: true, 
+      attempted: articles.length,
+      count: result.count,
+      successes: result.successes || [],
+      failures: result.failures || []
+    }, { status: 200 })
   } catch (error: any) {
     if (error instanceof Error && (error.message === 'Unauthorized' || error.message === 'Forbidden')) {
       return NextResponse.json({ error: error.message }, { status: 403 })

@@ -1,7 +1,7 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { FileText, Table } from 'lucide-react'
+import { FileText, Table, File, Briefcase, Scale, Presentation } from 'lucide-react'
 import AssetRenderer from '@/components/admin/renderers/AssetRenderer'
 import CSVRenderer from '@/components/admin/renderers/CSVRenderer'
 import DataSheetRenderer from '@/components/admin/renderers/DataSheetRenderer'
@@ -20,6 +20,50 @@ interface UniversalAssetViewerProps {
 }
 
 export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles }: UniversalAssetViewerProps) {
+  // Process all case files (not just datasets) to display all assets
+  const processedCaseFiles = useMemo(() => {
+    if (!caseFiles || caseFiles.length === 0) {
+      return []
+    }
+
+    // Process all case files that have content
+    return caseFiles
+      .filter(file => file.content && file.content.trim().length > 0)
+      .map((file, index) => {
+        const content = file.content!
+        let fileType = 'UNKNOWN'
+        let fileName = file.fileName || `file_${index}`
+        
+        // Determine file type from fileType field or file extension
+        if (file.fileType === 'FINANCIAL_DATA' || file.fileType === 'MARKET_DATASET' || fileName.toLowerCase().endsWith('.csv')) {
+          fileType = 'CSV'
+        } else if (file.fileType === 'MEMO' || file.fileType === 'INTERNAL_MEMO') {
+          fileType = 'MEMO'
+        } else if (file.fileType === 'REPORT') {
+          fileType = 'REPORT'
+        } else if (file.fileType === 'LEGAL_DOCUMENT') {
+          fileType = 'LEGAL_DOCUMENT'
+        } else if (file.fileType === 'PRESENTATION_DECK') {
+          fileType = 'PRESENTATION_DECK'
+        } else if (fileName.toLowerCase().endsWith('.json') || content.trim().startsWith('{') || content.trim().startsWith('[')) {
+          fileType = 'JSON'
+        } else if (fileName.toLowerCase().endsWith('.md') || fileName.toLowerCase().endsWith('.markdown')) {
+          fileType = 'MARKDOWN'
+        } else {
+          // Default to markdown for text content
+          fileType = 'MARKDOWN'
+        }
+
+        return {
+          key: file.fileId || `file_${index}`,
+          fileName,
+          fileType,
+          content,
+          originalFileType: file.fileType,
+        }
+      })
+  }, [caseFiles])
+
   // Process datasets to determine their types and prepare for rendering
   const processedDatasets = useMemo(() => {
     // If datasets is an array (metadata), match with caseFiles
@@ -147,6 +191,74 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
     })
   }, [datasets, caseFiles])
 
+  // Get icon for file type
+  const getFileIcon = (fileType: string) => {
+    switch (fileType) {
+      case 'FINANCIAL_DATA':
+      case 'MARKET_DATASET':
+      case 'CSV':
+        return <Table className="h-4 w-4" />
+      case 'MEMO':
+      case 'INTERNAL_MEMO':
+        return <FileText className="h-4 w-4" />
+      case 'REPORT':
+        return <Briefcase className="h-4 w-4" />
+      case 'LEGAL_DOCUMENT':
+        return <Scale className="h-4 w-4" />
+      case 'PRESENTATION_DECK':
+        return <Presentation className="h-4 w-4" />
+      default:
+        return <File className="h-4 w-4" />
+    }
+  }
+
+  // Render a case file
+  const renderCaseFile = (file: typeof processedCaseFiles[0]) => {
+    const { content, fileType, fileName, originalFileType } = file
+
+    // For CSV files
+    if (fileType === 'CSV' || fileName.toLowerCase().endsWith('.csv')) {
+      return <CSVRenderer content={content} />
+    }
+
+    // For JSON files
+    if (fileType === 'JSON' || fileName.toLowerCase().endsWith('.json') || 
+        (content.trim().startsWith('{') || content.trim().startsWith('['))) {
+      try {
+        const parsed = JSON.parse(content)
+        return <DataSheetRenderer data={parsed} />
+      } catch {
+        return <AssetRenderer content={content} fileType={fileType} fileName={fileName} mimeType={null} />
+      }
+    }
+
+    // For markdown files
+    if (fileType === 'MARKDOWN' || fileName.toLowerCase().endsWith('.md') || 
+        fileName.toLowerCase().endsWith('.markdown')) {
+      return <MarkdownRenderer content={content} />
+    }
+
+    // For memos, reports, legal documents, etc. - use markdown renderer if it looks like markdown
+    if (fileType === 'MEMO' || fileType === 'REPORT' || fileType === 'LEGAL_DOCUMENT' || fileType === 'PRESENTATION_DECK') {
+      // Check if content looks like markdown
+      if (content.includes('#') || content.includes('*') || content.includes('[')) {
+        return <MarkdownRenderer content={content} />
+      }
+      // Otherwise use AssetRenderer
+      return <AssetRenderer content={content} fileType={fileType} fileName={fileName} mimeType={null} />
+    }
+
+    // Default: use AssetRenderer which has smart detection
+    return (
+      <AssetRenderer
+        content={content}
+        fileType={fileType}
+        fileName={fileName}
+        mimeType={null}
+      />
+    )
+  }
+
   // Determine which renderer to use for each dataset
   const renderDataset = (dataset: typeof processedDatasets[0]) => {
     const { content, fileType, fileName, originalValue, isObject, metadata } = dataset
@@ -212,9 +324,10 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
 
   const hasBriefing = briefingDoc && briefingDoc.trim().length > 0
   const hasDatasets = processedDatasets.length > 0
+  const hasCaseFiles = processedCaseFiles.length > 0
 
   // If no content at all, show empty state
-  if (!hasBriefing && !hasDatasets) {
+  if (!hasBriefing && !hasDatasets && !hasCaseFiles) {
     return (
       <div className="h-full flex items-center justify-center bg-white border-r border-gray-200">
         <div className="text-center p-8">
@@ -226,38 +339,57 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
     )
   }
 
-  // If only briefing, show it directly without tabs
-  if (hasBriefing && !hasDatasets) {
-    return (
-      <div className="h-full flex flex-col bg-white border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="font-semibold text-gray-900">Briefing Document</h3>
-          <p className="text-sm text-gray-600">Reference materials for this scenario</p>
-        </div>
-        <div className="flex-1 overflow-y-auto p-6">
-          <AssetRenderer
-            content={briefingDoc}
-            fileType="MARKDOWN"
-            fileName="briefing.md"
-            mimeType="text/markdown"
-          />
-        </div>
-      </div>
-    )
-  }
+  // Show all assets (briefing + case files + datasets) in tabs
+  const totalAssets = (hasBriefing ? 1 : 0) + processedCaseFiles.length + processedDatasets.length
 
-  // If only datasets, show them in tabs
-  if (!hasBriefing && hasDatasets) {
-    return (
-      <div className="h-full flex flex-col bg-white border-r border-gray-200">
-        <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <h3 className="font-semibold text-gray-900">Case Data</h3>
-          <p className="text-sm text-gray-600">Financial and operational data for this scenario</p>
+  return (
+    <div className="h-full flex flex-col bg-white border-r border-gray-200">
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <h3 className="font-semibold text-gray-900">Case Materials</h3>
+        <p className="text-sm text-gray-600">Reference materials and data for this scenario</p>
+      </div>
+
+      {totalAssets === 0 ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center p-8">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 font-medium">No materials available</p>
+            <p className="text-sm text-gray-500 mt-2">Case materials will appear here when available</p>
+          </div>
         </div>
-        <Tabs defaultValue="data-0" className="flex-1 flex flex-col">
+      ) : totalAssets === 1 ? (
+        // Single asset - show directly without tabs
+        <div className="flex-1 overflow-y-auto p-6">
+          {hasBriefing ? (
+            <AssetRenderer
+              content={briefingDoc}
+              fileType="MARKDOWN"
+              fileName="briefing.md"
+              mimeType="text/markdown"
+            />
+          ) : processedCaseFiles.length > 0 ? (
+            renderCaseFile(processedCaseFiles[0])
+          ) : processedDatasets.length > 0 ? (
+            renderDataset(processedDatasets[0])
+          ) : null}
+        </div>
+      ) : (
+        // Multiple assets - show in tabs
+        <Tabs defaultValue={hasBriefing ? "briefing" : processedCaseFiles.length > 0 ? `file-${processedCaseFiles[0].key}` : `data-0`} className="flex-1 flex flex-col">
           <TabsList className="mx-4 mt-4 !flex !flex-col !inline-flex h-auto w-auto overflow-y-auto">
+            {hasBriefing && (
+              <TabsTrigger value="briefing" className="gap-2 w-full justify-start">
+                <FileText className="h-4 w-4" />
+                Briefing Document
+              </TabsTrigger>
+            )}
+            {processedCaseFiles.map((file) => (
+              <TabsTrigger key={file.key} value={`file-${file.key}`} className="gap-2 w-full justify-start">
+                {getFileIcon(file.originalFileType || file.fileType)}
+                {file.fileName}
+              </TabsTrigger>
+            ))}
             {processedDatasets.map((dataset, index) => {
-              // Get title from metadata or use a formatted version of the key
               const title = dataset.metadata?.name || dataset.metadata?.title || dataset.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
               return (
                 <TabsTrigger key={dataset.key} value={`data-${index}`} className="gap-2 w-full justify-start">
@@ -267,61 +399,31 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
               )
             })}
           </TabsList>
+
+          {hasBriefing && (
+            <TabsContent value="briefing" className="flex-1 overflow-y-auto p-6 mt-0">
+              <AssetRenderer
+                content={briefingDoc}
+                fileType="MARKDOWN"
+                fileName="briefing.md"
+                mimeType="text/markdown"
+              />
+            </TabsContent>
+          )}
+
+          {processedCaseFiles.map((file) => (
+            <TabsContent key={file.key} value={`file-${file.key}`} className="flex-1 overflow-y-auto p-6 mt-0">
+              {renderCaseFile(file)}
+            </TabsContent>
+          ))}
+
           {processedDatasets.map((dataset, index) => (
             <TabsContent key={dataset.key} value={`data-${index}`} className="flex-1 overflow-y-auto p-6 mt-0">
               {renderDataset(dataset)}
             </TabsContent>
           ))}
         </Tabs>
-      </div>
-    )
-  }
-
-  // Both briefing and datasets - show tabs
-  return (
-    <div className="h-full flex flex-col bg-white border-r border-gray-200">
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <h3 className="font-semibold text-gray-900">Briefing Documents & Data</h3>
-        <p className="text-sm text-gray-600">Reference materials for this scenario</p>
-      </div>
-
-      <Tabs defaultValue={hasBriefing ? "briefing" : `data-0`} className="flex-1 flex flex-col">
-        <TabsList className="mx-4 mt-4 !flex !flex-col !inline-flex h-auto w-auto overflow-y-auto">
-          {hasBriefing && (
-            <TabsTrigger value="briefing" className="gap-2 w-full justify-start">
-              <FileText className="h-4 w-4" />
-              Briefing Document
-            </TabsTrigger>
-          )}
-          {processedDatasets.map((dataset, index) => {
-            // Get title from metadata or use a formatted version of the key
-            const title = dataset.metadata?.name || dataset.metadata?.title || dataset.key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-            return (
-              <TabsTrigger key={dataset.key} value={`data-${index}`} className="gap-2 w-full justify-start">
-                <Table className="h-4 w-4" />
-                {title}
-              </TabsTrigger>
-            )
-          })}
-        </TabsList>
-
-        {hasBriefing && (
-          <TabsContent value="briefing" className="flex-1 overflow-y-auto p-6 mt-0">
-            <AssetRenderer
-              content={briefingDoc}
-              fileType="MARKDOWN"
-              fileName="briefing.md"
-              mimeType="text/markdown"
-            />
-          </TabsContent>
-        )}
-
-        {processedDatasets.map((dataset, index) => (
-          <TabsContent key={dataset.key} value={`data-${index}`} className="flex-1 overflow-y-auto p-6 mt-0">
-            {renderDataset(dataset)}
-          </TabsContent>
-        ))}
-      </Tabs>
+      )}
     </div>
   )
 }

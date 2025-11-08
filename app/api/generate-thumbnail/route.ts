@@ -163,13 +163,15 @@ export async function POST(request: NextRequest) {
               type: 'png' 
             })
           } catch (imagenError) {
-            console.error('Imagen generation failed:', imagenError)
-            // Return empty response on failure
+            console.error('[generate-thumbnail] Imagen generation failed for lesson:', imagenError)
+            const errorMessage = imagenError instanceof Error ? imagenError.message : 'Unknown error'
+            // Return failure response - no fallback
             return NextResponse.json({ 
               url: null, 
               imageBuffer: null,
               type: 'png',
-              error: 'Imagen generation failed' 
+              error: 'Imagen generation failed',
+              details: errorMessage
             })
           }
         }
@@ -215,13 +217,15 @@ export async function POST(request: NextRequest) {
               type: 'png' 
             })
           } catch (imagenError) {
-            console.error('Imagen generation failed:', imagenError)
-            // Return empty response on failure
+            console.error('[generate-thumbnail] Imagen generation failed for case:', imagenError)
+            const errorMessage = imagenError instanceof Error ? imagenError.message : 'Unknown error'
+            // Return failure response - no fallback
             return NextResponse.json({ 
               url: null, 
               imageBuffer: null,
               type: 'png',
-              error: 'Imagen generation failed' 
+              error: 'Imagen generation failed',
+              details: errorMessage
             })
           }
         }
@@ -259,13 +263,15 @@ export async function POST(request: NextRequest) {
           type: 'png' 
         })
       } catch (imagenError) {
-        console.error('Imagen generation failed:', imagenError)
-        // Return empty response on failure
+        console.error('[generate-thumbnail] Imagen generation failed:', imagenError)
+        const errorMessage = imagenError instanceof Error ? imagenError.message : 'Unknown error'
+        // Return failure response - no fallback
         return NextResponse.json({ 
           url: null, 
           imageBuffer: null,
           type: 'png',
-          error: 'Imagen generation failed' 
+          error: 'Imagen generation failed',
+          details: errorMessage
         })
       }
     }

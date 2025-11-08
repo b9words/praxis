@@ -6,7 +6,50 @@
 import Replicate from 'replicate'
 
 /**
- * Get conceptual scene from Gemini 2.5 Flash
+ * Build deterministic metaphor from title keywords (no API call)
+ */
+function buildDeterministicMetaphor(title: string, description?: string): string {
+  const titleLower = title.toLowerCase()
+  const text = (description || title).toLowerCase()
+  
+  // Keyword-based mapping
+  if (titleLower.includes('risk') || text.includes('risk')) {
+    return 'A narrow footbridge over a deep canyon under steady wind.'
+  }
+  if (titleLower.includes('growth') || text.includes('growth') || text.includes('expand')) {
+    return 'A sapling breaking through cracked concrete toward sunlight.'
+  }
+  if (titleLower.includes('system') || text.includes('system') || text.includes('process')) {
+    return 'Interlocking gears smoothly turning in tight alignment.'
+  }
+  if (titleLower.includes('strateg') || text.includes('strateg') || text.includes('plan')) {
+    return 'A compass pointing through morning fog toward a distant peak.'
+  }
+  if (titleLower.includes('tradeoff') || text.includes('tradeoff') || text.includes('balance')) {
+    return 'Two balanced scales with different precious items on each side.'
+  }
+  if (titleLower.includes('decision') || text.includes('decision') || text.includes('choose')) {
+    return 'A fork in a forest path with both routes leading into misty distance.'
+  }
+  if (titleLower.includes('leadership') || text.includes('leadership') || text.includes('lead')) {
+    return 'A lighthouse casting a steady beam over calm water at dusk.'
+  }
+  if (titleLower.includes('team') || text.includes('team') || text.includes('collaborat')) {
+    return 'Multiple hands working together to lift a heavy stone into place.'
+  }
+  if (titleLower.includes('innov') || text.includes('innov') || text.includes('creat')) {
+    return 'A single lightbulb illuminating a dark workshop filled with tools.'
+  }
+  if (titleLower.includes('value') || text.includes('value') || text.includes('worth')) {
+    return 'A single lighthouse casting a steady beam over calm water at dusk.'
+  }
+  
+  // Default fallback
+  return 'A single lighthouse casting a steady beam over calm water at dusk.'
+}
+
+/**
+ * Get conceptual scene from Gemini 1.5 Flash
  * @param title - Lesson or case study title
  * @param description - Lesson or case study description (optional)
  * @returns Conceptual scene description for use in Imagen prompt
@@ -18,26 +61,26 @@ export async function getVisualMetaphor(
   const geminiApiKey = process.env.GEMINI_API_KEY
 
   if (!geminiApiKey) {
-    throw new Error('GEMINI_API_KEY not configured')
+    // Use deterministic fallback if no API key
+    return buildDeterministicMetaphor(title, description)
   }
 
   const prompt = `You are the Art Director for Harvard Business Review. Create a conceptual scene for a business lesson${description ? ` about: ${description}` : ''}.
 
 **CRITICAL CONSTRAINTS:**
 1. The scene must be a metaphor for the lesson's core idea.
-2. The description must be concise (2-3 sentences) and visually descriptive.
+2. The description must be concise (1-2 sentences) and visually descriptive.
 3. It should involve real-world objects in a slightly surreal or symbolic arrangement.
 4. DO NOT include the lesson title, lesson number, or any text references in your description.
 5. DO NOT mention numbers, letters, or any textual elements.
+6. AVOID scenes that commonly contain text: no signage, storefronts, screens, monitors, documents, books, magazines, newspapers, whiteboards, jerseys, uniforms, labels, or any objects that typically display text.
+7. Favor abstract, geometric, or natural scenes: landscapes, architectural elements, objects in space, patterns, or symbolic arrangements that are purely visual.
 
-**Example:** For 'Second-Order Decision Making,' a good scene would be: 'A top-down view of a single, large ship navigating a calm sea. However, its wake is creating massive, unexpected waves that are rocking a series of smaller boats far behind it.'
-
-**Your Task:** Provide ONLY the visual scene description. No title, no numbers, no text references.`
-
+**Your Task:** Provide ONLY the visual scene description. One sentence. No title, no numbers, no text references.`
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
@@ -50,9 +93,10 @@ export async function getVisualMetaphor(
             },
           ],
           generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 150,
-            topP: 0.95,
+            responseMimeType: 'text/plain',
+            temperature: 0.6,
+            maxOutputTokens: 60,
+            candidateCount: 1,
           },
         }),
       }
@@ -60,61 +104,77 @@ export async function getVisualMetaphor(
 
     if (!response.ok) {
       const errorText = await response.text()
-      throw new Error(`Gemini API error: ${response.status} - ${errorText}`)
+      console.warn(`[getVisualMetaphor] Gemini API error: ${response.status}, using deterministic fallback`)
+      return buildDeterministicMetaphor(title, description)
     }
 
     const data = await response.json()
     
-    // Try multiple response structure paths
+    // Strict parse: only check candidates[0].content.parts[*].text
     let metaphor: string | undefined = undefined
+    const candidate = data.candidates?.[0]
     
-    // Path 1: Standard structure
-    metaphor = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
-    
-    // Path 2: Alternative structure (some Gemini versions)
-    if (!metaphor && data.candidates?.[0]?.output) {
-      metaphor = data.candidates[0].output.trim()
-    }
-    
-    // Path 3: Direct text response
-    if (!metaphor && data.text) {
-      metaphor = data.text.trim()
-    }
-    
-    // Path 4: Check all candidates and parts
-    if (!metaphor && data.candidates) {
-      for (const candidate of data.candidates) {
-        if (candidate.content?.parts) {
-          for (const part of candidate.content.parts) {
-            if (part.text) {
-              metaphor = part.text.trim()
-              break
-            }
-          }
+    if (candidate?.content?.parts && Array.isArray(candidate.content.parts)) {
+      for (const part of candidate.content.parts) {
+        if (part.text) {
+          metaphor = part.text.trim()
+          break
         }
-        if (metaphor) break
       }
     }
     
-    // Debug logging if we can't find the response
+    // If empty, retry with ultra-short prompt
     if (!metaphor) {
-      console.error('Gemini response structure:', JSON.stringify(data, null, 2))
-      // Fallback to generic conceptual scene instead of throwing
-      console.warn('No metaphor found in Gemini response, using fallback')
-      return `A symbolic scene representing ${description || title.toLowerCase()}, with real-world objects arranged in a meaningful, metaphorical composition`
+      const shortPrompt = `Visual metaphor for "${title}": One sentence symbolic scene. No text in image.`
+      
+      try {
+        const retryResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: shortPrompt }] }],
+              generationConfig: {
+                responseMimeType: 'text/plain',
+                temperature: 0.6,
+                maxOutputTokens: 60,
+              },
+            }),
+          }
+        )
+        
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json()
+          const retryCandidate = retryData.candidates?.[0]
+          if (retryCandidate?.content?.parts && Array.isArray(retryCandidate.content.parts)) {
+            for (const part of retryCandidate.content.parts) {
+              if (part.text) {
+                metaphor = part.text.trim()
+                break
+              }
+            }
+          }
+        }
+      } catch (retryError) {
+        // Fall through to deterministic
+      }
+    }
+    
+    // If still empty, use deterministic fallback
+    if (!metaphor) {
+      return buildDeterministicMetaphor(title, description)
     }
 
-    // Clean up the response - remove quotes if present, remove markdown formatting
-    metaphor = metaphor.replace(/^["']|["']$/g, '') // Remove quotes
-    metaphor = metaphor.replace(/^\*\*|\*\*$/g, '') // Remove markdown bold
-    metaphor = metaphor.replace(/^`|`$/g, '') // Remove code backticks
+    // Clean up the response
+    metaphor = metaphor.replace(/^["']|["']$/g, '')
+    metaphor = metaphor.replace(/^\*\*|\*\*$/g, '')
+    metaphor = metaphor.replace(/^`|`$/g, '')
     
     return metaphor.trim()
   } catch (error) {
-    console.error('Error getting visual metaphor from Gemini:', error)
-    
-    // Fallback to generic conceptual scene
-    return `A symbolic scene representing ${description || title.toLowerCase()}, with real-world objects arranged in a meaningful, metaphorical composition`
+    console.warn('[getVisualMetaphor] Error calling Gemini, using deterministic fallback:', error)
+    return buildDeterministicMetaphor(title, description)
   }
 }
 
@@ -145,13 +205,15 @@ Illustrate this scene: ${scene}.
 
 [!!! CRITICAL: ABSOLUTELY NO TEXT !!!]
 The image must contain ZERO text, letters, numbers, titles, labels, captions, or characters of any kind. This includes:
-- NO lesson titles
-- NO lesson numbers (like "4.1")
-- NO words or phrases
-- NO letters or numbers
-- NO text overlays
-- NO labels or captions
-The image must be purely graphical and symbolic. ANY TEXT IS A COMPLETE FAILURE.
+- NO lesson titles, lesson numbers (like "4.1"), words, phrases, letters (A-Z), numbers (0-9), or alphanumeric glyphs
+- NO text overlays, labels, captions, subtitles, headings, or typography
+- NO signage, logos, brandmarks, watermarks, signatures, or written text
+- NO screens, monitors, displays, keyboards, or UI elements that might contain text
+- NO books, magazines, newspapers, documents, papers with writing, or whiteboards
+- NO jerseys, uniforms, name tags, or clothing with text
+- NO storefronts, street signs, banners, or any objects that typically display text
+- NO handwritten text, printed text, digital text, or text in any form
+The image must be purely graphical, symbolic, and abstract. Use shapes, patterns, objects, and compositions that convey meaning without any textual elements. ANY TEXT, LETTER, NUMBER, OR CHARACTER IS A COMPLETE FAILURE.
 
 [FORMAT]
 Vertical aspect ratio, 2:3.`
@@ -162,7 +224,7 @@ Vertical aspect ratio, 2:3.`
  * @returns Negative prompt string
  */
 export function getNegativePrompt(): string {
-  return 'photorealistic, 3D render, glossy, plastic, surrealism, text, words, letters, numbers, title, label, caption, signature, watermark, lesson number, subtitle, heading, typography, lettering, written text, printed text, cartoon, generic stock photo, cluttered, messy, ugly, low quality'
+  return 'photorealistic, 3D render, glossy, plastic, surrealism, text, words, letters, numbers, title, label, caption, signature, watermark, lesson number, subtitle, heading, typography, lettering, written text, printed text, digital text, handwritten text, alphanumeric, characters, glyphs, symbols that look like text, signage, logo, brandmark, storefront, street sign, banner, poster, screen, monitor, display, keyboard, UI text, on-screen text, book, magazine, newspaper, document, paper with writing, whiteboard, chalkboard, jersey, uniform, name tag, clothing with text, label, tag, sticker, badge, ticket, receipt, menu, sign, billboard, advertisement, cartoon, generic stock photo, cluttered, messy, ugly, low quality'
 }
 
 /**

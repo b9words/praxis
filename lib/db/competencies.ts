@@ -183,3 +183,65 @@ export async function deleteCompetency(id: string) {
   })
 }
 
+/**
+ * Ensure default "General" competency exists (idempotent)
+ * Returns the ID of the default competency, creating it if necessary
+ */
+export async function ensureDefaultCompetency(prisma?: any): Promise<string> {
+  const executor = prisma ? async (fn: (p: any) => Promise<any>) => fn(prisma) : dbCall
+  
+  return executor(async (p) => {
+    // Try to find existing "General" competency
+    let defaultComp = await p.competency.findFirst({
+      where: {
+        name: 'General',
+        level: 'domain',
+      },
+      select: { id: true },
+    })
+
+    if (!defaultComp) {
+      // Create it if it doesn't exist
+      defaultComp = await p.competency.create({
+        data: {
+          name: 'General',
+          description: 'Default competency for articles without a specific competency',
+          level: 'domain',
+          displayOrder: 0,
+        },
+        select: { id: true },
+      })
+    }
+
+    return defaultComp.id
+  })
+}
+
+/**
+ * Resolve competency ID - returns provided ID if valid, else default competency ID
+ */
+export async function resolveCompetencyId(maybeId?: string | null, prisma?: any): Promise<string> {
+  if (maybeId) {
+    const executor = prisma ? async (fn: (p: any) => Promise<any>) => fn(prisma) : dbCall
+    
+    try {
+      const exists = await executor(async (p) => {
+        return await p.competency.findUnique({
+          where: { id: maybeId },
+          select: { id: true },
+        })
+      })
+      
+      if (exists) {
+        return maybeId
+      }
+    } catch (err) {
+      // If lookup fails, fall through to default
+      console.warn(`[resolveCompetencyId] Failed to verify competency ${maybeId}, using default:`, err)
+    }
+  }
+  
+  // Return default competency ID
+  return ensureDefaultCompetency(prisma)
+}
+

@@ -80,6 +80,7 @@ export default function AdminContentClient() {
           type: 'article' as const,
           published: a.published ?? false,
           updatedAt: new Date(a.updatedAt),
+          metadata: a.metadata || {},
         })),
         total: data.total,
         page: data.page,

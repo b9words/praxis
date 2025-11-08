@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
           published: true,
           updatedAt: true,
           storagePath: true,
+          metadata: true,
           competency: { select: { name: true } },
         },
         orderBy: { updatedAt: 'desc' },
@@ -52,6 +53,11 @@ export async function GET(request: NextRequest) {
       }),
       prisma.article.count({ where }),
     ])
+
+    console.log(`[admin/content/articles] Found ${total} total articles, returning ${items.length} items for page ${page}`)
+    if (items.length > 0) {
+      console.log(`[admin/content/articles] Sample article IDs:`, items.slice(0, 3).map(a => a.id))
+    }
 
     const response = NextResponse.json({
       items,

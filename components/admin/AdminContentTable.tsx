@@ -31,8 +31,55 @@ interface ContentItem {
   updatedAt: Date
   competency?: { name: string }
   storagePath?: string | null
+  metadata?: Record<string, any>
   creator?: { username: string }
   updater?: { username: string }
+}
+
+// Helper function to generate public URL for content
+function getPublicUrl(item: ContentItem): string | null {
+  if (item.type === 'case') {
+    return `/simulations/${item.id}/brief`
+  }
+  
+  if (item.type === 'article') {
+    // Parse from storagePath (most reliable)
+    if (item.storagePath) {
+      // Storage path format: content/curriculum/{domain}/{module}/{lesson}.md
+      // or {domain}/{module}/{lesson}.md
+      // or just the filename pattern: {domain}/{module}/{lesson}.md
+      const pathMatch = item.storagePath.match(/(?:content\/curriculum\/)?([^\/]+)\/([^\/]+)\/([^\/]+)\.md$/)
+      if (pathMatch) {
+        const [, domain, module, lesson] = pathMatch
+        return `/library/curriculum/${domain}/${module}/${lesson}`
+      }
+      
+      // Alternative: try to match just the last three path segments
+      const segments = item.storagePath.split('/').filter(Boolean)
+      if (segments.length >= 3) {
+        const lessonFile = segments[segments.length - 1]
+        const module = segments[segments.length - 2]
+        const domain = segments[segments.length - 3]
+        if (lessonFile.endsWith('.md')) {
+          const lesson = lessonFile.replace('.md', '')
+          return `/library/curriculum/${domain}/${module}/${lesson}`
+        }
+      }
+    }
+    
+    // Fallback: try metadata (less reliable as lesson ID might not be in metadata)
+    const metadata = item.metadata || {}
+    if (metadata.domain && metadata.module && item.storagePath) {
+      // Extract lesson from storage path filename
+      const lessonMatch = item.storagePath.match(/([^\/]+)\.md$/)
+      if (lessonMatch) {
+        const lesson = lessonMatch[1]
+        return `/library/curriculum/${metadata.domain}/${metadata.module}/${lesson}`
+      }
+    }
+  }
+  
+  return null
 }
 
 interface AdminContentTableProps {
@@ -233,7 +280,31 @@ export default function AdminContentTable({
                               throw new Error('Failed to update published status')
                             }
                             queryClient.invalidateQueries({ queryKey: ['admin-content'] })
-                            toast.success(checked ? 'Content published' : 'Content unpublished')
+                            
+                            if (checked) {
+                              const publicUrl = getPublicUrl(item)
+                              if (publicUrl) {
+                                toast.success(
+                                  <div className="flex items-center gap-2">
+                                    <span>Content published</span>
+                                    <a
+                                      href={publicUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:underline font-medium"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      View public page →
+                                    </a>
+                                  </div>,
+                                  { duration: 5000 }
+                                )
+                              } else {
+                                toast.success('Content published')
+                              }
+                            } else {
+                              toast.success('Content unpublished')
+                            }
                           } catch (error) {
                             console.error('Failed to update published status:', error)
                             toast.error('Failed to update published status')
@@ -259,6 +330,20 @@ export default function AdminContentTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {item.published && (() => {
+                            const publicUrl = getPublicUrl(item)
+                            return publicUrl ? (
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  window.open(publicUrl, '_blank', 'noopener,noreferrer')
+                                }}
+                              >
+                                <ExternalLink className="h-3 w-3 mr-2" />
+                                View Public Page
+                              </DropdownMenuItem>
+                            ) : null
+                          })()}
                           <DropdownMenuItem onClick={() => onOpenDetails(item)}>
                             <Eye className="h-3 w-3 mr-2" />
                             View Details

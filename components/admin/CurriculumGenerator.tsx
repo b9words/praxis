@@ -44,6 +44,9 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
     targetWordCount: 2500,
     tone: 'professional'
   })
+  
+  // Thumbnail generation option
+  const [skipThumbnail, setSkipThumbnail] = useState<boolean>(false)
 
   // Get all lessons from the platform (all 219 lessons across 10 domains)
   const allLessons = getAllLessonsFlat()
@@ -112,19 +115,92 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
 
   // Bulk save mutation
   const bulkSaveMutation = useMutation({
-    mutationFn: (articles: Array<{ title: string; content: string; competencyId: string; status: string }>) =>
-      fetchJson('/api/articles/bulk', {
+    mutationFn: async (articles: Array<{ title: string; content: string; competencyId: string; status: string }>) => {
+      console.log(`[bulkSaveMutation] Attempting to save ${articles.length} articles`)
+      const response = await fetch('/api/articles/bulk', {
         method: 'POST',
-        body: { articles },
-      }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
-      toast.success(`Saved ${variables.length} lessons to database!`)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articles }),
+      })
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || `HTTP ${response.status}`)
+      }
+      
+      const data = await response.json()
+      console.log(`[bulkSaveMutation] API response:`, data)
+      
+      // VERIFY articles actually exist in database
+      if (data.count > 0 && data.successes && data.successes.length > 0) {
+        console.log(`[bulkSaveMutation] Verifying ${data.successes.length} articles exist in DB...`)
+        const verifyResponse = await fetch(`/api/admin/content/articles?page=1&pageSize=100`, { cache: 'no-store' })
+        if (verifyResponse.ok) {
+          const verifyData = await verifyResponse.json()
+          const savedIds = data.successes.map((a: any) => a.id)
+          const foundIds = verifyData.items.map((a: any) => a.id)
+          const found = savedIds.filter((id: string) => foundIds.includes(id))
+          console.log(`[bulkSaveMutation] Verification: ${found.length}/${savedIds.length} articles found in admin content API`)
+          if (found.length === 0 && savedIds.length > 0) {
+            console.error(`[bulkSaveMutation] ⚠️  WARNING: Articles saved but not found in admin content API!`)
+            console.error(`[bulkSaveMutation] Saved IDs:`, savedIds)
+            console.error(`[bulkSaveMutation] Found IDs:`, foundIds.slice(0, 10))
+            console.error(`[bulkSaveMutation] Check filters/permissions - articles may be hidden by status or competency filters`)
+          }
+        }
+      }
+      
+      return data
+    },
+    onSuccess: async (result, variables) => {
+      const attempted = result.attempted || variables.length
+      const count = result.count || 0
+      const failures = result.failures || []
+      
+      console.log(`[bulkSaveMutation] Success callback - count: ${count}, attempted: ${attempted}`)
+      
+      if (count === 0) {
+        // Show detailed error with failure reasons
+        const failureReasons = failures.slice(0, 5).map(f => `${f.title}: ${f.error}`).join('; ')
+        toast.error(
+          `Failed to save any articles. ${failures.length > 0 ? `Errors: ${failureReasons}${failures.length > 5 ? '...' : ''}` : 'Check console for details.'}`,
+          { duration: 10000 }
+        )
+        // DO NOT clear results - allow user to retry
+        return
+      }
+      
+      // Invalidate all article-related queries
+      await queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
+      
+      // Invalidate admin content queries - use prefix matching to catch all filter variations
+      await queryClient.invalidateQueries({ 
+        queryKey: ['admin-content'],
+        exact: false // Match all queries starting with 'admin-content'
+      })
+      
+      // Force refetch of admin content
+      await queryClient.refetchQueries({ 
+        queryKey: ['admin-content'],
+        exact: false
+      })
+      
+      // Show accurate success message
+      if (failures.length > 0) {
+        const failureReasons = failures.slice(0, 3).map(f => f.title).join(', ')
+        toast.success(
+          `Saved ${count} of ${attempted} lessons. Failed: ${failureReasons}${failures.length > 3 ? ` (+${failures.length - 3} more)` : ''}`,
+          { duration: 8000 }
+        )
+      } else {
+        toast.success(`Saved ${count} lessons to database!`)
+      }
+      
+      // Only clear results if we saved at least one
       setProgress(prev => ({ ...prev, results: [] }))
-      // Reload existing articles to update status
-      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all() })
     },
     onError: (error) => {
+      console.error(`[bulkSaveMutation] Error:`, error)
       toast.error(error instanceof Error ? error.message : 'Failed to save to database')
     },
   })
@@ -226,15 +302,17 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
 
     // Convert selected lesson paths to LessonStructure format with competency resolution
     const selectedLessonStructures: Array<LessonStructure & { lessonPath: string; competencyId: string | null }> = []
+    let lessonsWithoutCompetency = 0
+    
     for (const lessonPath of selectedLessons) {
       const lesson = allLessons.find(l => `${l.domain}/${l.moduleId}/${l.lessonId}` === lessonPath)
       if (lesson) {
-        // Resolve competency for this lesson
+        // Resolve competency for this lesson (but don't block if it fails)
         const competencyId = await resolveCompetencyForLesson(lesson.domain, lesson.moduleId, lesson.lessonTitle)
         
         if (!competencyId) {
-          toast.warning(`Could not resolve competency for lesson: ${lesson.lessonTitle}. Skipping.`)
-          continue
+          console.warn(`Could not resolve competency for lesson: ${lesson.lessonTitle}. Will use default competency.`)
+          lessonsWithoutCompetency++
         }
 
         selectedLessonStructures.push({
@@ -244,14 +322,18 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
           lessonName: lesson.lessonTitle,
           description: lesson.description,
           lessonPath,
-          competencyId
+          competencyId: competencyId || null // Pass null, API will handle it
         })
       }
     }
     
     if (selectedLessonStructures.length === 0) {
-      toast.error('No lessons with valid competencies to generate')
+      toast.error('No lessons selected to generate')
       return
+    }
+
+    if (lessonsWithoutCompetency > 0) {
+      toast.info(`${lessonsWithoutCompetency} lesson(s) will use default competency`)
     }
 
     setProgress({
@@ -282,35 +364,49 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
         }))
 
         try {
-          // Call server-side API route for generation
-          const response = await fetch('/api/content-generation/generate-lesson', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              lesson: structure,
-              options: config,
-              competencyId: competencyId!,
-              domainTitle: domainTitle,
-            }),
-          })
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}))
-            throw new Error(errorData.error || `HTTP ${response.status}`)
-          }
-
-          const data = await response.json()
-          results.push({
-            ...data.lesson,
-            lessonPath
-          } as any)
+          // Call server-side API route for generation with timeout
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 6 * 60 * 1000) // 6 minutes timeout
           
-          // Add delay between requests to avoid rate limiting
-          if (i < selectedLessonStructures.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000))
+          try {
+            const response = await fetch('/api/content-generation/generate-lesson', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lesson: structure,
+                options: config,
+                competencyId: competencyId!,
+                domainTitle: domainTitle,
+              }),
+              signal: controller.signal,
+            })
+            
+            clearTimeout(timeoutId)
+
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}))
+              throw new Error(errorData.error || `HTTP ${response.status}`)
+            }
+
+            const data = await response.json()
+            results.push({
+              ...data.lesson,
+              lessonPath
+            } as any)
+            
+            // Add delay between requests to avoid rate limiting
+            if (i < selectedLessonStructures.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+          } catch (fetchError) {
+            clearTimeout(timeoutId)
+            throw fetchError
           }
         } catch (error) {
           console.error(`Failed to generate lesson ${structure.lessonName}:`, error)
+          const errorMessage = error instanceof Error 
+            ? (error.name === 'AbortError' ? 'Request timeout - generation took too long' : error.message)
+            : 'Unknown error'
           results.push({
             title: structure.lessonName,
             content: '',
@@ -318,7 +414,7 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
             status: 'draft',
             metadata: {},
             lessonPath,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: errorMessage
           } as any)
         }
       }
@@ -330,6 +426,12 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
         currentLesson: 'Complete',
         completed: selectedLessonStructures.length
       }))
+
+      // Auto-preview the first successfully generated lesson
+      const firstSuccessResult = results.find((r: any) => r.content && !r.error)
+      if (firstSuccessResult) {
+        setPreviewLesson(firstSuccessResult)
+      }
 
       toast.success(`Generated ${results.length} lessons successfully!`)
     } catch (error) {
@@ -355,7 +457,9 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       
       // Extract domain, module, lesson from path: domain/module/lesson
       let storagePath = null
-      let metadata: any = {}
+      
+      // Start with existing metadata (preserves thumbnailUrl, thumbnailType, etc.)
+      let metadata: any = { ...(lesson.metadata || {}) }
       
       if (lessonPath) {
         const [domain, module, lessonId] = lessonPath.split('/')
@@ -367,7 +471,9 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
         )
         
         if (lessonData) {
+          // Merge path-based metadata with existing metadata (preserves thumbnail)
           metadata = {
+            ...metadata, // Preserve thumbnailUrl, thumbnailType, keyTakeaways, etc.
             domain,
             module,
             lesson_number: lessonData.lessonNumber,
@@ -694,6 +800,22 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
                     }))}
                   />
                 </div>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-gray-50">
+                <div className="space-y-0.5">
+                  <Label htmlFor="skipThumbnail" className="text-sm font-medium">
+                    Skip Thumbnail Generation
+                  </Label>
+                  <p className="text-xs text-gray-500">
+                    Skip generating thumbnails to speed up generation
+                  </p>
+                </div>
+                <Switch
+                  id="skipThumbnail"
+                  checked={skipThumbnail}
+                  onCheckedChange={setSkipThumbnail}
+                />
               </div>
             </CardContent>
           </Card>

@@ -4,7 +4,7 @@
  */
 
 import type { Prisma } from '@prisma/client'
-import { assertFound, dbCall, isColumnNotFoundError } from './utils'
+import { assertFound, dbCall, isColumnNotFoundError, withTransaction } from './utils'
 
 export interface ArticleFilters {
   status?: string
@@ -260,41 +260,73 @@ export async function bulkCreateArticles(
   articles: Array<Omit<CreateArticleData, 'createdBy' | 'updatedBy'>>,
   userId: string
 ) {
-  return dbCall(async (prisma) => {
-    // Verify user exists before bulk creating
-    let verifiedUserId: string | null = userId && userId.trim() ? userId : null
-    
-    if (verifiedUserId) {
-      try {
-        const userExists = await prisma.profile.findUnique({
-          where: { id: verifiedUserId },
+  const { resolveCompetencyId } = await import('./competencies')
+  
+  const successes: Array<{ id: string; title: string }> = []
+  const failures: Array<{ title: string; error: string }> = []
+  
+  // Verify user exists once (avoid FK constraint on createdBy/updatedBy)
+  let verifiedUserId: string | null = userId && userId.trim() ? userId : null
+  if (verifiedUserId) {
+    try {
+      const userExists = await dbCall(async (prisma) => {
+        return await prisma.profile.findUnique({
+          where: { id: verifiedUserId! },
           select: { id: true },
         })
-        if (!userExists) {
-          console.warn(`[bulkCreateArticles] User ${verifiedUserId} not found, setting createdBy/updatedBy to null`)
-          verifiedUserId = null
-        }
-      } catch (err) {
-        console.warn('[bulkCreateArticles] Failed to verify user, setting createdBy/updatedBy to null:', err)
+      })
+      if (!userExists) {
+        console.warn(`[bulkCreateArticles] User ${verifiedUserId} not found, setting createdBy/updatedBy to null`)
         verifiedUserId = null
       }
+    } catch (err) {
+      console.warn('[bulkCreateArticles] Failed to verify user, setting createdBy/updatedBy to null:', err)
+      verifiedUserId = null
     }
-    
-    return prisma.article.createMany({
-      data: articles.map((article) => ({
-        title: article.title,
-        content: article.content ?? null,
-        competencyId: article.competencyId,
-        status: article.status ?? 'draft',
-        published: article.published ?? false,
-        storagePath: article.storagePath ?? null,
-        metadata: article.metadata ?? {},
-        description: article.description ?? null,
-        createdBy: verifiedUserId,
-        updatedBy: verifiedUserId,
-      })),
-    })
-  })
+  }
+  
+  // Create articles one by one in individual transactions (allows partial success)
+  for (const articleData of articles) {
+    try {
+      // Resolve competency ID - always succeeds (uses default if needed)
+      const competencyId = await resolveCompetencyId(articleData.competencyId)
+      
+      // Create article in individual transaction
+      const created = await dbCall(async (prisma) => {
+        return await prisma.article.create({
+          data: {
+            title: articleData.title,
+            content: articleData.content ?? null,
+            competencyId,
+            status: articleData.status ?? 'draft',
+            published: articleData.published ?? false,
+            storagePath: articleData.storagePath ?? null,
+            metadata: articleData.metadata ?? {},
+            description: articleData.description ?? null,
+            createdBy: verifiedUserId,
+            updatedBy: verifiedUserId,
+          },
+        })
+      })
+      
+      successes.push({ id: created.id, title: created.title })
+    } catch (createError: any) {
+      const errorMessage = createError.message || createError.code || 'Unknown error'
+      failures.push({ 
+        title: articleData.title || 'Untitled', 
+        error: errorMessage.length > 100 ? errorMessage.substring(0, 100) + '...' : errorMessage
+      })
+      console.error(`[bulkCreateArticles] Failed to create article "${articleData.title}":`, errorMessage)
+    }
+  }
+  
+  console.log(`[bulkCreateArticles] Summary: ${successes.length}/${articles.length} articles created successfully`)
+  return { 
+    count: successes.length, 
+    articles: successes.map(s => ({ id: s.id, title: s.title })),
+    successes,
+    failures
+  }
 }
 
 /**
@@ -360,15 +392,15 @@ export async function countArticlesForResidency(residencyYear: number) {
 
 /**
  * Find article by storage path pattern
+ * Tries exact match first, then contains match
  */
 export async function findArticleByStoragePath(pattern: string) {
   return dbCall(async (prisma) => {
-    return prisma.article.findFirst({
+    // Try exact match first
+    let article = await prisma.article.findFirst({
       where: {
         published: true,
-        storagePath: {
-          contains: pattern,
-        },
+        storagePath: pattern,
       },
       select: {
         id: true,
@@ -379,6 +411,28 @@ export async function findArticleByStoragePath(pattern: string) {
         status: true,
       },
     })
+    
+    // If not found, try contains match
+    if (!article) {
+      article = await prisma.article.findFirst({
+        where: {
+          published: true,
+          storagePath: {
+            contains: pattern,
+          },
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          storagePath: true,
+          metadata: true,
+          status: true,
+        },
+      })
+    }
+    
+    return article
   }).catch(() => null)
 }
 

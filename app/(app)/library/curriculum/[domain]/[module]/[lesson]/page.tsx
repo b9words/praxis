@@ -1,20 +1,20 @@
 import BookmarkButton from '@/components/library/BookmarkButton'
 import CaseStudyCard from '@/components/library/CaseStudyCard'
-import LessonViewTracker from '@/components/library/LessonViewTracker'
 import LessonDomainCompletionHandler from '@/components/library/LessonDomainCompletionHandler'
-import { Button } from '@/components/ui/button'
+import LessonViewTracker from '@/components/library/LessonViewTracker'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
 import { loadLessonByPath } from '@/lib/content-loader'
-import { getAllLessonsFlat, getDomainById, getLessonById, getModuleById, getCurriculumStats } from '@/lib/curriculum-data'
+import { getAllLessonsFlat, getCurriculumStats, getDomainById, getLessonById, getModuleById } from '@/lib/curriculum-data'
 import { findArticleByStoragePath } from '@/lib/db/articles'
 import { getCasesWithPrerequisites } from '@/lib/db/cases'
 import { getLessonProgress } from '@/lib/db/progress'
 import { fetchFromStorageServer } from '@/lib/supabase/storage'
-import { getPublicAccessStatus } from '@/lib/auth/authorize'
-import { ChevronLeft, ChevronRight, Clock, Target, Info } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Clock, Info, Target } from 'lucide-react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 
@@ -64,107 +64,30 @@ function getPreviousLessonInSequence(domainId: string, moduleId: string, lessonI
   }
 }
 
-// Helper function to generate fallback content
-function generateFallbackContent(
-  domainId: string, 
-  moduleId: string, 
-  lessonId: string,
-  domain?: any,
-  module?: any,
-  lesson?: any
-): string {
-  const lessonTitle = lesson?.title || 'Untitled Lesson'
-  const lessonDescription = lesson?.description || 'This lesson provides comprehensive insights.'
-  const domainTitle = domain?.title || 'Domain'
-  const moduleTitle = module?.title || 'Module'
-  
-  return `# ${lessonTitle}
-
-## Executive Summary
-
-${lessonDescription}
-
-This lesson provides a comprehensive framework for understanding and applying the core concepts that drive executive decision-making in this critical area.
-
-**Key Learning Objectives:**
-- Master the fundamental principles and frameworks
-- Understand real-world applications through case studies
-- Develop practical skills for immediate implementation
-- Learn to avoid common pitfalls and mistakes
-
----
-
-## Core Principle
-
-The foundation of this lesson rests on understanding that every business decision has multiple layers of complexity and consequence. As a CEO, your role is to see beyond the immediate effects and understand the systemic implications of your choices.
-
-### The Strategic Framework
-
-This lesson introduces a systematic approach to decision-making that considers:
-
-1. **Immediate Impact**: Direct, measurable effects
-2. **Secondary Effects**: Indirect consequences that emerge over time
-3. **Systemic Implications**: How decisions affect the broader organization
-4. **Long-term Value Creation**: Sustainable competitive advantage
-
-### Why This Matters for CEOs
-
-In today's complex business environment, the ability to think systematically and strategically is what separates exceptional leaders from the rest. This framework provides the mental models necessary to navigate uncertainty and create lasting value.
-
----
-
-## Implementation Framework
-
-\`\`\`mermaid
-flowchart TD
-    A[Assess Situation] --> B{Strategic Options}
-    B --> C[Option 1: Conservative]
-    B --> D[Option 2: Moderate]
-    B --> E[Option 3: Aggressive]
-    C --> F[Risk Assessment]
-    D --> F
-    E --> F
-    F --> G[Decision Matrix]
-    G --> H[Implementation Plan]
-    H --> I[Monitor & Adjust]
-\`\`\`
-
-### Decision Criteria
-
-| Factor | Weight | Conservative | Moderate | Aggressive |
-|--------|--------|-------------|----------|------------|
-| **Risk Level** | 30% | Low | Medium | High |
-| **Resource Requirements** | 25% | Minimal | Moderate | Significant |
-| **Time Horizon** | 20% | Short | Medium | Long |
-| **Expected ROI** | 25% | 10-15% | 20-30% | 35%+ |
-
----
-
-## Key Takeaways
-
-- **Framework-driven thinking** enables consistent, high-quality decisions
-- **Systematic analysis** reduces the risk of costly mistakes
-- **Long-term perspective** creates sustainable competitive advantage
-- **Continuous monitoring** allows for course correction and optimization
-- **Stakeholder alignment** ensures successful implementation
-
----
-
-*This lesson is part of **${domainTitle}** → **${moduleTitle}** in the Execemy Executive Education curriculum.*
-
-> **Note**: This lesson content is being prepared. The full content will be available soon.`
-}
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { domain: domainId, module: moduleId, lesson: lessonId } = await params
   
   // Cache article lookup (1 hour revalidate)
+  // Try multiple storage path patterns
   const getCachedArticle = cache(
     async () => {
       try {
-        return await findArticleByStoragePath(`${domainId}/${moduleId}/${lessonId}.md`)
+        // Try exact pattern first: domain/module/lesson.md
+        let article = await findArticleByStoragePath(`${domainId}/${moduleId}/${lessonId}.md`)
+        
+        // If not found, try with content/curriculum prefix
+        if (!article) {
+          article = await findArticleByStoragePath(`content/curriculum/${domainId}/${moduleId}/${lessonId}.md`)
+        }
+        
+        // If still not found, try just the lesson filename
+        if (!article) {
+          article = await findArticleByStoragePath(`${lessonId}.md`)
+        }
+        
+        return article
       } catch (error: any) {
-        // On error, continue without DB article
         console.error('Error fetching article from database:', error)
         return null
       }
@@ -178,7 +101,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   const articleFromDb = await getCachedArticle()
 
-  let lessonContent: string
+  let lessonContent: string | null = null
   let lessonDuration = 12
   let lessonDifficulty = 'intermediate'
   let lessonTitle = ''
@@ -200,45 +123,24 @@ export default async function LessonPage({ params }: LessonPageProps) {
       lessonContent = content
     } else {
       console.error('Failed to fetch from storage:', error)
-      // Fall back to local file system
-      const lessonContentData = loadLessonByPath(domainId, moduleId, lessonId)
-      if (lessonContentData && lessonContentData.content) {
-        lessonContent = lessonContentData.content
-        lessonDuration = lessonContentData.duration || 12
-        lessonDifficulty = lessonContentData.difficulty || 'intermediate'
-        lessonTitle = lessonContentData.title
-        lessonDescription = lessonContentData.description
-      } else {
-        // If no content anywhere, use fallback
-        lessonContent = generateFallbackContent(domainId, moduleId, lessonId)
-      }
+      // No fallback - content must exist in storage
     }
   } else {
-    // Fall back to hardcoded curriculum data and local file system
-    const domain = getDomainById(domainId)
-    const module = getModuleById(domainId, moduleId)
-    const lesson = getLessonById(domainId, moduleId, lessonId)
-
-    if (!domain || !module || !lesson) {
-      notFound()
-    }
-
-    lessonTitle = lesson.title
-    lessonDescription = lesson.description
-
-    // Load actual lesson content from markdown files
+    // Try local file system as last resort (for development/legacy content)
     const lessonContentData = loadLessonByPath(domainId, moduleId, lessonId)
     
     if (lessonContentData && lessonContentData.content) {
       lessonContent = lessonContentData.content
       lessonDuration = lessonContentData.duration || 12
       lessonDifficulty = lessonContentData.difficulty || 'intermediate'
-    } else {
-      // Fallback content generation
-      lessonContent = generateFallbackContent(domainId, moduleId, lessonId, domain, module, lesson)
-      lessonDuration = 12
-      lessonDifficulty = 'intermediate'
+      lessonTitle = lessonContentData.title
+      lessonDescription = lessonContentData.description
     }
+  }
+
+  // If no content found anywhere, return 404
+  if (!lessonContent) {
+    notFound()
   }
 
   // Get domain/module for breadcrumbs (try from hardcoded data first)
@@ -246,10 +148,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const module = getModuleById(domainId, moduleId)
   const lesson = getLessonById(domainId, moduleId, lessonId)
   
+  // If not in hardcoded data and no article in DB, return 404
   if (!domain || !module || !lesson) {
-    // If not in hardcoded data, try to construct from article metadata
     if (!articleFromDb) {
       notFound()
+    }
+    // If article exists but not in hardcoded data, use metadata for display
+    if (!lessonTitle && articleFromDb) {
+      lessonTitle = articleFromDb.title
     }
   }
 

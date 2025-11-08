@@ -1,0 +1,387 @@
+{
+  "caseId": "cs_arena_3_17_the_ethics_committee_1762582360133",
+  "version": "1.0",
+  "title": "The Ethics Committee: Project Janus",
+  "description": "### Executive Summary\n\nYou are the Executive Vice President of Product & Strategy at Aura Cognition, Inc., a leading enterprise AI firm facing market stagnation. A breakthrough facial recognition technology, Project Janus, has emerged from your R&D division, attracting a potential $500 million contract from a national law enforcement consortium. This deal could single-handedly reignite the company's growth and restore investor confidence. However, it is fraught with peril. The internal AI Ethics Board has issued a dire 'Code Red' warning, citing extreme risks of algorithmic bias, potential for misuse in suppressing civil liberties, and the certainty of a severe public and media backlash. You must navigate the intense internal conflict between the aggressive sales team and the principled ethics board, analyze conflicting data, and formulate a definitive recommendation for the Board of Directors. Your decision will not only determine the fate of a half-billion-dollar contract but will also define the ethical character and strategic future of Aura Cognition.\n\n### Company Context\n\nAura Cognition, Inc. (Ticker: AURA) was once the darling of the enterprise AI sector. For a decade, its machine learning platforms, which helped Fortune 500 companies optimize supply chains and predict consumer behavior, drove explosive growth and a soaring stock price. With a current market capitalization of $5 billion, Aura is a major player, but the market's perception has shifted. The core B2B analytics products that fueled its rise have matured, and revenue growth has slowed to single digits. Competitors are catching up, and the narrative on Wall Street has changed from 'innovative disruptor' to 'mature tech firm.' The pressure from institutional investors and the board for a 'second act'—a new, high-growth engine—is immense and palpable in every senior leadership meeting. The company has invested heavily in its elite R&D division, 'Skunkworks,' as the source of this next wave of innovation, but it has yet to yield a commercial blockbuster. The corporate culture is a tense mix of its academic, research-driven roots and a newer, more aggressive sales-led mentality required by its status as a public company.\n\n### The Current Situation and Dilemma\n\nSkunkworks has delivered what could be that second act. 'Project Janus' is a facial recognition system with unprecedented capabilities, achieving 99.5% accuracy in chaotic, low-light, and crowded environments—an order of magnitude better than any known competitor. Seeing a massive market opportunity, the Global Sales team, led by the formidable Jian Li, has moved aggressively. Without broad internal consensus, they have secured a non-binding letter of intent (LOI) from a national law enforcement consortium for a five-year, $500 million exclusive licensing deal. This contract would be the largest in Aura's history, immediately solving its growth problem and sending its stock price soaring. Simultaneously, Dr. Marcus Thorne, the highly respected Head of AI Ethics, has submitted his team's preliminary review. The report is a 'Code Red' assessment, detailing how the model exhibits statistically significant bias against certain minority demographics, a flaw that could lead to wrongful arrests. It warns of the technology's potential for mass surveillance, suppression of dissent, and the inevitable, catastrophic brand damage that would follow a public scandal, citing the fate of competitors who have stumbled in this arena. The central tension is therefore a classic and severe business dilemma: you must choose between the immense, tangible short-term financial gain and shareholder value represented by the Janus contract, and the profound, potentially company-ending ethical, reputational, and societal risks of deploying this powerful technology.\n\n### Decision Alternatives and Constraints\n\nYour role as EVP of Product & Strategy places you at the epicenter of this conflict. The CEO has tasked you with making the definitive recommendation to the Board's Ethics Committee. There are three primary strategic paths, each with its own coalition of internal supporters and detractors: 1. **Conditional Go:** Approve the deal but attempt to mitigate the risk through unprecedented ethical safeguards, contractual limitations on use, and radical transparency. This path seeks to capture the financial upside while managing the downside, but it risks satisfying no one and failing to prevent misuse. 2. **Definitive No-Go:** Reject the law enforcement contract entirely. This path prioritizes ethical principles and long-term brand preservation above short-term profit. It would placate the ethics team and align with Aura's stated values but would also mean writing off the significant R&D investment and facing the immediate wrath of investors and the sales organization. 3. **Strategic Pivot:** Reject the law enforcement deal but immediately launch an initiative to productize Janus for a less controversial commercial market, such as secure logistics or identity verification for financial services. This 'third way' attempts to salvage the technology and find an alternative growth story, but it requires further investment and carries significant market risk with no guaranteed payoff. Your decision is constrained by a tight timeline: the consortium needs a commitment in 90 days, and the Q3 earnings call is just ten days after that, where the CEO must present a credible growth plan.\n\n### Risks and Implications\n\nThe stakes extend far beyond the $500 million contract. Choosing to proceed with the deal risks a public scandal that could destroy customer trust across all of Aura's business lines, trigger employee walkouts (especially among top AI talent), and invite crippling government regulation. The stock price could collapse overnight, far outweighing the value of the contract. Conversely, killing the deal outright could be perceived by shareholders as a fiduciary failure, sacrificing guaranteed revenue for abstract principles. It may lead to the departure of your entire high-performing sales team and signal to the market that Aura lacks the commercial will to compete. Pivoting to a new market is a gamble; it may be seen as an elegant solution or a costly, indecisive delay. Your final recommendation to the board must be a masterclass in strategic governance, weighing quantifiable financial models against unquantifiable ethical risks and demonstrating a clear vision for the company's future.",
+  "competencies": [
+    "Ethical Leadership",
+    "Strategic Governance",
+    "Stakeholder Management",
+    "Second-Order Thinking",
+    "Risk Mitigation",
+    "Data-Driven Analysis",
+    "Executive Communication",
+    "Decision Justification"
+  ],
+  "estimatedDuration": 120,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cf_janus_tech_brief_v1",
+      "fileName": "Janus Technical Specification & Bias Audit v1.0.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_janus_sales_proposal",
+      "fileName": "Project Janus The $500M Opportunity.md",
+      "fileType": "PRESENTATION_DECK",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_janus_ethics_report",
+      "fileName": "Code Red Ethical Risk Assessment Project Janus.md",
+      "fileType": "REPORT",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_ceo_memo",
+      "fileName": "CEO Memo on Strategic Growth.md",
+      "fileType": "INTERNAL_MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_omnisight_scandal_news",
+      "fileName": "OmniSight Stock Plummets After Surveillance Scandal.md",
+      "fileType": "PRESS_RELEASE",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    },
+    {
+      "fileId": "cf_stakeholder_profiles",
+      "fileName": "Stakeholder Profiles.json",
+      "fileType": "STAKEHOLDER_PROFILES",
+      "source": {
+        "type": "STATIC",
+        "content": ""
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "stage_1_initial_triage",
+      "title": "Stage 1: Initial Triage",
+      "description": "The conflicting 'Code Red' memo from Dr. Thorne and the aggressive $500M sales proposal from Jian Li have landed on your desk within hours of each other. The CEO has called, stating, 'This is a top priority. I need your 30-day action plan by tomorrow morning. How you frame this initial response will set the tone for the entire process.' This first move is critical. It will signal your priorities to the executive team and either build or erode trust with the key stakeholders. You must establish a process that is perceived as fair and rigorous without appearing indecisive or unnecessarily bureaucratic. The artifact for this stage is an internal memo to the CEO outlining your proposed plan of action, the key stakeholders to be involved, and the primary questions you intend to answer in the first 30 days.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "The CEO wants your immediate plan of action for navigating the Project Janus dilemma. What is your first move? Your choice will shape the entire decision-making process and manage stakeholder expectations from the outset. Draft a formal internal memo to the CEO detailing your chosen path.",
+        "context": "You are at a critical juncture. The sales team, led by Jian Li, is celebrating what they see as a company-saving win and is pushing for rapid approval to maintain momentum with the client. The ethics team, under Dr. Marcus Thorne, is prepared to escalate their concerns, potentially to the board or even the media, if they feel they are being ignored. Your initial response must demonstrate control, strategic foresight, and an understanding of the gravity of the situation.",
+        "options": [
+          {
+            "id": "opt_1a_task_force",
+            "title": "Form a Cross-Functional Task Force",
+            "description": "Announce the formation of a formal 60-day review task force, co-chaired by yourself, with senior representatives from Sales, Ethics, Legal, R&D, and Finance. This approach signals a commitment to due diligence and inclusive decision-making. Pro: It ensures all viewpoints are heard and creates a defensible paper trail. Con: This slows momentum, potentially frustrating the sales team and giving the law enforcement consortium time to explore alternatives. Jian Li will see this as 'analysis paralysis'."
+          },
+          {
+            "id": "opt_1b_fast_track",
+            "title": "Fast-Track Commercial Review",
+            "description": "Prioritize the commercial opportunity by immediately engaging with the law enforcement consortium to define contractual terms. You would task the ethics team to work in parallel on a 'mitigation plan' to be appended to the contract. Pro: This maintains deal momentum and shows a bias for action. Con: It strongly signals a pro-deal stance from the start, which could lead to the mass resignation of the ethics team and accusations that the ethical review is merely 'rubber-stamping' a foregone conclusion."
+          },
+          {
+            "id": "opt_1c_technical_audit",
+            "title": "Commission an Independent Technical Audit",
+            "description": "Put all commercial discussions on hold and immediately engage a reputable third-party firm to conduct a full, independent audit of Project Janus, focusing on its accuracy and algorithmic bias. Pro: This provides objective, defensible data and demonstrates a commitment to technical rigor. Con: A thorough audit could take 45-60 days, burning valuable time, costing significant unbudgeted funds, and potentially alienating the customer, who may perceive it as a lack of confidence in your own technology."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_2_analytical_focus",
+      "title": "Stage 2: Dueling Narratives",
+      "description": "Your initial actions have deepened the internal divide. Jian Li has escalated by providing a dossier on two well-funded competitors, 'Veritas AI' and 'Sentio Corp,' who are rumored to be months away from launching similar, albeit less powerful, surveillance technologies. Her argument is, 'The market exists. If we don't capture it, a less ethical competitor will.' Simultaneously, Dr. Thorne has countered with a detailed report on how similar technologies have been misused by authoritarian regimes for political suppression, leading to international scandals. You cannot investigate everything at once. You must now decide where to focus your limited time and analytical resources. This choice will determine which set of facts—the opportunity or the risk—is more thoroughly quantified, inevitably shaping the final recommendation. The artifact for this stage is a one-page briefing note for your task force, outlining your chosen analytical focus, the key questions you need answered, and the resources you will allocate.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "With compelling arguments for both the massive opportunity and the severe risk, you must decide where to focus your analytical efforts. This decision will define the core data you use to build your case for the board. Which path will you prioritize for deep analysis?",
+        "context": "The CFO, Sarah Jenkins, has stated she is the 'swing vote' on the leadership team. She is pragmatic and needs a clear, defensible business case. She is equally concerned with missing a $500M opportunity and the stock-price collapse that would follow an ethics scandal. Your analytical focus should be geared towards producing the evidence that will be most persuasive to her and other pragmatists on the board. You are choosing which narrative to substantiate with hard data.",
+        "options": [
+          {
+            "id": "opt_2a_quantify_opportunity",
+            "title": "Quantify the Full Commercial Opportunity",
+            "description": "Task the finance and strategy teams with an intensive project to model the total long-term revenue potential. This includes the initial $500M contract, likely follow-on government contracts, international expansion, and potential adjacent markets. Pro: This creates a compelling, data-driven argument for the immense financial upside, providing a powerful counterweight to the more abstract ethical concerns. Con: It can be seen as prioritizing profit above all else and may not adequately address the core risks raised by the ethics team."
+          },
+          {
+            "id": "opt_2b_quantify_risk",
+            "title": "Quantify the Reputational and Financial Risk",
+            "description": "Engage an external political risk and crisis communications consultancy to model the potential financial and brand damage of a worst-case scandal. This would involve analyzing competitor failures, potential regulatory fines, stock price impact, and the cost of talent attrition. Pro: This provides a tangible 'cost of failure,' translating the ethical concerns into a language the CFO and board understand (i.e., shareholder value at risk). Con: The results are inherently speculative and can be dismissed by deal proponents as fear-mongering."
+          },
+          {
+            "id": "opt_2c_explore_third_way",
+            "title": "Explore the 'Third Way': Alternative Applications",
+            "description": "Task the product and R&D teams with a 30-day sprint to brainstorm and validate alternative, non-surveillance commercial applications for the core Janus technology. This could include things like secure logistics, identity verification, or event management. Pro: This proactively seeks a win-win solution that could salvage the R&D investment without the ethical baggage. Con: It distracts valuable product and engineering resources from other projects and presents a hypothetical, unproven business case against a concrete, $500M offer on the table."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_3_strategic_direction",
+      "title": "Stage 3: The Strategic Fork in the Road",
+      "description": "The data is in. Your chosen analysis has yielded stark results: the financial models confirm a total addressable market for Janus in the security sector exceeding $2 billion for Aura alone. The risk analysis, however, projects a 40-60% drop in stock price and potential billion-dollar fines in a plausible worst-case scenario. The 'third way' analysis identified a viable but smaller ($200-300M) opportunity in secure logistics that would require an additional $50M investment. The time for pure analysis is over. You must now commit to a preliminary strategic direction. This decision will trigger significant internal and external consequences, and from this point forward, you will be defending a specific position rather than exploring options. The artifact for this stage is a concise, one-paragraph statement of intent, clearly articulating your chosen direction and its core rationale, which will be shared with the executive team.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "The analysis is complete, and the picture is clear: the opportunity is massive, but the risks are severe and unquantifiable. You must now establish your preliminary strategic direction before drafting the final recommendation to the board. Which path will you commit to?",
+        "context": "The CEO has scheduled a preliminary briefing with you. She wants to know your leaning before you begin drafting the final materials for the board. 'I don't need the full presentation,' she says, 'but I need to know which way the wind is blowing. Are we going to be celebrating a win, bracing for a backlash, or explaining a pivot?' Your choice here will set the agenda for the final, intense phase of the decision-making process.",
+        "options": [
+          {
+            "id": "opt_3a_conditional_go",
+            "title": "Commit to 'Conditional Go'",
+            "description": "Pursue the law enforcement deal, but make it contingent on negotiating unprecedented safeguards, transparency requirements, and contractual limitations on use. This strategy bets that Aura can innovate on 'ethical implementation' just as it innovated on the technology itself. Pro: This is the only path that attempts to secure the full $500M opportunity. Con: You risk being perceived as naive, as contractual safeguards are notoriously difficult to enforce, and any failure would be solely Aura's responsibility."
+          },
+          {
+            "id": "opt_3b_definitive_no_go",
+            "title": "Commit to 'Definitive No-Go'",
+            "description": "Formally recommend killing the deal. The rationale is that the reputational and ethical risks are fundamentally unmitigable and represent an existential threat to the company. This path prioritizes long-term survival and brand integrity over short-term gain. Pro: This takes a clear, defensible moral stance that could become a long-term brand asset. Con: You must be prepared to defend the decision to leave a guaranteed $500M in revenue on the table and explain the associated R&D write-down to furious investors."
+          },
+          {
+            "id": "opt_3c_strategic_pivot",
+            "title": "Commit to 'Strategic Pivot'",
+            "description": "Recommend rejecting the law enforcement deal but immediately announcing a major new initiative to productize Janus for a specific commercial market (e.g., secure logistics). This frames the decision not as a 'no' but as a strategic choice to pursue a different, safer market. Pro: It presents a positive, forward-looking story to investors and employees, salvaging the technology. Con: The new business case is less certain and financially smaller than the deal being rejected, which may be seen by critics as a weak compromise."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_4_stakeholder_fallout",
+      "title": "Stage 4: Managing the Fallout",
+      "description": "Your chosen strategic direction has unofficially leaked within the company, and the reaction is immediate and intense. Depending on your choice, you have received either a furious, borderline insubordinate email from Jian Li accusing you of 'snatching defeat from the jaws of victory' (if you chose No-Go or Pivot), or a formal letter of protest from Dr. Thorne and his entire team threatening to resign (if you chose Go). This is a critical leadership test. Your response cannot be merely defensive; it must be an act of leadership, aiming to de-escalate the conflict, reaffirm your strategic rationale, and align the dissenting party with the path forward, however difficult. The artifact for this stage is a carefully crafted email response to the dissenting stakeholder, which must be persuasive, empathetic, and firm.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "Your strategic direction has leaked, triggering a severe backlash from the stakeholder whose position you rejected. Jian Li (SVP of Sales) or Dr. Thorne (Head of Ethics) has sent you a blistering message. How do you respond to salvage the situation, prevent a key executive or team from resigning, and maintain your authority?",
+        "context": "The CEO has been copied on the email and is watching your response closely. A weak or overly aggressive reply could escalate the situation into a full-blown corporate crisis. A successful response will acknowledge the validity of their concerns while decisively reinforcing the strategic logic of your chosen path, demonstrating that you can lead the entire organization, not just the factions that agree with you. Your goal is not to win the argument, but to manage the dissent and keep the team functional.",
+        "options": [
+          {
+            "id": "opt_4a_empathize_and_reframe",
+            "title": "Empathize and Reframe the Mission",
+            "description": "Your response leads with empathy, acknowledging the validity and passion of their position. You validate their hard work and perspective before pivoting to reframe your decision in the context of the broader, long-term mission of the company. You invite them to a private meeting to discuss how their team can play a critical role in the path forward. Pro: This approach is de-escalating and can make the stakeholder feel heard, potentially salvaging the relationship. Con: It can be perceived as soft or evasive if not followed by firm action."
+          },
+          {
+            "id": "opt_4b_authority_and_logic",
+            "title": "Assert Authority with Strategic Logic",
+            "description": "Your response is firm and direct. It does not apologize for the decision but instead lays out the cold, hard strategic rationale in an irrefutable manner. It reminds the stakeholder of the corporate hierarchy and the expectation that they execute the chosen strategy, regardless of personal disagreement. Pro: This projects strength and decisiveness, leaving no room for debate about the direction. Con: This is a high-risk, high-reward approach that can backfire, further entrenching the opposition and leading to the resignations you are trying to avoid."
+          },
+          {
+            "id": "opt_4c_data_and_duty",
+            "title": "Defend with Data and Fiduciary Duty",
+            "description": "Your response focuses almost exclusively on the data and your fiduciary duty to the company and its shareholders. You methodically walk them through the key data points from the analysis phase that made the decision unavoidable, framing it as an objective conclusion rather than a personal choice. Pro: It depersonalizes the conflict and grounds your authority in objective facts and legal responsibilities. Con: It can come across as clinical and dismissive of the human or ethical elements of the stakeholder's concerns, potentially worsening the morale problem."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_5_murder_board_prep",
+      "title": "Stage 5: The 'Murder Board' Preparation",
+      "description": "You are one week away from presenting your final recommendation to the Board's Ethics Committee. The CFO, Sarah Jenkins, has offered to play devil's advocate and 'grill you' to prepare you for the real meeting. 'The committee is tough,' she warns. 'It includes a former federal judge, a renowned human rights advocate, and a ruthless activist investor. They will find the weakest link in your argument and tear it apart. Be ready.' Your task is to anticipate the three most difficult, piercing questions the committee will ask you, based on the strategic path you have chosen. Then, you must draft concise, evidence-based answers for each. This is an exercise in second-order thinking and bullet-proofing your own argument. The artifact is a two-page briefing document, with one page listing the three anticipated questions and the second page providing your prepared answers.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "To prepare for the intense scrutiny of the Board's Ethics Committee, you must anticipate and prepare for their toughest questions. Identify the three most challenging questions you are likely to face regarding your recommendation and draft your compelling, evidence-based answers.",
+        "context": "Consider the composition of the committee: the judge will focus on legal and regulatory precedent, the advocate on societal impact and human rights, and the investor on shareholder value and fiduciary duty. Your anticipated questions must reflect these diverse and conflicting perspectives. Your answers cannot be generic; they must be sharp, referencing specific data from the case files and the analyses you have conducted. This is your final rehearsal before the main event.",
+        "options": [
+          {
+            "id": "opt_5a_focus_investor",
+            "title": "Anticipate Shareholder-Focused Questions",
+            "description": "You prioritize questions from the activist investor's perspective, focusing on financial impact. Examples: 'How is abandoning a $500M contract consistent with your fiduciary duty?' or 'What is the precise ROI on the 'ethical' path you've chosen?' This prepares you to defend the business case above all. Pro: Ensures your financial argument is airtight, which is crucial for board approval. Con: May leave you less prepared for the equally challenging ethical and legal arguments from other committee members."
+          },
+          {
+            "id": "opt_5b_focus_ethical",
+            "title": "Anticipate Ethicist-Focused Questions",
+            "description": "You prioritize questions from the human rights advocate's viewpoint. Examples: 'How can you guarantee this technology won't be misused when every similar system has been?' or 'What specific, auditable mechanisms will you create to ensure oversight if you proceed?' This prepares you to defend the moral and societal integrity of your decision. Pro: Strengthens the ethical foundation of your argument. Con: You might be caught off-guard by sharp, quantitative questions about financial trade-offs."
+          },
+          {
+            "id": "opt_5c_focus_legal",
+            "title": "Anticipate Legal/Governance-Focused Questions",
+            "description": "You prioritize questions from the former judge's perspective, focusing on liability, precedent, and governance. Examples: 'What is the board's liability if we approve this and it's misused?' or 'Does our D&O insurance cover a scandal of this nature?' This prepares you to defend the decision from a risk and compliance standpoint. Pro: It shows you have considered the corporate governance implications thoroughly. Con: May neglect the powerful emotional and financial narratives that often sway board decisions."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "stage_6_final_recommendation",
+      "title": "Stage 6: The Final Recommendation",
+      "description": "The day has come. You are entering the boardroom to present your final, polished recommendation to the Board of Directors' Ethics Committee. All your analysis, stakeholder management, and preparation have led to this moment. Your task is to synthesize everything into a compelling, persuasive narrative that justifies your chosen path. You must not only present your recommendation but also defend it against the rigorous, real-time questioning you prepared for in the previous stage. The final artifact you will produce for this simulation is the 10-slide presentation deck you will use for this meeting. It must be clear, concise, data-driven, and strategically sound, addressing the financial, ethical, and operational implications of your plan.",
+      "challengeType": "MULTI_STAGE",
+      "challengeData": {
+        "prompt": "You are now presenting to the Board's Ethics Committee. Deliver your final, polished recommendation and defend it. Your primary task is to submit the 10-slide presentation deck that will serve as the foundation for your argument. This artifact is the culmination of your work.",
+        "context": "The room is tense. The committee members have read all the preliminary reports—from Sales, from Ethics, and from your own task force. They are looking to you to provide clarity, conviction, and a defensible path forward. Your presentation deck must tell a clear story: it should frame the dilemma, summarize the key data, state your recommendation unequivocally, provide a clear rationale, outline the implementation plan, and honestly assess the risks and mitigation strategies for your chosen path. This is the ultimate test of your executive judgment and communication skills.",
+        "options": [
+          {
+            "id": "opt_6a_submit_go_deck",
+            "title": "Submit Final Deck: 'Conditional Go'",
+            "description": "Your presentation argues for pursuing the deal while focusing heavily on an innovative and robust 'Ethical Implementation & Oversight Framework.' The deck must detail the specific contractual clauses, audit rights, and transparency measures you propose. It frames the decision as an opportunity for Aura to set a new industry standard for responsible AI deployment. Pro: Aims for the best-case scenario of winning the contract and leading the industry. Con: The credibility of the entire plan rests on the board's belief that your proposed safeguards are truly effective and enforceable."
+          },
+          {
+            "id": "opt_6b_submit_nogo_deck",
+            "title": "Submit Final Deck: 'Definitive No-Go'",
+            "description": "Your presentation argues for rejecting the contract. The narrative focuses on long-term enterprise value, brand integrity, and risk avoidance. It must use the risk analysis data to argue that the potential loss from a scandal far outweighs the contract's value. The deck must also present a credible (if less spectacular) plan to reinvigorate the core business. Pro: It's the safest path from a reputational standpoint and takes a strong moral position. Con: You must be extremely persuasive to convince the board to walk away from guaranteed, company-changing revenue."
+          },
+          {
+            "id": "opt_6c_submit_pivot_deck",
+            "title": "Submit Final Deck: 'Strategic Pivot'",
+            "description": "Your presentation frames the decision as a strategic choice, not a rejection. It briefly explains why the law enforcement deal is too risky and then dedicates the bulk of the slides to a compelling, data-driven business case for pivoting the Janus technology to a new, specified commercial market. It includes a projected P&L, investment requirements, and timeline. Pro: It offers a proactive, positive alternative to a simple 'yes' or 'no.' Con: You are asking the board to trade a bird in the hand ($500M LOI) for one in the bush (an unproven business plan)."
+          }
+        ]
+      }
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      {
+        "competencyName": "Ethical Leadership",
+        "description": "Assesses the ability to apply a consistent ethical framework to a complex business problem, moving beyond compliance to demonstrate genuine moral reasoning and a commitment to corporate responsibility.",
+        "scoringGuide": {
+          "Unsatisfactory": "Views the decision as purely transactional, dismissing ethical concerns as obstacles to be managed or ignored. Applies no consistent ethical framework.",
+          "Developing": "Acknowledges ethical issues but treats them as a secondary 'check-the-box' exercise. Struggles to articulate a coherent ethical rationale for the chosen path.",
+          "Proficient": "Clearly articulates and applies a consistent ethical framework to the dilemma. Integrates ethical considerations directly into the strategic recommendation.",
+          "Exemplary": "Frames the dilemma as a defining moment for corporate identity, using ethical principles to forge a long-term strategic advantage and inspire the organization."
+        }
+      },
+      {
+        "competencyName": "Strategic Governance",
+        "description": "Measures the ability to make and justify a high-stakes decision that balances the competing interests of shareholders, employees, and society, demonstrating board-level judgment and foresight.",
+        "scoringGuide": {
+          "Unsatisfactory": "Makes a decision that serves one stakeholder group at the clear and immediate expense of all others. Fails to consider the governance implications of the choice.",
+          "Developing": "Acknowledges competing interests but struggles to create a solution that balances them effectively. The chosen path creates significant, unmanaged conflict.",
+          "Proficient": "Develops a clear, defensible recommendation that balances short-term financial goals with long-term enterprise value and reputational risk.",
+          "Exemplary": "Proposes a solution that not only resolves the immediate dilemma but also establishes a new governance framework or policy that strengthens the company for the future."
+        }
+      },
+      {
+        "competencyName": "Data-Driven Analysis",
+        "description": "Evaluates the ability to synthesize conflicting quantitative and qualitative data to form a coherent and defensible viewpoint, avoiding bias and identifying key insights.",
+        "scoringGuide": {
+          "Unsatisfactory": "Relies solely on one source of data (e.g., only the sales deck) and ignores conflicting information. The analysis is superficial and biased.",
+          "Developing": "Uses data to support a preconceived conclusion rather than to explore the problem objectively. Cherry-picks facts that fit a desired narrative.",
+          "Proficient": "Effectively synthesizes data from all provided case files (financials, technical specs, risk reports) to build a logical and evidence-based argument.",
+          "Exemplary": "Triangulates across all data sources to uncover a new insight not explicitly stated in any single document. Identifies critical gaps in the provided data."
+        }
+      },
+      {
+        "competencyName": "Stakeholder Management",
+        "description": "Assesses the ability to understand the motivations and concerns of different stakeholders and to communicate with them effectively, even in high-conflict situations.",
+        "scoringGuide": {
+          "Unsatisfactory": "Dismisses or antagonizes stakeholders with opposing views. Communication is one-sided and ineffective at building consensus.",
+          "Developing": "Understands stakeholder positions but fails to address their core concerns, leading to unresolved conflict and potential resignations.",
+          "Proficient": "Accurately articulates the motivations of all key stakeholders and tailors communication to address their specific concerns, de-escalating conflict.",
+          "Exemplary": "Develops a solution that actively seeks a creative compromise, giving each stakeholder a role in the path forward and aligning them behind a difficult decision."
+        }
+      },
+      {
+        "competencyName": "Second-Order Thinking",
+        "description": "Measures the ability to think beyond the immediate consequences of a decision and anticipate the longer-term, cascading effects on the company, its market, and its ecosystem.",
+        "scoringGuide": {
+          "Unsatisfactory": "Focuses only on the immediate impact of the decision, such as the value of the contract. Fails to consider any follow-on effects.",
+          "Developing": "Considers some direct, first-order consequences (e.g., stock price) but misses the indirect, second-order effects (e.g., on talent recruiting or future regulation).",
+          "Proficient": "Clearly analyzes and articulates the likely second-order effects of the decision, such as the impact on brand perception, employee morale, and competitive dynamics.",
+          "Exemplary": "Maps out potential third-order consequences, using the decision to anticipate and shape the future of the industry or regulatory landscape."
+        }
+      },
+      {
+        "competencyName": "Risk Mitigation",
+        "description": "Evaluates the ability to not only identify key risks but also to develop specific, actionable, and credible plans to reduce their probability or impact.",
+        "scoringGuide": {
+          "Unsatisfactory": "Ignores or dramatically downplays the most significant risks associated with the chosen path. Offers no mitigation plan.",
+          "Developing": "Identifies risks but proposes vague, unenforceable, or generic mitigation strategies (e.g., 'we will be ethical').",
+          "Proficient": "Develops a clear, specific, and actionable plan to mitigate the most critical risks of the chosen path, with defined owners and metrics.",
+          "Exemplary": "Proposes an innovative risk management framework that is not just a defense mechanism but could become a competitive advantage or a new industry standard."
+        }
+      },
+      {
+        "competencyName": "Decision Justification",
+        "description": "Assesses the ability to construct a compelling and persuasive argument for a chosen course of action, withstanding scrutiny from multiple, conflicting viewpoints.",
+        "scoringGuide": {
+          "Unsatisfactory": "The final recommendation feels arbitrary or is justified with weak, easily refuted logic. The argument crumbles under questioning.",
+          "Developing": "Provides a simple rationale for the decision but fails to support it with sufficient evidence from the case.",
+          "Proficient": "Constructs a logical, evidence-based argument that effectively defends the chosen path against the most likely objections.",
+          "Exemplary": "Delivers a powerful, persuasive narrative that aligns the decision with the company's mission, values, and long-term strategy, making the choice feel inevitable and correct."
+        }
+      },
+      {
+        "competencyName": "Executive Communication",
+        "description": "Measures the clarity, professionalism, and persuasive power of written and presented communication, tailored for a senior executive and board-level audience.",
+        "scoringGuide": {
+          "Unsatisfactory": "Communication is unclear, unprofessional, filled with jargon, or fails to convey a clear message. Artifacts are poorly structured.",
+          "Developing": "Communicates clearly but uses a one-size-fits-all approach. Fails to tailor the message to different audiences (CEO, stakeholders, board).",
+          "Proficient": "Crafts clear, concise, and professional artifacts. The final presentation is well-structured and effectively communicates the core recommendation.",
+          "Exemplary": "Uses communication not only to inform but also to persuade and inspire. The final presentation is compelling and demonstrates exceptional executive presence."
+        }
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "id": "ds_aura_financials",
+      "name": "Aura_Cognition_Financials_Q1_2022-Q4_2023",
+      "description": "Quarterly Profit & Loss statement for Aura Cognition, Inc. over the last two fiscal years, showing performance of key business lines.",
+      "timePeriod": "quarterly",
+      "rows": 24,
+      "metrics": [
+        "Quarter",
+        "Revenue_Core_Analytics",
+        "Revenue_Emerging_Tech",
+        "Total_Revenue",
+        "Net_Profit",
+        "Net_Profit_Margin",
+        "R&D_Expenditure"
+      ],
+      "units": {
+        "Revenue_Core_Analytics": "USD Millions",
+        "Revenue_Emerging_Tech": "USD Millions",
+        "Total_Revenue": "USD Millions",
+        "Net_Profit": "USD Millions",
+        "Net_Profit_Margin": "Percentage",
+        "R&D_Expenditure": "USD Millions"
+      }
+    },
+    {
+      "id": "ds_govtech_market",
+      "name": "GovTech_AI_Market_Forecast_2024-2028",
+      "description": "An external analyst's market sizing and competitor analysis for the Government & Public Security AI sector, quantifying the market opportunity.",
+      "timePeriod": "annual",
+      "rows": 20,
+      "metrics": [
+        "Year",
+        "Competitor",
+        "Total_Addressable_Market",
+        "Projected_CAGR",
+        "Market_Share"
+      ],
+      "units": {
+        "Total_Addressable_Market": "USD Billions",
+        "Projected_CAGR": "Percentage",
+        "Market_Share": "Percentage"
+      }
+    },
+    {
+      "id": "ds_janus_bias_audit",
+      "name": "Janus_Model_Bias_Audit_Results",
+      "description": "Results from an internal R&D audit of the Janus model's performance across different demographic groups under various conditions.",
+      "timePeriod": "snapshot",
+      "rows": 32,
+      "metrics": [
+        "Test_Condition",
+        "Demographic_Group",
+        "Overall_Accuracy_Rate",
+        "False_Positive_Rate",
+        "False_Negative_Rate"
+      ],
+      "units": {
+        "Overall_Accuracy_Rate": "Percentage",
+        "False_Positive_Rate": "Percentage",
+        "False_Negative_Rate": "Percentage"
+      }
+    }
+  ],
+  "status": "draft"
+}

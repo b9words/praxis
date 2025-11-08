@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { caseId } = body
+    const { caseId, skipThumbnail } = body
 
     if (!caseId) {
       return NextResponse.json(
@@ -301,9 +301,9 @@ export async function POST(request: NextRequest) {
     
     fs.writeFileSync(outputPath, JSON.stringify(caseData, null, 2), 'utf-8')
 
-    // Generate thumbnail for the case study
+    // Generate thumbnail for the case study (unless skipped)
     let thumbnailUrl: string | null = null
-    if (caseData.title) {
+    if (!skipThumbnail && caseData.title) {
       try {
         // Get domain name from competencies or use default
         const competencyNames = Array.isArray(caseData.competencies) ? caseData.competencies : []

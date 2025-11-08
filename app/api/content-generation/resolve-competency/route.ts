@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * Shared logic to resolve competency from lesson metadata
+ * Returns { competencyId: string | null } - null if no competency can be found
  */
-async function resolveCompetency(domainId: string | null, moduleId: string | null, lessonTitle: string | null) {
+async function resolveCompetency(domainId: string | null, moduleId: string | null, lessonTitle: string | null): Promise<{ competencyId: string | null }> {
   try {
     console.log('[resolve-competency] Request:', { domainId, moduleId, lessonTitle })
 
@@ -27,7 +28,9 @@ async function resolveCompetency(domainId: string | null, moduleId: string | nul
         console.log('[resolve-competency] Using fallback domain competency')
         return { competencyId: fallbackComp.id }
       }
-      throw new Error('Domain not found in curriculum')
+      // If no fallback found, return null instead of throwing
+      console.warn('[resolve-competency] Domain not found in curriculum and no fallback competency available')
+      return { competencyId: null }
     }
 
     console.log('[resolve-competency] Found domain:', domain.title)
@@ -83,7 +86,9 @@ async function resolveCompetency(domainId: string | null, moduleId: string | nul
         console.log('[resolve-competency] Using first available domain competency as fallback')
         return { competencyId: firstDomain.id }
       }
-      throw new Error('Domain competency not found')
+      // If no domain competencies exist at all, return null instead of throwing
+      console.warn('[resolve-competency] No domain competencies found in database, returning null')
+      return { competencyId: null }
     }
 
     console.log('[resolve-competency] Found domain competency:', domainComp.name)

@@ -23,7 +23,6 @@ async function getGenerateWithAI() {
 
 /**
  * Read quality standards from markdown file
- * Uses require with string concatenation to prevent webpack static analysis
  * SERVER-ONLY: This function will throw if called on the client
  */
 async function readQualityStandards(fileName: string): Promise<string> {
@@ -32,23 +31,25 @@ async function readQualityStandards(fileName: string): Promise<string> {
     throw new Error('readQualityStandards can only be called server-side')
   }
   
-  // Use require with string manipulation to prevent webpack from statically analyzing
-  // Webpack can't analyze dynamic require() calls
-  const fsModule = 'f' + 's'
-  const pathModule = 'p' + 'a' + 't' + 'h'
-  
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const fs = require(fsModule)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const path = require(pathModule)
-  
-  // Use process.cwd() instead of __dirname for Next.js compatibility
-  const qualityPath = path.join(process.cwd(), 'core-docs', fileName)
-  
-  if (fs.existsSync(qualityPath)) {
-    return fs.readFileSync(qualityPath, 'utf-8')
+  try {
+    // Use dynamic import to avoid bundling issues
+    const fs = await import('fs/promises')
+    const path = await import('path')
+    
+    // Use process.cwd() instead of __dirname for Next.js compatibility
+    const qualityPath = path.join(process.cwd(), 'core-docs', fileName)
+    
+    try {
+      return await fs.readFile(qualityPath, 'utf-8')
+    } catch (readError) {
+      throw new Error(`Quality standards file not found: ${qualityPath}`)
+    }
+  } catch (importError) {
+    // If fs module is not available (e.g., in edge runtime), return empty string
+    // This allows the enhancement to continue without quality standards
+    console.warn(`[readQualityStandards] Cannot access fs module, skipping quality standards: ${importError}`)
+    return ''
   }
-  throw new Error(`Quality standards file not found: ${qualityPath}`)
 }
 
 /**
@@ -64,10 +65,12 @@ export async function enhanceCaseStudyWithAI(caseData: any): Promise<any> {
   const qualityStandards = await readQualityStandards('quality_casestudy.md')
   const generateWithAI = await getGenerateWithAI()
   
-  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study to meet the highest quality standards.
-
-QUALITY STANDARDS:
-${qualityStandards}
+  // Build prompt with or without quality standards
+  const qualityStandardsSection = qualityStandards 
+    ? `\nQUALITY STANDARDS:\n${qualityStandards}\n`
+    : '\nNote: Quality standards file not available. Focus on making the case study a genuine dilemma with messy, realistic details.\n'
+  
+  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study to meet the highest quality standards.${qualityStandardsSection}
 
 CURRENT CASE STUDY (JSON):
 ${JSON.stringify(caseData, null, 2)}
@@ -142,10 +145,12 @@ export async function enhanceLessonWithAI(content: string, lessonTitle: string):
   const qualityStandards = await readQualityStandards('quality_lesson.md')
   const generateWithAI = await getGenerateWithAI()
   
-  const prompt = `You are an expert business educator specializing in executive education. Your task is to evaluate and rewrite a lesson to meet the highest quality standards.
-
-QUALITY STANDARDS:
-${qualityStandards}
+  // Build prompt with or without quality standards
+  const qualityStandardsSection = qualityStandards 
+    ? `\nQUALITY STANDARDS:\n${qualityStandards}\n`
+    : '\nNote: Quality standards file not available. Focus on making the lesson actionable, specific, and opinionated.\n'
+  
+  const prompt = `You are an expert business educator specializing in executive education. Your task is to evaluate and rewrite a lesson to meet the highest quality standards.${qualityStandardsSection}
 
 CURRENT LESSON CONTENT:
 ${content}
@@ -213,10 +218,12 @@ export async function enhanceCaseStudyAssetWithAI(
   // Determine asset type context for enhancement
   const assetTypeContext = getAssetTypeContext(fileType)
   
-  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study asset file to meet the highest quality standards.
-
-QUALITY STANDARDS (from quality_casestudy.md):
-${qualityStandards}
+  // Build prompt with or without quality standards
+  const qualityStandardsSection = qualityStandards 
+    ? `\nQUALITY STANDARDS (from quality_casestudy.md):\n${qualityStandards}\n`
+    : '\nNote: Quality standards file not available. Focus on making the asset messy and realistic with conflicting perspectives.\n'
+  
+  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study asset file to meet the highest quality standards.${qualityStandardsSection}
 
 CASE STUDY CONTEXT:
 - Title: ${caseContext.title}
