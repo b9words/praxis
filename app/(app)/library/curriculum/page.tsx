@@ -7,6 +7,9 @@ import { getUserRole } from '@/lib/auth/middleware-helpers'
 import { BookOpen, ChevronRight, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default async function CurriculumLibraryPage() {
   const user = await getCurrentUser()
   let isAdmin = false

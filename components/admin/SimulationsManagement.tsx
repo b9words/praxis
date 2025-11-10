@@ -82,7 +82,7 @@ export default function SimulationsManagement({
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return fetchJson(`/api/simulations/${id}`, {
+      return fetchJson(`/api/case-studies/${id}`, {
         method: 'DELETE',
       })
     },
@@ -101,7 +101,7 @@ export default function SimulationsManagement({
     if (userId && userId !== '__all__') params.set('userId', userId)
     if (caseId && caseId !== '__all__') params.set('caseId', caseId)
     if (status && status !== '__all__') params.set('status', status)
-    router.push(`/admin/simulations?${params.toString()}`)
+    router.push(`/admin/case-studies-runs?${params.toString()}`)
   }
 
   const handleRegenerate = (id: string) => {
@@ -135,8 +135,8 @@ export default function SimulationsManagement({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-medium text-gray-900 mb-2">Simulations & Debriefs</h1>
-          <p className="text-sm text-gray-600">View and manage user simulations and debriefs</p>
+          <h1 className="text-2xl font-medium text-gray-900 mb-2">Case Study Runs & Debriefs</h1>
+          <p className="text-sm text-gray-600">View and manage user case study runs and debriefs</p>
         </div>
       </div>
 
@@ -260,7 +260,7 @@ export default function SimulationsManagement({
                           size="sm"
                           asChild
                         >
-                          <Link href={`/admin/simulations/${sim.id}`}>
+                          <Link href={`/admin/case-studies-runs/${sim.id}`}>
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
@@ -307,7 +307,7 @@ export default function SimulationsManagement({
                     if (caseId) params.set('caseId', caseId)
                     if (status) params.set('status', status)
                     params.set('page', String(currentPage - 1))
-                    router.push(`/admin/simulations?${params.toString()}`)
+                    router.push(`/admin/case-studies-runs?${params.toString()}`)
                   }}
                 >
                   Previous
@@ -322,7 +322,7 @@ export default function SimulationsManagement({
                     if (caseId) params.set('caseId', caseId)
                     if (status) params.set('status', status)
                     params.set('page', String(currentPage + 1))
-                    router.push(`/admin/simulations?${params.toString()}`)
+                    router.push(`/admin/case-studies-runs?${params.toString()}`)
                   }}
                 >
                   Next

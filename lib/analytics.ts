@@ -6,6 +6,8 @@
 type AnalyticsEvent = 
   | 'simulation_started'
   | 'simulation_completed'
+  | 'case_study_started'
+  | 'case_study_completed'
   | 'lesson_viewed'
   | 'lesson_completed'
   | 'debrief_shared'
@@ -55,9 +57,9 @@ class PostHogAnalyticsService implements AnalyticsService {
   private isMarketingPage(): boolean {
     if (typeof window === 'undefined') return false
     const pathname = window.location.pathname
-    // Marketing pages don't start with /dashboard, /library, /simulations, /profile, /admin
+    // Marketing pages don't start with /dashboard, /library, /case-studies, /profile, /admin
     const marketingPaths = ['/', '/pricing', '/about', '/contact', '/legal', '/signup', '/login']
-    const appPaths = ['/dashboard', '/library', '/simulations', '/profile', '/admin', '/onboarding']
+    const appPaths = ['/dashboard', '/library', '/case-studies', '/profile', '/admin', '/onboarding']
     
     if (appPaths.some(path => pathname.startsWith(path))) return false
     if (marketingPaths.some(path => pathname.startsWith(path))) return true
@@ -348,9 +350,25 @@ export const serverAnalyticsTracker = {
 export const trackEvents = {
   simulationStarted: (simulationId: string, caseId: string, userId: string) => {
     analytics.track('simulation_started', { simulationId, caseId, userId })
+    // Also track as case study for consistency
+    analytics.track('case_study_started', { simulationId, caseId, userId })
   },
   
   simulationCompleted: (simulationId: string, caseId: string, userId: string) => {
+    analytics.track('simulation_completed', { simulationId, caseId, userId })
+    // Also track as case study for consistency
+    analytics.track('case_study_completed', { simulationId, caseId, userId })
+  },
+  
+  caseStudyStarted: (simulationId: string, caseId: string, userId: string) => {
+    analytics.track('case_study_started', { simulationId, caseId, userId })
+    // Legacy alias
+    analytics.track('simulation_started', { simulationId, caseId, userId })
+  },
+  
+  caseStudyCompleted: (simulationId: string, caseId: string, userId: string) => {
+    analytics.track('case_study_completed', { simulationId, caseId, userId })
+    // Legacy alias
     analytics.track('simulation_completed', { simulationId, caseId, userId })
   },
   

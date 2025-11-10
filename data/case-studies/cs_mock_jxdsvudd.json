@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_jxdsvudd",
+  "version": "1.0",
+  "title": "Renner and Sons: Customizable sustainable intranet (2025)",
+  "description": "Cras veritas casso tutamen denuo doloribus. Nam communis adflicto cernuus absconditus. Vociferor crur suscipit coniuratio speciosus tibi vindico cubo terra cena.\nAcies pax soluta sto animi vigilo attonbitus qui cado cohibeo. Cur arto assumenda cura templum velociter ago. Amaritudo acceptus somniculosus pauper ascisco canis.",
+  "competencies": [
+    "Organizational Design",
+    "Strategic Thinking",
+    "Stakeholder Communication"
+  ],
+  "estimatedDuration": 61,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_jxdsvudd_data",
+      "fileName": "Collins, Feeney and Stroman Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,478,145,135,617\nProfit Margin,14.8%,5.7%,19.6%,5.2%"
+      }
+    },
+    {
+      "fileId": "cs_mock_jxdsvudd_memo",
+      "fileName": "URGENT: tersus cohibeo adhaero.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Customer Markets Strategist\n**To:** CEO\n**Date:** 2024-12-12\n**Subject:** Sui cernuus ventito corrupti inventore.\n\n## Current Situation\n\nCursim tristis tibi. Caelum totidem via allatus. Confero usus agnosco bene tantum admoneo.\nDecimus conculco crur ex arx mollitia. Temporibus arguo architecto ceno contra cunabula sponte adstringo adeo. Subiungo aut saepe caveo valde vehemens.\nCalculus cunctatio caput spectaculum trepide. Tredecim crux aro taceo contra speciosus cerno aggredior. Aro voveo voluptatum thalassinus soluta nesciunt usitas clam delibero quaerat.\n\n### Primary Challenges:\n\n1. Cursus comprehendo magni ullam baiulus victus.\n2. Trans iure tergum acceptus toties adhaero validus vulgaris.\n3. Bene teneo casus uredo ambulo.\n\n### Strategic Options:\n\n**Option A:** Volva sperno uberrime communis.\n**Option B:** Paens pax statim necessitatibus curto cetera tenuis calamitas.\n**Option C:** Canis quibusdam tametsi blanditiis adulatio aperte pecto ulciscor.\n\n### Recommendation:\n\nTabernus confugo demum. Conatus delego abutor aggredior caute acsi quos cursim infit ater. Sonitus vociferor admitto validus neque."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_jxdsvudd_strategy",
+      "title": "Strategic Decision",
+      "description": "Desidero aegrus alii paulatim confugo vero cum.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Sumo claudeo esse sublime. Textor spes spoliatio vinculum clementia ab cernuus blandior somniculosus reiciendis. Acceptus suspendo commodo sono iusto conicio appono.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "alius tripudio versus",
+            "description": "Amet cuius suspendo termes angustus a summa consuasor. Abundans harum ullus vita maxime. Ago inflammatio crastinus pectus creta caput alius."
+          },
+          {
+            "id": "option_b",
+            "title": "comburo alo atqui",
+            "description": "Decor exercitationem uterque vulnero nostrum tonsor compello cohaero culpa spectaculum. Comburo appello ratione aperiam nesciunt suadeo subseco tardus. Desidero sustineo quaerat audentia acies cinis decipio provident ullam."
+          },
+          {
+            "id": "option_c",
+            "title": "auxilium antea vix",
+            "description": "Demum numquam hic. Adstringo amiculum occaecati. Canis reprehenderit tracto adhuc deripio strenuus casus."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_jxdsvudd_communication",
+      "title": "Communication Strategy",
+      "description": "Porro velociter tollo nostrum sustineo.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Saepe deleniti auditor subvenio iure. Vere accusator comedo adstringo tener. Conatus spero crustulum temperantia defetiscor cupiditas victus casso.",
+        "wordLimit": 560,
+        "keyPoints": [
+          "Volubilis crapula aduro confido dicta arx solus.",
+          "Defero conspergo cui ancilla vacuus cuppedia crepusculum solutio decimus socius.",
+          "Torqueo vilicus sodalitas."
+        ]
+      }
+    }
+  ]
+}

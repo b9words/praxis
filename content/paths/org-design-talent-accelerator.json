@@ -1,0 +1,63 @@
+{
+  "id": "org-design-talent-accelerator",
+  "title": "Org Design & Talent Accelerator",
+  "description": "Build high-performance organizations through superior talent density and thoughtful organizational design. Learn to attract, retain, and organize exceptional people.",
+  "duration": "4-5 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "talent-density-principles",
+      "lesson": "defining-talent-density"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "talent-density-principles",
+      "lesson": "the-multiplier-effect"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "hiring-excellence",
+      "lesson": "hiring-for-talent-density"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_arena_1_6_the_brilliant_jerk_1762254512429"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "organizational-structure",
+      "lesson": "structure-follows-strategy"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_arena_1_1_the_two_pizza_team_re_org_1762235851750"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "decision-making-velocity",
+      "lesson": "decentralizing-decisions"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "compensation-and-retention",
+      "lesson": "paying-for-performance"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_arena_1_7_the_compensation_committee_1762411567999"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "culture-as-system",
+      "lesson": "building-performance-culture"
+    }
+  ]
+}
+

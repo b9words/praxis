@@ -7,6 +7,7 @@ import { getAllLessonsFlat, getDomainById } from './curriculum-data'
 import { getAllInteractiveSimulations } from './case-study-loader'
 import { getAllLearningPaths, getLearningPathByCaseId } from './learning-paths'
 import { getDomainIdForCompetency } from './competency-mapping'
+import { isYear1Lesson } from './year1-allowlist'
 
 export interface Recommendation {
   type: 'curriculum' | 'simulation'
@@ -87,7 +88,7 @@ function getCaseStudyForModule(domainId: string, moduleId: string): { id: string
       return {
         id: caseId,
         title: simulation.title,
-        url: `/simulations/${caseId}/brief`,
+        url: `/case-studies/${caseId}`,
       }
     }
   }
@@ -105,7 +106,7 @@ function getCaseStudyForModule(domainId: string, moduleId: string): { id: string
     return {
       id: caseStudy.caseId,
       title: caseStudy.title,
-      url: `/simulations/${caseStudy.caseId}/brief`,
+      url: `/case-studies/${caseStudy.caseId}`,
     }
   }
 
@@ -125,6 +126,7 @@ function hasCompletedYear1(lessonProgress: Array<{ domainId: string; status: str
   ]
 
   const allLessons = getAllLessonsFlat()
+    .filter(l => isYear1Lesson(l.domain, l.moduleId, l.lessonId))
   const year1Lessons = allLessons.filter(l => year1Domains.includes(l.domain))
   const completedYear1Lessons = lessonProgress.filter(
     p => year1Domains.includes(p.domainId) && p.status === 'completed'
@@ -324,6 +326,7 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
             } else {
               // Try next lesson in domain if available
               const allLessons = getAllLessonsFlat()
+                .filter(l => isYear1Lesson(l.domain, l.moduleId, l.lessonId))
               const domainLessons = allLessons.filter(l => l.domain === domainId)
               const foundationalIndex = domainLessons.findIndex(
                 l => l.domain === foundationalLesson.domain &&
@@ -437,7 +440,7 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
               id: caseId,
               title: simulation.title,
               reason: `Complete the ${path.title} learning path`,
-              url: `/simulations/${caseId}/brief`,
+              url: `/case-studies/${caseId}`,
               residencyYear: userResidency?.currentResidency,
             })
           }
@@ -505,7 +508,9 @@ export async function getSmartRecommendations(userId: string): Promise<Recommend
 
     // Final fallback: first lesson
     if (candidates.length === 0) {
-      const firstLesson = getAllLessonsFlat()[0]
+      const allLessons = getAllLessonsFlat()
+        .filter(l => isYear1Lesson(l.domain, l.moduleId, l.lessonId))
+      const firstLesson = allLessons[0]
       if (firstLesson) {
         const firstLessonId = `${firstLesson.domain}-${firstLesson.moduleId}-${firstLesson.lessonId}`
         if (!isOnCooldown(firstLessonId)) {

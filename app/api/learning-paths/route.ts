@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
           const progressMap = await getAllUserProgress(user.id)
           const lessonProgress = Array.from(progressMap.values())
 
-      // Calculate progress for each item
+      // Calculate progress for each item (first pass, no async)
       const itemsWithProgress = path.items.map((item) => {
         if (item.type === 'lesson') {
           const progress = lessonProgress.find(
@@ -73,18 +73,9 @@ export async function GET(request: NextRequest) {
             progress: progress?.progress_percentage || 0,
           }
         } else if (item.type === 'case') {
-          // Check if user has completed the simulation
-          const { listSimulations } = await import('@/lib/db/simulations')
-          const simulations = await listSimulations({
-            userId: user.id,
-            caseId: item.caseId,
-            status: 'completed',
-          }).catch(() => [])
-          const simulation = simulations[0] || null
-          
           return {
             ...item,
-            completed: false, // Will be updated when simulation query resolves
+            completed: false, // Will be updated in second async pass
             progress: 0,
           }
         }

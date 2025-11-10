@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_labfcbuw",
+  "version": "1.0",
+  "title": "Bogan - Kertzmann: Programmable high-level database (2023)",
+  "description": "Vicissitudo vesco desipio complectus tabula. Demo condico verumtamen. Ipsum taedium deorsum.\nVoluptas eaque porro. Denuo curto aestas amissio. Capto autem despecto tenuis aduro neque animadverto adfectus admoveo.",
+  "competencies": [
+    "Risk Management",
+    "Crisis Leadership",
+    "Organizational Design"
+  ],
+  "estimatedDuration": 110,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_labfcbuw_data",
+      "fileName": "Kessler - Sporer Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,479,135,504,620\nProfit Margin,19.3%,13.3%,12.9%,7.6%"
+      }
+    },
+    {
+      "fileId": "cs_mock_labfcbuw_memo",
+      "fileName": "URGENT: cornu alveus tener.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Principal Usability Facilitator\n**To:** CEO\n**Date:** 2025-01-22\n**Subject:** Cinis quos defleo dens tempora cilicium cometes vesper.\n\n## Current Situation\n\nDepereo verecundia pel. Carus conicio ulterius laboriosam dolorum alveus acceptus. Cotidie pax ager statua vicissitudo nemo antea non tener cum.\nSodalitas velum qui apostolus collum baiulus ver temporibus spes coerceo. Temperantia demitto caelum provident. Comparo delicate arceo.\nBellicus aperte barba tenus cursim maiores accusator adeo decumbo totam. Aiunt fugiat vereor cresco tricesimus appello videlicet tantillus vilis spes. Vigilo cetera conatus substantia teneo.\n\n### Primary Challenges:\n\n1. Bardus theologus taceo adversus crepusculum cimentarius cogo vomito sed sunt.\n2. Cotidie thorax dapifer ustulo attollo vinitor blanditiis comparo temperantia cruentus.\n3. Decretum talis calco adsum coepi demitto aspicio.\n\n### Strategic Options:\n\n**Option A:** Cubo adsuesco nostrum vado argentum.\n**Option B:** Sono curatio substantia cunctatio despecto absens stultus.\n**Option C:** Adficio corona volva curiositas desipio verbum sunt non.\n\n### Recommendation:\n\nUrbs defluo demo creptio voco subiungo agnosco urbanus denique. Inventore cur utpote. Trepide labore adopto volup."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_labfcbuw_strategy",
+      "title": "Strategic Decision",
+      "description": "Clamo delicate umquam cogo aurum aperiam coadunatio.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Demens calcar aspernatur concedo vigor conicio voveo deorsum atrox. Degero sui vorago admitto alo suppellex cilicium audacia adflicto acer. Appono delibero pecto cursus acsi terra abstergo tempus varietas.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "damnatio facilis demoror",
+            "description": "Valens varius condico possimus vester vivo. Defessus cibo vitae aranea nisi cimentarius cibo. Vulticulus adopto nesciunt agnitio arma decerno."
+          },
+          {
+            "id": "option_b",
+            "title": "dolore caute comes",
+            "description": "Cognatus voco vinco. Molestias verbera absconditus tollo vinum. Arx vitium fugiat."
+          },
+          {
+            "id": "option_c",
+            "title": "accedo causa defaeco",
+            "description": "Tabella vulnero civis fugiat expedita cultura asporto voluptatum. Deripio pax calcar illum sub dolorum vulariter perferendis correptius. Assumenda creo conor custodia terminatio denuo thalassinus nemo congregatio."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_labfcbuw_communication",
+      "title": "Communication Strategy",
+      "description": "Capitulus caelestis desparatus cavus absque socius dolorem decumbo volaticus.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Urbanus apud modi ustilo nostrum supellex corrigo. Defungo crur usque. Voco vitae carmen conqueror.",
+        "wordLimit": 948,
+        "keyPoints": [
+          "Decipio commemoro est sto certus tabgo admoneo admiratio creptio considero.",
+          "Deprecator commemoro aurum collum voluptatem.",
+          "Decretum nemo vorago carbo stabilis sumptus."
+        ]
+      }
+    }
+  ]
+}

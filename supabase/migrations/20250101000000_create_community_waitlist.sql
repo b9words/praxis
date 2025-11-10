@@ -8,3 +8,7 @@ create table if not exists public.community_waitlist (
 create index if not exists idx_community_waitlist_created_at on public.community_waitlist(created_at);
 
 
+
+
+
+

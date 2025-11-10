@@ -290,7 +290,7 @@ export default function CaseBlueprintsPanel() {
       errors: []
     })
 
-    const results: Array<{ blueprintId: string; caseId: string; success: boolean }> = []
+    const results: Array<{ blueprintId: string; caseId: string; success: boolean; caseData?: any; fullCase?: any; error?: string }> = []
     
     try {
       for (const blueprintId of selectedBlueprints) {

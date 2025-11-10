@@ -96,7 +96,7 @@ export async function middleware(request: NextRequest) {
 
   // STEP 4: Subscription gating (only for logged-in users on protected paths)
   if (user) {
-    const protectedPaths = ['/library', '/simulations', '/case-studies']
+    const protectedPaths = ['/library', '/case-studies']
     const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
     
     if (isProtectedPath) {
@@ -169,10 +169,10 @@ export async function middleware(request: NextRequest) {
             }
             
             // Check if path matches weekly briefing case
-            const caseBriefMatch = pathname.match(/^\/simulations\/([^\/]+)\/brief$/)
-            const caseWorkspaceMatch = pathname.match(/^\/simulations\/([^\/]+)\/workspace$/)
-            if ((caseBriefMatch && caseBriefMatch[1] === briefing.caseId) ||
-                (caseWorkspaceMatch && caseWorkspaceMatch[1] === briefing.caseId)) {
+            const caseOverviewMatch = pathname.match(/^\/case-studies\/([^\/]+)$/)
+            const caseTasksMatch = pathname.match(/^\/case-studies\/([^\/]+)\/tasks$/)
+            if ((caseOverviewMatch && caseOverviewMatch[1] === briefing.caseId) ||
+                (caseTasksMatch && caseTasksMatch[1] === briefing.caseId)) {
               return NextResponse.next()
             }
           }

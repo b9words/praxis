@@ -62,8 +62,8 @@ const navigation: NavItem[] = [
     group: 'Management',
   },
   {
-    name: 'Simulations',
-    href: '/admin/simulations',
+    name: 'Case Study Runs',
+    href: '/admin/case-studies-runs',
     icon: Activity,
     group: 'Management',
   },

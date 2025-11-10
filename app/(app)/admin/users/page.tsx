@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation'
 import UsersManagement from '@/components/admin/UsersManagement'
 import { cache, CacheTags } from '@/lib/cache'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default async function AdminUsersPage({
   searchParams,
 }: {

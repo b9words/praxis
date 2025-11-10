@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertTriangle, Building2, CheckCircle, Clock, Target, TrendingUp } from 'lucide-react'
 import { useState } from 'react'

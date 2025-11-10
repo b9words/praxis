@@ -532,7 +532,7 @@ export default function CaseAssetsManager({
                 if (e.key === 'Enter') loadAssets()
               }}
             />
-            <Button onClick={loadAssets} disabled={loading}>
+            <Button onClick={() => loadAssets()} disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,0 +1,67 @@
+{
+  "id": "capital-allocation-masterclass",
+  "title": "Capital Allocation Masterclass",
+  "description": "Master the CEO's most important job: deploying capital to maximize long-term per-share value. Learn frameworks for organic growth, acquisitions, buybacks, and more.",
+  "duration": "5-6 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "five-choices"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "per-share-value"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "calculating-intrinsic-value",
+      "lesson": "owners-earnings"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "calculating-intrinsic-value",
+      "lesson": "dcf-for-ceo"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "organic-reinvestment",
+      "lesson": "roic-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "organic-reinvestment",
+      "lesson": "growth-vs-roic"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "acquisitions",
+      "lesson": "build-vs-buy"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "acquisitions",
+      "lesson": "accretive-deal-arithmetic"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "stock-buybacks",
+      "lesson": "when-buybacks-create-value"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_arena_3_2_the_dividend_vs_buyback_debate_1762418067411"
+    }
+  ]
+}
+

@@ -369,7 +369,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                quote: "Execemy provided the analytical framework necessary for my transition from engineering to product management. The simulation scenarios are realistic; I apply the mental models daily in strategic decisions.",
+                quote: "Execemy provided the analytical framework necessary for my transition from engineering to product management. The case studies are realistic; I apply the mental models daily in strategic decisions.",
                 author: "Sarah Chen",
                 role: "Senior Product Manager",
                 company: "Meta"

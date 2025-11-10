@@ -32,3 +32,7 @@ ALTER TABLE public.cases
   ALTER COLUMN briefing_doc DROP NOT NULL;
 
 
+
+
+
+

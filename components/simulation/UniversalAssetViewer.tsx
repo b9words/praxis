@@ -5,7 +5,7 @@ import { FileText, Table, File, Briefcase, Scale, Presentation } from 'lucide-re
 import AssetRenderer from '@/components/admin/renderers/AssetRenderer'
 import CSVRenderer from '@/components/admin/renderers/CSVRenderer'
 import DataSheetRenderer from '@/components/admin/renderers/DataSheetRenderer'
-import MarkdownRenderer from '@/components/admin/renderers/MarkdownRenderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { useMemo } from 'react'
 
 interface UniversalAssetViewerProps {
@@ -86,8 +86,8 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
           const fileName = (f.fileName || '').toLowerCase()
           const datasetName = (datasetMeta.name || '').toLowerCase()
           // Check if dataset name keywords appear in filename
-          const nameWords = datasetName.split(/\s+/).filter(w => w.length > 3)
-          return nameWords.some(word => fileName.includes(word.toLowerCase()))
+          const nameWords = datasetName.split(/\s+/).filter((w: string) => w.length > 3)
+          return nameWords.some((word: string) => fileName.includes(word.toLowerCase()))
         })
         
         // If no match by name, use index-based matching

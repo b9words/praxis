@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_nwjb993r",
+  "version": "1.0",
+  "title": "Effertz, Deckow and Deckow: Front-line intangible help-desk (2022)",
+  "description": "Apud claro copiose defleo territo aveho doloribus. Adipiscor pectus assumenda advoco vinum vociferor titulus. Alter stella decerno animus deputo.\nVerbera caute somniculosus. Eius incidunt audacia volubilis terga. Varius patrocinor verus alienus autus adipisci comparo creta cernuus tribuo.",
+  "competencies": [
+    "Risk Management",
+    "Operations Management",
+    "Market Foresight"
+  ],
+  "estimatedDuration": 81,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_nwjb993r_data",
+      "fileName": "Connelly and Sons Financial Metrics 2021.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,989,795,279,104\nProfit Margin,25.4%,22.7%,23.2%,24.3%"
+      }
+    },
+    {
+      "fileId": "cs_mock_nwjb993r_memo",
+      "fileName": "URGENT: aer contego ancilla.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Human Web Director\n**To:** CEO\n**Date:** 2023-12-27\n**Subject:** Communis suspendo repellendus valens demens.\n\n## Current Situation\n\nSummisse temptatio laudantium. Depulso eos cursus acies amita addo repellat comburo dolor. Carus cunae temeritas calco aestus clam arx vetus titulus recusandae.\nThymbra audentia vapulus fugit timor vel cometes amo calcar. Toties undique absconditus dolorem cur brevis. Confero vilitas commodi.\nSuccedo convoco volup vivo caste derideo coerceo. Adfectus peior desolo admoneo cibo. Capto arbor deporto voro carbo spectaculum temptatio capio suscipit corona.\n\n### Primary Challenges:\n\n1. Recusandae facilis alioqui truculenter commemoro audentia adhaero officiis.\n2. Acceptus doloremque calamitas similique ater studio crepusculum video.\n3. Confugo amplitudo vesper utpote.\n\n### Strategic Options:\n\n**Option A:** Solutio totidem itaque ex carbo.\n**Option B:** Velit velut recusandae.\n**Option C:** Conscendo sursum velit valens termes.\n\n### Recommendation:\n\nAgo arx velociter pecto absque ambitus somnus abscido. Inflammatio stultus solio caelestis. Capio comparo tamen sodalitas ulciscor solum minus aliquid."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_nwjb993r_strategy",
+      "title": "Strategic Decision",
+      "description": "Celo careo voluptate crudelis vapulus.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Theatrum desolo neque depromo autus suppono cicuta acidus. Atqui vilicus viriliter vergo corpus accendo vestrum cursus. Vix ultio claustrum creo ullus comes assentator iusto video subito.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "molestiae alter possimus",
+            "description": "Apud eaque utpote talio subiungo subvenio contigo claudeo tolero tollo. Vereor dolorem desipio theologus sol subvenio theatrum validus confero. Aliquid nesciunt adeptio deleniti illo cito."
+          },
+          {
+            "id": "option_b",
+            "title": "officiis adaugeo adfero",
+            "description": "Contigo antepono enim tepesco bibo qui ait admoneo excepturi. Repellendus sursum voluptates ducimus commodi theatrum cerno. Aeternus acies vivo tubineus subito cunabula."
+          },
+          {
+            "id": "option_c",
+            "title": "atavus aro carus",
+            "description": "Summopere solutio cibus virtus taceo iste perspiciatis. Carmen constans tempora accedo ancilla adipisci. Umbra succedo demitto."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_nwjb993r_communication",
+      "title": "Communication Strategy",
+      "description": "Deprimo demergo atavus.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Cubitum praesentium rem adipisci corrupti quidem. Umerus soluta ascisco aeneus sapiente acquiro occaecati. Necessitatibus cresco sed defungo in vilis creptio vito ventosus autus.",
+        "wordLimit": 534,
+        "keyPoints": [
+          "Accusamus alius statua.",
+          "Comis tutis acervus.",
+          "Cilicium angustus subiungo quo utpote tabesco thymbra cilicium atrocitas."
+        ]
+      }
+    }
+  ]
+}

@@ -28,6 +28,7 @@ interface ArticleFrontmatter {
   year: number
   order: number
   status: 'draft' | 'in_review' | 'approved' | 'published'
+  published?: boolean
 }
 
 interface CaseFrontmatter {
@@ -39,6 +40,7 @@ interface CaseFrontmatter {
   status: 'draft' | 'in_review' | 'approved' | 'published'
   difficulty?: string
   estimated_time?: string
+  published?: boolean
 }
 
 async function importArticles() {

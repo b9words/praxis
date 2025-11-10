@@ -145,7 +145,7 @@ export async function validateModelAvailability(model: { provider: string; model
  */
 export async function getAvailableModels(skipValidation: boolean = false) {
   const allModels = [
-    { provider: 'gemini', model: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+    { provider: 'gemini', model: 'gemini-2.5-flash', name: 'Gemini 2.5 Pro' },
     { provider: 'gemini', model: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
     { provider: 'gemini', model: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Exp' },
     { provider: 'gemini', model: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },

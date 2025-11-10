@@ -23,8 +23,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/simulations" className="text-sm text-neutral-400 hover:text-white transition-colors">
-                  Simulations
+                <Link href="/library/case-studies" className="text-sm text-neutral-400 hover:text-white transition-colors">
+                  Case Studies
                 </Link>
               </li>
               <li>

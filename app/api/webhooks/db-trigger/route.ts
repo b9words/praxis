@@ -20,7 +20,7 @@ interface WebhookPayload {
  * Handle new user signup
  */
 async function handleNewUser(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   userRecord: { id: string; email?: string; created_at?: string }
 ): Promise<void> {
   // Get user email - try from record first, then from auth API
@@ -99,7 +99,7 @@ async function handleNewUser(
  * Handle domain completion
  */
 async function handleDomainCompletion(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  supabaseAdmin: any,
   completionRecord: { user_id: string; domain_id: string }
 ): Promise<void> {
   // Get user email

@@ -6,6 +6,9 @@ import { getCachedUserData, cache, CacheTags } from '@/lib/cache'
 import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default async function LibraryPage() {
   const user = await getCurrentUser()
 

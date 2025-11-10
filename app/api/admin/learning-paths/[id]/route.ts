@@ -31,6 +31,10 @@ export async function PUT(
         items: items !== undefined ? items : undefined,
       })
 
+      if (!updated) {
+        return NextResponse.json({ error: 'Learning path not found' }, { status: 404 })
+      }
+
       // Invalidate cache
       await revalidateCache(CacheTags.CURRICULUM)
 

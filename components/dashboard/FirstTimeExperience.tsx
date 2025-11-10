@@ -32,7 +32,7 @@ export default function FirstTimeExperience({
     }
     // For simulations, use the id to construct URL if needed
     if (primaryRecommendation.type === 'simulation') {
-      return primaryRecommendation.id ? `/simulations/${primaryRecommendation.id}/brief` : primaryRecommendation.url
+      return primaryRecommendation.id ? `/library/case-studies/${primaryRecommendation.id}` : primaryRecommendation.url
     }
     return primaryRecommendation.url
   }

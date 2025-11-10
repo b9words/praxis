@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import matter from 'gray-matter'
 import * as path from 'path'
+import { isYear1CaseStudy } from './year1-allowlist'
 
 export interface CaseStudy {
   id: string
@@ -150,7 +151,10 @@ export function getAllInteractiveSimulations(): InteractiveSimulation[] {
           const filePath = path.join(simulationsDir, file)
           const fileContents = fs.readFileSync(filePath, 'utf8')
           const simulation = JSON.parse(fileContents) as InteractiveSimulation
-          simulations.push(simulation)
+          // Filter to Year 1 content only
+          if (isYear1CaseStudy(simulation.caseId)) {
+            simulations.push(simulation)
+          }
         } catch (error) {
           console.error(`Error reading simulation ${file}:`, error)
         }
@@ -224,7 +228,8 @@ export function getAllCaseStudies(): CaseStudy[] {
 
     scanDirectory(casesDir)
     
-    return caseStudies
+    // Filter to Year 1 content only
+    return caseStudies.filter(cs => isYear1CaseStudy(cs.id))
   } catch (error) {
     console.error('Error getting case studies:', error)
     return []

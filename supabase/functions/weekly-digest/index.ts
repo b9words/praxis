@@ -52,7 +52,7 @@ function generateDigestHTML(data: WeeklyDigestData): string {
         </div>
         <div style="text-align: center; padding: 20px; background: #f3f4f6; border-radius: 8px;">
           <div style="font-size: 32px; font-weight: bold; color: #10b981;">${data.simulationsCompleted}</div>
-          <div style="color: #6b7280;">Simulations Completed</div>
+          <div style="color: #6b7280;">Case Studies Completed</div>
         </div>
       </div>
       <div style="text-align: center; padding: 15px; background: #eff6ff; border-left: 4px solid #3b82f6;">
@@ -228,7 +228,7 @@ serve(async (req) => {
           body: JSON.stringify({
             from: Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@execemy.com',
             to: user.email,
-            subject: `Your Weekly Execemy Summary - ${lessonsCompleted} lessons, ${simulationsCompleted} simulations`,
+            subject: `Your Weekly Execemy Summary - ${lessonsCompleted} lessons, ${simulationsCompleted} case studies`,
             html: htmlContent,
           }),
         })

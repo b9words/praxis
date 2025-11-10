@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth/get-user'
+
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/prisma/server'
 import WaitlistClientPage from './WaitlistClientPage'
 

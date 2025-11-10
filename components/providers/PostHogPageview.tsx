@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { analytics } from '@/lib/analytics'
 
@@ -10,7 +10,7 @@ import { analytics } from '@/lib/analytics'
  * This component subscribes to Next.js router changes and sends pageviews manually
  * to avoid duplicate events (PostHog auto-capture is disabled)
  */
-export default function PostHogPageview() {
+function PostHogPageviewContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -25,5 +25,13 @@ export default function PostHogPageview() {
   }, [pathname, searchParams])
 
   return null // This component doesn't render anything
+}
+
+export default function PostHogPageview() {
+  return (
+    <Suspense fallback={null}>
+      <PostHogPageviewContent />
+    </Suspense>
+  )
 }
 

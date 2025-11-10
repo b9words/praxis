@@ -1,0 +1,45 @@
+{
+  "id": "crisis-leadership-sprint",
+  "title": "Crisis Leadership Sprint",
+  "description": "Navigate high-stakes situations with confidence. Learn to assess, communicate, and lead through crises while maintaining public composure.",
+  "duration": "2-3 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "golden-hour-first-60-minutes",
+      "lesson": "first-response-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "first-communication-narrative-control",
+      "lesson": "narrative-framing"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_01_tesla_production_crisis_2018"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_03_airbnb_covid_crisis_2020"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_05_zoom_security_crisis_2020"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "public-composure-under-pressure",
+      "lesson": "maintaining-calm"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "recovery-and-learning",
+      "lesson": "post-crisis-analysis"
+    }
+  ]
+}
+

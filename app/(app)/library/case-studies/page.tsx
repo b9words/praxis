@@ -4,6 +4,9 @@ import { listCases } from '@/lib/db/cases'
 import { ArrowRight, BookOpen, Clock, Target, Users } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 /**
  * Strip markdown formatting and truncate text for preview
  */
@@ -52,8 +55,6 @@ function stripMarkdownAndTruncate(text: string, maxLength: number = 150): string
     : truncated + '...'
 }
 
-export const dynamic = 'force-dynamic'
-
 interface CaseStudyMeta {
   caseId: string
   title: string
@@ -75,7 +76,7 @@ async function getAllCaseStudies(): Promise<CaseStudyMeta[]> {
         title: c.title,
         description: c.description || '',
         competencies: metadata.competencies || c.competencies?.map(cc => cc.competency.name) || [],
-        estimatedDuration: c.estimatedMinutes,
+        estimatedDuration: c.estimatedMinutes ?? undefined,
         difficulty: (c.difficulty || 'intermediate') as 'beginner' | 'intermediate' | 'advanced'
       }
     })
@@ -120,7 +121,7 @@ export default async function CaseStudiesPage() {
               Executive Case Studies
             </h1>
             <p className="text-sm text-neutral-500 leading-snug max-w-3xl">
-              Immersive, high-fidelity business simulations that test your strategic thinking, 
+              Immersive, high-fidelity case studies that test your strategic thinking, 
               decision-making, and leadership skills in realistic executive scenarios.
             </p>
           </div>
@@ -219,7 +220,7 @@ export default async function CaseStudiesPage() {
                       </div>
                       
                       <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
-                        <Link href={`/simulations/${caseStudy.caseId}/brief`}>
+                        <Link href={`/library/case-studies/${caseStudy.caseId}`}>
                           Start Case
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>
@@ -236,7 +237,7 @@ export default async function CaseStudiesPage() {
                 No Case Studies Available
               </h3>
               <p className="text-sm text-gray-500 mb-6">
-                Case studies are being developed. Check back soon for immersive business simulations.
+                Case studies are being developed. Check back soon for immersive case studies.
               </p>
               <Button variant="outline" asChild className="border-gray-300 hover:border-gray-400 rounded-none">
                 <Link href="/library">

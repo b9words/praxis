@@ -126,7 +126,7 @@ export default async function BriefingPage() {
                     )}
                   </div>
                   <Link
-                    href={`/simulations/${caseItem.id}/brief`}
+                    href={`/case-studies/${caseItem.id}`}
                     className="inline-flex items-center gap-2 text-sm font-medium text-gray-900 hover:text-gray-700"
                   >
                     <PlayCircle className="h-4 w-4" />

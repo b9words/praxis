@@ -1,0 +1,77 @@
+{
+  "caseId": "cs_mock_xo0d3f3b",
+  "version": "1.0",
+  "title": "Johnston - Rolfson: Business-focused attitude-oriented focus group (2025)",
+  "description": "Spiritus conturbo paens abstergo repellat vereor perspiciatis uterque. Animi veniam aeger explicabo ara absum curis claustrum. Neque adimpleo annus laboriosam conicio suspendo.\nTutis stultus curtus speculum cetera cohibeo testimonium decumbo. Traho umquam veritatis curvo comis non correptius paulatim sufficio. Corrupti aspernatur curvo aranea validus coniuratio arma acies.",
+  "competencies": [
+    "Crisis Leadership",
+    "Stakeholder Communication",
+    "Capital Efficiency",
+    "Operations Management"
+  ],
+  "estimatedDuration": 99,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_xo0d3f3b_data",
+      "fileName": "Bernier Inc Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,710,645,428,296\nProfit Margin,29.7%,16.3%,22.2%,8.5%"
+      }
+    },
+    {
+      "fileId": "cs_mock_xo0d3f3b_memo",
+      "fileName": "URGENT: depereo acsi despecto.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Principal Markets Supervisor\n**To:** CEO\n**Date:** 2023-12-03\n**Subject:** Artificiose acervus temperantia degenero civitas velut.\n\n## Current Situation\n\nVis combibo valeo. Trepide vorax civitas vito cribro creptio confugo. Arguo iste id tempus triumphus decet cognatus.\nAutem adsuesco conicio centum voco. Conor nisi apud decor quidem deporto cuius. Utrum qui modi quas baiulus crur adflicto demonstro illo calcar.\nVerbera suppono expedita usus aperte texo ante thalassinus cetera utpote. Arcesso delectatio vomica denuncio urbanus odit corrupti circumvenio barba tempus. Dolorem deprimo neque uredo vomer cumque.\n\n### Primary Challenges:\n\n1. Tendo nam viscus averto amo ultra decens uberrime varietas.\n2. Vacuus dedico dolore.\n3. Vester accusantium demoror sto suppono stultus appono coepi.\n\n### Strategic Options:\n\n**Option A:** Thymum cibo bene vita absorbeo.\n**Option B:** Spiculum tribuo claustrum accedo taceo trucido taedium aranea tardus tenus.\n**Option C:** Tener tyrannus placeat alienus depopulo aetas cumque cum.\n\n### Recommendation:\n\nConscendo amor titulus. Aequus vis eos coepi aestus desino thalassinus suffragium admitto aequus. Claustrum candidus cicuta thymbra vetus cultellus."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_xo0d3f3b_strategy",
+      "title": "Strategic Decision",
+      "description": "Comminor demonstro caelum rerum volva pax contabesco socius annus valeo.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Deduco occaecati quibusdam aequitas statim carbo summopere. Thymum ipsam eius aranea terga cernuus derideo ciminatio appello. Adopto tamisium cometes a dolorem adipiscor cetera suffragium.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "advenio tumultus abduco",
+            "description": "Talio comedo ambitus contigo. Turbo combibo testimonium vallum damno. Cotidie vobis alii stips depulso cresco recusandae succurro abeo aspernatur."
+          },
+          {
+            "id": "option_b",
+            "title": "summisse sophismata voco",
+            "description": "Virga subvenio coadunatio amiculum tero sequi administratio contigo viscus. Damnatio defungo bellicus corporis corpus admoveo tenetur. Traho ullam beneficium solum demens utrum."
+          },
+          {
+            "id": "option_c",
+            "title": "bibo spiritus pecus",
+            "description": "Approbo soleo taceo comedo similique. Summisse aveho validus civis corona adsum. Ducimus ceno truculenter."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_xo0d3f3b_communication",
+      "title": "Communication Strategy",
+      "description": "Cras confero accusantium.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Cupio depromo culpo. Pariatur absque delectus vix earum spiculum color. Terebro eligendi voluptatibus antea acceptus tepesco timor animi cena.",
+        "wordLimit": 508,
+        "keyPoints": [
+          "Terebro eaque conqueror corrigo ab.",
+          "Sint voluptatem uberrime acervus velociter.",
+          "Termes defungo cubicularis cognatus aedificium calco caritas denuo tametsi."
+        ]
+      }
+    }
+  ]
+}

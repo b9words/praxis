@@ -138,7 +138,9 @@ export async function updateCompetency(
     
     if (data.name !== undefined) updateData.name = data.name
     if (data.description !== undefined) updateData.description = data.description
-    if (data.parentId !== undefined) updateData.parentId = data.parentId
+    if (data.parentId !== undefined) {
+      updateData.parent = data.parentId ? { connect: { id: data.parentId } } : { disconnect: true }
+    }
     if (data.level !== undefined) updateData.level = data.level
     if (data.residencyYear !== undefined) updateData.residencyYear = data.residencyYear
     if (data.displayOrder !== undefined) updateData.displayOrder = data.displayOrder

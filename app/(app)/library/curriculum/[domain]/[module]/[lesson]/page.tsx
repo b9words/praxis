@@ -4,11 +4,11 @@ import LessonDomainCompletionHandler from '@/components/library/LessonDomainComp
 import LessonViewTracker from '@/components/library/LessonViewTracker'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
-import { loadLessonByPath } from '@/lib/content-loader'
+import { loadLessonByPathAsync } from '@/lib/content-loader'
 import { getAllLessonsFlat, getCurriculumStats, getDomainById, getLessonById, getModuleById } from '@/lib/curriculum-data'
 import { findArticleByStoragePath } from '@/lib/db/articles'
 import { getCasesWithPrerequisites } from '@/lib/db/cases'
@@ -127,7 +127,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     }
   } else {
     // Try local file system as last resort (for development/legacy content)
-    const lessonContentData = loadLessonByPath(domainId, moduleId, lessonId)
+    const lessonContentData = await loadLessonByPathAsync(domainId, moduleId, lessonId)
     
     if (lessonContentData && lessonContentData.content) {
       lessonContent = lessonContentData.content
@@ -254,7 +254,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
     initialReflections = reflections
   }
   
-  // Find associated case study for this lesson
+  // Check if this is the last lesson in the module
+  const isLastLessonInModule = module && lesson 
+    ? module.lessons[module.lessons.length - 1]?.id === lesson.id
+    : false
+
+  // Find associated case study - only show at end of module
   let associatedCaseStudy: { 
     id: string
     title: string
@@ -265,80 +270,83 @@ export default async function LessonPage({ params }: LessonPageProps) {
     estimatedMinutes?: number
   } | null = null
   
-  // Check if any cases have this lesson in prerequisites
-  const casesWithPrerequisites = await getCachedCasesWithPrerequisites()
-  
-  for (const caseItem of casesWithPrerequisites) {
-    if (caseItem.prerequisites && typeof caseItem.prerequisites === 'object') {
-      const prereqs = caseItem.prerequisites as any
-      if (Array.isArray(prereqs)) {
-        const hasThisLesson = prereqs.some((prereq: any) => 
-          prereq.domain === domainId && 
-          prereq.module === moduleId && 
-          prereq.lesson === lessonId
-        )
-        
-        if (hasThisLesson) {
-          const caseItemWithCompetencies = caseItem as any
-          associatedCaseStudy = {
-            id: caseItem.id,
-            title: caseItem.title,
-            url: `/simulations/${caseItem.id}/brief`,
-            description: caseItem.description || undefined,
-            competencies: caseItemWithCompetencies.competencies?.map((cc: any) => cc.competency?.name) || [],
-            difficulty: caseItem.difficulty || undefined,
-            estimatedMinutes: caseItem.estimatedMinutes || undefined,
+  // Only find case studies if this is the last lesson in the module
+  if (isLastLessonInModule) {
+    // Check if any cases have this module in prerequisites (check all lessons in module)
+    const casesWithPrerequisites = await getCachedCasesWithPrerequisites()
+    
+    for (const caseItem of casesWithPrerequisites) {
+      if (caseItem.prerequisites && typeof caseItem.prerequisites === 'object') {
+        const prereqs = caseItem.prerequisites as any
+        if (Array.isArray(prereqs)) {
+          // Check if all prerequisites for this case are in this module
+          const modulePrereqs = prereqs.filter((prereq: any) => 
+            prereq.domain === domainId && prereq.module === moduleId
+          )
+          
+          // If case has prerequisites in this module, show it
+          if (modulePrereqs.length > 0) {
+            const caseItemWithCompetencies = caseItem as any
+            associatedCaseStudy = {
+              id: caseItem.id,
+              title: caseItem.title,
+              url: `/library/case-studies/${caseItem.id}`,
+              description: caseItem.description || undefined,
+              competencies: caseItemWithCompetencies.competencies?.map((cc: any) => cc.competency?.name) || [],
+              difficulty: caseItem.difficulty || undefined,
+              estimatedMinutes: caseItem.estimatedMinutes || undefined,
+            }
+            break
           }
-          break
-        }
-      }
-    }
-  }
-  
-  // Fallback: use module-based matching (similar to getCaseStudyForModule)
-  if (!associatedCaseStudy) {
-    const allSimulations = getAllInteractiveSimulations()
-    const caseMapping: Record<string, string> = {
-      'capital-allocation-ceo-as-investor': 'cs_unit_economics_crisis',
-      'second-order-decision-making-unit-economics-mastery': 'cs_unit_economics_crisis',
-    }
-    
-    const caseKey = `${domainId}-${moduleId}`
-    const caseId = caseMapping[caseKey]
-    
-    if (caseId) {
-      const simulation = allSimulations.find(s => s.caseId === caseId)
-      if (simulation) {
-        associatedCaseStudy = {
-          id: caseId,
-          title: simulation.title,
-          url: `/simulations/${caseId}/brief`,
-          description: simulation.description,
-          competencies: simulation.competencies,
-          difficulty: simulation.difficulty,
-          estimatedMinutes: simulation.estimatedDuration,
         }
       }
     }
     
-    // Final fallback: find first case study in domain
+    // Fallback: use module-based matching (similar to getCaseStudyForModule)
     if (!associatedCaseStudy) {
-      const domainCases = allSimulations.filter(s => {
-        if (domainId.includes('second-order') && s.caseId.includes('unit_economics')) return true
-        if (domainId.includes('competitive') && s.caseId.includes('asymmetric')) return true
-        return false
-      })
+      const allSimulations = getAllInteractiveSimulations()
+      const caseMapping: Record<string, string> = {
+        'capital-allocation-ceo-as-investor': 'cs_unit_economics_crisis',
+        'second-order-decision-making-unit-economics-mastery': 'cs_unit_economics_crisis',
+      }
+    
+      const caseKey = `${domainId}-${moduleId}`
+      const caseId = caseMapping[caseKey]
       
-      if (domainCases.length > 0) {
-        const caseStudy = domainCases[0]
-        associatedCaseStudy = {
-          id: caseStudy.caseId,
-          title: caseStudy.title,
-          url: `/simulations/${caseStudy.caseId}/brief`,
-          description: caseStudy.description,
-          competencies: caseStudy.competencies,
-          difficulty: caseStudy.difficulty,
-          estimatedMinutes: caseStudy.estimatedDuration,
+      if (caseId) {
+        const simulation = allSimulations.find(s => s.caseId === caseId)
+        if (simulation) {
+          associatedCaseStudy = {
+            id: caseId,
+            title: simulation.title,
+            url: `/library/case-studies/${caseId}`,
+            description: simulation.description,
+            competencies: simulation.competencies,
+            difficulty: simulation.difficulty,
+            estimatedMinutes: simulation.estimatedDuration,
+          }
+        }
+      }
+      
+      // Final fallback: find first case study in domain
+      if (!associatedCaseStudy) {
+        const domainCases = allSimulations.filter(s => {
+          if (domainId.includes('second-order') && s.caseId.includes('unit_economics')) return true
+          if (domainId.includes('competitive') && s.caseId.includes('asymmetric')) return true
+          return false
+        })
+        
+        if (domainCases.length > 0) {
+          const caseStudy = domainCases[0]
+          associatedCaseStudy = {
+            id: caseStudy.caseId,
+            title: caseStudy.title,
+            url: `/library/case-studies/${caseStudy.caseId}`,
+            description: caseStudy.description,
+            competencies: caseStudy.competencies,
+            difficulty: caseStudy.difficulty,
+            estimatedMinutes: caseStudy.estimatedDuration,
+          }
         }
       }
     }
@@ -435,17 +443,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
               />
             </div>
             
-            {/* Associated Case Study Card */}
-            {associatedCaseStudy && (
-              <CaseStudyCard
-                caseId={associatedCaseStudy.id}
-                title={associatedCaseStudy.title}
-                url={associatedCaseStudy.url}
-                description={associatedCaseStudy.description}
-                competencies={associatedCaseStudy.competencies}
-                difficulty={associatedCaseStudy.difficulty}
-                duration={associatedCaseStudy.estimatedMinutes}
-              />
+            {/* Put Your Knowledge to the Test - Only show at end of module */}
+            {isLastLessonInModule && associatedCaseStudy && (
+              <div className="mt-12 pt-12 border-t border-neutral-200">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-light text-neutral-900 tracking-tight mb-2">
+                    Put Your Knowledge to the Test
+                  </h2>
+                  <p className="text-neutral-600">
+                    Apply what you've learned in this module with a real-world case study
+                  </p>
+                </div>
+                <CaseStudyCard
+                  caseId={associatedCaseStudy.id}
+                  title={associatedCaseStudy.title}
+                  url={associatedCaseStudy.url}
+                  description={associatedCaseStudy.description}
+                  competencies={associatedCaseStudy.competencies}
+                  difficulty={associatedCaseStudy.difficulty}
+                  duration={associatedCaseStudy.estimatedMinutes}
+                />
+              </div>
             )}
             
             {/* Analytics Tracking */}

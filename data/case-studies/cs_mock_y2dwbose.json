@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_y2dwbose",
+  "version": "1.0",
+  "title": "Tromp, Hermann and Ferry: Secured discrete protocol (2022)",
+  "description": "Allatus quia defero ocer aspicio tabula unus bis. Acervus sapiente pectus. Campana crinis paens derideo votum approbo sub.\nCursus sunt stultus vulgaris aperiam amicitia. Nesciunt certus ager ait varius aureus commodo calamitas. Aegrus earum aegre thesaurus canis.",
+  "competencies": [
+    "Capital Efficiency",
+    "Organizational Design"
+  ],
+  "estimatedDuration": 92,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_y2dwbose_data",
+      "fileName": "Lesch Inc Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,703,995,696,602\nProfit Margin,23.3%,16.6%,6.5%,19.1%"
+      }
+    },
+    {
+      "fileId": "cs_mock_y2dwbose_memo",
+      "fileName": "URGENT: vita atque strues.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Dynamic Operations Executive\n**To:** CEO\n**Date:** 2024-10-05\n**Subject:** Conqueror sono theatrum vestigium canonicus cubitum argumentum vulgivagus vestigium.\n\n## Current Situation\n\nTurbo eligendi qui alii temeritas antiquus trepide. Sui adfectus cognatus celebrer contigo alias viduo iste cohaero. Dedecor pauci ducimus verto derideo vulgivagus.\nBellicus via angelus totidem creator utrimque ustilo timidus texo. Aggero culpa atavus sub coniuratio. Saepe traho apparatus unus vesco depono pecto teneo ater desolo.\nArca corona aegrotatio acies appositus vix. Vociferor damnatio color dicta decerno amiculum saepe. Quaerat sol argentum aduro.\n\n### Primary Challenges:\n\n1. Degero adsum vulgus adsuesco sub vorago capitulus aranea animus.\n2. Amaritudo stultus advenio dolor vulnus.\n3. Possimus cohaero quia et cursim aperte valde defaeco autem.\n\n### Strategic Options:\n\n**Option A:** Cupio tres tabella tenus absum.\n**Option B:** Denique accusantium caveo temporibus approbo facere.\n**Option C:** Abundans caput voluptates thesis.\n\n### Recommendation:\n\nDepopulo amo infit defetiscor tutamen alter depopulo architecto communis tabula. Coruscus crur degenero territo vapulus vis. Comedo sto debitis caterva turba adficio venia deinde repellendus."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_y2dwbose_strategy",
+      "title": "Strategic Decision",
+      "description": "Vehemens repellendus porro aeger eaque arcus tabula doloremque.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Adhuc ago sumptus aequus aequitas abundans viscus tabula. Clibanus consectetur teres solvo audax. Altus solutio tendo celo.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "accusator agnitio volaticus",
+            "description": "Tenus quibusdam creber basium animus. Teres sequi ex adhuc volo theologus clarus. Pauper non tamisium tondeo sollicito antiquus confero vestrum caelestis corrigo."
+          },
+          {
+            "id": "option_b",
+            "title": "custodia decens placeat",
+            "description": "Caput animus avaritia valens sint circumvenio totam universe tyrannus verto. Temeritas degusto turbo suscipit tergeo. Atrocitas impedit vorax viduo adimpleo asper apostolus sursum."
+          },
+          {
+            "id": "option_c",
+            "title": "totidem benigne dicta",
+            "description": "Tabella id officia distinctio coadunatio maiores strenuus uterque repellat. Artificiose deinde absque caritas sursum vulgaris alveus cuius thesaurus. Itaque tabella praesentium audeo."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_y2dwbose_communication",
+      "title": "Communication Strategy",
+      "description": "Terreo iste abscido temptatio adeptio.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Balbus vitae corona compello arcesso cohaero utor vulnus. Deduco suppono valde optio cruciamentum. Sub abduco quaerat constans thalassinus aliquam.",
+        "wordLimit": 794,
+        "keyPoints": [
+          "Sapiente advoco nisi laudantium laudantium pax.",
+          "Tibi centum tremo deripio aestus adsum concido territo.",
+          "Tertius ea decerno arceo complectus damno alienus bos."
+        ]
+      }
+    }
+  ]
+}

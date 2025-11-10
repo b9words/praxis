@@ -187,7 +187,7 @@ export default function OnboardingFlow({ userId, userProfile }: OnboardingFlowPr
                 </div>
                 <div className="p-6">
                   <p className="text-sm text-gray-600">
-                    Apply knowledge in realistic business simulations with AI stakeholders and real data
+                    Apply knowledge in realistic case studies with AI stakeholders and real data
                   </p>
                 </div>
               </div>

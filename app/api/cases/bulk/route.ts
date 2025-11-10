@@ -1,4 +1,5 @@
 import { bulkCreateCases } from '@/lib/db/cases'
+import type { CreateCaseData } from '@/lib/db/cases'
 import { AppError } from '@/lib/db/utils'
 import { prisma } from '@/lib/prisma/server'
 import { NextRequest, NextResponse } from 'next/server'
@@ -201,7 +202,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Filter out any invalid competency IDs - ensure only valid strings
-        const validCompetencyIds = competencyIds.filter((id): id is string => 
+        const validCompetencyIds = competencyIds.filter((id: unknown): id is string => 
           typeof id === 'string' && id.length > 0
         )
 
@@ -225,7 +226,9 @@ export async function POST(request: NextRequest) {
     )
     
     // Filter out cases that already exist
-    const casesToCreate = casesWithCompetencyIds.filter((c: any) => !c._skip)
+    const casesToCreate = casesWithCompetencyIds.filter(
+      (c: any): c is Omit<CreateCaseData, 'createdBy' | 'updatedBy'> => !c._skip
+    )
     const skippedCount = casesWithCompetencyIds.length - casesToCreate.length
     
     if (casesToCreate.length === 0) {
@@ -240,7 +243,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Save cases - even if competencyIds are empty, cases should still save
-    const created = await bulkCreateCases(casesToCreate, user.id)
+    const created = await bulkCreateCases(
+      casesToCreate as unknown as Omit<CreateCaseData, 'createdBy' | 'updatedBy'>[],
+      user.id
+    )
 
     // No server cache - client queries will refetch automatically
     const response = NextResponse.json({ 

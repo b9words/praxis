@@ -4,12 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Progress } from '@/components/ui/progress'
 import { fetchJson } from '@/lib/api'
@@ -18,7 +18,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/database.types'
 import type { User } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
-import { BarChart3, BookOpen, Target, Users } from 'lucide-react'
+import { BarChart3, BookOpen, Compass, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
@@ -63,16 +63,16 @@ export default function Navbar({ user, profile }: NavbarProps) {
       description: 'Your analytical workspace'
     },
     { 
+      href: '/discover', 
+      label: 'Discover',
+      icon: Compass,
+      description: 'Curated paths and themes'
+    },
+    { 
       href: '/library/curriculum', 
       label: 'Library',
       icon: BookOpen,
       description: userProgress ? `${userProgress.articlesCompleted}/${userProgress.totalArticles} articles` : 'Intelligence library'
-    },
-    { 
-      href: '/simulations', 
-      label: 'Simulations',
-      icon: Target,
-      description: userProgress ? `${userProgress.simulationsCompleted} completed` : 'Simulation scenarios'
     },
     {
       href: '/community',

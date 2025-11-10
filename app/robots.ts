@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
           '/dashboard/',
           '/admin/',
           '/profile/edit/',
-          '/simulations/',
+          '/case-studies/',
           '/debrief/',
           '/onboarding/',
           '/library/',

@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Search, Filter, Download, X } from 'lucide-react'
 import Link from 'next/link'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { toast } from 'sonner'
 
 interface ContentItem {

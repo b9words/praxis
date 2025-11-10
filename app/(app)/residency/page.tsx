@@ -1,5 +1,8 @@
 import ResidencySelector from '@/components/dashboard/ResidencySelector'
 import { getCurrentUser } from '@/lib/auth/get-user'
+
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
 import { getUserResidencyFull } from '@/lib/db/profiles'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
 

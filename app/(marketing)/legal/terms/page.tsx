@@ -2,6 +2,9 @@ import PublicHeader from '@/components/layout/PublicHeader'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'Terms of Service for Execemy Platform. Review our terms, conditions, and user agreement.',

@@ -5,6 +5,7 @@
 
 import { dbCall, withTransaction, assertFound, isColumnNotFoundError } from './utils'
 import type { Prisma } from '@prisma/client'
+import { isYear1CaseStudy } from '../year1-allowlist'
 
 export interface CaseFilters {
   status?: string
@@ -76,12 +77,19 @@ export async function listCases(filters: CaseFilters = {}) {
   }
 
   return dbCall(async (prisma) => {
-    return prisma.case.findMany({
+    const cases = await prisma.case.findMany({
       where,
       include: defaultInclude,
       orderBy: {
         createdAt: 'desc',
       },
+    })
+    
+    // Filter to Year 1 content only
+    return cases.filter(caseItem => {
+      // Check both database ID and metadata.caseId
+      const caseId = (caseItem.metadata as any)?.caseId || caseItem.id
+      return isYear1CaseStudy(caseId)
     })
   })
 }
@@ -538,9 +546,7 @@ export async function updateCaseWithCompetencies(
     }
 
     // Update case fields
-    const updateData: Prisma.CaseUpdateInput = {
-      updatedBy: data.updatedBy,
-    }
+    const updateData: Prisma.CaseUpdateInput = {}
 
     if (data.title !== undefined) updateData.title = data.title
     if (data.briefingDoc !== undefined) updateData.briefingDoc = data.briefingDoc
@@ -662,7 +668,7 @@ export async function getCasesWithPrerequisites() {
       where: {
         prerequisites: {
           not: null,
-        },
+        } as any,
       },
       include: {
         competencies: {

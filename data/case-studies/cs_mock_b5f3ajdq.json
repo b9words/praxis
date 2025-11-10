@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_b5f3ajdq",
+  "version": "1.0",
+  "title": "Collier - Wilderman: Business-focused content-based focus group (2023)",
+  "description": "Antea clam capitulus benigne cunctatio succurro blandior. Crinis voluptatibus virtus thesaurus carbo. Comes cenaculum dicta.\nUna tutis contigo stips coma adulescens substantia absque cunabula. Suadeo tener cognomen tondeo claudeo. Suscipio suadeo votum caelestis somniculosus pel.",
+  "competencies": [
+    "Strategic Thinking",
+    "Stakeholder Communication"
+  ],
+  "estimatedDuration": 115,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_b5f3ajdq_data",
+      "fileName": "Mante, Goodwin and Krajcik Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,621,900,612,669\nProfit Margin,18%,6.2%,10.8%,17.3%"
+      }
+    },
+    {
+      "fileId": "cs_mock_b5f3ajdq_memo",
+      "fileName": "URGENT: collum attonbitus desparatus.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Product Functionality Architect\n**To:** CEO\n**Date:** 2024-02-16\n**Subject:** Usque suffragium amissio tergeo titulus tenetur amplitudo sequi trucido neque.\n\n## Current Situation\n\nDefungo eveniet adeo repudiandae aggredior dapifer clarus impedit. Studio theatrum ascit amicitia. Utpote eum deleo amissio.\nUstilo tribuo quidem aestivus amplexus admiratio causa appositus. Creo villa pel truculenter sulum. Tabgo cervus repudiandae.\nVulpes celer cibo via acidus. Surgo tubineus voluptatem voluptates aedificium traho sint sit. Sol vomito vere decens.\n\n### Primary Challenges:\n\n1. Conturbo trepide substantia.\n2. Adsidue curso delicate vestrum saepe color.\n3. Aedificium voluptas contigo demulceo conspergo statim somniculosus.\n\n### Strategic Options:\n\n**Option A:** Ceno comedo antea sollers adflicto patrocinor ustulo validus.\n**Option B:** Degenero aestus speciosus trado caries curiositas.\n**Option C:** Utpote carcer ipsa aurum ambitus vere tracto temporibus administratio.\n\n### Recommendation:\n\nDebitis conicio in aliqua temperantia non audentia audio audacia. Odio tunc accommodo. Nam totus compello."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_b5f3ajdq_strategy",
+      "title": "Strategic Decision",
+      "description": "Patior certus acquiro tabesco quidem.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Talio spero basium conservo antea aperio spes. Vivo quisquam auctus amiculum torqueo nihil quae terminatio succedo. Adstringo tametsi ullus circumvenio rerum combibo vitae ademptio nisi.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "aspernatur summa atque",
+            "description": "Depulso vergo beneficium arbor. Desino vere arca sint candidus aro statua paens temeritas. Dedico cultura vorax claro claustrum."
+          },
+          {
+            "id": "option_b",
+            "title": "conspergo maiores casus",
+            "description": "Cena vehemens amet sollicito venustas asporto volo defessus vinculum spiculum. Audio cognomen aliquam arbitro amicitia. Theatrum ara aperte sed auxilium alter."
+          },
+          {
+            "id": "option_c",
+            "title": "aspernatur vesica trado",
+            "description": "Sollicito fuga spiculum statim quo. Adficio defleo vallum modi tristis. Ascit stultus sperno volva voro stipes careo theologus amissio termes."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_b5f3ajdq_communication",
+      "title": "Communication Strategy",
+      "description": "Crebro quos curtus debitis colo tempus video vilicus ater utilis.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Casus aegre ceno verecundia recusandae supplanto cauda super. Corrupti quis arbustum. Canonicus solio cultellus patior amita acceptus verbera centum totus.",
+        "wordLimit": 1000,
+        "keyPoints": [
+          "Celo somnus vociferor veritas.",
+          "Theatrum appositus voluptatum vobis ascit coepi amaritudo.",
+          "Totam crapula alienus congregatio vomica."
+        ]
+      }
+    }
+  ]
+}

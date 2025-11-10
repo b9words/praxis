@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_0fdgf3sj",
+  "version": "1.0",
+  "title": "Schneider, Senger and Watsica: Organic content-based microservice (2024)",
+  "description": "Eligendi aegrotatio correptius verumtamen nulla fugiat censura corporis. Sophismata tersus defetiscor quod carpo sufficio cursus decipio sodalitas video. Tredecim clarus decor.\nCoerceo desolo adstringo. Vestigium amiculum tendo cunae sollers caveo. Arto aeneus audax sonitus.",
+  "competencies": [
+    "Risk Management",
+    "Operations Management",
+    "Market Foresight"
+  ],
+  "estimatedDuration": 113,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_0fdgf3sj_data",
+      "fileName": "Brown, Green and Hagenes Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,564,582,421,418\nProfit Margin,25.7%,24.8%,12.7%,27.9%"
+      }
+    },
+    {
+      "fileId": "cs_mock_0fdgf3sj_memo",
+      "fileName": "URGENT: viridis compello conspergo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Central Factors Facilitator\n**To:** CEO\n**Date:** 2024-01-25\n**Subject:** Ipsum desolo aut una spiculum tum.\n\n## Current Situation\n\nTamisium decens pel arto speculum attero suasoria calculus angulus. Ab super synagoga dolorum. Agnosco accusantium asperiores validus.\nConsidero amiculum cado earum. Cariosus adsuesco crinis canis bonus vitiosus praesentium. Cupressus curto hic subito subvenio astrum desidero.\nUsus quos exercitationem ancilla pecto angulus. Aranea stultus beatae cruciamentum vehemens. Distinctio curatio accusamus textor.\n\n### Primary Challenges:\n\n1. Demitto laudantium quisquam.\n2. Catena absque supra facilis tubineus trado turpis deorsum.\n3. Textilis defendo auctus umbra vaco.\n\n### Strategic Options:\n\n**Option A:** Aestivus cresco thymbra venia barba aeger.\n**Option B:** Cribro id volo aeger socius aestas coruscus thymum damno vulpes.\n**Option C:** Commemoro bonus consequatur corroboro aegrotatio corpus delectus.\n\n### Recommendation:\n\nSolum sui absorbeo blandior somniculosus denuo abscido thymum. Infit aeger tener nulla tero tantillus thymbra eaque aqua. Quam talis assentator autem validus tandem ver tempora."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_0fdgf3sj_strategy",
+      "title": "Strategic Decision",
+      "description": "Solium valetudo nihil ratione aro demitto sumptus.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Balbus combibo carbo bestia currus. Dignissimos audeo aestus subito crebro traho soluta theca cernuus stultus. Vigor repellat communis centum aufero.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "suasoria blanditiis pariatur",
+            "description": "Somniculosus tot tergo temptatio audeo. Subnecto corona custodia. Caveo ademptio utroque."
+          },
+          {
+            "id": "option_b",
+            "title": "careo iusto adficio",
+            "description": "Commodi velociter valeo communis venia vulnus tremo tutis. Neque aegre alius vulticulus. Tamisium timidus una vulpes carbo."
+          },
+          {
+            "id": "option_c",
+            "title": "adhaero cunctatio aperio",
+            "description": "Contra terra maxime. Solium campana accedo tendo quia. Adficio tui quaerat magnam quia urbs ocer nobis vulariter."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_0fdgf3sj_communication",
+      "title": "Communication Strategy",
+      "description": "Decimus suffragium creta calco patria vestrum vetus congregatio eum.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Vulnero vomica sodalitas thymum. Optio adnuo deficio spero spiculum corroboro vilis aspicio. Studio subiungo socius cetera aro repellat patruus.",
+        "wordLimit": 589,
+        "keyPoints": [
+          "Deficio sordeo tui assentator accusantium tergum pel subnecto.",
+          "Thymbra vitium facilis deporto cuius arguo nam charisma verus.",
+          "Optio conspergo admoneo addo curo ago pectus."
+        ]
+      }
+    }
+  ]
+}

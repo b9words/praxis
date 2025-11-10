@@ -44,7 +44,8 @@ class GeminiTestAnalyzer {
     }
     
     this.genAI = new GoogleGenerativeAI(apiKey)
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-pro' })
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+    this.model = this.genAI.getGenerativeModel({ model: modelName })
   }
 
   /**

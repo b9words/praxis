@@ -542,12 +542,12 @@ export async function POST(request: NextRequest) {
       competencyIds, // Optional: competency IDs from UI
     } = body
     
-    // Use Gemini 2.5 Pro for HBR-quality generation
+    // Use configured Gemini model for HBR-quality generation
     const finalOptions = { ...options }
     if (finalOptions.provider === 'gemini') {
-      // Force Gemini 2.5 Pro for high-quality case generation
-      finalOptions.model = 'gemini-2.5-pro-latest'
-      console.log('[generate-case] Using gemini-2.5-pro-latest for HBR-quality generation')
+      // Use GEMINI_MODEL from environment, fallback to gemini-2.5-pro-latest for HBR-quality
+      finalOptions.model = process.env.GEMINI_MODEL || 'gemini-2.5-pro-latest'
+      console.log(`[generate-case] Using ${finalOptions.model} for HBR-quality generation`)
     }
 
     if (!arenaId || !competencyName || (!blueprintId && !blueprintTitle) || !options) {
@@ -607,8 +607,6 @@ export async function POST(request: NextRequest) {
       outlinePrompt,
       'You are an expert business educator specializing in executive case study design.',
       {
-        provider: finalOptions.provider,
-        model: finalOptions.model,
         trackUsage: true,
       }
     )
@@ -640,8 +638,6 @@ export async function POST(request: NextRequest) {
           casePrompt + (generationAttempt > 1 ? '\n\nIMPORTANT: Output ONLY valid JSON. No markdown, no code fences, no explanations. Ensure all strings are properly escaped and all brackets/braces are balanced.' : ''),
           'You are an expert business educator specializing in executive case study design. Generate complete, realistic, challenging case study JSON structures. Output ONLY valid JSON - no markdown, no code fences, no explanations.',
           {
-            provider: finalOptions.provider,
-            model: finalOptions.model,
             trackUsage: true,
           }
         )
@@ -736,6 +732,19 @@ export async function POST(request: NextRequest) {
     caseData.status = 'draft'
     caseData.caseId = finalCaseId
 
+    // Enforce ≤3 assets limit (trim and prioritize)
+    if (caseData.caseFiles && Array.isArray(caseData.caseFiles)) {
+      const { prioritizeFiles } = await import('@/lib/asset-utils')
+      caseData.caseFiles = prioritizeFiles(caseData.caseFiles).slice(0, 3)
+      console.info(`[generate-case] Trimmed caseFiles to ${caseData.caseFiles.length} (max 3)`)
+    }
+    
+    if (caseData.datasets && Array.isArray(caseData.datasets)) {
+      const { prioritizeDatasets } = await import('@/lib/asset-utils')
+      caseData.datasets = prioritizeDatasets(caseData.datasets).slice(0, 3)
+      console.info(`[generate-case] Trimmed datasets to ${caseData.datasets.length} (max 3)`)
+    }
+
     // Validate HBR-quality requirements
     const caseValidationErrors: string[] = []
     
@@ -743,7 +752,7 @@ export async function POST(request: NextRequest) {
     if (!caseData.description || typeof caseData.description !== 'string') {
       caseValidationErrors.push('Description is missing or invalid')
     } else {
-      const descWordCount = caseData.description.split(/\s+/).filter(w => w.length > 0).length
+      const descWordCount = caseData.description.split(/\s+/).filter((w: string) => w.length > 0).length
       if (descWordCount < 800) {
         caseValidationErrors.push(`Description too short: ${descWordCount} words, need at least 800 for HBR quality`)
       }
@@ -779,16 +788,22 @@ export async function POST(request: NextRequest) {
       })
     }
     
-    // Check datasets (at least 3)
+    // Check datasets (exactly 3, max 3)
     if (!caseData.datasets || !Array.isArray(caseData.datasets)) {
       caseValidationErrors.push('Datasets are missing or invalid')
     } else if (caseData.datasets.length < 3) {
-      caseValidationErrors.push(`Too few datasets: ${caseData.datasets.length}, need at least 3 for HBR quality`)
+      caseValidationErrors.push(`Too few datasets: ${caseData.datasets.length}, need exactly 3 for HBR quality`)
+    } else if (caseData.datasets.length > 3) {
+      caseValidationErrors.push(`Too many datasets: ${caseData.datasets.length}, maximum 3 allowed`)
     }
     
-    // Check caseFiles
-    if (!caseData.caseFiles || !Array.isArray(caseData.caseFiles) || caseData.caseFiles.length < 3) {
-      caseValidationErrors.push(`Too few caseFiles: ${caseData.caseFiles?.length || 0}, need at least 3`)
+    // Check caseFiles (exactly 3, max 3)
+    if (!caseData.caseFiles || !Array.isArray(caseData.caseFiles)) {
+      caseValidationErrors.push('caseFiles are missing or invalid')
+    } else if (caseData.caseFiles.length < 3) {
+      caseValidationErrors.push(`Too few caseFiles: ${caseData.caseFiles.length}, need exactly 3`)
+    } else if (caseData.caseFiles.length > 3) {
+      caseValidationErrors.push(`Too many caseFiles: ${caseData.caseFiles.length}, maximum 3 allowed`)
     }
     
     // If validation fails, attempt repair/expansion
@@ -809,20 +824,20 @@ REPAIR INSTRUCTIONS:
 - EXPAND the description to 800-1200+ words with clear sections: executive summary, context, dilemma, alternatives, constraints, risks
 - EXPAND to 6-8 detailed stages (currently ${caseData.stages?.length || 0})
 - EXPAND rubric to 8-10 criteria with 4 performance levels each (Unsatisfactory, Developing, Proficient, Exemplary)
-- ENSURE at least 3 datasets are included (currently ${caseData.datasets?.length || 0})
+- ENSURE exactly 3 datasets are included (currently ${caseData.datasets?.length || 0}) - if more than 3, trim to top 3
+- ENSURE exactly 3 caseFiles are included (currently ${caseData.caseFiles?.length || 0}) - if more than 3, prioritize and trim to top 3
+- Priority for caseFiles: PRESENTATION_DECK > REPORT/MEMO > FINANCIAL_DATA/MARKET_DATASET
 - Each stage description must be 150-250 words
 - Each option description must be 100-150 words
 - NO placeholders, NO empty sections
 - Output ONLY valid JSON, no markdown, no code fences
 
-Return the complete, expanded, HBR-quality case JSON.`
+Return the complete, expanded, HBR-quality case JSON with exactly 3 caseFiles and exactly 3 datasets.`
         
         const repairResult = await generateWithAI(
           repairPrompt,
           'You are an expert business educator. Fix and expand the case study to HBR-quality standards.',
           {
-            provider: finalOptions.provider,
-            model: finalOptions.model,
             trackUsage: true,
           }
         )

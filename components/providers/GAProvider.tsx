@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import Script from "next/script"
 
@@ -28,7 +28,7 @@ function hasAnalyticsConsent(): boolean {
   return false
 }
 
-export default function GAProvider() {
+function GAProviderContent() {
   const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -128,6 +128,14 @@ export default function GAProvider() {
         }}
       />
     </>
+  )
+}
+
+export default function GAProvider() {
+  return (
+    <Suspense fallback={null}>
+      <GAProviderContent />
+    </Suspense>
   )
 }
 

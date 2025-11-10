@@ -88,9 +88,9 @@ function parseArenaMarkdown(filePath: string, arenaId: string, arenaName: string
       const blueprintContent = section.substring(startPos, endPos)
       
       // Extract fields (format: *   **Field:** value)
-      const challengeTypeMatch = blueprintContent.match(/\*\*Challenge Type:\*\*\s*(.+?)(?:\n|\*|$)/s)
-      const dilemmaMatch = blueprintContent.match(/\*\*Dilemma:\*\*\s*(.+?)(?:\*\*Task:|\*|$)/s)
-      const taskMatch = blueprintContent.match(/\*\*Task:\*\*\s*(.+?)(?:\*\*Case File Assets:|\*|$)/s)
+      const challengeTypeMatch = blueprintContent.match(/\*\*Challenge Type:\*\*\s*([\s\S]+?)(?:\n|\*|$)/)
+      const dilemmaMatch = blueprintContent.match(/\*\*Dilemma:\*\*\s*([\s\S]+?)(?:\*\*Task:|\*|$)/)
+      const taskMatch = blueprintContent.match(/\*\*Task:\*\*\s*([\s\S]+?)(?:\*\*Case File Assets:|\*|$)/)
       
       const assets: string[] = []
       // Extract assets (format: *   `[Asset Name]` Description)

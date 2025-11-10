@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_pv0hcydg",
+  "version": "1.0",
+  "title": "Littel, Windler and Heaney: Profit-focused user-facing array (2025)",
+  "description": "Aegre coerceo suggero aegre non coniuratio quas adipisci. Voluptate volo tamquam aperio tempora acidus acerbitas commodo deporto. Statua decumbo certus vulpes cursim defendo ascit theatrum suadeo.\nAgnitio sponte solium certe. Arcus custodia villa curia reprehenderit cubicularis certus vorago cunabula varius. Benevolentia addo solio corporis.",
+  "competencies": [
+    "Operations Management",
+    "Market Foresight",
+    "Organizational Design"
+  ],
+  "estimatedDuration": 112,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_pv0hcydg_data",
+      "fileName": "Denesik, Stroman and Sanford Financial Metrics 2024.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,861,785,664,218\nProfit Margin,5.8%,28.1%,20.4%,24.9%"
+      }
+    },
+    {
+      "fileId": "cs_mock_pv0hcydg_memo",
+      "fileName": "URGENT: dens angulus antea.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** International Group Manager\n**To:** CEO\n**Date:** 2024-11-04\n**Subject:** Non censura thema.\n\n## Current Situation\n\nDeficio absum aequus crudelis denego. Claro sub undique termes adflicto denique amicitia. Vos aranea deserunt quae.\nLaborum absque compello eaque alias consequatur ademptio aeternus. Apparatus minima strenuus thesaurus aveho aspicio. Repellat suffoco addo.\nAdmoneo hic sui ut summopere thesis conforto tot aggero varius. Totidem defero sed est suus aggredior adulescens. Artificiose ut blanditiis voluptates.\n\n### Primary Challenges:\n\n1. Attonbitus testimonium soluta deripio itaque.\n2. Calco vulnus voluptatem sol aveho sponte aequus adaugeo.\n3. Delectatio ustilo suscipio talis cursim.\n\n### Strategic Options:\n\n**Option A:** Correptius votum adhaero usque nihil.\n**Option B:** Surgo depono uterque velut curis charisma.\n**Option C:** Verecundia bene qui quos tabella apostolus sumptus.\n\n### Recommendation:\n\nAttero capio volup attollo ultra deprimo caritas usus decretum dolorum. Optio ascit crinis volubilis causa. Communis terebro aperte volubilis defetiscor canto aer assentator."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_pv0hcydg_strategy",
+      "title": "Strategic Decision",
+      "description": "Conduco tricesimus curvo carpo provident suffragium aspernatur.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Adfectus tabgo sonitus demo. Tibi numquam ustilo basium amoveo centum adsuesco excepturi video. Animus defero victoria.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "comedo dignissimos adhuc",
+            "description": "Vos vociferor abeo virgo. Ustilo deficio ducimus deporto sopor apud adamo cohors. Baiulus speculum volubilis aliquid spectaculum decor ustilo atqui."
+          },
+          {
+            "id": "option_b",
+            "title": "stultus tum vinco",
+            "description": "Derideo quae ustulo molestias adaugeo vicinus strenuus spes. Soluta cruentus soleo amissio. Xiphias administratio voluptatum cum usus tero minima taceo."
+          },
+          {
+            "id": "option_c",
+            "title": "utrimque culpo compello",
+            "description": "Titulus tempus theologus debeo toties animi illum abscido. Cornu crustulum sub creta deduco. Corroboro calcar aer pax."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_pv0hcydg_communication",
+      "title": "Communication Strategy",
+      "description": "Quaerat delectus crastinus urbanus earum demum acies confugo.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Cubitum nisi explicabo pecus teneo torqueo. Vis accusamus autus absens sit velociter careo vestigium. Victus consequuntur ambitus.",
+        "wordLimit": 743,
+        "keyPoints": [
+          "Cinis cohibeo thymbra fugit colo.",
+          "Sumptus certe cupio animus attollo stabilis attonbitus.",
+          "Sui amissio minima cauda vivo denuo timidus."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_dhxflbua",
+  "version": "1.0",
+  "title": "Lakin LLC: Adaptive systemic task-force (2023)",
+  "description": "Vesco suffragium argumentum nemo pectus curriculum tabgo victus. Defendo amplitudo vorax tumultus ante verumtamen usus earum officiis cubitum. Conculco thymbra abeo.\nCubicularis fuga verto coniuratio conor. Defero caelestis defero aqua atqui deripio curatio vergo. Nobis ratione abutor somnus atrocitas.",
+  "competencies": [
+    "Operations Management",
+    "Stakeholder Communication",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 118,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_dhxflbua_data",
+      "fileName": "Bogan and Sons Financial Metrics 2023.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,636,160,775,289\nProfit Margin,27.5%,10.1%,9.7%,5.9%"
+      }
+    },
+    {
+      "fileId": "cs_mock_dhxflbua_memo",
+      "fileName": "URGENT: demens maiores aedificium.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Forward Division Designer\n**To:** CEO\n**Date:** 2024-09-28\n**Subject:** Laborum armarium attonbitus universe vindico corroboro.\n\n## Current Situation\n\nSequi cunabula acies armarium sumptus. Acsi brevis callide spectaculum accusantium amicitia thesaurus atrox. Capio alveus carcer suppono umbra triduana crux sordeo.\nClarus vel abundans ait. Acquiro attonbitus nostrum curis. Totidem congregatio caveo crastinus officia ceno quia cunae ipsam debeo.\nVinum tenax apud ustilo depono. Thesaurus currus acerbitas censura id recusandae causa apud truculenter vorax. Astrum certe accusamus vergo angulus nemo certus.\n\n### Primary Challenges:\n\n1. Soleo tricesimus beatae abstergo approbo velut utilis.\n2. Pauci sono atque vergo curatio crebro earum.\n3. Aspernatur taceo agnitio.\n\n### Strategic Options:\n\n**Option A:** Cariosus creta civitas constans super clibanus maxime.\n**Option B:** Sonitus video synagoga bestia addo celebrer.\n**Option C:** Admoneo derelinquo patria concido tepidus amissio aestivus.\n\n### Recommendation:\n\nDeputo sto dapifer caritas totus thermae sub cernuus. Contra aliqua vero approbo virga decumbo audacia. Uterque synagoga timidus soluta stultus ulciscor carus."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_dhxflbua_strategy",
+      "title": "Strategic Decision",
+      "description": "Bos votum vinco adflicto sufficio vespillo.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Minus veritas ademptio subiungo. Vesper volup vinco demitto unus. Comis tricesimus adfectus patior calculus animi aestus subito conforto.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "surgo aedificium comburo",
+            "description": "Texo comis quidem valde praesentium candidus acidus. Acer utilis eveniet vigor theologus vulpes consequatur tenetur cuius. Quis uterque vorax tenuis cura curiositas."
+          },
+          {
+            "id": "option_b",
+            "title": "tabula capitulus amor",
+            "description": "Cito clibanus canis adicio accommodo. Cursus credo spoliatio blanditiis virga terror alii cura utroque vinco. Placeat aspernatur vulgaris campana vilitas sodalitas."
+          },
+          {
+            "id": "option_c",
+            "title": "pecus dolores callide",
+            "description": "Bos audentia tergum consectetur. Volubilis vacuus vestigium. Atavus crustulum tempora subito arguo totam caelestis caecus fuga optio."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_dhxflbua_communication",
+      "title": "Communication Strategy",
+      "description": "Aliqua utpote cena aperio valeo vis unus.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Sollers ipsa aiunt cunabula corroboro caveo supra derelinquo aggero. Statua aestus ullus deputo. Omnis tredecim conqueror spiritus maxime cenaculum.",
+        "wordLimit": 940,
+        "keyPoints": [
+          "Solus ullam usque suggero tui subiungo sponte quae tantum.",
+          "Utrum ut adamo tremo.",
+          "Conculco talus arto toties."
+        ]
+      }
+    }
+  ]
+}

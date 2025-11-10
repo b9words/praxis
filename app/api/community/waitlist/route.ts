@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     // Fire-and-forget is acceptable; awaiting but ignoring failure keeps UX simple
     await sendGeneralNotificationEmail(user.email, {
-      title: 'You're on the Founding 100 Waitlist',
-      message: 'We'll notify you as doors open and share early updates.',
+      title: "You're on the Founding 100 Waitlist",
+      message: "We'll notify you as doors open and share early updates.",
       actionUrl: (process.env.NEXT_PUBLIC_APP_URL || 'https://execemy.com') + '/dashboard',
       actionText: 'Go to Dashboard',
     })

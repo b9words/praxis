@@ -77,12 +77,12 @@ export function WeeklySummaryEmail({
           )}
           {simulationsCompleted > 0 && (
             <Text style={stat}>
-              <strong>{simulationsCompleted}</strong> simulation{simulationsCompleted !== 1 ? 's' : ''} completed
+              <strong>{simulationsCompleted}</strong> case stud{simulationsCompleted !== 1 ? 'ies' : 'y'} completed
             </Text>
           )}
           {totalActivities === 0 && !hasInsights && (
             <Text style={stat}>
-              No activities completed this week. Deploy to your first scenario.
+              No activities completed this week. Start your first case study.
             </Text>
           )}
         </Section>

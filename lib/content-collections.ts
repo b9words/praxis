@@ -1,5 +1,6 @@
 import { getAllLessonsFlat, getDomainById } from './curriculum-data'
 import { getAllInteractiveSimulations } from './case-study-loader'
+import { isYear1Lesson } from './year1-allowlist'
 
 export interface ContentItem {
   type: 'lesson' | 'case'
@@ -24,6 +25,7 @@ export interface ContentCollection {
  */
 export function createThemedCollections(userCompletedIds: Set<string> = new Set()): ContentCollection[] {
   const allLessons = getAllLessonsFlat()
+    .filter(l => isYear1Lesson(l.domain, l.moduleId, l.lessonId))
   const allSimulations = getAllInteractiveSimulations()
   
   const collections: ContentCollection[] = []
@@ -111,7 +113,7 @@ export function createThemedCollections(userCompletedIds: Set<string> = new Set(
           type: 'case' as const,
           id: c.caseId,
           title: c.title,
-          url: `/simulations/${c.caseId}/brief`,
+          url: `/case-studies/${c.caseId}`,
         }))
       ].slice(0, 8),
       viewAllHref: '/library/curriculum/crisis-leadership-public-composure'
@@ -205,7 +207,7 @@ export function createThemedCollections(userCompletedIds: Set<string> = new Set(
         type: 'case' as const,
         id: c.caseId,
         title: c.title,
-        url: `/simulations/${c.caseId}/brief`,
+        url: `/case-studies/${c.caseId}`,
       })),
       viewAllHref: '/simulations'
     })

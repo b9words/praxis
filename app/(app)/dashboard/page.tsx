@@ -46,32 +46,7 @@ export default async function DashboardPage() {
 
   return (
     <FocusedDashboard
-      user={user}
-      recommendation={dashboardData.recommendation}
-      residencyData={dashboardData.residencyData}
-      currentStreak={dashboardData.currentStreak}
-      longestStreak={dashboardData.longestStreak}
-      recentActivities={dashboardData.recentActivities}
-      aggregateScores={dashboardData.aggregateScores}
-      jumpBackInItems={dedupeContent(dashboardData.jumpBackInItems)}
-      strengthenCoreShelves={(dashboardData.strengthenCoreShelves || []).map(shelf => ({
-        ...shelf,
-        lessons: dedupeContent(shelf.lessons),
-        cases: dedupeContent(shelf.cases),
-      }))}
-      newContent={dedupeContent(dashboardData.newContent)}
-      popularContent={dedupeContent(dashboardData.popularContent)}
-      practiceSpotlight={dedupeContent(dashboardData.practiceSpotlight)}
-      continueYearPath={dedupeContent(dashboardData.continueYearPath)}
-      themedCollections={(dashboardData.themedCollections || []).map(collection => ({
-        ...collection,
-        items: dedupeContent(collection.items)
-      }))}
-      moduleCollections={(dashboardData.moduleCollections || []).map(collection => ({
-        ...collection,
-        items: dedupeContent(collection.items)
-      }))}
-      learningPaths={dashboardData.learningPaths || []}
+      roadmap={dashboardData.roadmap}
     />
   )
 }

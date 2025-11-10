@@ -111,7 +111,7 @@ export default function SmartRecommendation({ recommendation, aggregateScores }:
 
   const isCurriculum = primary.type === 'curriculum'
   const isSimulation = primary.type === 'simulation'
-  const actionUrl = isCurriculum ? (primary.url || `/library/curriculum`) : (primary.id ? `/simulations/${primary.id}/brief` : `/simulations`)
+  const actionUrl = isCurriculum ? (primary.url || `/library/curriculum`) : (primary.id ? `/library/case-studies/${primary.id}` : `/library/case-studies`)
 
   if (!actionUrl) {
     return (

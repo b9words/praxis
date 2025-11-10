@@ -39,7 +39,7 @@ interface ContentItem {
 // Helper function to generate public URL for content
 function getPublicUrl(item: ContentItem): string | null {
   if (item.type === 'case') {
-    return `/simulations/${item.id}/brief`
+    return `/library/case-studies/${item.id}`
   }
   
   if (item.type === 'article') {

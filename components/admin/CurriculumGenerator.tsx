@@ -5,12 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { fetchJson } from '@/lib/api'
 import { DEFAULT_MODELS, GeneratedLesson, GenerationOptions, LessonStructure } from '@/lib/content-generator'
 import { completeCurriculumData, getAllLessonsFlat } from '@/lib/curriculum-data'
 import { queryKeys } from '@/lib/queryKeys'
@@ -38,7 +37,7 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
   // Configuration
   const [config, setConfig] = useState<GenerationOptions>({
     provider: 'gemini',
-    model: 'gemini-2.5-pro', // Default to Gemini 2.5 Pro
+    model: 'gemini-2.5-flash', // Default - server will override with GEMINI_MODEL if set
     includeVisualizations: true,
     includeMermaidDiagrams: true,
     targetWordCount: 2500,
@@ -161,7 +160,7 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       
       if (count === 0) {
         // Show detailed error with failure reasons
-        const failureReasons = failures.slice(0, 5).map(f => `${f.title}: ${f.error}`).join('; ')
+        const failureReasons = failures.slice(0, 5).map((f: any) => `${f.title}: ${f.error}`).join('; ')
         toast.error(
           `Failed to save any articles. ${failures.length > 0 ? `Errors: ${failureReasons}${failures.length > 5 ? '...' : ''}` : 'Check console for details.'}`,
           { duration: 10000 }
@@ -187,7 +186,7 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       
       // Show accurate success message
       if (failures.length > 0) {
-        const failureReasons = failures.slice(0, 3).map(f => f.title).join(', ')
+        const failureReasons = failures.slice(0, 3).map((f: any) => f.title).join(', ')
         toast.success(
           `Saved ${count} of ${attempted} lessons. Failed: ${failureReasons}${failures.length > 3 ? ` (+${failures.length - 3} more)` : ''}`,
           { duration: 8000 }

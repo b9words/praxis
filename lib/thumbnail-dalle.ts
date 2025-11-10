@@ -78,9 +78,10 @@ export async function getVisualMetaphor(
 
 **Your Task:** Provide ONLY the visual scene description. One sentence. No title, no numbers, no text references.`
 
+  const modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash-latest'
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
@@ -129,7 +130,7 @@ export async function getVisualMetaphor(
       
       try {
         const retryResponse = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -224,14 +224,14 @@ export async function updateProfile(
     isPublic?: boolean
   }
 ) {
-  return dbCall(async (prisma) => {
-    const updateData: any = {}
-    if (data.username !== undefined) updateData.username = data.username
-    if (data.fullName !== undefined) updateData.fullName = data.fullName
-    if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl
-    if (data.bio !== undefined) updateData.bio = data.bio
-    if (data.isPublic !== undefined) updateData.isPublic = data.isPublic
+  const updateData: any = {}
+  if (data.username !== undefined) updateData.username = data.username
+  if (data.fullName !== undefined) updateData.fullName = data.fullName
+  if (data.avatarUrl !== undefined) updateData.avatarUrl = data.avatarUrl
+  if (data.bio !== undefined) updateData.bio = data.bio
+  if (data.isPublic !== undefined) updateData.isPublic = data.isPublic
 
+  return dbCall(async (prisma) => {
     return prisma.profile.update({
       where: { id: userId },
       data: updateData,
@@ -281,10 +281,10 @@ export async function partialUpdateProfile(
   userId: string,
   data: Record<string, any>
 ) {
-  return dbCall(async (prisma) => {
-    // Filter out emailNotificationsEnabled as it may not exist
-    const { emailNotificationsEnabled, ...updateData } = data
+  // Filter out emailNotificationsEnabled as it may not exist
+  const { emailNotificationsEnabled, ...updateData } = data
 
+  return dbCall(async (prisma) => {
     return prisma.profile.update({
       where: { id: userId },
       data: updateData,

@@ -6,6 +6,9 @@ import { isMissingTable } from '@/lib/api/route-helpers'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
 import ManageBillingButton from './ManageBillingButton'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 const PLANS = [
   {
     name: 'Explorer',

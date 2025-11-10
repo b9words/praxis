@@ -3,9 +3,9 @@
 import { Input } from '@/components/ui/input'
 import { Search, X } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 
-export default function SearchBar() {
+function SearchBarContent() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -57,6 +57,14 @@ export default function SearchBar() {
         </button>
       )}
     </div>
+  )
+}
+
+export default function SearchBar() {
+  return (
+    <Suspense fallback={<div className="relative"><Input type="text" placeholder="Search frameworks, models, case files..." className="pl-10 pr-10" disabled /></div>}>
+      <SearchBarContent />
+    </Suspense>
   )
 }
 

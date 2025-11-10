@@ -5,6 +5,7 @@
 
 import type { Prisma } from '@prisma/client'
 import { assertFound, dbCall, isColumnNotFoundError, withTransaction } from './utils'
+import { isYear1Article } from '../year1-allowlist'
 
 export interface ArticleFilters {
   status?: string
@@ -66,13 +67,16 @@ export async function listArticles(filters: ArticleFilters = {}) {
   }
 
   return dbCall(async (prisma) => {
-    return prisma.article.findMany({
+    const articles = await prisma.article.findMany({
       where,
       include: defaultInclude,
       orderBy: {
         createdAt: 'desc',
       },
     })
+    
+    // Filter to Year 1 content only
+    return articles.filter(article => isYear1Article(article.id))
   })
 }
 

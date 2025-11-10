@@ -84,6 +84,33 @@ export interface DashboardData {
     completed: boolean
     progress: number
   }>
+  roadmap: {
+    totalLessons: number
+    completedCount: number
+    nextLesson: {
+      domainId: string
+      moduleId: string
+      lessonId: string
+      title: string
+      url: string
+    } | null
+    sections: Array<{
+      domainId: string
+      domainTitle: string
+      modules: Array<{
+        moduleId: string
+        moduleTitle: string
+        moduleNumber: number
+        lessons: Array<{
+          lessonId: string
+          lessonTitle: string
+          lessonNumber: number
+          status: 'completed' | 'in_progress' | 'not_started'
+          url: string
+        }>
+      }>
+    }>
+  }
 }
 
 /**
@@ -207,7 +234,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
         type: 'simulation' as const,
         id: sim.id,
         title: sim.case.title,
-        url: `/simulations/${sim.case.id}/brief`,
+        url: `/case-studies/${sim.case.id}`,
         updatedAt: sim.updatedAt,
       }))
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
@@ -343,7 +370,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
               .map(s => ({
                 id: s.caseId,
                 title: s.title,
-                url: `/simulations/${s.caseId}/brief`,
+                url: `/case-studies/${s.caseId}`,
               }))
 
             if (domainLessons.length > 0 || domainCases.length > 0) {
@@ -391,7 +418,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
             type: 'case',
             id: c.caseId,
             title: c.title,
-            url: `/simulations/${c.caseId}/brief`,
+            url: `/case-studies/${c.caseId}`,
             reason: 'Apply what you\'ve learned',
           })
         }
@@ -483,7 +510,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
         type: 'case' as const,
         id: c.id,
         title: c.title,
-        url: `/simulations/${c.id}/brief`,
+        url: `/case-studies/${c.id}`,
         createdAt: c.createdAt,
       })),
       ...articleLessons,
@@ -522,7 +549,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
           type: 'case',
           id: popSim.caseId,
           title: simulation.title,
-          url: `/simulations/${popSim.caseId}/brief`,
+          url: `/case-studies/${popSim.caseId}`,
         })
       }
     }
@@ -660,6 +687,93 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
     .slice(0, 5)
 
+  // Build curriculum roadmap: scan entire curriculum in order, find next lesson
+  let roadmap: DashboardData['roadmap'] = {
+    totalLessons: 0,
+    completedCount: 0,
+    nextLesson: null,
+    sections: [],
+  }
+  try {
+    const completedLessonIds = new Set(
+      userProgress
+        .filter(p => p.status === 'completed')
+        .map(p => `${p.domainId}:${p.moduleId}:${p.lessonId}`)
+    )
+    const inProgressLessonIds = new Set(
+      userProgress
+        .filter(p => p.status === 'in_progress')
+        .map(p => `${p.domainId}:${p.moduleId}:${p.lessonId}`)
+    )
+
+    let totalLessons = 0
+    let completedCount = 0
+    let nextLessonFound = false
+
+    const sections = completeCurriculumData.map(domain => {
+      const domainModules = domain.modules
+        .sort((a, b) => a.number - b.number)
+        .map(module => {
+          const moduleLessons = module.lessons
+            .sort((a, b) => a.number - b.number)
+            .map(lesson => {
+              totalLessons++
+              const lessonKey = `${domain.id}:${module.id}:${lesson.id}`
+              let status: 'completed' | 'in_progress' | 'not_started' = 'not_started'
+              
+              if (completedLessonIds.has(lessonKey)) {
+                status = 'completed'
+                completedCount++
+              } else if (inProgressLessonIds.has(lessonKey)) {
+                status = 'in_progress'
+              }
+
+              // Find next lesson (first not completed, in order)
+              if (!nextLessonFound && status !== 'completed') {
+                nextLessonFound = true
+                roadmap.nextLesson = {
+                  domainId: domain.id,
+                  moduleId: module.id,
+                  lessonId: lesson.id,
+                  title: lesson.title,
+                  url: `/library/curriculum/${domain.id}/${module.id}/${lesson.id}`,
+                }
+              }
+
+              return {
+                lessonId: lesson.id,
+                lessonTitle: lesson.title,
+                lessonNumber: lesson.number,
+                status,
+                url: `/library/curriculum/${domain.id}/${module.id}/${lesson.id}`,
+              }
+            })
+
+          return {
+            moduleId: module.id,
+            moduleTitle: module.title,
+            moduleNumber: module.number,
+            lessons: moduleLessons,
+          }
+        })
+
+      return {
+        domainId: domain.id,
+        domainTitle: domain.title,
+        modules: domainModules,
+      }
+    })
+
+    roadmap = {
+      totalLessons,
+      completedCount,
+      nextLesson: roadmap.nextLesson,
+      sections,
+    }
+  } catch (error) {
+    console.error('Error building roadmap:', error)
+  }
+
   // Calculate learning streak (current and longest)
   let currentStreak = 0
   let longestStreak = 0
@@ -709,7 +823,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     currentStreak,
     longestStreak,
     recentActivities,
-    aggregateScores: aggregateScoresResult,
+    aggregateScores: aggregateScoresResult as unknown as Record<string, number> | null,
     jumpBackInItems,
     strengthenCoreShelves,
     newContent,
@@ -720,5 +834,6 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     moduleCollections,
     learningPaths,
     domainCompletions,
+    roadmap,
   }
 }

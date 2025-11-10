@@ -109,9 +109,10 @@ Now answer the student's question using ONLY the information from the article ab
     }
 
     // Call Gemini API with retry logic
+    const modelName = Deno.env.get('GEMINI_MODEL') || 'gemini-1.5-flash'
     const geminiResponse = await retryWithBackoff(async () => {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: {
@@ -167,7 +168,7 @@ Now answer the student's question using ONLY the information from the article ab
           .from('token_usage')
           .insert({
             date: today,
-            model: 'gemini-1.5-flash',
+            model: modelName,
             prompt_tokens: usageMetadata.promptTokenCount || 0,
             completion_tokens: usageMetadata.candidatesTokenCount || 0,
             total_tokens: usageMetadata.totalTokenCount || 0,

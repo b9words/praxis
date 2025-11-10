@@ -5,10 +5,11 @@ import OrgChartRenderer from './OrgChartRenderer'
 import StakeholderRenderer from './StakeholderRenderer'
 import DataChartRenderer from './DataChartRenderer'
 import DataSheetRenderer from './DataSheetRenderer'
-import MarkdownRenderer from './MarkdownRenderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import SQLRenderer from './SQLRenderer'
 import CSVRenderer from './CSVRenderer'
 import SlidesRenderer from './SlidesRenderer'
+import MarpRenderer from './MarpRenderer'
 import { AlertCircle } from 'lucide-react'
 
 interface AssetRendererProps {
@@ -156,7 +157,7 @@ export default function AssetRenderer({ content, fileType, fileName, mimeType }:
         return <MarkdownRenderer content={content} />
 
     case 'PRESENTATION_DECK': {
-      // Check for fallback flag - if enabled and parsing fails, render as markdown
+      // Check for fallback flag - if enabled, use SlidesRenderer instead of MarpRenderer
       const fallbackToMarkdown = process.env.NEXT_PUBLIC_ASSET_RENDER_FALLBACK === 'markdown'
       if (fallbackToMarkdown) {
         // Try to detect if it's valid Marp format
@@ -167,8 +168,11 @@ export default function AssetRenderer({ content, fileType, fileName, mimeType }:
         if (!hasFrontmatter && !hasSeparators) {
           return <MarkdownRenderer content={content} />
         }
+        // Otherwise use SlidesRenderer as fallback
+        return <SlidesRenderer content={content} />
       }
-      return <SlidesRenderer content={content} />
+      // Default: use MarpRenderer for full Marp support
+      return <MarpRenderer content={content} />
     }
 
       default: {

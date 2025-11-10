@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_bjzvdqdm",
+  "version": "1.0",
+  "title": "Marquardt LLC: Digitized exuding firmware (2020)",
+  "description": "Tripudio certe eaque. Vilicus caveo curtus uter turbo. Thorax defungo denuncio appello.\nSuscipit derelinquo debilito. Teneo articulus pel appositus tantillus solum viscus aegrotatio. Cilicium cedo caritas.",
+  "competencies": [
+    "Market Foresight",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 115,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_bjzvdqdm_data",
+      "fileName": "Rowe - Kirlin Financial Metrics 2024.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,158,539,130,156\nProfit Margin,27.7%,8.4%,18.3%,15.3%"
+      }
+    },
+    {
+      "fileId": "cs_mock_bjzvdqdm_memo",
+      "fileName": "URGENT: conor velum acer.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Investor Usability Planner\n**To:** CEO\n**Date:** 2025-09-25\n**Subject:** Curatio caveo suus.\n\n## Current Situation\n\nCauda solium avaritia maiores delectus voluptas pecus consectetur amplitudo argentum. Casso ullam laudantium eos. Undique supra aegre.\nIllo aggredior defungo deorsum asperiores vinculum ullam sortitus. Cupiditas soleo impedit advenio doloremque timidus. Admoneo terror baiulus caute asper comprehendo.\nEarum bardus utpote utroque usus capitulus defendo voro ter. Aedificium delectus verbera. Deripio amiculum solum traho creator terga vobis.\n\n### Primary Challenges:\n\n1. Eos cito textus nesciunt.\n2. Theologus crustulum veritas expedita ars subito textus comes.\n3. Ventus charisma vorago aqua baiulus audacia varius solium argentum.\n\n### Strategic Options:\n\n**Option A:** Possimus agnosco vaco thymbra despecto volaticus.\n**Option B:** Vorax sordeo rem asperiores vaco cursus.\n**Option C:** Abundans laborum et super.\n\n### Recommendation:\n\nAger suus audeo una totus hic sulum comburo deludo trado. Contabesco depulso tribuo conculco atavus summa. Amaritudo capto ara conqueror defaeco tamquam soleo quas conservo."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_bjzvdqdm_strategy",
+      "title": "Strategic Decision",
+      "description": "Deludo volva reiciendis antepono spes communis stipes aegrus ater.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Calamitas tui cibo sed suasoria dolores cohaero benevolentia ademptio. Solitudo vigilo ut tener tertius. Cavus venustas speciosus laborum amor dedecor degero urbs.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "incidunt creator voluptatibus",
+            "description": "Curo adhuc taedium. Cibus una claro verbum tego tibi accommodo vivo sursum cogo. Cilicium uter amplexus succedo hic alo carbo abundans delicate."
+          },
+          {
+            "id": "option_b",
+            "title": "coerceo patrocinor clibanus",
+            "description": "Talus administratio veniam ulterius sordeo. Vapulus audax aeternus capto thalassinus adeo nostrum. Umbra eligendi adversus tripudio patruus amplus aliquid verbera sortitus tricesimus."
+          },
+          {
+            "id": "option_c",
+            "title": "utroque mollitia ea",
+            "description": "Comes dapifer teres pauper vapulus decipio. Quos omnis subvenio capio doloremque amicitia creo. Solio virga paulatim talus dicta reiciendis."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_bjzvdqdm_communication",
+      "title": "Communication Strategy",
+      "description": "Caterva conturbo demergo.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Apud charisma volup. Dens autus perferendis cicuta beatae. Abscido absens blanditiis adfectus amita confido thorax.",
+        "wordLimit": 786,
+        "keyPoints": [
+          "Claudeo vicinus crux alias provident amplitudo conitor.",
+          "Utilis depulso subvenio vulgivagus apostolus cervus crur.",
+          "Cunctatio venustas summopere pecus collum trans."
+        ]
+      }
+    }
+  ]
+}

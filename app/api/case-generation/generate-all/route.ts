@@ -142,8 +142,8 @@ async function generateSingleAsset(
 
     // Build prompt
     const assetPrompt = buildAssetGenerationPrompt(
-      caseData,
-      file,
+      file.fileName,
+      file.fileType as any,
       blueprint || { title: caseData.title || '', dilemma: caseData.description || '', task: '', assets: [] },
       competency || { name: caseData.competencies?.[0] || 'Strategic Thinking', primaryChallengeType: '', secondaryTypes: [], blueprints: [] },
       framework

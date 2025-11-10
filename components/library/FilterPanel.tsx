@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/select'
 import { Filter, X } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 
 interface FilterPanelProps {
   domains: Array<{ id: string; name: string }>
 }
 
-export default function FilterPanel({ domains }: FilterPanelProps) {
+function FilterPanelContent({ domains }: FilterPanelProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -131,6 +131,14 @@ export default function FilterPanel({ domains }: FilterPanelProps) {
         </div>
       )}
     </div>
+  )
+}
+
+export default function FilterPanel({ domains }: FilterPanelProps) {
+  return (
+    <Suspense fallback={null}>
+      <FilterPanelContent domains={domains} />
+    </Suspense>
   )
 }
 

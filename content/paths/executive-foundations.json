@@ -1,0 +1,55 @@
+{
+  "id": "executive-foundations",
+  "title": "Executive Foundations",
+  "description": "Start here: core concepts every modern executive needs to master. This path covers the fundamental frameworks for thinking like a CEO.",
+  "duration": "3-4 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "five-choices"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "per-share-value"
+    },
+    {
+      "type": "lesson",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "opportunity-cost"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "moat-fundamentals",
+      "lesson": "sources-of-moat"
+    },
+    {
+      "type": "lesson",
+      "domain": "organizational-design-talent-density",
+      "module": "talent-density-principles",
+      "lesson": "defining-talent-density"
+    },
+    {
+      "type": "lesson",
+      "domain": "second-order-decision-making",
+      "module": "principles-of-second-order",
+      "lesson": "second-order-maps"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_01_tesla_production_crisis_2018"
+    },
+    {
+      "type": "lesson",
+      "domain": "crisis-leadership-public-composure",
+      "module": "golden-hour-first-60-minutes",
+      "lesson": "first-response-framework"
+    }
+  ]
+}
+

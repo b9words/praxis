@@ -221,13 +221,17 @@ Generate a valid JSON object with this exact structure:
 }
 
 REQUIREMENTS (HBR-Quality Standards):
-- Include ALL ${blueprint.assets.length} caseFiles from blueprint assets (${blueprint.assets.join(', ')})
+- CRITICAL: Include AT MOST 3 caseFiles (select the top 3 highest-value assets from blueprint: ${blueprint.assets.join(', ')})
+- Priority order for caseFiles: 1) PRESENTATION_DECK (Marp format), 2) REPORT/INTERNAL_MEMO/MEMO, 3) FINANCIAL_DATA or MARKET_DATASET
+- If blueprint has more than 3 assets, prioritize down to the top 3 that provide the best coverage and decision support
 - Use empty STATIC content for caseFiles (assets will be generated separately via asset generation endpoint)
 - Design 6-8 detailed stages with progressively complex decisions and clear progression
 - Each stage's challengeType must be "${mappedLayout}" (internal enum)
+- Each stage prompt must be specific, thought-provoking, and demand quantitative reasoning - avoid generic questions like "Analyze the Situation"
+- Stage prompts should frame real trade-offs, dilemmas, and require specific quantitative justification
 - Description must be 800-1200+ words with clear sections: executive summary, context, dilemma, alternatives, constraints, risks
 - Create comprehensive rubric with 8-10 criteria including ${competency.name}, each with 4 performance levels (Unsatisfactory, Developing, Proficient, Exemplary)
-- Include at least 3 datasets in the datasets array, each with 16-32 rows of realistic data
+- Include AT MOST 3 datasets in the datasets array, each with 16-32 rows of realistic data
 - Each stage description must be 150-250 words with detailed context and required artifacts
 - Each option description must be 100-150 words with pros/cons and implications
 - Make scenarios realistic, detailed, and grounded in the blueprint's dilemma
@@ -242,7 +246,9 @@ CRITICAL OUTPUT REQUIREMENTS:
 - The JSON must be parseable and complete
 - Description must be 800-1200+ words (enforce this length requirement)
 - All text fields must be fully written out, not abbreviated or placeholder
-- Datasets array must contain at least 3 complete dataset definitions with realistic schemas`
+- caseFiles array must contain EXACTLY 3 items (never more, never less) - prioritize from blueprint assets
+- datasets array must contain EXACTLY 3 items (never more, never less) - each with complete dataset definitions and realistic schemas
+- If blueprint specifies more than 3 assets, select the top 3 highest-priority assets that best support decision-making`
 }
 
 /**

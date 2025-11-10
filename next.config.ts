@@ -10,6 +10,41 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // Redirects: simulations -> library/case-studies, case-studies -> library/case-studies
+  async redirects() {
+    return [
+      {
+        source: '/simulations/:path*',
+        destination: '/library/case-studies/:path*',
+        permanent: true,
+      },
+      {
+        source: '/api/simulations/:path*',
+        destination: '/api/case-studies/:path*',
+        permanent: true,
+      },
+      {
+        source: '/case-studies',
+        destination: '/library/case-studies',
+        permanent: true,
+      },
+      {
+        source: '/case-studies/:caseId',
+        destination: '/library/case-studies/:caseId',
+        permanent: true,
+      },
+      {
+        source: '/case-studies/:caseId/tasks',
+        destination: '/library/case-studies/:caseId/tasks',
+        permanent: true,
+      },
+      {
+        source: '/simulations/:slug/brief',
+        destination: '/library/case-studies',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {
@@ -97,7 +132,8 @@ const nextConfig: NextConfig = {
 
 // Sentry automatically handles source map upload when SENTRY_AUTH_TOKEN is set
 // The @sentry/nextjs plugin handles this in the build process
-const configWithSentry = process.env.SENTRY_AUTH_TOKEN
+// Disable source map uploads if SENTRY_DISABLE_UPLOAD is set (useful for CI/offline builds)
+const configWithSentry = process.env.SENTRY_AUTH_TOKEN && !process.env.SENTRY_DISABLE_UPLOAD
   ? withSentryConfig(withBundleAnalyzer(nextConfig), {
       // Sentry source map upload configuration
       silent: true, // Suppress logs during build

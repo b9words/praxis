@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_dpazoh43",
+  "version": "1.0",
+  "title": "Spinka Inc: Reactive real-time challenge (2022)",
+  "description": "Aeneus conturbo facere vulnus demo totam custodia theca. Valde cunctatio peccatus quod cur arbor aliquid. Uterque capillus beneficium.\nComitatus dicta ascisco vitiosus ullus urbanus cum tempus. Absorbeo accusantium ocer deficio. Absens curo supellex decipio synagoga candidus torqueo.",
+  "competencies": [
+    "Stakeholder Communication",
+    "Organizational Design"
+  ],
+  "estimatedDuration": 95,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_dpazoh43_data",
+      "fileName": "Murphy - Simonis Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,332,881,703,503\nProfit Margin,17.2%,10.1%,20.7%,14%"
+      }
+    },
+    {
+      "fileId": "cs_mock_dpazoh43_memo",
+      "fileName": "URGENT: vulnero denego depereo.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Global Interactions Assistant\n**To:** CEO\n**Date:** 2024-10-05\n**Subject:** Occaecati deprimo aurum delectus cariosus vergo condico viridis.\n\n## Current Situation\n\nQuos illo aperio coruscus alveus qui dedecor. Bos asper cultura vester sulum curatio ea ago vorax. Circumvenio occaecati amo vociferor ater socius cariosus sunt.\nSpeculum porro vapulus aeternus comptus carpo voveo cribro synagoga. Beneficium capitulus cilicium cunctatio canonicus accusantium utroque vociferor. Confido absens sponte tremo arca.\nTexo praesentium adinventitias quasi. Corporis tenus tondeo cubo vinitor. Ter denuo velit venustas alias video.\n\n### Primary Challenges:\n\n1. Textilis averto tibi ullam civitas viridis admiratio architecto fugiat.\n2. Similique acceptus vitium adinventitias aranea accedo minima.\n3. Sophismata traho abutor id degero deserunt aequus stella desolo teneo.\n\n### Strategic Options:\n\n**Option A:** Architecto socius at uter placeat ars.\n**Option B:** Eaque aequus quis casus thymbra toties volutabrum desipio deficio tardus.\n**Option C:** Incidunt in alii cura.\n\n### Recommendation:\n\nUmerus alveus alioqui celebrer utilis aperiam suppellex ambitus qui. Testimonium canis repudiandae canto summisse. Antepono usitas optio antepono cursus arto subseco tempore amiculum."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_dpazoh43_strategy",
+      "title": "Strategic Decision",
+      "description": "Torrens video doloribus virga facilis cruentus ubi.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Demens depraedor tyrannus tristis culpo concedo. Nam capitulus thalassinus depereo concido amissio. Vir cogo asporto degusto.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "cohibeo adeptio commodi",
+            "description": "Ipsam consuasor dedecor vociferor cotidie causa careo. Tempore basium sui acer curatio tergeo. Magni bardus talis admoveo ulterius."
+          },
+          {
+            "id": "option_b",
+            "title": "avaritia utilis conservo",
+            "description": "Comis ventus antepono atrox depromo aggredior autus villa. Coruscus vesica impedit centum subvenio soluta vox celo spectaculum admoneo. Abduco xiphias thorax."
+          },
+          {
+            "id": "option_c",
+            "title": "terror dolore coepi",
+            "description": "Cinis coruscus temperantia harum. Accusamus ambulo cunctatio. Repellendus thorax deleniti conturbo amitto utor terra aspicio doloremque depono."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_dpazoh43_communication",
+      "title": "Communication Strategy",
+      "description": "Vindico nisi harum admitto advenio audeo adduco talus.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Appositus tubineus arma coerceo carpo corrigo caterva deporto. Vos adsidue aranea admoveo quidem adopto. Doloremque et libero assumenda avaritia comis optio bellum angelus.",
+        "wordLimit": 986,
+        "keyPoints": [
+          "Thorax tertius clibanus.",
+          "Arbustum subiungo sed tero.",
+          "Stultus armarium careo turbo bellum aequus succedo culpa verumtamen sol."
+        ]
+      }
+    }
+  ]
+}

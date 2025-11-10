@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: 'Thematic collections that solve specific challenges and job-to-be-done scenarios',
 }
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default async function LearningPathsPage() {
   const user = await getCurrentUser()
 

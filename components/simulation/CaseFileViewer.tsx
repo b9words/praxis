@@ -1,7 +1,7 @@
 'use client'
 
 import StructuredCaseDisplay from '@/components/simulation/StructuredCaseDisplay'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { parseCaseBriefing } from '@/lib/parse-case-template'
 import { FileText, Table, Users } from 'lucide-react'
@@ -18,8 +18,8 @@ export default function CaseFileViewer({ briefingDoc, datasets }: CaseFileViewer
   return (
     <div className="h-full flex flex-col bg-white border-r border-gray-200">
       <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <h3 className="font-semibold text-gray-900">Briefing Documents</h3>
-        <p className="text-sm text-gray-600">Reference materials for this scenario</p>
+        <h3 className="font-semibold text-gray-900">Overview</h3>
+        <p className="text-sm text-gray-600">Reference materials for this case study</p>
       </div>
 
       <Tabs defaultValue="structured" className="flex-1 flex flex-col">

@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import { ArticleSection } from '@/lib/parse-article-template'
 import { AlertTriangle, Cog, Lightbulb, Target } from 'lucide-react'
 

@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_ssedrscj",
+  "version": "1.0",
+  "title": "Treutel - Mueller: Versatile human-resource solution (2021)",
+  "description": "Aeger voluptates totidem ulterius vigilo. Creptio aeneus bene. Delicate censura amaritudo aspicio.\nVoluptate tempore volaticus decerno. Theologus comparo coepi candidus aperio. Conspergo sperno advenio bene tolero.",
+  "competencies": [
+    "Risk Management",
+    "Stakeholder Communication"
+  ],
+  "estimatedDuration": 68,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_ssedrscj_data",
+      "fileName": "Crist, Boehm and Kuhic Financial Metrics 2022.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,607,824,223,623\nProfit Margin,17.6%,8.6%,20.6%,11.8%"
+      }
+    },
+    {
+      "fileId": "cs_mock_ssedrscj_memo",
+      "fileName": "URGENT: depopulo agnitio degero.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Product Creative Associate\n**To:** CEO\n**Date:** 2024-09-11\n**Subject:** Surgo natus sopor tergiversatio unus combibo.\n\n## Current Situation\n\nTunc vox valetudo corrigo autem deporto talio. Denuncio tum conturbo unde cum complectus. Tempus antea auxilium virgo atque minus.\nDepraedor similique calculus ipsum corrigo somniculosus ara. Audax cibo blanditiis auctor tremo circumvenio vestigium. Molestias aranea corrupti thema corona aiunt iusto tutis theca ater.\nBos blandior utilis carus celebrer a usus textor. Tandem argentum defungo consequatur aliquid depereo verumtamen adhaero. Beatus capio ver delibero deleniti.\n\n### Primary Challenges:\n\n1. Arma depono curtus patria xiphias tenus cubicularis tres assumenda.\n2. Bardus confugo dolorem.\n3. Verbum dolore desino admitto adeo ipsa debitis.\n\n### Strategic Options:\n\n**Option A:** Arto acidus deduco capio admiratio surculus amoveo pecus cicuta.\n**Option B:** Crastinus thesis cruciamentum tantillus.\n**Option C:** Ter capillus spiculum maxime.\n\n### Recommendation:\n\nCrepusculum aeger accusantium tres esse terga canonicus conitor adaugeo vito. Victoria cena perferendis spiritus cometes ubi vinitor vado. Chirographum cilicium vix abstergo sumptus suffoco qui vulariter."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_ssedrscj_strategy",
+      "title": "Strategic Decision",
+      "description": "Conforto aeternus decipio cavus coniecto.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Videlicet audax corroboro vestrum aduro aliquam ascisco pariatur arcus. Dedecor desipio caritas deludo somniculosus tantillus tego nesciunt ventito totidem. Adsidue absconditus benevolentia somnus cunctatio culpa vado vehemens verbera.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "combibo studio cernuus",
+            "description": "Audacia congregatio curtus tripudio. Tabesco excepturi civis. Coepi patior damno asper angelus incidunt."
+          },
+          {
+            "id": "option_b",
+            "title": "veniam coniecto tabella",
+            "description": "Vicinus trado minima solum velociter cubo compello abstergo. Thesis amicitia neque delectus angustus vomer bestia aegre pariatur. Adduco soluta exercitationem amet at minus clibanus vigilo."
+          },
+          {
+            "id": "option_c",
+            "title": "toties vorago caveo",
+            "description": "Curvo conqueror admitto admoveo stultus defungo calamitas porro casus nesciunt. Trans tracto demoror consequatur conventus. Complectus bellicus ago deleo dens turba brevis creator titulus."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_ssedrscj_communication",
+      "title": "Communication Strategy",
+      "description": "Creo degenero cognatus vicissitudo angustus victoria stella exercitationem adduco.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Cumque arx sollicito volup libero sumo. Cura angelus placeat. Somniculosus aestus conspergo ipsa culpa triumphus torrens perspiciatis corrumpo cattus.",
+        "wordLimit": 553,
+        "keyPoints": [
+          "Cupiditate spes solus aeneus crur.",
+          "Aro tres adhuc curatio.",
+          "Utroque iusto campana desipio."
+        ]
+      }
+    }
+  ]
+}

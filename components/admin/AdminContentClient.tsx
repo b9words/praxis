@@ -47,7 +47,7 @@ export default function AdminContentClient() {
   const pageSize = parseInt(searchParams.get('pageSize') || '50', 10)
 
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
-  const [detailsItem, setDetailsItem] = useState<ContentItem | null>(null)
+  const [detailsItem, setDetailsItem] = useState<any>(null)
   const [generatePanelOpen, setGeneratePanelOpen] = useState(false)
 
   // Fetch competencies
@@ -206,7 +206,7 @@ export default function AdminContentClient() {
     if (selectedItems.size === contentData.items.length) {
       setSelectedItems(new Set())
     } else {
-      setSelectedItems(new Set(contentData.items.map((item) => item.id)))
+      setSelectedItems(new Set(contentData.items.map((item: any) => item.id)))
     }
   }
 
@@ -214,9 +214,9 @@ export default function AdminContentClient() {
     if (selectedItems.size === 0) return
 
     const selectedIds = Array.from(selectedItems)
-    const selectedItemsData = contentData.items.filter((item) => selectedIds.includes(item.id))
-    const hasArticles = selectedItemsData.some((item) => item.type === 'article')
-    const hasCases = selectedItemsData.some((item) => item.type === 'case')
+    const selectedItemsData = contentData.items.filter((item: any) => selectedIds.includes(item.id))
+    const hasArticles = selectedItemsData.some((item: any) => item.type === 'article')
+    const hasCases = selectedItemsData.some((item: any) => item.type === 'case')
 
     const type = hasArticles && hasCases ? 'both' : hasArticles ? 'article' : 'case'
 
@@ -257,8 +257,8 @@ export default function AdminContentClient() {
       <div className="w-56 border-r bg-white flex-shrink-0 overflow-hidden">
         <AdminTree
           competencies={competencies}
-          articles={contentData.items.filter((i) => i.type === 'article')}
-          cases={contentData.items.filter((i) => i.type === 'case')}
+          articles={contentData.items.filter((i: any) => i.type === 'article')}
+          cases={contentData.items.filter((i: any) => i.type === 'case')}
           selectedArena={filters.arena}
           selectedCompetency={filters.competency}
           onSelect={handleTreeSelect}

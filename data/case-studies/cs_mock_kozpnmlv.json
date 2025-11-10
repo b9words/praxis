@@ -1,0 +1,77 @@
+{
+  "caseId": "cs_mock_kozpnmlv",
+  "version": "1.0",
+  "title": "Labadie, Shanahan and Hammes: Total fresh-thinking access (2025)",
+  "description": "Comis virga virga. Ratione dedico clarus compono spectaculum tantum textilis. Aliqua depulso adsuesco inflammatio decimus valens consequatur angelus aranea.\nQuae ambitus ago substantia aequus traho suffoco aggredior ago. Corrumpo correptius tonsor vinitor vos tardus coruscus agnosco tergiversatio labore. Ventus amoveo depromo absum delicate adstringo.",
+  "competencies": [
+    "Operations Management",
+    "Organizational Design",
+    "Market Foresight",
+    "Strategic Thinking"
+  ],
+  "estimatedDuration": 67,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_kozpnmlv_data",
+      "fileName": "Rodriguez LLC Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,437,357,882,301\nProfit Margin,29.1%,5.3%,29.3%,6%"
+      }
+    },
+    {
+      "fileId": "cs_mock_kozpnmlv_memo",
+      "fileName": "URGENT: vallum eum vulgivagus.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Senior Infrastructure Strategist\n**To:** CEO\n**Date:** 2024-11-27\n**Subject:** Subito deficio quis nulla venia adipisci cicuta virga.\n\n## Current Situation\n\nDefleo quam chirographum audeo delectus conservo nulla aetas voluptatem vos. Facilis collum torqueo stillicidium ascisco vere traho vir. Placeat cura vicissitudo usitas adipisci acquiro cotidie tollo.\nArcus paens creator volubilis turbo tum delicate cuppedia certus adstringo. Torqueo xiphias vulnus itaque tenus vinco ulciscor carmen defendo. Virtus pecto calco spectaculum.\nContabesco amplitudo speciosus eius ter eius ulterius. Laudantium utor culpo appello ad temeritas quam. Benevolentia approbo accedo consequatur officia cruciamentum debitis ventito.\n\n### Primary Challenges:\n\n1. Doloribus terra crux quasi unus.\n2. Arca vester deprimo causa degenero vomer depromo compono recusandae capto.\n3. Aperiam antiquus argentum.\n\n### Strategic Options:\n\n**Option A:** Saepe attonbitus coniuratio vel.\n**Option B:** Sopor at aurum adhaero asporto cibo.\n**Option C:** Alienus animi degusto beatae.\n\n### Recommendation:\n\nDesolo strues adflicto thermae quisquam. Uterque verumtamen aduro. Timidus tamisium audacia bellum correptius."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_kozpnmlv_strategy",
+      "title": "Strategic Decision",
+      "description": "Quae corporis delectatio tametsi adfectus casus.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Vehemens doloremque exercitationem amita dedecor expedita carcer censura. Accusator comminor beneficium complectus animadverto validus. Spoliatio testimonium deripio aiunt fuga ocer tamdiu.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "custodia antiquus ciminatio",
+            "description": "Sint molestias constans vos pecto. Ambitus argumentum cariosus arto. Cinis atavus vel aggero."
+          },
+          {
+            "id": "option_b",
+            "title": "error cunae vomito",
+            "description": "Cubicularis volubilis uredo. Causa assumenda sordeo vetus iusto mollitia cibus tenus audentia. Cursim distinctio carcer amplus perferendis."
+          },
+          {
+            "id": "option_c",
+            "title": "civitas nobis arma",
+            "description": "Expedita admoneo conduco appono adversus vox. Tollo caterva stabilis temporibus patior. Cupiditas conscendo vetus triduana vociferor ante."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_kozpnmlv_communication",
+      "title": "Communication Strategy",
+      "description": "Vigilo attonbitus aeger talio natus turba apud theatrum.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Ascit asper torrens sono. Contego utpote crudelis totam decens cotidie delectatio. Tametsi desolo campana velum credo.",
+        "wordLimit": 772,
+        "keyPoints": [
+          "Quia angelus vigor quisquam conculco apud thalassinus quam expedita varietas.",
+          "Argentum color carpo tam ademptio molestiae tempus utor congregatio.",
+          "Amor tyrannus antiquus crux thema architecto calculus suppono suppellex."
+        ]
+      }
+    }
+  ]
+}

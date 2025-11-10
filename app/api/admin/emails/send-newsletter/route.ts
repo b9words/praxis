@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Get all users with email notifications enabled
-    const { data: profiles } = await prisma.profile.findMany({
+    // Get all users with email notifications enabled (from Prisma)
+    const profiles = await prisma.profile.findMany({
       where: {
         emailNotificationsEnabled: true,
       },

@@ -107,27 +107,27 @@ test.describe('E2E User Journey', () => {
       await page.waitForURL(/.*\/library\/curriculum\/.*\/.*/, { timeout: 10000 })
     }
 
-    // Action 13: Use navbar to go to "Simulations"
-    const simulationsLink = page.locator('nav a:has-text("Simulations")').first()
-    await expect(simulationsLink).toBeVisible({ timeout: 5000 })
-    await simulationsLink.click({ timeout: 5000 })
-    await page.waitForURL(/.*\/simulations/, { timeout: 10000 })
+    // Action 13: Use navbar to go to "Case Studies"
+    const caseStudiesLink = page.locator('nav a:has-text("Case Studies")').first()
+    await expect(caseStudiesLink).toBeVisible({ timeout: 5000 })
+    await caseStudiesLink.click({ timeout: 5000 })
+    await page.waitForURL(/.*\/library\/case-studies/, { timeout: 10000 })
 
-    // Action 14: Click first case "Deploy to Scenario" button
-    const deployButton = page.locator('a:has-text("Deploy to Scenario"), a:has-text("Continue Engagement")').first()
-    await expect(deployButton).toBeVisible({ timeout: 5000 })
-    await deployButton.click({ timeout: 5000 })
+    // Action 14: Click first case "Start Case Study" button
+    const startButton = page.locator('a:has-text("Start Case Study"), a:has-text("Continue Case Study")').first()
+    await expect(startButton).toBeVisible({ timeout: 5000 })
+    await startButton.click({ timeout: 5000 })
     
-    // Wait for brief page
-    await page.waitForURL(/.*\/simulations\/.*\/brief/, { timeout: 10000 })
+    // Wait for overview page
+    await page.waitForURL(/.*\/library\/case-studies\/.*/, { timeout: 10000 })
 
-    // Action 15: On brief page, click "Deploy to Scenario"
-    const deployFromBriefButton = page.locator('a:has-text("Deploy to Scenario"), a:has-text("Continue Simulation")').first()
-    await expect(deployFromBriefButton).toBeVisible({ timeout: 5000 })
-    await deployFromBriefButton.click({ timeout: 5000 })
+    // Action 15: On overview page, click "Start Case Study"
+    const startFromOverviewButton = page.locator('a:has-text("Start Case Study"), a:has-text("Continue Case Study")').first()
+    await expect(startFromOverviewButton).toBeVisible({ timeout: 5000 })
+    await startFromOverviewButton.click({ timeout: 5000 })
     
-    // Wait for workspace
-    await page.waitForURL(/.*\/simulations\/.*\/workspace/, { timeout: 10000 })
+    // Wait for tasks page
+    await page.waitForURL(/.*\/library\/case-studies\/.*\/tasks/, { timeout: 10000 })
     await page.waitForTimeout(2000) // Wait for workspace to fully load
 
     // Action 16: Type ≥50 chars into "Your Analysis" textarea

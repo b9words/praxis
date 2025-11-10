@@ -64,8 +64,15 @@ export async function POST(request: NextRequest) {
 
     const generator = new ContentGenerator(openaiKey, geminiKey)
 
+    // Override model with GEMINI_MODEL from environment if using Gemini
+    const finalOptions = { ...opts }
+    if (finalOptions.provider === 'gemini') {
+      finalOptions.model = process.env.GEMINI_MODEL || finalOptions.model
+      console.log(`[generate-lesson] Using ${finalOptions.model} for lesson generation`)
+    }
+
     // Generate lesson (this happens server-side, so Prisma in TokenTracker will work)
-    const generatedLesson = await generator.generateLesson(lesson, opts, finalCompetencyId)
+    const generatedLesson = await generator.generateLesson(lesson, finalOptions, finalCompetencyId)
 
     // Generate thumbnail after successful lesson generation (unless skipped)
     let thumbnailUrl: string | null = null

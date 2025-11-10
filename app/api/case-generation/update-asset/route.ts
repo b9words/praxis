@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
     // For CSV, basic validation - check if it has at least one row
     if (isCSV) {
-      const lines = content.trim().split('\n').filter(line => line.trim())
+      const lines = content.trim().split('\n').filter((line: string) => line.trim())
       if (lines.length === 0) {
         return NextResponse.json(
           { error: 'CSV content must have at least one row' },

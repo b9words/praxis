@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_t3xwmzxx",
+  "version": "1.0",
+  "title": "Connelly - Mueller: Secured logistical budgetary management (2024)",
+  "description": "Cresco sperno caveo conitor vero clamo delinquo validus. Advenio arceo absens quos dedico appono vita ex. Desino spoliatio aestus cervus.\nDegero incidunt damnatio adimpleo asperiores decumbo bellicus admiratio turpis. Textus ultio carbo vitium auxilium virgo vulgus summa vomica modi. Debilito optio aer quasi vomica.",
+  "competencies": [
+    "Crisis Leadership",
+    "Capital Efficiency"
+  ],
+  "estimatedDuration": 71,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_t3xwmzxx_data",
+      "fileName": "Welch, Willms and Lebsack Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,782,245,529,747\nProfit Margin,11.2%,21%,21.7%,9%"
+      }
+    },
+    {
+      "fileId": "cs_mock_t3xwmzxx_memo",
+      "fileName": "URGENT: maiores tepidus deserunt.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Lead Solutions Director\n**To:** CEO\n**Date:** 2025-09-17\n**Subject:** Reiciendis brevis comminor ubi.\n\n## Current Situation\n\nAllatus curto adamo denique somniculosus angustus civitas cubicularis. Vulgo adinventitias temptatio corrigo crudelis tego versus virga neque consuasor. Casso magni contego sollicito caput aureus versus ambitus dicta.\nAdficio adeptio atque usitas. Virga non debilito nisi ea. Cimentarius conservo varius vindico vapulus curia termes demonstro deripio.\nOfficiis audax conatus umbra. Aequitas aegrotatio vilicus dignissimos. Tondeo truculenter conatus suadeo tepidus solium.\n\n### Primary Challenges:\n\n1. Utor fugit cimentarius currus.\n2. Antiquus teneo a.\n3. Enim adopto voluptate caelum cognomen cognomen.\n\n### Strategic Options:\n\n**Option A:** Ab suspendo voco caelestis.\n**Option B:** Talis ubi curo cognatus communis summa totam attonbitus.\n**Option C:** Veniam timidus vorax tego crudelis.\n\n### Recommendation:\n\nSolvo aeternus illum sui aspicio termes nulla. Adicio cena paulatim clibanus summopere tempore ambulo doloribus dolor corporis. Tres subiungo summopere deinde verus suasoria suspendo universe certus timor."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_t3xwmzxx_strategy",
+      "title": "Strategic Decision",
+      "description": "Conitor condico volutabrum umerus.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Suscipio libero vinitor derelinquo creator ascisco terror tabernus. Acies tumultus absum succedo voluntarius debitis. Sufficio totidem in volaticus.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "admoneo despecto supellex",
+            "description": "Attero thesaurus ipsum crux apostolus uredo ars collum clam. Speculum theca casso quibusdam mollitia tristis ventus abundans sperno. Inflammatio civis cohibeo."
+          },
+          {
+            "id": "option_b",
+            "title": "conservo quas concido",
+            "description": "Cultellus aegrotatio terra circumvenio damnatio stillicidium concedo adstringo. Vinco sapiente speciosus ratione avarus. Tantillus ambitus chirographum charisma custodia vomer."
+          },
+          {
+            "id": "option_c",
+            "title": "aegre earum attero",
+            "description": "Amplitudo culpo taceo succurro curo conor cubicularis celo basium denuncio. Civis solum volo peccatus aestus. Virgo clibanus aliqua."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_t3xwmzxx_communication",
+      "title": "Communication Strategy",
+      "description": "Quia socius ceno accendo vociferor casso spes.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Pel coma cerno patrocinor usitas vindico amiculum arma. Tabgo vacuus balbus ocer substantia sponte cumque accendo nostrum casus. Vita cubitum tumultus audio spectaculum voluptatum.",
+        "wordLimit": 551,
+        "keyPoints": [
+          "Damno aliquam tamisium.",
+          "Damno caute damno supra absque odit placeat reprehenderit carbo summopere.",
+          "Aveho utpote taceo."
+        ]
+      }
+    }
+  ]
+}

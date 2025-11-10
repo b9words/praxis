@@ -279,9 +279,9 @@ CRITICAL: Output the complete asset content only. No markdown code blocks (unles
     // Ensure CSV format is preserved (comma-separated values)
     if (!enhancedContent.includes(',') && enhancedContent.includes('|')) {
       // If AI returned a markdown table, convert to CSV
-      const lines = enhancedContent.split('\n').filter(line => line.trim())
-      const csvLines = lines.map(line => {
-        const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell)
+      const lines = enhancedContent.split('\n').filter((line: string) => line.trim())
+      const csvLines = lines.map((line: string) => {
+        const cells = line.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
         return cells.join(',')
       })
       enhancedContent = csvLines.join('\n')

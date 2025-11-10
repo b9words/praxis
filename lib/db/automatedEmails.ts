@@ -58,7 +58,7 @@ export async function getAutomatedEmailById(id: string) {
  */
 export async function getAutomatedEmailByEventName(eventName: string) {
   return dbCall(async (prisma) => {
-    return prisma.automatedEmail.findUnique({
+    return prisma.automatedEmail.findFirst({
       where: { eventName },
     })
   })

@@ -39,7 +39,7 @@ export default function RecentActivity({ activities }: RecentActivityProps) {
             href={
               activity.type === 'article'
                 ? `/library/${activity.id}`
-                : `/simulations/${activity.id}/brief`
+                : `/library/case-studies/${activity.id}`
             }
             className="block hover:bg-gray-50 transition-colors"
           >

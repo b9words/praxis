@@ -4,7 +4,7 @@
  */
 
 import { GeneralNotificationEmail } from '@/components/emails/GeneralNotificationEmail'
-import { SimulationCompleteEmail } from '@/components/emails/SimulationCompleteEmail'
+import { CaseStudyCompleteEmail } from '@/components/emails/CaseStudyCompleteEmail'
 import { SubscriptionConfirmationEmail } from '@/components/emails/SubscriptionConfirmationEmail'
 import { WeeklySummaryEmail } from '@/components/emails/WeeklySummaryEmail'
 import { WelcomeEmail } from '@/components/emails/WelcomeEmail'
@@ -74,7 +74,7 @@ export async function renderEmailTemplate(
         throw new Error('caseTitle is required for simulation_complete template')
       }
       return await render(
-        SimulationCompleteEmail({
+        CaseStudyCompleteEmail({
           caseTitle: props.simulation_complete.caseTitle,
           debriefUrl: props.simulation_complete.debriefUrl || `${baseUrl}/dashboard`,
           userName: props.simulation_complete.userName,

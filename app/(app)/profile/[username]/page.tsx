@@ -53,7 +53,7 @@ export async function generateMetadata({
   const ogImageUrl = `${baseUrl}/og-default.png`
 
   const title = `${profile.fullName || profile.username}'s Profile`
-  const description = profile.bio || `View ${profile.fullName || profile.username}'s profile, including their competency matrix and a history of completed business simulations.`
+  const description = profile.bio || `View ${profile.fullName || profile.username}'s profile, including their competency matrix and a history of completed case studies.`
 
   return {
     title,
@@ -90,7 +90,7 @@ function generateAnalyticalStrengths(scores: Record<string, number>): string {
     .slice(0, 2)
 
   if (sortedScores.length === 0) {
-    return 'Analysis pending. Complete simulations to build your competency profile.'
+    return 'Analysis pending. Complete case studies to build your competency profile.'
   }
 
   const competencyNames: Record<string, string> = {
@@ -211,7 +211,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
     : null
 
   // Generate analytical strengths
-  const analyticalStrengths = aggregateScores ? generateAnalyticalStrengths(aggregateScores) : null
+  const analyticalStrengths = aggregateScores ? generateAnalyticalStrengths(aggregateScores as unknown as Record<string, number>) : null
 
   // Helper to extract performance metrics from debrief scores
   function getPerformanceMetrics(debrief: any): string {
@@ -348,8 +348,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
       {simulations.length > 0 && (
         <div className="bg-white border border-gray-200 mb-12">
           <div className="border-b border-gray-200 px-6 py-4">
-            <h2 className="text-lg font-medium text-gray-900">Engagement History</h2>
-            <p className="text-xs text-gray-500 mt-1">Log of all completed simulations and after-action reports.</p>
+            <h2 className="text-lg font-medium text-gray-900">Case Study History</h2>
+            <p className="text-xs text-gray-500 mt-1">Log of all completed case studies and debriefs.</p>
           </div>
           <div className="divide-y divide-gray-100">
             {simulations.map((sim) => {
@@ -391,11 +391,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
       {simulations.length === 0 && (
         <div className="bg-white border border-gray-200 p-12 text-center">
           <Target className="h-10 w-10 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-base font-medium text-gray-900 mb-2">No completed engagements</h3>
-          <p className="text-sm text-gray-600 mb-6">Complete your first simulation to build your engagement history</p>
+          <h3 className="text-base font-medium text-gray-900 mb-2">No completed case studies</h3>
+          <p className="text-sm text-gray-600 mb-6">Complete your first case study to build your case study history</p>
           {isOwnProfile && (
             <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
-              <Link href="/simulations">Deploy to Scenario</Link>
+              <Link href="/library/case-studies">Start Case Study</Link>
             </Button>
           )}
         </div>

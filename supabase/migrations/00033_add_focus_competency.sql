@@ -8,3 +8,7 @@ CREATE INDEX IF NOT EXISTS idx_user_residency_focus_competency
   ON public.user_residency(focus_competency);
 
 
+
+
+
+

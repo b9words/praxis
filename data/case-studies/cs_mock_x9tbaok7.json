@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_x9tbaok7",
+  "version": "1.0",
+  "title": "Lueilwitz - Mertz: Synchronised logistical flexibility (2024)",
+  "description": "Ager maxime ver crustulum clibanus arbitro argentum. Patior aggero vigor temeritas ocer tribuo. Demoror quod tribuo.\nCharisma vilicus ante utique voluntarius atqui suppono adhaero cultura. Nobis video spectaculum denique tolero virga acerbitas. Aiunt torrens cicuta apparatus decerno sequi creator adopto patruus veniam.",
+  "competencies": [
+    "Risk Management",
+    "Market Foresight",
+    "Crisis Leadership"
+  ],
+  "estimatedDuration": 83,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_x9tbaok7_data",
+      "fileName": "Beahan and Sons Financial Metrics 2024.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,629,418,820,599\nProfit Margin,25.7%,20.8%,24.6%,20%"
+      }
+    },
+    {
+      "fileId": "cs_mock_x9tbaok7_memo",
+      "fileName": "URGENT: cupio vita hic.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Customer Integration Orchestrator\n**To:** CEO\n**Date:** 2025-01-01\n**Subject:** Adulatio peccatus tenax eos.\n\n## Current Situation\n\nSophismata aggero decimus ascit. Balbus crepusculum admoneo cubicularis. Denuncio crebro tumultus arbustum dicta aduro aequitas.\nMaxime utrimque labore vitiosus administratio alter adinventitias. Hic similique adipisci vindico. Clibanus aetas assentator antepono anser earum cariosus contabesco vox.\nVir aranea creber itaque aestus abeo spargo sapiente. Depraedor cupressus acervus condico atqui altus. Patruus suscipit comedo crudelis capillus alo atrox thema spiculum incidunt.\n\n### Primary Challenges:\n\n1. Vesco aequus cicuta consectetur tero vulgivagus.\n2. Utilis triduana caelestis cubitum.\n3. Volutabrum attollo thermae concido suus curia.\n\n### Strategic Options:\n\n**Option A:** Tristis thymum usitas adulatio stultus apud cupressus.\n**Option B:** Culpa eius vulnus appositus spero crustulum apparatus.\n**Option C:** Vir utroque venustas vulgaris.\n\n### Recommendation:\n\nConstans sortitus denuo cura. Paens nemo arx demens ipsum. Bellum talis acies conspergo termes magni cavus."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_x9tbaok7_strategy",
+      "title": "Strategic Decision",
+      "description": "Minima theca tabesco pel depopulo appello cedo curatio.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Doloribus civis absconditus derelinquo circumvenio tabernus acervus. Vilis ater demens aliqua quidem inventore cum. Vel auxilium acerbitas universe neque validus patria.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "tollo curtus tandem",
+            "description": "Mollitia attollo censura avarus caritas cohibeo itaque odio curso possimus. Alias astrum eaque. Ciminatio cubo tonsor abutor."
+          },
+          {
+            "id": "option_b",
+            "title": "sodalitas sortitus theologus",
+            "description": "Accusator arguo valde degenero maiores somnus spoliatio vicinus vulnus suppellex. Utroque admiratio callide velit cattus. Apto unde desidero spero."
+          },
+          {
+            "id": "option_c",
+            "title": "capitulus tempora temporibus",
+            "description": "Cunctatio bellum voluptatibus similique victus. Tero tener studio vociferor cruentus. Spectaculum suspendo necessitatibus beatae."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_x9tbaok7_communication",
+      "title": "Communication Strategy",
+      "description": "Color cursus similique tamdiu campana cultellus censura.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Terra verbera corpus tantillus. Tyrannus auctor viscus cotidie confido advenio depereo amitto carpo comes. Utique cognatus una umquam tendo arca strues vinculum statim.",
+        "wordLimit": 666,
+        "keyPoints": [
+          "Sint dolorem animadverto color thorax universe apto.",
+          "Compono somniculosus tantum tonsor vinculum coma una apostolus sufficio talis.",
+          "Casus uterque asporto adnuo sunt demonstro ulciscor credo."
+        ]
+      }
+    }
+  ]
+}

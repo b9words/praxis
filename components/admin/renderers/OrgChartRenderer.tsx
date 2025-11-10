@@ -56,7 +56,7 @@ export default function OrgChartRenderer({ content }: OrgChartRendererProps) {
     return { parsedData: orgData, title, summary, keyTakeaways }
   }, [content])
 
-  const orgData = parsedData
+  const orgData = parsedData || []
 
   if (orgData.length === 0) {
     // Fallback: Render as DataSheet if we can't parse as org chart

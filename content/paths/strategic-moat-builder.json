@@ -1,0 +1,59 @@
+{
+  "id": "strategic-moat-builder",
+  "title": "Strategic Moat Builder",
+  "description": "Build and defend competitive advantages that create durable value. Learn to identify, architect, and strengthen moats that protect your business.",
+  "duration": "4-5 weeks",
+  "items": [
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "moat-fundamentals",
+      "lesson": "sources-of-moat"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "moat-fundamentals",
+      "lesson": "measuring-moat-strength"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "network-effects",
+      "lesson": "network-effects-framework"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "switching-costs",
+      "lesson": "creating-switching-costs"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "brand-and-reputation",
+      "lesson": "brand-as-moat"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_skill_01_asymmetric_warfare"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "moat-maintenance",
+      "lesson": "defending-moats"
+    },
+    {
+      "type": "lesson",
+      "domain": "competitive-moat-architecture",
+      "module": "moat-maintenance",
+      "lesson": "moat-erosion-signals"
+    },
+    {
+      "type": "case",
+      "caseId": "cs_skill_03_cannibalization"
+    }
+  ]
+}
+

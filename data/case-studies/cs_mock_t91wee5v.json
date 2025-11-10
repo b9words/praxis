@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_t91wee5v",
+  "version": "1.0",
+  "title": "Batz Group: Stand-alone resilient focus group (2022)",
+  "description": "A carbo bellicus casso timidus cibus aureus. Uredo carbo aeternus consuasor tametsi ipsa totam. Textor peccatus depromo adhaero vorax credo argumentum sopor cinis occaecati.\nDecumbo tubineus celo deduco fugiat somnus terreo. Sint arcus vicissitudo crebro suspendo accusator. Depono utrimque et vetus.",
+  "competencies": [
+    "Capital Efficiency",
+    "Stakeholder Communication",
+    "Market Foresight"
+  ],
+  "estimatedDuration": 89,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_t91wee5v_data",
+      "fileName": "Schmitt - Franecki Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,920,949,568,710\nProfit Margin,24.5%,8.2%,20%,5.8%"
+      }
+    },
+    {
+      "fileId": "cs_mock_t91wee5v_memo",
+      "fileName": "URGENT: deripio arma auctor.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** National Division Orchestrator\n**To:** CEO\n**Date:** 2024-01-04\n**Subject:** Auctor natus repellendus iusto taceo condico teneo.\n\n## Current Situation\n\nDenuo socius accusamus solium quae collum. Alioqui vesica strenuus. Consuasor omnis truculenter adimpleo.\nValetudo absque baiulus vitiosus. Cedo aeger ad caries uxor cupressus suppellex. Cumque aureus ea ver thymum aedificium stultus mollitia venustas annus.\nUtroque cunae dens aeneus chirographum communis vinculum. Degusto speciosus ascisco depereo taceo. Quidem sortitus antepono vinculum apparatus teres celo victoria suppellex.\n\n### Primary Challenges:\n\n1. Blanditiis decipio quae tepesco amet vivo validus cerno traho.\n2. Deinde comburo nobis sustineo cunctatio quo subnecto.\n3. Admoneo unde defungo celebrer carbo denuncio valde crapula.\n\n### Strategic Options:\n\n**Option A:** Alo demonstro vulgaris tepesco bene desino canis cunae.\n**Option B:** Tepidus calcar vesco omnis crastinus desipio pecco laborum depereo.\n**Option C:** Atqui tonsor id aperte tener vicissitudo vinitor.\n\n### Recommendation:\n\nAppositus eaque amplexus victus auctus. Cum crebro thalassinus defleo assumenda. Dolor arceo perspiciatis maxime summopere."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_t91wee5v_strategy",
+      "title": "Strategic Decision",
+      "description": "Verecundia vindico caries apostolus cogito vehemens voluptas unde amo vinitor.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Absque decimus adipiscor illum confido demergo. Ustilo somniculosus damno totus ventosus animadverto exercitationem. Adiuvo sordeo unus ascisco tonsor.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "ultio vergo cena",
+            "description": "Commemoro ipsam admitto adimpleo suppellex decretum cauda aufero spargo a. Ager aureus creptio deorsum conspergo commemoro vix saepe acervus. Utique cogito alius tempora pecto molestiae."
+          },
+          {
+            "id": "option_b",
+            "title": "adnuo aqua quasi",
+            "description": "Desparatus impedit ciminatio vinum. Suppono aetas amissio depromo arto volutabrum articulus depono convoco. Aperiam curtus cervus valens adhaero vereor triumphus coadunatio."
+          },
+          {
+            "id": "option_c",
+            "title": "testimonium addo voco",
+            "description": "Cognatus conventus aeger vox adflicto sollers decipio. Cariosus exercitationem dens succedo aegre aut bestia taceo audio nam. Universe vilitas eaque consequuntur."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_t91wee5v_communication",
+      "title": "Communication Strategy",
+      "description": "Admiratio censura solium explicabo.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Crustulum suasoria deporto dolores ceno deficio deludo suffoco vilicus compono. Derelinquo illum asporto. Vorax vinculum auxilium utique succurro defetiscor hic ulciscor denego.",
+        "wordLimit": 686,
+        "keyPoints": [
+          "Nihil audio venia sperno recusandae alveus.",
+          "Animi aeternus et culpa odit alii curvo.",
+          "Votum laudantium stips comparo."
+        ]
+      }
+    }
+  ]
+}

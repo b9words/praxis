@@ -31,7 +31,7 @@ export function useSimulationPersistence(simulationId: string | null) {
       }
 
       try {
-        const response = await fetch(`/api/simulations/${simulationId}/state`, {
+        const response = await fetch(`/api/case-studies/${simulationId}/state`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

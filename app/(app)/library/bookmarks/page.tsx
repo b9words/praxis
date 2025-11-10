@@ -5,6 +5,9 @@ import { getAllUserProgress } from '@/lib/progress-tracking'
 import { BookOpen, CheckCircle, Clock, Star, Target } from 'lucide-react'
 import Link from 'next/link'
 
+// Force dynamic rendering to avoid static generation issues with useSearchParams
+export const dynamic = 'force-dynamic'
+
 export default async function BookmarksPage() {
   const user = await getCurrentUser()
 

@@ -1,0 +1,75 @@
+{
+  "caseId": "cs_mock_5yhqe1ox",
+  "version": "1.0",
+  "title": "Pfannerstill, Friesen and Bergstrom: Public-key local functionalities (2022)",
+  "description": "Sortitus voluntarius atque patria. Dedecor catena tremo deorsum illo cogo. Ait summopere auxilium strues.\nCupressus delicate corona amaritudo collum sonitus. Circumvenio degero aut bene acervus vel bene calcar. Antiquus repudiandae aestivus appono similique.",
+  "competencies": [
+    "Crisis Leadership",
+    "Operations Management"
+  ],
+  "estimatedDuration": 80,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_5yhqe1ox_data",
+      "fileName": "Gerhold LLC Financial Metrics 2021.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,583,493,341,644\nProfit Margin,26.8%,30%,20.2%,15.1%"
+      }
+    },
+    {
+      "fileId": "cs_mock_5yhqe1ox_memo",
+      "fileName": "URGENT: caelestis cauda demum.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** National Interactions Coordinator\n**To:** CEO\n**Date:** 2024-08-09\n**Subject:** Tubineus soleo porro concido toties adficio.\n\n## Current Situation\n\nDolores cubicularis derideo sopor abundans ut dedecor conicio aptus. Derelinquo culpo spiritus curiositas vito patruus. Amo crux conduco modi universe aeternus aequus ullam benevolentia.\nIllo triumphus ante aperio iusto vindico cuppedia compello. Via tui vulnero acerbitas amplexus peior tracto. Capitulus tersus adstringo corpus dicta.\nSuscipit conspergo placeat numquam infit rerum caveo. Animadverto caelestis desidero. Substantia testimonium consequatur cultellus cruentus aureus aduro officiis vox.\n\n### Primary Challenges:\n\n1. Adipiscor tergum casus tricesimus.\n2. Vinculum cunabula somniculosus delego quod defaeco audio distinctio.\n3. Tollo tabesco sonitus amplitudo suppellex desidero varius.\n\n### Strategic Options:\n\n**Option A:** Adsidue tracto adfero cornu id arceo tamen absorbeo asporto nobis.\n**Option B:** Veritatis sufficio spectaculum cruentus ab animi facere spero.\n**Option C:** Sustineo enim aestas aureus tunc surgo.\n\n### Recommendation:\n\nAngulus vulariter bellum absum vulpes cicuta sordeo atqui nisi ventito. Spargo audeo quibusdam conduco bene. Atrox veniam crux cariosus dedico."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_5yhqe1ox_strategy",
+      "title": "Strategic Decision",
+      "description": "Tam volup debitis universe maxime.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Strues dolores sol valetudo. Venia tandem deporto pax comparo vorago. Adimpleo compello qui adstringo acervus defaeco concedo debitis.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "celebrer asper strenuus",
+            "description": "Aveho comitatus omnis aequus arceo aer tonsor. Tardus sumptus sortitus demoror sapiente adficio quas tergo desidero. Chirographum sed suadeo ut congregatio."
+          },
+          {
+            "id": "option_b",
+            "title": "tepesco laudantium vaco",
+            "description": "Eaque nesciunt tamquam vobis aer adnuo viduo. Possimus dens aliquid tenuis tametsi color cohaero. Aequus uxor cauda optio video spiritus cuppedia strenuus coniecto."
+          },
+          {
+            "id": "option_c",
+            "title": "charisma vulnus tantillus",
+            "description": "Conspergo admiratio addo iste tempus fuga tunc ademptio. Capillus dedecor aequus virtus caecus. Cursim voro iste via abscido tamisium venio apud alo currus."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_5yhqe1ox_communication",
+      "title": "Communication Strategy",
+      "description": "Id et aqua a tollo alias reiciendis vergo bellicus sono.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Peccatus ascit tabgo. Delectatio patruus astrum talio cognatus. Articulus sto aperiam currus caritas tamisium cedo uxor.",
+        "wordLimit": 946,
+        "keyPoints": [
+          "Porro alias cruciamentum summisse.",
+          "Quibusdam cimentarius crapula ambulo super desparatus sui carpo.",
+          "Concido acies confugo thymbra velit."
+        ]
+      }
+    }
+  ]
+}

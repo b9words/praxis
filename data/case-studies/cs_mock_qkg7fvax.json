@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_qkg7fvax",
+  "version": "1.0",
+  "title": "Christiansen - Leuschke: Upgradable eco-centric strategy (2024)",
+  "description": "Adfectus ambitus suscipit aveho. Desipio surgo amplitudo cultura deorsum. Toties astrum titulus suadeo iure subnecto cupiditas.\nSophismata esse repudiandae confero. Ocer ait defaeco temperantia thalassinus deputo varius ceno cunctatio velociter. Stipes unde alienus uredo commemoro atrox capto cura casso commemoro.",
+  "competencies": [
+    "Strategic Thinking",
+    "Market Foresight",
+    "Capital Efficiency"
+  ],
+  "estimatedDuration": 68,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_qkg7fvax_data",
+      "fileName": "Kiehn Inc Financial Metrics 2024.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,905,781,399,770\nProfit Margin,8.8%,8.2%,13.6%,25.2%"
+      }
+    },
+    {
+      "fileId": "cs_mock_qkg7fvax_memo",
+      "fileName": "URGENT: caritas adversus apostolus.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Human Web Engineer\n**To:** CEO\n**Date:** 2024-12-20\n**Subject:** Sollers candidus urbs collum suasoria acceptus corroboro.\n\n## Current Situation\n\nIllo aequus texo blandior spiculum. Libero talio somniculosus constans tolero claustrum molestias tamdiu cras. Degenero toties vetus impedit solvo.\nAltus campana sui trans umquam cuppedia alii debitis callide clamo. Aestivus tres cursus patior alii confero alii vito timor. Caecus victoria conitor arto magnam villa.\nCapio vigilo assumenda. Molestiae universe demoror. Spoliatio aestas vulgivagus cumque civis labore cogo aiunt ab defaeco.\n\n### Primary Challenges:\n\n1. Mollitia xiphias cito cicuta artificiose ascit cinis textus ventosus.\n2. Candidus uxor complectus amplexus usus repellat asper curtus cito tabula.\n3. Vox adopto conspergo dens desolo comedo.\n\n### Strategic Options:\n\n**Option A:** Utilis vigilo tibi ullam inventore trepide cognomen cubitum.\n**Option B:** Deleo circumvenio vito coma alter.\n**Option C:** Adsuesco amor bonus delectus damnatio thermae tactus.\n\n### Recommendation:\n\nConcido comes teres admoveo abundans theatrum. Aperte canto vicissitudo unde sulum dens. Voluptates vociferor bibo tondeo avaritia benigne spes."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_qkg7fvax_strategy",
+      "title": "Strategic Decision",
+      "description": "Vicinus alienus doloremque versus ventito aro.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Quaerat artificiose volo vergo aspernatur. Ait verbera aut. Deduco patruus aequitas calamitas vicinus ver.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "terminatio accusantium compello",
+            "description": "Cervus verbera reiciendis aequitas verbera vita aetas exercitationem. Crudelis attero nesciunt vitae desolo. Quam conforto umerus."
+          },
+          {
+            "id": "option_b",
+            "title": "dapifer aurum aufero",
+            "description": "Cena tenetur basium comminor deleniti villa vicinus beatae contabesco. Dolore degusto velut via. Deprimo vel timidus abduco comitatus curis."
+          },
+          {
+            "id": "option_c",
+            "title": "calculus aveho adfero",
+            "description": "Celebrer admoveo callide thorax ullus denuncio cupressus voluptatum. Bibo claro at cras. Possimus cupiditas victus administratio bene maxime possimus adflicto culpa sodalitas."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_qkg7fvax_communication",
+      "title": "Communication Strategy",
+      "description": "Reprehenderit commemoro aliquid curso aperiam vinitor demo comes.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Deripio collum tonsor usque speculum adipiscor maxime tenax approbo. Vaco accusator tantum demitto. Absens totus contigo hic spiculum subvenio.",
+        "wordLimit": 978,
+        "keyPoints": [
+          "Cubo viriliter sapiente coadunatio antepono turbo conturbo.",
+          "Deludo avarus pauper adulescens cupiditate incidunt debeo tamisium.",
+          "Tepidus adficio aut fuga victus truculenter turbo cognatus curtus."
+        ]
+      }
+    }
+  ]
+}

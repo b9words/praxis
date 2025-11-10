@@ -104,7 +104,7 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
             return {
               ...item,
               title: caseStudy?.title || 'Unknown Case',
-              url: `/simulations/${item.caseId}/brief`,
+              url: `/library/case-studies/${item.caseId}`,
               completed: !!simulation,
               progress: simulation ? 100 : 0,
             }

@@ -52,7 +52,7 @@ export default function FinancialModelingLayout({ challengeData }: FinancialMode
       blockId: 'documents',
       blockType: 'DOCUMENT_VIEWER',
       props: {
-        title: 'Briefing Documents',
+        title: 'Overview',
         fileIds: fileIds,
         showTabs: true
       }

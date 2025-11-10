@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import LoadingSkeleton from '@/components/ui/loading-skeleton'
-import MarkdownRenderer from '@/components/ui/markdown-renderer'
+import MarkdownRenderer from '@/components/ui/Markdown'
 import SlidesRenderer from '@/components/admin/renderers/SlidesRenderer'
 import { useCaseFile } from '@/hooks/useCaseFile'
 import { AlertCircle, Building2, FileText, TrendingUp } from 'lucide-react'
@@ -19,7 +19,7 @@ interface DocumentViewerBlockProps {
 
 export default function DocumentViewerBlock({
   blockId,
-  title = 'Briefing Documents',
+  title = 'Overview',
   fileIds,
   defaultFileId,
   showTabs = true

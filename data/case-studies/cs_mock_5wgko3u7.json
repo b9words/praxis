@@ -1,0 +1,76 @@
+{
+  "caseId": "cs_mock_5wgko3u7",
+  "version": "1.0",
+  "title": "Hilll - Hintz: Decentralized secondary orchestration (2021)",
+  "description": "Amiculum quisquam animus voro termes. Nesciunt vere iste ater cras turpis. Soleo usitas varius verto alius illum taedium templum.\nAspernatur thema suppellex aiunt delectus atavus confero. Cubo inventore quaerat. Tubineus bibo animi ullus aro voluptatem turbo desino.",
+  "competencies": [
+    "Organizational Design",
+    "Market Foresight",
+    "Capital Efficiency"
+  ],
+  "estimatedDuration": 119,
+  "difficulty": "intermediate",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_5wgko3u7_data",
+      "fileName": "Nienow - Heller Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,159,595,632,688\nProfit Margin,11.4%,14.1%,26.1%,9.8%"
+      }
+    },
+    {
+      "fileId": "cs_mock_5wgko3u7_memo",
+      "fileName": "URGENT: tres magnam tempus.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** International Implementation Planner\n**To:** CEO\n**Date:** 2025-08-05\n**Subject:** Voco defero aranea cribro virgo comitatus.\n\n## Current Situation\n\nUxor consectetur agnosco surculus color terra decipio deorsum tergo. Decipio coruscus cornu est titulus conturbo. Speciosus centum chirographum victoria supra neque socius.\nQuae dolor in. Aggredior aut virga cunabula deleo. Adfero sunt fugiat.\nCarcer tamdiu asporto auditor degusto circumvenio carmen. Soleo tredecim cura aer certus vomer patior sulum. Eaque adfero modi.\n\n### Primary Challenges:\n\n1. Volo hic defungo vinculum speculum advoco deleniti caput delinquo defleo.\n2. Consuasor asper desparatus triduana sonitus confido videlicet.\n3. Bellum adflicto talio tres volaticus valetudo pauci ex acsi caritas.\n\n### Strategic Options:\n\n**Option A:** Quisquam iusto talis cibus maiores alienus.\n**Option B:** Tandem suadeo vulariter chirographum deripio comprehendo.\n**Option C:** Umquam stella vaco barba uterque adulatio.\n\n### Recommendation:\n\nCompono comburo doloremque vilicus adiuvo consequuntur umerus crustulum avarus currus. Veritas tempus despecto voveo delego adsum. Debeo aro vinitor tenetur censura."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_5wgko3u7_strategy",
+      "title": "Strategic Decision",
+      "description": "Supplanto vilis uxor dolorum teres libero ipsum.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Antepono ex censura. Supra adduco pariatur. Volo denuo adversus ipsam turba vulnus curtus.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "comitatus ventus aureus",
+            "description": "Cultura adhuc conor celo stipes vinum ceno. Adsidue fugiat aeneus victus tener solus tredecim sit volo. Vesper ea angelus eum antepono omnis denuncio quasi."
+          },
+          {
+            "id": "option_b",
+            "title": "abstergo autem deprecator",
+            "description": "Credo curriculum summopere peccatus coaegresco cunctatio blandior voco aperte corrigo. Brevis termes averto. Demitto absque ago."
+          },
+          {
+            "id": "option_c",
+            "title": "timor tepidus veritas",
+            "description": "Statua admoveo terra tutis thermae distinctio candidus tutis suscipio. Armarium caelum beneficium textor audentia aeger vulticulus acidus truculenter copiose. Itaque venia vester absque aestivus casso sortitus valeo degero."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_5wgko3u7_communication",
+      "title": "Communication Strategy",
+      "description": "Audio tibi volaticus censura deputo aiunt laboriosam.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Arbor decimus concido enim occaecati absorbeo temptatio. Copiose admoveo temeritas vis capto commodo auctus neque. Constans subiungo laborum crepusculum.",
+        "wordLimit": 710,
+        "keyPoints": [
+          "Abscido aeternus uxor aetas suffragium verumtamen cerno.",
+          "Modi uxor vilis tactus aiunt.",
+          "Cunae deludo admiratio aufero texo defetiscor cogito credo."
+        ]
+      }
+    }
+  ]
+}

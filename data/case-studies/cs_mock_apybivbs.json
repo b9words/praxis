@@ -1,0 +1,77 @@
+{
+  "caseId": "cs_mock_apybivbs",
+  "version": "1.0",
+  "title": "Predovic, Hettinger and Thiel: Realigned clear-thinking functionalities (2025)",
+  "description": "Vito spoliatio quos. Carpo vilitas coadunatio terga crudelis. Abstergo illum voluptates corporis.\nConiecto eligendi decet utrum dicta. Aptus vomito carus aer somnus pariatur cuppedia. Territo autus tracto sodalitas curatio defungo.",
+  "competencies": [
+    "Risk Management",
+    "Operations Management",
+    "Organizational Design",
+    "Stakeholder Communication"
+  ],
+  "estimatedDuration": 75,
+  "difficulty": "advanced",
+  "caseFiles": [
+    {
+      "fileId": "cs_mock_apybivbs_data",
+      "fileName": "Hammes LLC Financial Metrics 2025.csv",
+      "fileType": "FINANCIAL_DATA",
+      "source": {
+        "type": "STATIC",
+        "content": "Metric,Q1,Q2,Q3,Q4\nRevenue,492,929,410,149\nProfit Margin,10.1%,15.5%,10.5%,5%"
+      }
+    },
+    {
+      "fileId": "cs_mock_apybivbs_memo",
+      "fileName": "URGENT: veritas tutamen talis.md",
+      "fileType": "MEMO",
+      "source": {
+        "type": "STATIC",
+        "content": "# URGENT MEMO\n\n**From:** Corporate Research Associate\n**To:** CEO\n**Date:** 2025-04-22\n**Subject:** Curvo animadverto doloremque conscendo corrupti quas supellex amor adeptio vulgus.\n\n## Current Situation\n\nAdnuo auditor adficio cruciamentum. Confugo decor spero dolor universe usitas absque tergo degusto. Denuncio vos tego carpo fugiat vulgivagus umquam alter suffoco coniuratio.\nCulpo canonicus totus. Tres a cohors caput canis. Audentia itaque claro.\nCotidie utor ventosus depromo comprehendo amissio. Adulescens coadunatio coadunatio commemoro asper terra annus rem anser aeneus. Auditor trado impedit aetas vis caritas unde asporto ultra abutor.\n\n### Primary Challenges:\n\n1. Tenus victus verbera totus valeo aveho ciminatio.\n2. Cotidie crudelis impedit artificiose studio.\n3. Collum desolo theca tactus.\n\n### Strategic Options:\n\n**Option A:** Armarium incidunt alias cotidie cupio adflicto certus vis.\n**Option B:** Consequuntur adimpleo atrox cruciamentum vinitor ara tenax amitto vomica creber.\n**Option C:** Conicio quisquam aureus arbustum vigilo vero valens quibusdam titulus.\n\n### Recommendation:\n\nConculco combibo repellat. Arcesso patior torrens creber apparatus. Capio coepi sed paulatim."
+      }
+    }
+  ],
+  "stages": [
+    {
+      "stageId": "cs_mock_apybivbs_strategy",
+      "title": "Strategic Decision",
+      "description": "Conventus tredecim barba delicate thesis attero amo vacuus.",
+      "challengeType": "STRATEGIC_OPTIONS",
+      "challengeData": {
+        "prompt": "Stella acies strues comedo adsidue. Caput crepusculum aggero arceo coadunatio alii verbum. Denuo anser cohors.",
+        "options": [
+          {
+            "id": "option_a",
+            "title": "vester arx vociferor",
+            "description": "Talio incidunt vado iste. Autus aspernatur veritatis complectus corrigo temporibus confido. Taceo patria uxor admiratio cauda delego calamitas tam verto curriculum."
+          },
+          {
+            "id": "option_b",
+            "title": "congregatio vito decretum",
+            "description": "Consequuntur verbera modi tempus tondeo congregatio. Ubi conventus thalassinus vilis qui talio. Tutis crur admoneo cuius sperno defaeco tamquam consuasor rem."
+          },
+          {
+            "id": "option_c",
+            "title": "audentia tamquam in",
+            "description": "Claro tamisium denuncio bibo. Sumo vita curso demo velociter esse suffragium caste dedecor anser. A adflicto voluptatum carcer."
+          }
+        ]
+      }
+    },
+    {
+      "stageId": "cs_mock_apybivbs_communication",
+      "title": "Communication Strategy",
+      "description": "Tumultus ipsa argumentum suscipit pauci suus tenus voluptates.",
+      "challengeType": "WRITTEN_ANALYSIS",
+      "challengeData": {
+        "prompt": "Congregatio socius aegrotatio velit animadverto complectus tot. Cruentus demergo ultra conforto ustulo alienus tergiversatio. Attonbitus curtus asperiores suffoco facere rem auxilium beneficium adhuc.",
+        "wordLimit": 661,
+        "keyPoints": [
+          "Una sopor dapifer viriliter super via eum.",
+          "Admoveo sursum animus cognatus exercitationem.",
+          "Pauci aspernatur crastinus provident volubilis suscipio vesco."
+        ]
+      }
+    }
+  ]
+}

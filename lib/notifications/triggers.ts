@@ -54,8 +54,8 @@ export async function notifySimulationComplete(userId: string, simulationId: str
   return createNotification({
     userId,
     type: 'simulation_complete',
-    title: 'Simulation Complete',
-    message: `You have completed the "${caseTitle}" simulation. View your after-action report to see your results and feedback.`,
+    title: 'Case Study Complete',
+    message: `You have completed the "${caseTitle}" case study. View your debrief to see your results and feedback.`,
     link: `/debrief/${simulationId}`,
     metadata: {
       simulationId,

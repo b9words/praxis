@@ -96,9 +96,10 @@ Generate the SVG visualization now.`
     throw lastError || new Error('Retry exhausted')
   }
 
+  const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp'
   const response = await retryWithBackoff(async () => {
     const apiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {

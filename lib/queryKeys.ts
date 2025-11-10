@@ -13,6 +13,10 @@ export const queryKeys = {
     byId: (id: string) => ['simulations', id] as const,
     state: (id: string) => ['simulations', id, 'state'] as const,
   },
+  caseStudies: {
+    byId: (id: string) => ['case-studies', id] as const,
+    state: (id: string) => ['case-studies', id, 'state'] as const,
+  },
   debriefs: {
     bySimulation: (simulationId: string) => ['debriefs', simulationId] as const,
   },

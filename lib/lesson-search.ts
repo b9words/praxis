@@ -1,5 +1,6 @@
 import { loadLessonByPath } from './content-loader'
 import { completeCurriculumData } from './curriculum-data'
+import { isYear1Lesson } from './year1-allowlist'
 
 export interface LessonSearchResult {
   domainId: string
@@ -27,10 +28,14 @@ export async function searchLessons(query: string): Promise<LessonSearchResult[]
   const searchTerm = query.toLowerCase().trim()
   const results: LessonSearchResult[] = []
 
-  // Search through all curriculum lessons
+  // Search through all curriculum lessons (Year 1 only)
   for (const domain of completeCurriculumData) {
     for (const module of domain.modules) {
       for (const lesson of module.lessons) {
+        // Filter to Year 1 content only
+        if (!isYear1Lesson(domain.id, module.id, lesson.id)) {
+          continue
+        }
         // Check title and description first (faster, no file I/O)
         const titleMatch = lesson.title.toLowerCase().includes(searchTerm)
         const descMatch = lesson.description.toLowerCase().includes(searchTerm)
@@ -118,6 +123,10 @@ export function quickSearchLessons(query: string): Array<{
   for (const domain of completeCurriculumData) {
     for (const module of domain.modules) {
       for (const lesson of module.lessons) {
+        // Filter to Year 1 content only
+        if (!isYear1Lesson(domain.id, module.id, lesson.id)) {
+          continue
+        }
         if (
           lesson.title.toLowerCase().includes(searchTerm) ||
           lesson.description.toLowerCase().includes(searchTerm) ||

@@ -210,15 +210,7 @@ export default function CaseStudyPlayer({ className = '', simulationId = null }:
           </p>
         </div>
         <WrittenAnalysisLayout
-          stage={currentStage}
-          caseStudyData={caseStudyData}
-          stageState={stageStates[currentStage.stageId]}
-          onUpdate={(updates) => {
-            // Update stage state
-            const currentState = stageStates[currentStage.stageId] || { status: 'in_progress', data: {} }
-            // Merge updates
-            Object.assign(currentState.data || {}, updates)
-          }}
+          challengeData={currentStage.challengeData as any}
         />
       </div>
     )

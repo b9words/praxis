@@ -142,7 +142,7 @@ export default function SimulationWorkspace({
   // Mutation for saving simulation state
   const saveStateMutation = useMutation({
     mutationFn: (newState: SimulationState) =>
-      fetchJson(`/api/simulations/${simulation.id}/state`, {
+      fetchJson(`/api/case-studies/${simulation.id}/state`, {
         method: 'PUT',
         body: {
           stageStates: { simulationState: newState }, // Store full state in stageStates
@@ -251,7 +251,7 @@ export default function SimulationWorkspace({
 
   // Mutation for completing simulation
   const completeMutation = useMutation({
-    mutationFn: () => fetchJson<{ success: boolean }>(`/api/simulations/${simulation.id}/complete`, {
+      mutationFn: () => fetchJson<{ success: boolean }>(`/api/case-studies/${simulation.id}/complete`, {
       method: 'POST',
     }),
     onSuccess: () => {
@@ -329,8 +329,8 @@ export default function SimulationWorkspace({
             Dashboard
           </Link>
           <ChevronRight className="h-3 w-3" />
-          <Link href="/simulations" className="hover:text-gray-700 font-medium">
-            Simulations
+          <Link href="/library/case-studies" className="hover:text-gray-700 font-medium">
+            Case Studies
           </Link>
           <ChevronRight className="h-3 w-3" />
           <span className="text-gray-700 font-medium">{caseData?.title || caseItem.title}</span>

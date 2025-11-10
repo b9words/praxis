@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRight, Home } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { useMemo } from 'react'
+import { Suspense, useMemo } from 'react'
 
 interface BreadcrumbNode {
   id: string
@@ -15,7 +15,7 @@ interface BreadcrumbNode {
   residency_year?: number
 }
 
-export default function LibraryBreadcrumbs() {
+function LibraryBreadcrumbsContent() {
   const searchParams = useSearchParams()
   const competencyId = searchParams.get('competency')
 
@@ -92,6 +92,14 @@ export default function LibraryBreadcrumbs() {
         </div>
       ))}
     </nav>
+  )
+}
+
+export default function LibraryBreadcrumbs() {
+  return (
+    <Suspense fallback={null}>
+      <LibraryBreadcrumbsContent />
+    </Suspense>
   )
 }
 
