@@ -3,14 +3,22 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { fetchJson } from '@/lib/api'
 import { completeCurriculumData } from '@/lib/curriculum-data'
 import { queryKeys } from '@/lib/queryKeys'
+import { useLibraryUiStore } from '@/lib/ui/library-ui-store'
 import { useQuery } from '@tanstack/react-query'
 import {
     Briefcase,
     CheckCircle,
     ChevronDown,
+    ChevronLeft,
     ChevronRight,
     Clock,
     FileText,
@@ -21,7 +29,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 interface LibrarySidebarProps {
   className?: string
@@ -47,6 +55,15 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
   const [searchQuery, setSearchQuery] = useState('')
   const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set())
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set())
+  const sidebarMode = useLibraryUiStore((state) => state.sidebarMode)
+  const setSidebarMode = useLibraryUiStore((state) => state.setSidebarMode)
+  const toggleSidebarMode = useLibraryUiStore((state) => state.toggleSidebarMode)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  
+  // Check if we're on mobile (when onMobileClose is provided, we're in mobile overlay)
+  const isMobile = !!onMobileClose
+  // Rail mode is desktop-only
+  const isRail = !isMobile && sidebarMode === 'rail'
 
   // Fetch user progress with React Query
   const { data: progressData, isLoading: isLoadingProgress } = useQuery({
@@ -160,104 +177,212 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
     )
   }
 
+  const handleSearchClick = () => {
+    if (isRail) {
+      setSidebarMode('expanded')
+      // Focus search input after expansion
+      setTimeout(() => {
+        searchInputRef.current?.focus()
+      }, 100)
+    }
+  }
+
+  const NavButton = ({ 
+    href, 
+    icon: Icon, 
+    label, 
+    isActive: active 
+  }: { 
+    href: string
+    icon: typeof FileText
+    label: string
+    isActive: boolean
+  }) => {
+    const buttonContent = (
+      <Button 
+        asChild 
+        variant="ghost"
+        size={isRail ? "icon" : "sm"}
+        className={`${isRail ? 'w-full h-12' : 'w-full justify-start h-11 md:h-8 px-2'} text-xs font-medium ${
+          active 
+            ? 'bg-neutral-100 text-neutral-900' 
+            : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
+        }`}
+      >
+        <Link href={href} onClick={onMobileClose}>
+          <Icon className={isRail ? 'h-5 w-5' : 'mr-2 h-3 w-3'} />
+          {!isRail && label}
+        </Link>
+      </Button>
+    )
+
+    if (isRail) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {buttonContent}
+          </TooltipTrigger>
+          <TooltipContent side="right" sideOffset={8}>
+            {label}
+          </TooltipContent>
+        </Tooltip>
+      )
+    }
+
+    return buttonContent
+  }
+
   return (
     <div className={`flex flex-col h-full bg-white ${className}`}>
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-neutral-200">
-        <div className="mb-3">
-          <h2 className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
-            Executive Library
-          </h2>
-        </div>
+      <div className={`flex-shrink-0 ${isRail ? 'px-2 py-2' : 'px-4 py-3'} border-b border-neutral-200`}>
+        {!isRail && (
+          <div className="mb-3">
+            <h2 className="text-xs font-medium text-neutral-600 uppercase tracking-wide">
+              Executive Library
+            </h2>
+          </div>
+        )}
         
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
-               <Input
-                 placeholder="Search frameworks, models, case files..."
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-                 className="pl-8 pr-8 h-11 md:h-8 text-sm bg-neutral-50 border border-neutral-300 text-neutral-800 placeholder:text-neutral-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 rounded-none"
-               />
-               {isSearchingContent && (
-                 <Loader2 className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 animate-spin text-neutral-400" />
-               )}
-        </div>
+        {isRail ? (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-full h-12 hover:bg-neutral-100"
+                  onClick={handleSearchClick}
+                  aria-label="Search"
+                >
+                  <Search className="h-5 w-5 text-neutral-600" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right" sideOffset={8}>
+                Search
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
+            <Input
+              ref={searchInputRef}
+              placeholder="Search frameworks, models, case files..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 pr-8 h-11 md:h-8 text-sm bg-neutral-50 border border-neutral-300 text-neutral-800 placeholder:text-neutral-400 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 rounded-none"
+            />
+            {isSearchingContent && (
+              <Loader2 className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 animate-spin text-neutral-400" />
+            )}
+          </div>
+        )}
+
+        {/* Toggle Button - Desktop only */}
+        {!isMobile && (
+          <div className={isRail ? 'mt-2' : 'mt-3'}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size={isRail ? "icon" : "sm"}
+                    className={`${isRail ? 'w-full h-10' : 'w-full justify-start h-8 px-2'} text-xs text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100`}
+                    onClick={toggleSidebarMode}
+                    aria-label={isRail ? 'Expand sidebar' : 'Collapse sidebar'}
+                  >
+                    {isRail ? (
+                      <ChevronRight className="h-4 w-4" />
+                    ) : (
+                      <>
+                        <ChevronLeft className="mr-2 h-3 w-3" />
+                        Collapse
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                {isRail && (
+                  <TooltipContent side="right" sideOffset={8}>
+                    Expand sidebar
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
       </div>
 
       {/* Quick Navigation */}
-      <div className="flex-shrink-0 px-4 py-2 border-b border-neutral-200">
-        <div className="space-y-0.5">
-          <Button 
-            asChild 
-            variant="ghost"
-            size="sm" 
-            className={`w-full justify-start h-11 md:h-8 px-2 text-xs font-medium ${
-              isActive('/library') 
-                ? 'bg-neutral-100 text-neutral-900' 
-                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-            }`}
-          >
-            <Link href="/library" onClick={onMobileClose}>
-              <FileText className="mr-2 h-3 w-3" />
-              ALL ARTICLES
-            </Link>
-          </Button>
-          <Button 
-            asChild 
-            variant="ghost"
-            size="sm" 
-            className={`w-full justify-start h-11 md:h-8 px-2 text-xs font-medium ${
-              isActive('/library/curriculum') 
-                ? 'bg-neutral-100 text-neutral-900' 
-                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-            }`}
-          >
-            <Link href="/library/curriculum" onClick={onMobileClose}>
-              <Target className="mr-2 h-3 w-3" />
-              CURRICULUM
-            </Link>
-          </Button>
-          <Button 
-            asChild 
-            variant="ghost"
-            size="sm" 
-            className={`w-full justify-start h-11 md:h-8 px-2 text-xs font-medium ${
-              isActive('/library/case-studies') 
-                ? 'bg-neutral-100 text-neutral-900' 
-                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-            }`}
-          >
-            <Link href="/library/case-studies" onClick={onMobileClose}>
-              <Briefcase className="mr-2 h-3 w-3" />
-              CASE STUDIES
-            </Link>
-          </Button>
-          <Button 
-            asChild 
-            variant="ghost"
-            size="sm" 
-            className={`w-full justify-start h-11 md:h-8 px-2 text-xs font-medium ${
-              isActive('/library/bookmarks') 
-                ? 'bg-neutral-100 text-neutral-900' 
-                : 'text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100'
-            }`}
-          >
-            <Link href="/library/bookmarks" onClick={onMobileClose}>
-              <Star className="mr-2 h-3 w-3" />
-              BOOKMARKS
-            </Link>
-          </Button>
-        </div>
+      <div className={`flex-shrink-0 ${isRail ? 'px-2 py-2' : 'px-4 py-2'} border-b border-neutral-200`}>
+        {isRail ? (
+          <TooltipProvider>
+            <div className="space-y-1">
+              <NavButton 
+                href="/library" 
+                icon={FileText} 
+                label="ALL ARTICLES" 
+                isActive={isActive('/library')} 
+              />
+              <NavButton 
+                href="/library/curriculum" 
+                icon={Target} 
+                label="CURRICULUM" 
+                isActive={isActive('/library/curriculum')} 
+              />
+              <NavButton 
+                href="/library/case-studies" 
+                icon={Briefcase} 
+                label="CASE STUDIES" 
+                isActive={isActive('/library/case-studies')} 
+              />
+              <NavButton 
+                href="/library/bookmarks" 
+                icon={Star} 
+                label="BOOKMARKS" 
+                isActive={isActive('/library/bookmarks')} 
+              />
+            </div>
+          </TooltipProvider>
+        ) : (
+          <div className="space-y-0.5">
+            <NavButton 
+              href="/library" 
+              icon={FileText} 
+              label="ALL ARTICLES" 
+              isActive={isActive('/library')} 
+            />
+            <NavButton 
+              href="/library/curriculum" 
+              icon={Target} 
+              label="CURRICULUM" 
+              isActive={isActive('/library/curriculum')} 
+            />
+            <NavButton 
+              href="/library/case-studies" 
+              icon={Briefcase} 
+              label="CASE STUDIES" 
+              isActive={isActive('/library/case-studies')} 
+            />
+            <NavButton 
+              href="/library/bookmarks" 
+              icon={Star} 
+              label="BOOKMARKS" 
+              isActive={isActive('/library/bookmarks')} 
+            />
+          </div>
+        )}
       </div>
 
-      {/* Curriculum Navigation */}
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="px-4 py-3 space-y-1">
-            <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide mb-3">
-              DOMAINS
-            </div>
+      {/* Curriculum Navigation - Hidden in rail mode */}
+      {!isRail && (
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="px-4 py-3 space-y-1">
+              <div className="text-xs font-medium text-neutral-600 uppercase tracking-wide mb-3">
+                DOMAINS
+              </div>
           
           {isLoadingProgress ? (
             <div className="flex items-center justify-center py-8">
@@ -443,35 +568,38 @@ export default function LibrarySidebar({ className = '', onMobileClose }: Librar
               </div>
             )
           }))}
-          </div>
-        </ScrollArea>
-      </div>
+            </div>
+          </ScrollArea>
+        </div>
+      )}
 
-      {/* Footer */}
-      <div className="flex-shrink-0 p-4 border-t border-neutral-200">
-        <div className="text-xs text-neutral-500 space-y-1">
-          <div className="flex justify-between">
-            <span>Total Domains:</span>
-            <span className="font-medium">{completeCurriculumData.length}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Total Lessons:</span>
-            <span className="font-medium">
-              {completeCurriculumData.reduce((sum, d) => 
-                sum + d.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0
-              )}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span>Est. Time:</span>
-            <span className="font-medium">
-              {Math.round(completeCurriculumData.reduce((sum, d) => 
-                sum + d.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0
-              ) * 12 / 60)} hours
-            </span>
+      {/* Footer - Hidden in rail mode */}
+      {!isRail && (
+        <div className="flex-shrink-0 p-4 border-t border-neutral-200">
+          <div className="text-xs text-neutral-500 space-y-1">
+            <div className="flex justify-between">
+              <span>Total Domains:</span>
+              <span className="font-medium">{completeCurriculumData.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total Lessons:</span>
+              <span className="font-medium">
+                {completeCurriculumData.reduce((sum, d) => 
+                  sum + d.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Est. Time:</span>
+              <span className="font-medium">
+                {Math.round(completeCurriculumData.reduce((sum, d) => 
+                  sum + d.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0
+                ) * 12 / 60)} hours
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
