@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -13,16 +13,16 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
 
-    const simulation = await getSimulationByIdFull(id)
+    const simulation = await getSimulationByIdFull(caseId)
 
     if (!simulation) {
       return NextResponse.json({ error: 'Case study not found' }, { status: 404 })
     }
 
     // Users can only access their own case studies
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -41,7 +41,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -49,16 +49,16 @@ export async function PUT(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
     const body = await request.json()
 
     // Check ownership
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const simulation = await updateSimulation(id, body)
+    const simulation = await updateSimulation(caseId, body)
 
     return NextResponse.json({ simulation })
   } catch (error: any) {
@@ -77,7 +77,7 @@ export async function PUT(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -85,16 +85,16 @@ export async function PATCH(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
     const body = await request.json()
 
     // Check ownership
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const simulation = await updateSimulation(id, body)
+    const simulation = await updateSimulation(caseId, body)
 
     return NextResponse.json({ simulation })
   } catch (error: any) {

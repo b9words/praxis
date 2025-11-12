@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import { BarChart3, BookOpen, Compass, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import NotificationsBell from '@/components/nav/NotificationsBell'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -126,6 +127,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <NotificationsBell />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">

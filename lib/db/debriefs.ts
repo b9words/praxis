@@ -74,6 +74,7 @@ export async function upsertDebrief(data: {
   summaryText: string
   radarChartData: any
   rubricVersion?: string | null
+  goldStandardExemplar?: string | null
 }) {
   return dbCall(async (prisma) => {
     return prisma.debrief.upsert({
@@ -81,14 +82,20 @@ export async function upsertDebrief(data: {
       update: {
         scores: data.scores,
         summaryText: data.summaryText,
-        radarChartData: data.radarChartData,
+        radarChartData: {
+          ...(data.radarChartData || {}),
+          ...(data.goldStandardExemplar && { goldStandardExemplar: data.goldStandardExemplar }),
+        },
         ...(data.rubricVersion !== undefined && { rubricVersion: data.rubricVersion }),
       },
       create: {
         simulationId: data.simulationId,
         scores: data.scores,
         summaryText: data.summaryText,
-        radarChartData: data.radarChartData,
+        radarChartData: {
+          ...(data.radarChartData || {}),
+          ...(data.goldStandardExemplar && { goldStandardExemplar: data.goldStandardExemplar }),
+        },
         rubricVersion: data.rubricVersion ?? null,
       },
       include: defaultInclude,

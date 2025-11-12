@@ -10,11 +10,17 @@ type AnalyticsEvent =
   | 'case_study_completed'
   | 'lesson_viewed'
   | 'lesson_completed'
+  | 'lesson_progress'
+  | 'lesson_bookmarked'
   | 'debrief_shared'
   | 'application_submitted'
   | 'subscription_started'
   | 'user_signed_up'
   | 'dashboard_card_clicked'
+  | 'onboarding_step_completed'
+  | 'onboarding_completed'
+  | 'case_decision_submitted'
+  | 'response_liked'
 
 interface AnalyticsProperties {
   [key: string]: string | number | boolean | undefined

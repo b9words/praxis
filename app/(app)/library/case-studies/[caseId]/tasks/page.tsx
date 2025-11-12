@@ -8,6 +8,7 @@ import { getSimulationByUserAndCase, createSimulation } from '@/lib/db/simulatio
 import { getLessonProgressList } from '@/lib/db/progress'
 import { checkSubscription } from '@/lib/auth/require-subscription'
 import { getCurrentBriefing } from '@/lib/briefing'
+import { upsertCaseFromJson } from '@/lib/cases/upsert-from-json'
 import { notFound } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -23,15 +24,27 @@ export default async function CaseStudyTasksPage({ params }: { params: Promise<{
 
   const { caseId } = await params
 
-  // Fetch case details - try database first, then JSON files
+  // Fetch case details - try database first
   let caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
   
-  // Fallback to JSON files if not found in database
-  if (!caseItem) {
-    const { loadInteractiveSimulation } = await import('@/lib/case-study-loader')
-    const jsonCase = loadInteractiveSimulation(caseId)
-    if (jsonCase) {
-      // Convert JSON case to database format
+  // Check if this is a JSON case (not found in DB and exists as JSON)
+  const { loadInteractiveSimulation } = await import('@/lib/case-study-loader')
+  const jsonCase = loadInteractiveSimulation(caseId)
+  const isJsonCase = !caseItem && !!jsonCase
+  
+  // If JSON case, upsert it to DB first
+  if (isJsonCase && jsonCase) {
+    try {
+      const dbCaseId = await upsertCaseFromJson(caseId, user.id)
+      // Now fetch the case from DB
+      caseItem = await getCaseByIdWithCompetencies(dbCaseId).catch(() => null)
+      if (!caseItem) {
+        // Fallback: try by caseId slug
+        caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
+      }
+    } catch (error) {
+      console.error('Error upserting JSON case to DB:', error)
+      // Fallback to JSON-only mode (but this should not happen)
       caseItem = {
         id: jsonCase.caseId,
         title: jsonCase.title,
@@ -60,19 +73,15 @@ export default async function CaseStudyTasksPage({ params }: { params: Promise<{
   // Fetch case files (which contain the actual dataset data)
   // For JSON cases, extract from JSON structure
   let caseFiles: any[] = []
-  const isJsonCase = caseItem.id === caseId && !caseItem.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
   
-  if (isJsonCase) {
-    const { loadInteractiveSimulation } = await import('@/lib/case-study-loader')
-    const jsonCase = loadInteractiveSimulation(caseId)
-    if (jsonCase && jsonCase.caseFiles) {
-      caseFiles = jsonCase.caseFiles.map((file: any) => ({
-        id: file.fileId,
-        fileName: file.fileName,
-        fileType: file.fileType,
-        source: file.source,
-      }))
-    }
+  if (jsonCase && jsonCase.caseFiles) {
+    caseFiles = jsonCase.caseFiles.map((file: any) => ({
+      id: file.fileId,
+      fileName: file.fileName,
+      fileType: file.fileType,
+      source: file.source,
+      content: file.source?.type === 'STATIC' ? file.source.content : '',
+    }))
   } else {
     caseFiles = await listCaseFiles(caseItem.id).catch(() => [])
   }
@@ -109,23 +118,21 @@ export default async function CaseStudyTasksPage({ params }: { params: Promise<{
   }
 
   // Check for existing case study or create new one
-  // JSON cases don't have database simulations, so skip for them
-  let simulation = null
-  if (!isJsonCase) {
-    // Use caseItem.id (UUID) instead of caseId from URL (slug)
-    simulation = await getSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
+  // Now all cases should have DB records, so we can always create/find simulation
+  // Use caseItem.id (UUID) - this is now always a DB UUID after upsert
+  let simulation = await getSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
 
-    if (!simulation) {
-      try {
-        simulation = await createSimulation({
-          userId: user.id,
-          caseId: caseItem.id, // Use UUID from database, not slug from URL
-          status: 'in_progress',
-          userInputs: {},
-        })
-      } catch (error) {
-        console.error('Error creating case study:', error)
-        // Return error state instead of crashing
+  if (!simulation) {
+    try {
+      simulation = await createSimulation({
+        userId: user.id,
+        caseId: caseItem.id, // Use UUID from database
+        status: 'in_progress',
+        userInputs: {},
+      })
+    } catch (error) {
+      console.error('Error creating case study:', error)
+      // Return error state instead of crashing
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
@@ -206,12 +213,14 @@ export default async function CaseStudyTasksPage({ params }: { params: Promise<{
 
   // Check if soft paywall should be enabled
   // Enabled when: user is logged-in non-subscriber AND case is current weekly case
+  // Can be disabled via NEXT_PUBLIC_DISABLE_SOFT_PAYWALL env var
+  const disableSoftPaywall = process.env.NEXT_PUBLIC_DISABLE_SOFT_PAYWALL === 'true'
   const { isActive } = await checkSubscription()
   const briefing = await getCurrentBriefing()
   // Compare using metadata.caseId (slug) for briefing match
   const caseMetadata = caseItem.metadata as any
   const caseIdFromMetadata = caseMetadata?.caseId || caseItem.id
-  const softPaywallEnabled = !isActive && briefing?.caseId === caseIdFromMetadata
+  const softPaywallEnabled = !disableSoftPaywall && !isActive && briefing?.caseId === caseIdFromMetadata
 
   return (
     <div className="h-[calc(100vh-8rem)]">

@@ -190,6 +190,7 @@ export async function sendWeeklySummaryEmail(
     strongestCompetency?: string
     simulatorTimeMinutes?: number
     simulatorTimeChangePct?: number
+    recommendedContent?: Array<{ title: string; type: 'lesson' | 'case'; url: string; reason?: string }>
   }
 ) {
   const { renderEmailTemplate, getEmailSubject } = await import('./email-templates')

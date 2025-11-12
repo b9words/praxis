@@ -233,7 +233,9 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
       : 0
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-900 mb-2">
@@ -370,6 +372,8 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
           </Button>
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

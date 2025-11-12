@@ -303,7 +303,7 @@ ${JSON.stringify(simulation.user_inputs, null, 2)}`
           }
           if (typeof score !== 'number' || isNaN(score)) {
             errors.push(`Invalid score for ${competencyName}: must be a number`)
-            score = 3 // Default to middle score
+            score = 1 // Default to low score for invalid/missing scores
           } else {
             // Clamp score to valid range [1, 5]
             score = Math.max(1, Math.min(5, Math.round(score * 10) / 10)) // Round to 1 decimal
@@ -313,6 +313,7 @@ ${JSON.stringify(simulation.user_inputs, null, 2)}`
           const justification = scoreItem.justification || scoreItem.feedback || ''
           if (typeof justification !== 'string' || justification.trim().length === 0) {
             errors.push(`Missing justification for ${competencyName}`)
+            // Don't set a default - reject empty justifications
           }
 
           normalized.scores.push({

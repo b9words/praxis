@@ -3,15 +3,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchJson } from '@/lib/api'
 import { Button } from '@/components/ui/button'
-import { ThumbsUp, User, Calendar } from 'lucide-react'
+import { ThumbsUp, User, Calendar, MessageSquare, CheckCircle2 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import MarkdownRenderer from '@/components/ui/Markdown'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { analytics } from '@/lib/analytics'
 
 interface CommunityResponsesProps {
   caseId: string
   userId?: string
+  isCompleted?: boolean
+  headerSlot?: React.ReactNode
 }
 
 interface Response {
@@ -29,17 +33,21 @@ interface Response {
   likes: Array<{ userId: string }>
 }
 
-export default function CommunityResponses({ caseId, userId }: CommunityResponsesProps) {
+type SortOption = 'top' | 'new' | 'following'
+
+export default function CommunityResponses({ caseId, userId, isCompleted = false, headerSlot }: CommunityResponsesProps) {
   const queryClient = useQueryClient()
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [sortBy, setSortBy] = useState<SortOption>('top')
 
   // Fetch public responses
   const { data: responsesData, isLoading } = useQuery({
-    queryKey: ['case-responses', caseId],
+    queryKey: ['case-responses', caseId, sortBy],
     queryFn: () =>
       fetchJson<{ items: Response[]; nextCursor: string | null; hasNextPage: boolean }>(
-        `/api/case-studies/${caseId}/responses?limit=20`
+        `/api/case-studies/${caseId}/responses?limit=20&sortBy=${sortBy}`
       ),
+    enabled: isCompleted, // Only fetch if case is completed
   })
 
   // Toggle like mutation
@@ -70,7 +78,21 @@ export default function CommunityResponses({ caseId, userId }: CommunityResponse
     }
 
     const hasLiked = response.likes.some(like => like.userId === userId)
+    
+    // Track analytics
+    analytics.track('response_liked', {
+      responseId: response.id,
+      caseId,
+      liked: !hasLiked,
+      userId,
+    })
+    
     toggleLikeMutation.mutate({ responseId: response.id, liked: hasLiked })
+  }
+
+  // Don't show anything if case is not completed
+  if (!isCompleted) {
+    return null
   }
 
   if (isLoading) {
@@ -87,11 +109,38 @@ export default function CommunityResponses({ caseId, userId }: CommunityResponse
 
   return (
     <div className="bg-white border border-gray-200 mb-6">
+      {headerSlot && <div className="border-b border-gray-200 px-6 py-4">{headerSlot}</div>}
       <div className="border-b border-gray-200 px-6 py-4">
-        <h2 className="text-lg font-medium text-gray-900">Community Responses</h2>
-        <p className="text-sm text-gray-600 mt-1">
-          See how others approached this case study
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-lg font-medium text-gray-900">Community Responses</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              See how others approached this case study
+            </p>
+          </div>
+        </div>
+        <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+          <TabsList className="grid w-full max-w-xs grid-cols-3 bg-transparent border-b border-neutral-200 rounded-none h-auto">
+            <TabsTrigger
+              value="top"
+              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium py-2"
+            >
+              Top
+            </TabsTrigger>
+            <TabsTrigger
+              value="new"
+              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium py-2"
+            >
+              New
+            </TabsTrigger>
+            <TabsTrigger
+              value="following"
+              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium py-2"
+            >
+              Following
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       <div className="divide-y divide-gray-200">
         {responsesData.items.map((response) => {
@@ -127,18 +176,36 @@ export default function CommunityResponses({ caseId, userId }: CommunityResponse
                     </div>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleToggleLike(response)}
-                  disabled={!userId || toggleLikeMutation.isPending}
-                  className={`flex items-center gap-2 ${
-                    hasLiked ? 'border-blue-500 bg-blue-50 text-blue-700' : ''
-                  }`}
-                >
-                  <ThumbsUp className={`h-4 w-4 ${hasLiked ? 'fill-current' : ''}`} />
-                  <span>{response.likesCount}</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleToggleLike(response)}
+                    disabled={!userId || toggleLikeMutation.isPending}
+                    className={`flex items-center gap-1.5 h-8 px-2.5 ${
+                      hasLiked ? 'border-blue-500 bg-blue-50 text-blue-700' : ''
+                    }`}
+                  >
+                    <ThumbsUp className={`h-3.5 w-3.5 ${hasLiked ? 'fill-current' : ''}`} />
+                    <span className="text-xs">{response.likesCount}</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 flex items-center gap-1.5"
+                    title="Mark as helpful"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-2.5 flex items-center gap-1.5"
+                    title="Reply"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
               </div>
 
               <div className="mt-4">

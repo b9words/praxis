@@ -1,121 +1,122 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
-import { notifyDebriefGenerationFailure } from '@/lib/notifications/triggers'
-import { createJob } from '@/lib/job-processor'
-import { getDebriefBySimulationId } from '@/lib/db/debriefs'
-import { AppError } from '@/lib/db/utils'
-import * as Sentry from '@sentry/nextjs'
+import { getSimulationByIdFull, verifySimulationOwnership } from '@/lib/db/simulations'
+import { getDebriefBySimulationId, upsertDebrief } from '@/lib/db/debriefs'
+import { generateDebrief } from '@/lib/debrief/generator'
+import { createJob, updateJob } from '@/lib/job-processor'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 
-// In-memory rate limit store (simple implementation for GA)
-// In production, consider using Redis or similar
-const rateLimitStore = new Map<string, { count: number; refusedAt: number }>()
-
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  const fiveMinutesAgo = now - 5 * 60 * 1000
-  for (const [key, value] of rateLimitStore.entries()) {
-    if (value.refusedAt < fiveMinutesAgo) {
-      rateLimitStore.delete(key)
-    }
-  }
-}, 5 * 60 * 1000)
-
-function checkRateLimit(userId: string, ip: string): boolean {
-  const key = userId || `ip:${ip}`
-  const now = Date.now()
-  const oneMinuteAgo = now - 60 * 1000
-
-  const entry = rateLimitStore.get(key)
-  if (entry) {
-    // Check if window expired
-    if (entry.refusedAt < oneMinuteAgo) {
-      // Reset after 1 minute - start new window
-      rateLimitStore.set(key, { count: 1, refusedAt: now })
-      return true
-    }
-    // Check if limit exceeded
-    if (entry.count >= 3) {
-      // Update refusedAt to track when limit was hit
-      entry.refusedAt = now
-      return false
-    }
-    entry.count++
-    entry.refusedAt = now // Update window start
-  } else {
-    rateLimitStore.set(key, { count: 1, refusedAt: now })
-  }
-  return true
-}
-
+/**
+ * POST /api/generate-debrief
+ * Generate or retrieve a debrief for a completed simulation
+ */
 export async function POST(request: NextRequest) {
   try {
-    const { getCurrentUser } = await import('@/lib/auth/get-user')
     const user = await getCurrentUser()
     if (!user) {
-      return NextResponse.json({ error: 'No user found' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const body = await request.json()
 
+    const body = await request.json()
     const { simulationId } = body
 
     if (!simulationId) {
+      return NextResponse.json({ error: 'Missing simulationId' }, { status: 400 })
+    }
+
+    // Verify ownership
+    const isOwner = await verifySimulationOwnership(simulationId, user.id)
+    if (!isOwner) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Check if debrief already exists
+    const existingDebrief = await getDebriefBySimulationId(simulationId)
+    if (existingDebrief) {
+      return NextResponse.json({
+        fromCache: true,
+        debriefId: existingDebrief.id,
+        debrief: existingDebrief,
+      })
+    }
+
+    // Get full simulation data
+    const simulation = await getSimulationByIdFull(simulationId)
+    if (!simulation) {
+      return NextResponse.json({ error: 'Simulation not found' }, { status: 404 })
+    }
+
+    if (simulation.status !== 'completed') {
       return NextResponse.json(
-        { error: 'Missing required field: simulationId' },
+        { error: 'Simulation must be completed before generating debrief' },
         { status: 400 }
       )
     }
 
-    // Check if debrief already exists (idempotency)
-    const existingDebrief = await getDebriefBySimulationId(simulationId)
+    // Create job for tracking
+    const job = await createJob('debrief_generation', { simulationId, userId: user.id })
 
-    if (existingDebrief) {
-      return NextResponse.json({
-        debriefId: existingDebrief.id,
-        debrief: {
-          id: existingDebrief.id,
-          scores: existingDebrief.scores,
-          summaryText: existingDebrief.summaryText,
-          radarChartData: existingDebrief.radarChartData,
-          createdAt: existingDebrief.createdAt,
+    try {
+      // Generate debrief
+      const result = await generateDebrief({
+        id: simulation.id,
+        userId: simulation.userId,
+        caseId: simulation.caseId,
+        userInputs: simulation.userInputs,
+        case: {
+          id: simulation.case.id,
+          title: simulation.case.title,
+          rubric: simulation.case.rubric as any,
+          competencies: (simulation.case as any).competencies || [],
         },
-        fromCache: true,
       })
-    }
 
-    // Rate limiting: 3 requests per minute per user
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 
-               request.headers.get('x-real-ip') || 
-               'unknown'
-    const userId = user.id
+      // Persist debrief
+      const debrief = await upsertDebrief({
+        simulationId: simulation.id,
+        scores: result.scores,
+        summaryText: result.summaryText,
+        radarChartData: result.radarChartData,
+        rubricVersion: '1.0',
+        goldStandardExemplar: result.goldStandardExemplar || null,
+      })
 
-    if (!checkRateLimit(userId, ip)) {
+      // Update job as completed
+      await updateJob(job.id, {
+        status: 'completed',
+        result: { debriefId: debrief.id },
+      })
+
+      return NextResponse.json({
+        success: true,
+        debriefId: debrief.id,
+        jobId: job.id,
+      })
+    } catch (error) {
+      // Update job as failed
+      await updateJob(job.id, {
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+
+      console.error('Error generating debrief:', error)
       return NextResponse.json(
-        { error: 'Rate limit exceeded. Please wait before generating another debrief.' },
-        { status: 429 }
+        {
+          error: 'Failed to generate debrief',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        },
+        { status: 500 }
       )
     }
-
-    // Create background job for debrief generation
-    const job = await createJob('debrief_generation', {
-      simulationId,
-      userId: user.id,
-    })
-
-    // Return job ID immediately
-    return NextResponse.json({
-      jobId: job.id,
-      status: job.status,
-      message: 'Debrief generation started. Poll /api/jobs/[jobId] for status.',
-    })
   } catch (error) {
-    const { createErrorResponse } = await import('@/lib/api/error-wrapper')
-    return createErrorResponse(error, {
-      defaultMessage: 'Failed to generate debrief',
-      statusCode: 500,
-    })
+    console.error('Error in generate-debrief route:', error)
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    )
   }
 }
-

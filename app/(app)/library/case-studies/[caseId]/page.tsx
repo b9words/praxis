@@ -7,10 +7,12 @@ import UniversalAssetViewer from '@/components/case-study/UniversalAssetViewer'
 // Force dynamic rendering to avoid static generation issues with useSearchParams
 export const dynamic = 'force-dynamic'
 import { getCaseByIdWithCompetencies, listCaseFiles } from '@/lib/db/cases'
-import { getSimulationByUserAndCase } from '@/lib/db/simulations'
+import { getSimulationByUserAndCase, getCompletedSimulationByUserAndCase } from '@/lib/db/simulations'
 import { getLessonProgressList } from '@/lib/db/progress'
-import { getCachedUserData, getCachedCase, CacheTags } from '@/lib/cache'
+import { getCachedUserData, CacheTags } from '@/lib/cache'
+import { getCachedCase } from '@/lib/case-cache'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
+import { upsertCaseFromJson } from '@/lib/cases/upsert-from-json'
 import { AlertCircle, CheckCircle2, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
@@ -35,8 +37,10 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
       loginUrl.searchParams.set('redirectTo', `/library/case-studies/${caseId}`)
       redirect(loginUrl.toString())
     } else {
-      // Redirect to pricing
-      redirect('/pricing')
+      // Redirect to billing with return URL
+      const billingUrl = new URL('/profile/billing', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+      billingUrl.searchParams.set('returnUrl', `/library/case-studies/${caseId}`)
+      redirect(billingUrl.toString())
     }
   }
 
@@ -53,32 +57,46 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
   if (!caseItem) {
     // Fallback if not found in cache - try database lookup
     caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
+    
+    // Check if this is a JSON case (not found in DB and exists as JSON)
     if (!caseItem) {
-      // Final fallback: try JSON file
       const { loadInteractiveSimulation } = await import('@/lib/case-study-loader')
       const jsonCase = loadInteractiveSimulation(caseId)
       if (jsonCase) {
-        // Convert JSON case to database format
-        caseItem = {
-          id: jsonCase.caseId,
-          title: jsonCase.title,
-          description: jsonCase.description,
-          difficulty: jsonCase.difficulty,
-          estimatedMinutes: jsonCase.estimatedDuration,
-          published: true,
-          metadata: {
-            caseId: jsonCase.caseId,
-            version: jsonCase.version,
-          },
-          competencies: jsonCase.competencies?.map((comp: string) => ({
-            competency: { name: comp }
-          })) || [],
-          briefingDoc: jsonCase.description || '',
-          datasets: null,
-          prerequisites: null,
-        } as any
+        // Upsert JSON case to DB
+        try {
+          const dbCaseId = await upsertCaseFromJson(caseId, user.id)
+          // Now fetch the case from DB
+          caseItem = await getCaseByIdWithCompetencies(dbCaseId).catch(() => null)
+          if (!caseItem) {
+            // Fallback: try by caseId slug
+            caseItem = await getCaseByIdWithCompetencies(caseId).catch(() => null)
+          }
+        } catch (error) {
+          console.error('Error upserting JSON case to DB:', error)
+          // Fallback to JSON-only mode (but this should not happen)
+          caseItem = {
+            id: jsonCase.caseId,
+            title: jsonCase.title,
+            description: jsonCase.description,
+            difficulty: jsonCase.difficulty,
+            estimatedMinutes: jsonCase.estimatedDuration,
+            published: true,
+            metadata: {
+              caseId: jsonCase.caseId,
+              version: jsonCase.version,
+            },
+            competencies: jsonCase.competencies?.map((comp: string) => ({
+              competency: { name: comp }
+            })) || [],
+            briefingDoc: jsonCase.description || '',
+            datasets: null,
+            prerequisites: null,
+          } as any
+        }
       }
     }
+    
     if (!caseItem || !caseItem.published) {
       notFound()
     }
@@ -97,6 +115,7 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
         fileName: file.fileName,
         fileType: file.fileType,
         source: file.source,
+        content: file.source?.type === 'STATIC' ? file.source.content : '',
       }))
     } else {
       // Database case - fetch files normally
@@ -108,16 +127,10 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
   }
 
   // Cache user case study status (5 minutes revalidate, userId in key)
-  // For JSON cases, check if caseItem.id is a UUID (database case) or a caseId (JSON case)
-  const isJsonCase = caseItem.id === caseId && !caseItem.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)
-  
+  // Now all cases should have DB records after upsert, so caseItem.id is always a UUID
   const getCachedCaseStudyStatus = getCachedUserData(
     user.id,
     async () => {
-      // JSON cases don't have database simulations, so return null
-      if (isJsonCase) {
-        return null
-      }
       // Check if user has an in-progress case study
       // Use caseItem.id (UUID) for database lookup
       const existingCaseStudy = await getSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
@@ -131,6 +144,11 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
   )
 
   const existingCaseStudy = await getCachedCaseStudyStatus()
+
+  // Check if user has completed this case study
+  // Use caseItem.id (UUID) - now always a DB UUID after upsert
+  const completedSimulation = await getCompletedSimulationByUserAndCase(user.id, caseItem.id).catch(() => null)
+  const isCompleted = !!completedSimulation
 
   // Check prerequisites
   let prerequisites: Array<{ domain: string; module: string; lesson: string; title?: string }> = []
@@ -263,7 +281,7 @@ export default async function CaseStudyOverviewPage({ params }: { params: Promis
       )}
 
       {/* Community Responses */}
-      <CommunityResponses caseId={caseId} userId={user.id} />
+      <CommunityResponses caseId={caseId} userId={user.id} isCompleted={isCompleted} />
 
       <div className="flex justify-between items-center">
         <Button asChild variant="outline" className="border-gray-300 hover:border-gray-400 rounded-none">

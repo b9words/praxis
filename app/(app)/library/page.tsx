@@ -3,7 +3,13 @@ import { getCurrentUser } from '@/lib/auth/get-user'
 import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getAllUserProgress, getUserReadingStats } from '@/lib/progress-tracking'
 import { getCachedUserData, cache, CacheTags } from '@/lib/cache'
-import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp } from 'lucide-react'
+import { listCases } from '@/lib/db/cases'
+import { getPopularLessons } from '@/lib/db/progress'
+import { getPopularSimulations } from '@/lib/db/simulations'
+import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
+import LibraryTabs from '@/components/library/LibraryTabs'
+import EmptyState from '@/components/ui/empty-state'
+import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp, ArrowRight, Bookmark } from 'lucide-react'
 import Link from 'next/link'
 
 // Force dynamic rendering to avoid static generation issues with useSearchParams
@@ -31,6 +37,35 @@ export default async function LibraryPage() {
     title: string
     domainTitle: string
     completedAt: string
+  }> = []
+  let bookmarkedLessons: Array<{
+    domainId: string
+    moduleId: string
+    lessonId: string
+    title: string
+    domainTitle: string
+    moduleTitle: string
+    progress: number
+  }> = []
+  let allCaseStudies: Array<{
+    id: string
+    title: string
+    description: string
+    url: string
+    estimatedMinutes?: number
+    difficulty?: string
+  }> = []
+  let trendingLessons: Array<{
+    domainId: string
+    moduleId: string
+    lessonId: string
+    title: string
+    url: string
+  }> = []
+  let trendingCases: Array<{
+    id: string
+    title: string
+    url: string
   }> = []
 
   if (user) {
@@ -126,6 +161,110 @@ export default async function LibraryPage() {
         })
       }
     })
+
+    // Get bookmarked lessons
+    const bookmarkedProgress = progressArray.filter((p) => p.bookmarked)
+    bookmarkedLessons = bookmarkedProgress
+      .map((progress) => {
+        const lesson = allLessons.find(
+          l => l.domain === progress.domain_id && 
+               l.moduleId === progress.module_id && 
+               l.lessonId === progress.lesson_id
+        )
+        if (lesson) {
+          return {
+            domainId: progress.domain_id,
+            moduleId: progress.module_id,
+            lessonId: progress.lesson_id,
+            title: lesson.lessonTitle,
+            domainTitle: lesson.domainTitle,
+            moduleTitle: lesson.moduleTitle,
+            progress: progress.progress_percentage || 0,
+          }
+        }
+        return null
+      })
+      .filter(Boolean) as typeof bookmarkedLessons
+  }
+
+  // Get all case studies
+  try {
+    const cases = await listCases({})
+    const allSimulations = getAllInteractiveSimulations()
+    
+    allCaseStudies = cases.map((c) => {
+      const metadata = c.metadata as any || {}
+      const caseId = metadata.caseId || c.id
+      return {
+        id: caseId,
+        title: c.title,
+        description: c.description || '',
+        url: `/library/case-studies/${caseId}`,
+        estimatedMinutes: c.estimatedMinutes ?? undefined,
+        difficulty: c.difficulty || undefined,
+      }
+    })
+    
+    // Also include JSON-based simulations
+    allSimulations.forEach((sim) => {
+      if (!allCaseStudies.some(c => c.id === sim.caseId)) {
+        allCaseStudies.push({
+          id: sim.caseId,
+          title: sim.title,
+          description: sim.description || '',
+          url: `/library/case-studies/${sim.caseId}`,
+          estimatedMinutes: sim.estimatedDuration,
+          difficulty: sim.difficulty,
+        })
+      }
+    })
+  } catch (error) {
+    console.error('Error loading case studies:', error)
+  }
+
+  // Get trending content
+  try {
+    const popularLessonsData = await getPopularLessons(6)
+    const allLessons = getAllLessonsFlat()
+    
+    trendingLessons = popularLessonsData
+      .map((pop) => {
+        const lesson = allLessons.find(
+          l => l.domain === pop.domainId &&
+               l.moduleId === pop.moduleId &&
+               l.lessonId === pop.lessonId
+        )
+        if (lesson) {
+          return {
+            domainId: pop.domainId,
+            moduleId: pop.moduleId,
+            lessonId: pop.lessonId,
+            title: lesson.lessonTitle,
+            url: `/library/curriculum/${pop.domainId}/${pop.moduleId}/${pop.lessonId}`,
+          }
+        }
+        return null
+      })
+      .filter(Boolean) as typeof trendingLessons
+
+    const popularSimsData = await getPopularSimulations(6)
+    const allSimulations = getAllInteractiveSimulations()
+    
+    trendingCases = popularSimsData
+      .map((pop) => {
+        const sim = allSimulations.find(s => s.caseId === pop.caseId)
+        if (sim) {
+          return {
+            id: pop.caseId,
+            title: sim.title,
+            url: `/library/case-studies/${pop.caseId}`,
+          }
+        }
+        return null
+      })
+      .filter(Boolean) as typeof trendingCases
+  } catch (error) {
+    console.error('Error loading trending content:', error)
   }
 
   // Cache recommended lessons (15 minutes revalidate)
@@ -142,24 +281,310 @@ export default async function LibraryPage() {
   )
   const recommendedLessons = await getCachedRecommendedLessons()
 
+  // Content components for tabs
+  const continueContent = (
+    <div className="p-4 space-y-6">
+      {/* Continue Learning Section */}
+      {user && inProgressLessons.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {inProgressLessons.slice(0, 6).map((lesson) => {
+            const progressKey = `${lesson.domainId}:${lesson.moduleId}:${lesson.lessonId}`
+            const lessonProgress = userProgress.get(progressKey)
+            const isCompleted = lessonProgress?.status === 'completed'
+            
+            return (
+              <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
+                <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="text-xs text-neutral-400 font-mono">
+                        {lesson.domainTitle.substring(0, 3).toUpperCase()}
+                      </div>
+                      <div className="text-xs text-neutral-500 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {Math.round(lesson.timeSpent / 60)} min
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
+                      {lesson.title}
+                    </h3>
+                    
+                    <p className="text-xs text-neutral-500 leading-snug mb-3 break-words">
+                      {lesson.moduleTitle}
+                    </p>
+
+                    {lesson.progress > 0 && (
+                      <div className="mb-3">
+                        <div className="w-full bg-neutral-200 h-1.5">
+                          <div 
+                            className="bg-gray-900 h-1.5 transition-all" 
+                            style={{ width: `${lesson.progress}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-neutral-500 mt-1">{lesson.progress}% complete</div>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-neutral-500">
+                        {isCompleted ? 'Completed' : lesson.progress > 0 ? 'In progress' : 'Not started'}
+                      </span>
+                      <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
+                        {lesson.progress > 0 ? 'CONTINUE' : 'START'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          icon={ArrowRight}
+          title="Nothing in progress"
+          description="Start a lesson or case study to track your progress here. Your learning journey begins with a single step."
+          action={{
+            label: "Browse Curriculum",
+            href: "/library/curriculum"
+          }}
+        />
+      )}
+    </div>
+  )
+
+  const articlesContent = (
+    <div className="p-4 space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900">All Articles</h2>
+        <Button variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs" asChild>
+          <Link href="/library/curriculum">VIEW ALL</Link>
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {recommendedLessons.map((lesson, index) => {
+          const progressKey = `${lesson.domain}:${lesson.moduleId}:${lesson.lessonId}`
+          const lessonProgress = user?.id ? userProgress.get(progressKey) : null
+          const isCompleted = lessonProgress?.status === 'completed'
+          
+          return (
+            <Link key={progressKey} href={`/library/curriculum/${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`}>
+              <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="text-xs text-neutral-400 font-mono">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                    <div className="text-xs text-neutral-500 flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      12 min
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
+                    {lesson.lessonTitle}
+                  </h3>
+                  
+                  <p className="text-sm text-neutral-500 leading-snug mb-4 break-words overflow-hidden">
+                    {lesson.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-neutral-500">
+                      {isCompleted ? 'Completed' : 'Not started'}
+                    </span>
+                    <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
+                      START
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
+
+  const caseStudiesContent = (
+    <div className="p-4 space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900">All Case Studies</h2>
+        <Button variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs" asChild>
+          <Link href="/library/case-studies">VIEW ALL</Link>
+        </Button>
+      </div>
+      {allCaseStudies.length > 0 ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {allCaseStudies.map((caseStudy) => (
+            <Link key={caseStudy.id} href={caseStudy.url}>
+              <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <Target className="h-4 w-4 text-neutral-400" />
+                    {caseStudy.difficulty && (
+                      <div className="px-2 py-1 text-xs font-medium border border-neutral-200 bg-neutral-100 text-neutral-700">
+                        {caseStudy.difficulty.toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
+                    {caseStudy.title}
+                  </h3>
+                  <p className="text-sm text-neutral-500 leading-snug mb-4 break-words line-clamp-2">
+                    {caseStudy.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-neutral-500 flex items-center gap-2">
+                      {caseStudy.estimatedMinutes && (
+                        <>
+                          <Clock className="h-3 w-3" />
+                          <span>{caseStudy.estimatedMinutes} min</span>
+                        </>
+                      )}
+                    </div>
+                    <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
+                      START
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={Target}
+          title="No case studies available"
+          description="Case studies are currently being developed. Check back soon, or explore the curriculum to build your foundational knowledge first."
+          action={{
+            label: "Explore Curriculum",
+            href: "/library/curriculum"
+          }}
+        />
+      )}
+    </div>
+  )
+
+  const savedContent = (
+    <div className="p-4 space-y-6">
+      {user && bookmarkedLessons.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bookmarkedLessons.map((lesson) => {
+            const progressKey = `${lesson.domainId}:${lesson.moduleId}:${lesson.lessonId}`
+            return (
+              <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
+                <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="text-xs text-neutral-400 font-mono">
+                        {lesson.domainTitle.substring(0, 3).toUpperCase()}
+                      </div>
+                      <Target className="h-3 w-3 text-neutral-400" />
+                    </div>
+                    <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
+                      {lesson.title}
+                    </h3>
+                    <p className="text-xs text-neutral-500 leading-snug mb-3 break-words">
+                      {lesson.moduleTitle}
+                    </p>
+                    {lesson.progress > 0 && (
+                      <div className="text-xs text-neutral-500 mb-3">{lesson.progress}% complete</div>
+                    )}
+                    <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none w-full">
+                      {lesson.progress > 0 ? 'CONTINUE' : 'START'}
+                    </Button>
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          icon={Bookmark}
+          title="No saved items"
+          description="Bookmark lessons and case studies while browsing to save them for later. Your saved items will appear here for quick access."
+          action={{
+            label: "Browse Content",
+            href: "/library/curriculum"
+          }}
+        />
+      )}
+    </div>
+  )
+
+  const trendingContent = (
+    <div className="p-4 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Trending Lessons */}
+        <div>
+          <h3 className="text-base font-semibold text-neutral-900 mb-4">Trending Articles</h3>
+          {trendingLessons.length > 0 ? (
+            <div className="space-y-2">
+              {trendingLessons.map((lesson) => (
+                <Link key={lesson.url} href={lesson.url}>
+                  <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-neutral-900 mb-1">{lesson.title}</h4>
+                        <p className="text-xs text-neutral-500">{lesson.domainId}</p>
+                      </div>
+                      <BookOpen className="h-4 w-4 text-neutral-400" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-neutral-500">No trending articles yet</p>
+          )}
+        </div>
+
+        {/* Trending Cases */}
+        <div>
+          <h3 className="text-base font-semibold text-neutral-900 mb-4">Trending Case Studies</h3>
+          {trendingCases.length > 0 ? (
+            <div className="space-y-2">
+              {trendingCases.map((caseStudy) => (
+                <Link key={caseStudy.url} href={caseStudy.url}>
+                  <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer p-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-neutral-900 mb-1">{caseStudy.title}</h4>
+                      </div>
+                      <Target className="h-4 w-4 text-neutral-400" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-neutral-500">No trending case studies yet</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Desktop Header */}
       <div className="hidden md:block border-b border-neutral-200 bg-white flex-shrink-0">
-        <div className="px-0 py-4">
+        <div className="px-6 py-4">
           <h1 className="text-xl font-semibold leading-tight text-neutral-900">
             Intelligence Library
-        </h1>
+          </h1>
           <p className="mt-1 text-sm text-neutral-500 leading-snug">
             Foundational knowledge for business decision-making
           </p>
         </div>
       </div>
 
-      {/* Content - ZERO MARGINS */}
+      {/* Content with Tabs */}
       <div className="flex-1 overflow-auto">
-        <div className="p-0 space-y-6 w-full">
-          
+        <div className="w-full">
           {/* Quick Stats Dashboard */}
           {user && readingStats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 border-b border-neutral-200">
@@ -202,242 +627,14 @@ export default async function LibraryPage() {
             </div>
           )}
 
-          {/* Welcome Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-            <div className="bg-neutral-50 border border-neutral-200 p-3">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-900">
-                  <GraduationCap className="h-4 w-4 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-base font-medium leading-tight text-neutral-900 mb-1">
-                    Executive Curriculum
-                  </h3>
-                  <p className="text-sm text-neutral-500 leading-snug mb-3">
-                    10 domains, 219 lessons for world-class leadership
-                  </p>
-                  <Button asChild size="sm" className="h-8 px-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-none">
-                    <Link href="/library/curriculum">Explore Curriculum</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-neutral-50 border border-neutral-200 p-3">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-gray-100 border border-gray-200">
-                  <BookOpen className="h-4 w-4 text-gray-700" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-base font-medium leading-tight text-neutral-900 mb-1">
-                    Learning Paths
-                  </h3>
-                  <p className="text-sm text-neutral-500 leading-snug mb-3">
-                    Structured curriculum to guide your learning journey
-                  </p>
-                  <Button asChild variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none">
-                    <Link href="/residency">Choose Path</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Continue Learning Section */}
-          {user && inProgressLessons.length > 0 && (
-            <div className="space-y-4 p-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-neutral-900">Continue Learning</h2>
-                <Button variant="outline" size="sm" className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs" asChild>
-                  <Link href="/library/curriculum">VIEW ALL</Link>
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {inProgressLessons.slice(0, 6).map((lesson) => {
-                  const progressKey = `${lesson.domainId}:${lesson.moduleId}:${lesson.lessonId}`
-                  const lessonProgress = userProgress.get(progressKey)
-                  const isCompleted = lessonProgress?.status === 'completed'
-                  
-                  return (
-                    <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
-                      <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
-                        <div className="p-4">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="text-xs text-neutral-400 font-mono">
-                              {lesson.domainTitle.substring(0, 3).toUpperCase()}
-                            </div>
-                            <div className="text-xs text-neutral-500 flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {Math.round(lesson.timeSpent / 60)} min
-                            </div>
-                          </div>
-                          
-                          <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
-                            {lesson.title}
-                          </h3>
-                          
-                          <p className="text-xs text-neutral-500 leading-snug mb-3 break-words">
-                            {lesson.moduleTitle}
-                          </p>
-
-                          {/* Progress Bar */}
-                          {lesson.progress > 0 && (
-                            <div className="mb-3">
-                                  <div className="w-full bg-neutral-200 h-1.5">
-                                <div 
-                                  className="bg-gray-900 h-1.5 transition-all" 
-                                  style={{ width: `${lesson.progress}%` }}
-                                />
-                              </div>
-                              <div className="text-xs text-neutral-500 mt-1">{lesson.progress}% complete</div>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {isCompleted ? (
-                                <div className="w-4 h-4 bg-gray-900 flex items-center justify-center">
-                                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                  </svg>
-                                </div>
-                              ) : lesson.progress > 0 ? (
-                                <div className="w-4 h-4 border-2 border-gray-600 flex items-center justify-center">
-                                  <div className="w-2 h-2 bg-gray-600" />
-                                </div>
-                              ) : (
-                                <div className="w-4 h-4 border-2 border-neutral-300"></div>
-                              )}
-                              <span className="text-xs text-neutral-500">
-                                {isCompleted ? 'Completed' : lesson.progress > 0 ? 'In progress' : 'Not started'}
-                              </span>
-                            </div>
-                            
-                            <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
-                              {lesson.progress > 0 ? 'CONTINUE' : 'START'}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Recommended for You */}
-          <div className="space-y-4 p-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-neutral-900">Recommended for You</h2>
-              <Button variant="outline" size="sm" className="h-8 px-2.5 bg-neutral-100 border border-neutral-200 text-neutral-700 hover:bg-neutral-200 rounded text-xs" asChild>
-                <Link href="/library/curriculum">VIEW ALL</Link>
-              </Button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recommendedLessons.map((lesson, index) => {
-                const progressKey = `${lesson.domain}:${lesson.moduleId}:${lesson.lessonId}`
-                const lessonProgress = user?.id ? userProgress.get(progressKey) : null
-                const isCompleted = lessonProgress?.status === 'completed'
-                
-                return (
-                  <Link key={progressKey} href={`/library/curriculum/${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}`}>
-                    <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="text-xs text-neutral-400 font-mono">
-                            {String(index + 1).padStart(2, '0')}
-                          </div>
-                          <div className="text-xs text-neutral-500 flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            12 min
-                          </div>
-                </div>
-                        
-                        <h3 className="text-base font-semibold leading-tight text-neutral-900 mb-2 break-words">
-                          {lesson.lessonTitle}
-                  </h3>
-                        
-                        <p className="text-sm text-neutral-500 leading-snug mb-4 break-words overflow-hidden">
-                          {lesson.description}
-                        </p>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {isCompleted ? (
-                                <div className="w-4 h-4 bg-gray-900 flex items-center justify-center">
-                                <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                              </div>
-                            ) : (
-                              <div className="w-4 h-4 border-2 border-neutral-300 rounded-full"></div>
-                            )}
-                            <span className="text-xs text-neutral-500">
-                              {isCompleted ? 'Completed' : 'Not started'}
-                            </span>
-                          </div>
-                          
-                          <Button size="sm" className="h-6 px-2 text-xs bg-gray-900 text-white hover:bg-gray-800 rounded-none">
-                            START
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="space-y-4 p-4">
-            <h2 className="text-lg font-semibold text-neutral-900">Recent Activity</h2>
-            {recentlyCompletedLessons.length > 0 ? (
-              <div className="space-y-2">
-                {recentlyCompletedLessons.map((lesson) => {
-                  const progressKey = `${lesson.domainId}:${lesson.moduleId}:${lesson.lessonId}`
-                  const date = new Date(lesson.completedAt)
-                  const timeAgo = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-                  
-                  return (
-                    <Link key={progressKey} href={`/library/curriculum/${lesson.domainId}/${lesson.moduleId}/${lesson.lessonId}`}>
-                      <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
-                        <div className="p-3">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-gray-100 border border-gray-200 flex items-center justify-center">
-                                <CheckCircle className="h-4 w-4 text-gray-600" />
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-neutral-900">{lesson.title}</div>
-                                <div className="text-xs text-neutral-500">{lesson.domainTitle} • {timeAgo}</div>
-                              </div>
-                            </div>
-                            <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-neutral-600">
-                              Review
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="bg-neutral-50 border border-neutral-200 p-4">
-                <div className="text-center py-8">
-                  <BookOpen className="mx-auto h-8 w-8 text-neutral-400 mb-3" />
-                  <h3 className="text-sm font-medium text-neutral-900 mb-1">No recent activity</h3>
-                  <p className="text-sm text-neutral-500">
-                    Start a lesson to see your progress here
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Library Tabs */}
+          <LibraryTabs
+            continueContent={continueContent}
+            articlesContent={articlesContent}
+            caseStudiesContent={caseStudiesContent}
+            savedContent={savedContent}
+            trendingContent={trendingContent}
+          />
         </div>
       </div>
     </div>

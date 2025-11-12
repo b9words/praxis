@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
       {/* Set Sentry user context for error tracking */}
       {user && (
         <SentryUserProvider
@@ -52,12 +52,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       )}
       {user && <Navbar user={{ id: user.id, email: user.email } as any} profile={profile as any} />}
       {user && subscription?.status === 'past_due' && (
-        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm px-4 py-3">
+        <div className="bg-amber-50 border-b border-amber-200 text-amber-900 text-sm px-4 py-3 flex-shrink-0">
           Your subscription is past due. Update your payment method to avoid interruption.{' '}
           <a href="/profile/billing" className="underline font-medium">Manage billing</a>
         </div>
       )}
-      <main className="lg:pb-0 pb-16">{children}</main>
+      <main className="flex-1 min-h-0 overflow-y-auto lg:pb-0 pb-16">{children}</main>
     </div>
   )
 }

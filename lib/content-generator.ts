@@ -356,6 +356,13 @@ Use markdown formatting with proper headers, tables, lists, and emphasis. Make t
 
     return results
   }
+
+  /**
+   * Generate text content using OpenAI (public method for debrief generation)
+   */
+  async generateText(prompt: string, model: string = 'gpt-4'): Promise<string> {
+    return this.generateWithOpenAI(prompt, model)
+  }
 }
 
 // Export default models for each provider

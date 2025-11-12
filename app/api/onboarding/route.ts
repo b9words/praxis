@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { strategicObjective, competencyId } = body
+    const { strategicObjective, competencyId, currentRole, weeklyTimeCommitment, preferredLearningTimes } = body
 
     if (!strategicObjective || !competencyId) {
       return NextResponse.json(
@@ -31,10 +31,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user's profile with onboarding data
-    // Store strategic objective in bio field
+    // Store strategic objective and role in bio field
+    const bioParts = [strategicObjective]
+    if (currentRole) {
+      bioParts.push(`Current role: ${currentRole}`)
+    }
+    if (weeklyTimeCommitment) {
+      bioParts.push(`Weekly commitment: ${weeklyTimeCommitment} hours`)
+    }
+    if (preferredLearningTimes && preferredLearningTimes.length > 0) {
+      bioParts.push(`Preferred times: ${preferredLearningTimes.join(', ')}`)
+    }
+    
     try {
       await updateProfile(user.id, {
-        bio: strategicObjective,
+        bio: bioParts.join(' | '),
       })
     } catch (error: any) {
       // Handle case where profile doesn't exist yet
@@ -43,7 +54,7 @@ export async function POST(request: NextRequest) {
         await ensureProfileExists(user.id)
         // Retry the update
         await updateProfile(user.id, {
-          bio: strategicObjective,
+          bio: bioParts.join(' | '),
         })
       } else {
         throw error

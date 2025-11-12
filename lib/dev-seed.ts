@@ -508,6 +508,58 @@ export async function seedComprehensiveData(userId: string, email?: string) {
               )
             `
             results.debriefs++
+
+            // Create community response for completed case study
+            try {
+              // Check if response already exists
+              const existingResponse = await prisma.$queryRaw`
+                SELECT id FROM case_responses 
+                WHERE case_id = ${caseId}::uuid AND user_id = ${userId}::uuid LIMIT 1
+              ` as any[]
+              
+              if (!existingResponse || existingResponse.length === 0) {
+                const responseContent = `## My Approach
+
+I approached this case study by first analyzing the key financial metrics and strategic constraints. The main challenge was balancing short-term operational needs with long-term strategic goals.
+
+## Key Decisions
+
+1. **Initial Assessment**: I focused on understanding the core business fundamentals before making any strategic moves.
+
+2. **Strategic Planning**: I prioritized initiatives that would create sustainable competitive advantages while managing cash flow carefully.
+
+3. **Stakeholder Management**: I ensured clear communication with all stakeholders throughout the decision-making process.
+
+## Lessons Learned
+
+This case study reinforced the importance of:
+- Data-driven decision making
+- Balancing multiple competing priorities
+- Long-term strategic thinking
+
+## What I'd Do Differently
+
+If I were to approach this again, I would spend more time on scenario planning and risk assessment before making final decisions.`
+
+                await prisma.$executeRaw`
+                  INSERT INTO case_responses (id, case_id, user_id, simulation_id, content, is_public, likes_count, created_at, updated_at)
+                  VALUES (
+                    gen_random_uuid(),
+                    ${caseId}::uuid,
+                    ${userId}::uuid,
+                    ${simulationId}::uuid,
+                    ${responseContent}::text,
+                    true,
+                    0,
+                    NOW(),
+                    NOW()
+                  )
+                `
+              }
+            } catch (responseError: any) {
+              // Don't fail if response creation fails - it's optional
+              console.warn(`Failed to create community response: ${responseError.message}`)
+            }
           } catch (debriefError: any) {
             results.errors.push(`Failed to create debrief: ${debriefError.message}`)
           }
@@ -515,6 +567,81 @@ export async function seedComprehensiveData(userId: string, email?: string) {
       } catch (simError: any) {
         results.errors.push(`Failed to create simulation: ${simError.message}`)
       }
+    }
+
+    // STEP 4.5: IMPORT JSON CASES into database
+    try {
+      const { upsertCaseFromJson } = await import('@/lib/cases/upsert-from-json')
+      const { getAllInteractiveSimulations } = await import('@/lib/case-study-loader')
+      
+      // Get all JSON cases
+      const jsonCases = getAllInteractiveSimulations()
+      
+      // Import key cases (limit to first 5 to avoid overwhelming the seed)
+      const casesToImport = jsonCases.slice(0, 5)
+      const importedCaseIds: string[] = []
+      
+      for (const jsonCase of casesToImport) {
+        try {
+          const dbCaseId = await upsertCaseFromJson(jsonCase.caseId, userId)
+          importedCaseIds.push(dbCaseId)
+          console.log(`[seed] Imported JSON case ${jsonCase.caseId} to DB as ${dbCaseId}`)
+        } catch (importError: any) {
+          console.warn(`[seed] Failed to import JSON case ${jsonCase.caseId}: ${importError.message}`)
+          results.errors.push(`Failed to import JSON case ${jsonCase.caseId}: ${importError.message}`)
+        }
+      }
+      
+      // If we have imported cases, add them to createdCaseIds for simulation creation
+      if (importedCaseIds.length > 0) {
+        createdCaseIds.push(...importedCaseIds)
+      }
+    } catch (jsonImportError: any) {
+      results.errors.push(`Failed to import JSON cases: ${jsonImportError.message}`)
+    }
+
+    // STEP 5: CREATE LESSON PROGRESS for first lessons
+    try {
+      const { getAllLessonsFlat } = await import('@/lib/curriculum-data')
+      const allLessons = getAllLessonsFlat()
+      
+      // Get first 5 lessons from different domains
+      const firstLessons = allLessons.slice(0, 5)
+      
+      for (const lesson of firstLessons) {
+        try {
+          const existingProgress = await prisma.userLessonProgress.findUnique({
+            where: {
+              userId_domainId_moduleId_lessonId: {
+                userId,
+                domainId: lesson.domain,
+                moduleId: lesson.moduleId,
+                lessonId: lesson.lessonId,
+              },
+            },
+          })
+
+          if (existingProgress) continue
+
+          await prisma.userLessonProgress.create({
+            data: {
+              userId,
+              domainId: lesson.domain,
+              moduleId: lesson.moduleId,
+              lessonId: lesson.lessonId,
+              status: 'completed',
+              progressPercentage: 100,
+              completedAt: new Date(Date.now() - Math.floor(Math.random() * 7) * 86400000),
+              timeSpentSeconds: 600 + Math.floor(Math.random() * 1200), // 10-30 minutes
+            },
+          })
+        } catch (lessonError: any) {
+          // Don't fail if lesson progress creation fails
+          console.warn(`Failed to create lesson progress for ${lesson.domain}/${lesson.moduleId}/${lesson.lessonId}: ${lessonError.message}`)
+        }
+      }
+    } catch (lessonProgressError: any) {
+      results.errors.push(`Failed to create lesson progress: ${lessonProgressError.message}`)
     }
 
     // STEP 6: CREATE ARTICLE PROGRESS

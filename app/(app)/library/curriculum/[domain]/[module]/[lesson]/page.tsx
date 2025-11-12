@@ -2,8 +2,13 @@ import BookmarkButton from '@/components/library/BookmarkButton'
 import CaseStudyCard from '@/components/library/CaseStudyCard'
 import LessonDomainCompletionHandler from '@/components/library/LessonDomainCompletionHandler'
 import LessonViewTracker from '@/components/library/LessonViewTracker'
+import LessonKeyboardShortcuts from '@/components/library/LessonKeyboardShortcuts'
+import TableOfContents from '@/components/library/TableOfContents'
+import RecommendationBlock from '@/components/library/RecommendationBlock'
+import { getSmartRecommendations } from '@/lib/recommendation-engine'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import MarkdownRenderer from '@/components/ui/Markdown'
 import { getPublicAccessStatus } from '@/lib/auth/authorize'
 import { cache, CacheTags, getCachedUserData } from '@/lib/cache'
@@ -182,8 +187,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
       loginUrl.searchParams.set('redirectTo', `/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
       redirect(loginUrl.toString())
     } else {
-      // Redirect to pricing
-      redirect('/pricing')
+      // Redirect to billing with return URL
+      const billingUrl = new URL('/profile/billing', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+      billingUrl.searchParams.set('returnUrl', `/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
+      redirect(billingUrl.toString())
     }
   }
   
@@ -252,6 +259,35 @@ export default async function LessonPage({ params }: LessonPageProps) {
     const { progress, reflections } = await getCachedProgress()
     currentProgress = progress
     initialReflections = reflections
+  }
+
+  // Fetch recommendations for user
+  let recommendations: Array<{
+    id: string
+    title: string
+    url: string
+    type: 'lesson' | 'case-study'
+    reason?: string
+    domainTitle?: string
+  }> = []
+  
+  if (user) {
+    try {
+      const smartRecs = await getSmartRecommendations(user.id)
+      recommendations = [
+        smartRecs.primary,
+        ...smartRecs.alternates,
+      ].filter((rec): rec is NonNullable<typeof rec> => rec !== null && rec !== undefined).map((rec) => ({
+        id: rec.id,
+        title: rec.title,
+        url: rec.url,
+        type: rec.type === 'curriculum' ? 'lesson' : 'case-study' as const,
+        reason: rec.reason,
+        domainTitle: rec.competencyName,
+      }))
+    } catch (error) {
+      console.error('Error fetching recommendations:', error)
+    }
   }
   
   // Check if this is the last lesson in the module
@@ -392,6 +428,17 @@ export default async function LessonPage({ params }: LessonPageProps) {
               <span className="text-neutral-700 font-medium">{displayModuleTitle}</span>
             </div>
 
+            {/* Progress Bar */}
+            {user && currentProgress && currentProgress.progress_percentage > 0 && (
+              <div className="mb-4">
+                <div className="flex items-center justify-between text-xs text-neutral-600 mb-1">
+                  <span>Progress</span>
+                  <span>{currentProgress.progress_percentage}%</span>
+                </div>
+                <Progress value={currentProgress.progress_percentage} className="h-1" />
+              </div>
+            )}
+
             {/* Title */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
@@ -408,11 +455,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
                       <Target className="h-3 w-3" />
                       <span>{lessonDifficulty.toUpperCase()}</span>
                     </div>
-                    {currentProgress && currentProgress.progress_percentage > 0 && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-700 font-medium">{currentProgress.progress_percentage}%</span>
-                      </div>
-                    )}
                   </div>
                 </div>
                 {user && (
@@ -430,103 +472,122 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-auto">
-          <div className="px-4 py-4 md:px-6 md:py-6 max-w-4xl">
-            <div className="prose prose-neutral max-w-none">
-              <MarkdownRenderer 
-                content={lessonContent}
-                lessonId={lessonId}
-                domainId={domainId}
-                moduleId={moduleId}
-                initialReflections={initialReflections}
-              />
-            </div>
-            
-            {/* Put Your Knowledge to the Test - Only show at end of module */}
-            {isLastLessonInModule && associatedCaseStudy && (
-              <div className="mt-12 pt-12 border-t border-neutral-200">
-                <div className="mb-6">
-                  <h2 className="text-2xl font-light text-neutral-900 tracking-tight mb-2">
-                    Put Your Knowledge to the Test
-                  </h2>
-                  <p className="text-neutral-600">
-                    Apply what you've learned in this module with a real-world case study
-                  </p>
-                </div>
-                <CaseStudyCard
-                  caseId={associatedCaseStudy.id}
-                  title={associatedCaseStudy.title}
-                  url={associatedCaseStudy.url}
-                  description={associatedCaseStudy.description}
-                  competencies={associatedCaseStudy.competencies}
-                  difficulty={associatedCaseStudy.difficulty}
-                  duration={associatedCaseStudy.estimatedMinutes}
+        {/* Content - Two Column Layout */}
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full px-4 py-4 md:px-6 md:py-6 overflow-y-auto">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
+              {/* Main Content */}
+              <div className="prose prose-neutral max-w-none">
+                <MarkdownRenderer 
+                  content={lessonContent}
+                  lessonId={lessonId}
+                  domainId={domainId}
+                  moduleId={moduleId}
+                  initialReflections={initialReflections}
                 />
-              </div>
-            )}
             
-            {/* Analytics Tracking */}
-            {user && (
-              <LessonViewTracker
-                lessonId={lessonId}
-                domainId={domainId}
-                moduleId={moduleId}
-                userId={user.id}
-              />
-            )}
+                {/* Put Your Knowledge to the Test - Only show at end of module */}
+                {isLastLessonInModule && associatedCaseStudy && (
+                  <div className="mt-12 pt-12 border-t border-neutral-200">
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-light text-neutral-900 tracking-tight mb-2">
+                        Apply in Case Study
+                      </h2>
+                      <p className="text-neutral-600">
+                        Put your knowledge to the test with a real-world scenario
+                      </p>
+                    </div>
+                    <CaseStudyCard
+                      caseId={associatedCaseStudy.id}
+                      title={associatedCaseStudy.title}
+                      url={associatedCaseStudy.url}
+                      description={associatedCaseStudy.description}
+                      competencies={associatedCaseStudy.competencies}
+                      difficulty={associatedCaseStudy.difficulty}
+                      duration={associatedCaseStudy.estimatedMinutes}
+                    />
+                  </div>
+                )}
+            
+                {/* Analytics Tracking */}
+                {user && (
+                  <>
+                    <LessonKeyboardShortcuts
+                      nextLessonUrl={nextLesson ? `/library/curriculum/${nextLesson.domainId}/${nextLesson.moduleId}/${nextLesson.lessonId}` : null}
+                      prevLessonUrl={previousLesson ? `/library/curriculum/${previousLesson.domainId}/${previousLesson.moduleId}/${previousLesson.lessonId}` : null}
+                    />
+                    <LessonViewTracker
+                      lessonId={lessonId}
+                      domainId={domainId}
+                      moduleId={moduleId}
+                      userId={user.id}
+                    />
+                  </>
+                )}
 
-            {/* Progress Tracker with Domain Completion Handler */}
-            {user && (
-              <LessonDomainCompletionHandler
-                userId={user.id}
-                domainId={domainId}
-                moduleId={moduleId}
-                lessonId={lessonId}
-                domainTitle={displayDomainTitle}
-                initialProgress={currentProgress?.progress_percentage || 0}
-                initialStatus={(currentProgress?.status as 'not_started' | 'in_progress' | 'completed') || 'not_started'}
-                initialTimeSpent={currentProgress?.time_spent_seconds || 0}
-                initialScrollPosition={currentProgress?.last_read_position?.scrollTop}
-              />
-            )}
+                {/* Progress Tracker with Domain Completion Handler */}
+                {user && (
+                  <LessonDomainCompletionHandler
+                    userId={user.id}
+                    domainId={domainId}
+                    moduleId={moduleId}
+                    lessonId={lessonId}
+                    domainTitle={displayDomainTitle}
+                    initialProgress={currentProgress?.progress_percentage || 0}
+                    initialStatus={(currentProgress?.status as 'not_started' | 'in_progress' | 'completed') || 'not_started'}
+                    initialTimeSpent={currentProgress?.time_spent_seconds || 0}
+                    initialScrollPosition={currentProgress?.last_read_position?.scrollTop}
+                  />
+                )}
 
-            {/* Navigation */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center pt-8 mt-8 border-t border-neutral-200 gap-4">
-              <Button variant="outline" size="sm" asChild className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs uppercase tracking-wide">
-                <Link href={`/library/curriculum/${domainId}/${moduleId}`}>
-                  <ChevronLeft className="mr-2 h-3 w-3" />
-                  MODULE
-                </Link>
-              </Button>
-              <div className="flex gap-2">
-                {previousLesson ? (
+                {/* Navigation */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center pt-8 mt-8 border-t border-neutral-200 gap-4">
                   <Button variant="outline" size="sm" asChild className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs uppercase tracking-wide">
-                    <Link href={`/library/curriculum/${previousLesson.domainId}/${previousLesson.moduleId}/${previousLesson.lessonId}`}>
+                    <Link href={`/library/curriculum/${domainId}/${moduleId}`}>
                       <ChevronLeft className="mr-2 h-3 w-3" />
-                      PREVIOUS
+                      MODULE
                     </Link>
                   </Button>
-                ) : (
-                  <Button variant="outline" size="sm" disabled className="h-8 px-2.5 border-gray-200 text-gray-400 rounded-none text-xs uppercase tracking-wide">
-                    <ChevronLeft className="mr-2 h-3 w-3" />
-                    PREVIOUS
-                  </Button>
-                )}
-                
-                {nextLesson ? (
-                  <Button size="sm" asChild className="h-8 px-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-none text-xs uppercase tracking-wide">
-                    <Link href={`/library/curriculum/${nextLesson.domainId}/${nextLesson.moduleId}/${nextLesson.lessonId}`}>
-                      NEXT
-                      <ChevronRight className="ml-2 h-3 w-3" />
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button size="sm" disabled className="h-8 px-2.5 bg-gray-400 text-white rounded-none text-xs uppercase tracking-wide">
-                    NEXT
-                    <ChevronRight className="ml-2 h-3 w-3" />
-                  </Button>
-                )}
+                  <div className="flex gap-2">
+                    {previousLesson ? (
+                      <Button variant="outline" size="sm" asChild className="h-8 px-2.5 border-gray-300 hover:border-gray-400 rounded-none text-xs uppercase tracking-wide">
+                        <Link href={`/library/curriculum/${previousLesson.domainId}/${previousLesson.moduleId}/${previousLesson.lessonId}`}>
+                          <ChevronLeft className="mr-2 h-3 w-3" />
+                          PREVIOUS
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button variant="outline" size="sm" disabled className="h-8 px-2.5 border-gray-200 text-gray-400 rounded-none text-xs uppercase tracking-wide">
+                        <ChevronLeft className="mr-2 h-3 w-3" />
+                        PREVIOUS
+                      </Button>
+                    )}
+                    
+                    {nextLesson ? (
+                      <Button size="sm" asChild className="h-8 px-2.5 bg-gray-900 text-white hover:bg-gray-800 rounded-none text-xs uppercase tracking-wide">
+                        <Link href={`/library/curriculum/${nextLesson.domainId}/${nextLesson.moduleId}/${nextLesson.lessonId}`}>
+                          NEXT
+                          <ChevronRight className="ml-2 h-3 w-3" />
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button size="sm" disabled className="h-8 px-2.5 bg-gray-400 text-white rounded-none text-xs uppercase tracking-wide">
+                        NEXT
+                        <ChevronRight className="ml-2 h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Rail - Sticky TOC and Recommendations */}
+              <div className="hidden lg:block">
+                <div className="sticky top-24 max-h-[calc(100vh-var(--header-h)-8rem)] overflow-y-auto space-y-8">
+                  <TableOfContents content={lessonContent} />
+                  {recommendations.length > 0 && (
+                    <RecommendationBlock recommendations={recommendations} maxItems={3} />
+                  )}
+                </div>
               </div>
             </div>
           </div>

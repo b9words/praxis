@@ -25,8 +25,8 @@ export interface CreateCaseData {
   storagePath?: string | null
   metadata?: Record<string, any>
   competencyIds?: string[]
-  createdBy: string
-  updatedBy: string
+  createdBy: string | null
+  updatedBy: string | null
 }
 
 export interface UpdateCaseData {
@@ -43,7 +43,7 @@ export interface UpdateCaseData {
   storagePath?: string | null
   metadata?: Record<string, any>
   competencyIds?: string[]
-  updatedBy: string
+  updatedBy?: string
 }
 
 const defaultInclude = {

@@ -55,7 +55,7 @@ export default function SimulationWorkspace({
   const [state, setState] = useState<SimulationState>({
     currentDecisionPoint: 0,
     decisions: [],
-    startedAt: simulation.started_at || new Date().toISOString(),
+    startedAt: simulation?.started_at || new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
   })
 
@@ -104,7 +104,7 @@ export default function SimulationWorkspace({
 
   // Track simulation started when component mounts
   useEffect(() => {
-    if (caseItem && simulation && !isLoading) {
+    if (caseItem && simulation?.id && !isLoading) {
       trackEvents.simulationStarted(simulation.id, caseItem.id, userId)
     }
   }, [caseItem, simulation, userId, isLoading])
@@ -127,7 +127,7 @@ export default function SimulationWorkspace({
 
   // Load existing state from simulation
   useEffect(() => {
-    if (simulation.user_inputs && typeof simulation.user_inputs === 'object') {
+    if (simulation?.user_inputs && typeof simulation.user_inputs === 'object') {
       const inputs = simulation.user_inputs as any
       if (inputs.decisions && Array.isArray(inputs.decisions)) {
         setState(prev => ({
@@ -137,12 +137,16 @@ export default function SimulationWorkspace({
         }))
       }
     }
-  }, [simulation.user_inputs])
+  }, [simulation?.user_inputs])
 
   // Mutation for saving simulation state
   const saveStateMutation = useMutation({
-    mutationFn: (newState: SimulationState) =>
-      fetchJson(`/api/case-studies/${simulation.id}/state`, {
+    mutationFn: (newState: SimulationState) => {
+      if (!simulation?.id) {
+        // Simulation should always exist after unification, but guard for safety
+        return Promise.reject(new Error('Simulation not available. Please refresh the page.'))
+      }
+      return fetchJson(`/api/case-studies/${simulation.id}/state`, {
         method: 'PUT',
         body: {
           stageStates: { simulationState: newState }, // Store full state in stageStates
@@ -154,7 +158,8 @@ export default function SimulationWorkspace({
             index: idx,
           })),
         },
-      }),
+      })
+    },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save your progress')
     },
@@ -184,7 +189,7 @@ export default function SimulationWorkspace({
         debrief?: any
       }>('/api/generate-debrief', {
         method: 'POST',
-        body: { simulationId: simulation.id },
+        body: { simulationId: simulation?.id },
       })
 
       // If debrief already exists (from cache), return immediately
@@ -219,7 +224,7 @@ export default function SimulationWorkspace({
               return { debriefId }
             }
             // Fallback: use simulationId to fetch debrief
-            return { debriefId: simulation.id }
+            return { debriefId: simulation?.id }
           } else if (jobStatus.status === 'failed') {
             throw new Error(jobStatus.error || 'Debrief generation failed')
           }
@@ -234,6 +239,7 @@ export default function SimulationWorkspace({
       throw new Error('Unexpected response from debrief generation')
     },
     onSuccess: (data) => {
+      if (!simulation?.id) return
       // Track simulation completion
       trackEvents.simulationCompleted(simulation.id, caseItem.id, userId)
       
@@ -251,10 +257,17 @@ export default function SimulationWorkspace({
 
   // Mutation for completing simulation
   const completeMutation = useMutation({
-      mutationFn: () => fetchJson<{ success: boolean }>(`/api/case-studies/${simulation.id}/complete`, {
-      method: 'POST',
-    }),
+    mutationFn: () => {
+      if (!simulation?.id) {
+        // Simulation should always exist after unification, but guard for safety
+        return Promise.reject(new Error('Simulation not available. Please refresh the page.'))
+      }
+      return fetchJson<{ success: boolean }>(`/api/case-studies/${simulation.id}/complete`, {
+        method: 'POST',
+      })
+    },
     onSuccess: () => {
+      if (!simulation?.id) return
       // Invalidate simulation queries
       queryClient.invalidateQueries({ queryKey: queryKeys.simulations.byId(simulation.id) })
       

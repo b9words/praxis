@@ -1,19 +1,21 @@
 import FocusedDashboard from '@/components/dashboard/FocusedDashboard'
 import { getCurrentUser } from '@/lib/auth/get-user'
+import { getUserResidency } from '@/lib/auth/get-residency'
 import { assembleDashboardData } from '@/lib/dashboard-assembler'
 import { getCachedUserData, CacheTags } from '@/lib/cache'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
 
-  // All auth checks removed
-
-  // Dashboard always renders - no server-side redirects to prevent loops
-  // If user doesn't have residency, dashboard will show appropriate empty state
-  // Client-side components can handle navigation if needed
-
   if (!user) {
     return null
+  }
+
+  // Check if user has completed onboarding (has residency set)
+  const residency = await getUserResidency(user.id)
+  if (!residency.currentResidency) {
+    redirect('/onboarding')
   }
 
   // Cache dashboard data with userId in key, 5 minute revalidation
@@ -47,6 +49,10 @@ export default async function DashboardPage() {
   return (
     <FocusedDashboard
       roadmap={dashboardData.roadmap}
+      recommendation={dashboardData.recommendation}
+      jumpBackInItems={dashboardData.jumpBackInItems}
+      currentStreak={dashboardData.currentStreak}
+      weeklyGoal={dashboardData.weeklyGoal}
     />
   )
 }

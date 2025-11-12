@@ -1,5 +1,6 @@
 import { prisma } from './prisma/server'
 import { sendWeeklySummaryEmail } from './email'
+import { getSmartRecommendations } from './recommendation-engine'
 
 export interface WeeklySummaryResult {
   success: boolean
@@ -217,8 +218,27 @@ export async function sendWeeklySummaries(): Promise<WeeklySummaryResult> {
           }
         }
 
-        // Only send email if user had activity or insights
-        if (lessonsCompleted > 0 || simulationsCompleted > 0 || articlesCompleted > 0 || strongestCompetency || simulatorTimeMinutes !== undefined) {
+        // Get smart recommendations for next session
+        let recommendedContent: Array<{ title: string; type: 'lesson' | 'case'; url: string; reason?: string }> = []
+        try {
+          const recommendations = await getSmartRecommendations(user.id)
+          recommendedContent = [
+            recommendations.primary,
+            ...recommendations.alternates.slice(0, 2),
+          ]
+            .filter((rec): rec is NonNullable<typeof rec> => rec !== null && rec !== undefined)
+            .map((rec) => ({
+              title: rec.title,
+              type: rec.type === 'curriculum' ? 'lesson' : 'case' as const,
+              url: rec.url,
+              reason: rec.reason,
+            }))
+        } catch (error) {
+          console.error(`Error fetching recommendations for user ${user.id}:`, error)
+        }
+
+        // Only send email if user had activity or insights or has recommendations
+        if (lessonsCompleted > 0 || simulationsCompleted > 0 || articlesCompleted > 0 || strongestCompetency || simulatorTimeMinutes !== undefined || recommendedContent.length > 0) {
           const userName = user.fullName || user.username || undefined
           
           if (!user.email) {
@@ -233,6 +253,7 @@ export async function sendWeeklySummaries(): Promise<WeeklySummaryResult> {
             strongestCompetency,
             simulatorTimeMinutes,
             simulatorTimeChangePct,
+            recommendedContent,
           })
 
           if (result.success) {

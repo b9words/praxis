@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { checkSubscription } from './lib/auth/middleware-helpers'
 import { getRedirectUrlForLegacyContent } from './lib/content-mapping'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   
   // STEP 1: Define public paths that bypass ALL checks (including case-studies)
@@ -11,8 +11,6 @@ export async function middleware(request: NextRequest) {
     '/library/curriculum',
     '/library/case-studies',  // Case studies listing - ALWAYS public
     '/library/paths',
-    '/profile/billing',
-    '/dashboard',
     '/residency',
   ]
   
@@ -94,11 +92,56 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // STEP 4: Subscription gating (only for logged-in users on protected paths)
+  // STEP 4: Onboarding check (only for logged-in users on protected paths)
   if (user) {
-    const protectedPaths = ['/library', '/case-studies']
+    const protectedPaths = ['/dashboard', '/library', '/case-studies', '/profile']
     const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
     
+    // Skip onboarding check for onboarding and billing pages
+    const skipOnboardingCheck = pathname === '/onboarding' || pathname.startsWith('/profile/billing')
+    
+    if (isProtectedPath && !skipOnboardingCheck) {
+      // Check if user has completed onboarding (has residency set)
+      try {
+        const { createClient } = await import('@supabase/supabase-js')
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+        
+        if (serviceRoleKey && supabaseUrl) {
+          const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          })
+          
+          const { data: residency, error: residencyError } = await supabaseAdmin
+            .from('user_residency')
+            .select('current_residency')
+            .eq('user_id', user.id)
+            .single()
+          
+          // If no residency found and no error (user just doesn't have one), redirect to onboarding
+          if (!residency && !residencyError) {
+            return NextResponse.redirect(new URL('/onboarding', request.url))
+          }
+          
+          // If error is "not found" (PGRST116), user hasn't completed onboarding
+          if (residencyError && residencyError.code === 'PGRST116') {
+            return NextResponse.redirect(new URL('/onboarding', request.url))
+          }
+          
+          // If there's a different error, log but allow through (fail open)
+          if (residencyError && residencyError.code !== 'PGRST116') {
+            console.error('Error checking residency in middleware:', residencyError)
+            // Fail open - allow access
+          }
+        }
+      } catch (error) {
+        // If residency check fails completely, log but allow through (fail open)
+        console.error('Error checking onboarding status in middleware:', error)
+        // Fail open - allow access
+      }
+    }
+    
+    // STEP 5: Subscription gating (only for logged-in users on protected paths)
     if (isProtectedPath) {
       try {
         // Check if user is admin - admins bypass subscription checks
@@ -138,6 +181,18 @@ export async function middleware(request: NextRequest) {
         if (userRole === null) {
           if (process.env.NODE_ENV === 'development') {
             console.warn(`[middleware] No role found for user ${user.id}, allowing access (fail open)`)
+          }
+          return NextResponse.next()
+        }
+        
+        // Check for mock subscription (dev mode only)
+        const enableMockCheckout = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 'true'
+        const mockSubscribedCookie = request.cookies.get('mock_subscribed')?.value === '1'
+        
+        if (enableMockCheckout || mockSubscribedCookie) {
+          // Mock subscription active - allow access
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[middleware] Mock subscription active for user ${user.id}, allowing access`)
           }
           return NextResponse.next()
         }
@@ -204,6 +259,9 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
+// Export as default middleware for Next.js 16
+export default proxy
+
 export const config = {
   matcher: [
     /*
@@ -216,3 +274,4 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+

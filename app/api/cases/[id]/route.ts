@@ -1,4 +1,4 @@
-import { getCachedCase } from '@/lib/cache'
+import { getCachedCase } from '@/lib/case-cache'
 import { updateCaseWithCompetencies, deleteCase } from '@/lib/db/cases'
 import { AppError } from '@/lib/db/utils'
 import { NextRequest, NextResponse } from 'next/server'

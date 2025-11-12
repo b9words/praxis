@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
+import { getUserResidency } from '@/lib/auth/get-residency'
 import { BookOpen, DollarSign, Shield, Target, TrendingUp, Users } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import ChannelIOSupport from '@/components/ui/ChannelIOSupport'
 import Footer from '@/components/layout/Footer'
 import PublicHeader from '@/components/layout/PublicHeader'
@@ -60,7 +62,15 @@ export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Don't redirect authenticated users
+  // Redirect authenticated users to dashboard or onboarding
+  if (user) {
+    const residency = await getUserResidency(user.id)
+    if (!residency.currentResidency) {
+      redirect('/onboarding')
+    } else {
+      redirect('/dashboard')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -89,12 +99,12 @@ export default async function Home() {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none px-8 h-12 text-sm font-medium">
                 <Link href="/signup">
-                  Request Access
+                  Start Free
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 rounded-none px-8 h-12 text-sm font-medium">
-                <Link href="#method">
-                  Review Method
+                <Link href="#demo">
+                  Try 5-Min Demo
                 </Link>
               </Button>
             </div>

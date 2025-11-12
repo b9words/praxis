@@ -10,7 +10,8 @@ import { getRecentCases } from '@/lib/db/cases'
 import { getRecentArticles } from '@/lib/db/articles'
 import { getCompletedArticleIds, getRecentCompletedArticles, getArticleProgressCompletionDates } from '@/lib/db/articleProgress'
 import { getCompletedSimulationsForDashboard, getInProgressSimulationsForDashboard, getAllSimulationsForDashboard, getCompletedSimulationsByCaseIds, getPopularSimulations } from '@/lib/db/simulations'
-import { getInProgressLessonsForDashboard, getLessonProgressSummary, getPopularLessons } from '@/lib/db/progress'
+import { getInProgressLessonsForDashboard, getLessonProgressSummary, getPopularLessons, getAllUserProgress } from '@/lib/db/progress'
+import { dbCall } from '@/lib/db/utils'
 import { getAllLearningPaths } from '@/lib/learning-paths'
 import { getSmartRecommendations, RecommendationWithAlternates } from '@/lib/recommendation-engine'
 
@@ -44,6 +45,11 @@ export interface DashboardData {
   } | null
   currentStreak: number
   longestStreak: number
+  weeklyGoal: {
+    targetHours: number
+    currentHours: number
+    progress: number
+  }
   recentActivities: Array<{
     id: string
     type: 'article' | 'simulation'
@@ -774,6 +780,49 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     console.error('Error building roadmap:', error)
   }
 
+  // Get profile to extract weekly goal from bio
+  const profile = await dbCall(async (prisma) => {
+    return prisma.profile.findUnique({
+      where: { id: userId },
+      select: { bio: true },
+    })
+  }).catch(() => null)
+
+  // Extract weekly goal from bio (format: "Weekly commitment: X hours")
+  let weeklyGoalHours = 2 // Default
+  if (profile?.bio) {
+    const match = profile.bio.match(/Weekly commitment:\s*(\d+)\s*hours?/i)
+    if (match) {
+      weeklyGoalHours = parseInt(match[1], 10) || 2
+    }
+  }
+
+  // Calculate weekly progress (time spent this week) using lesson progress (authoritative for time)
+  const now = new Date()
+  const weekStart = new Date(now)
+  weekStart.setDate(now.getDate() - (now.getDay() || 7) + 1) // Monday
+  weekStart.setHours(0, 0, 0, 0)
+
+  let weeklyTimeSpent = 0
+  try {
+    const allUserProgressMap = await getAllUserProgress(userId)
+    for (const progress of Array.from(allUserProgressMap.values())) {
+      const updatedAt = new Date(progress.updated_at)
+      if (updatedAt >= weekStart) {
+        weeklyTimeSpent += progress.time_spent_seconds || 0
+      }
+    }
+  } catch (error) {
+    // Best-effort; if this fails, weeklyTimeSpent remains 0
+    console.error('Error calculating weekly time spent:', error)
+  }
+
+  const weeklyGoal = {
+    targetHours: weeklyGoalHours,
+    currentHours: Math.round(weeklyTimeSpent / 3600 * 10) / 10, // Round to 1 decimal
+    progress: Math.min(100, Math.round((weeklyTimeSpent / 3600 / weeklyGoalHours) * 100)),
+  }
+
   // Calculate learning streak (current and longest)
   let currentStreak = 0
   let longestStreak = 0
@@ -822,6 +871,7 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     residencyData,
     currentStreak,
     longestStreak,
+    weeklyGoal,
     recentActivities,
     aggregateScores: aggregateScoresResult as unknown as Record<string, number> | null,
     jumpBackInItems,

@@ -4,11 +4,13 @@ import { cn } from '@/lib/utils'
 interface AlertProps {
   className?: string
   children: ReactNode
+  role?: string
+  'aria-live'?: 'off' | 'assertive' | 'polite'
 }
 
-export function Alert({ className, children }: AlertProps) {
+export function Alert({ className, children, role, 'aria-live': ariaLive }: AlertProps) {
   return (
-    <div className={cn('rounded-lg border p-4', className)}>
+    <div className={cn('rounded-lg border p-4', className)} role={role} aria-live={ariaLive}>
       {children}
     </div>
   )

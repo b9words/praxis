@@ -7,14 +7,14 @@ import { NextRequest, NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 
 /**
- * POST /api/case-studies/[id]/complete
+ * POST /api/case-studies/[caseId]/complete
  * Complete a case study and trigger side effects:
  * - Generate debrief
  * - Send notifications
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -22,29 +22,30 @@ export async function POST(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
 
     // Verify ownership
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Get case study with case info
-    const simulation = await getSimulationById(id)
+    const simulation = await getSimulationById(caseId)
     if (!simulation) {
       return NextResponse.json({ error: 'Case study not found' }, { status: 404 })
     }
 
+    // Idempotent: if already completed, return success
     if (simulation.status === 'completed') {
-      return NextResponse.json({ error: 'Case study already completed' }, { status: 400 })
+      return NextResponse.json({ success: true, alreadyCompleted: true, simulationId: caseId })
     }
 
     // Store case title before updating
     const caseTitle = simulation.case?.title || 'Case'
 
     // Mark case study as completed
-    await updateSimulationStatus(id, 'completed')
+    await updateSimulationStatus(caseId, 'completed')
 
     // Send notification
     await notifySimulationComplete(
@@ -98,7 +99,7 @@ export async function POST(
       console.error('Error checking domain completion:', completionError)
     }
 
-    return NextResponse.json({ success: true, simulationId: id })
+    return NextResponse.json({ success: true, simulationId: caseId })
   } catch (error: any) {
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: error.message }, { status: 401 })

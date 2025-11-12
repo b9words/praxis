@@ -4,9 +4,23 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 export default function PublicHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
+
+  // Check auth state on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+      setAuthChecked(true)
+    }
+    checkAuth()
+  }, [])
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -23,7 +37,7 @@ export default function PublicHeader() {
   const navLinks = [
     { href: '/#method', label: 'Method' },
     { href: '/#curriculum', label: 'Curriculum' },
-    { href: '/pricing', label: 'Pricing' },
+    { href: isAuthenticated ? '/profile/billing' : '/pricing', label: 'Pricing' },
     { href: '/ledger', label: 'The Ledger' },
   ]
 
@@ -77,12 +91,28 @@ export default function PublicHeader() {
               </button>
               {/* Desktop Auth Buttons */}
               <div className="hidden md:flex gap-4">
-                <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
-                  <Link href="/login">Authenticate</Link>
-                </Button>
-                <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
-                  <Link href="/signup">Request Access</Link>
-                </Button>
+                {!authChecked ? (
+                  // Show nothing while checking auth to prevent flash
+                  <div className="w-0 h-0" />
+                ) : isAuthenticated ? (
+                  <>
+                    <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
+                      <Link href="/dashboard">Go to Dashboard</Link>
+                    </Button>
+                    <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
+                      <Link href="/profile/billing">Manage Billing</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
+                      <Link href="/login">Authenticate</Link>
+                    </Button>
+                    <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
+                      <Link href="/signup">Request Access</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -139,21 +169,46 @@ export default function PublicHeader() {
 
             {/* Auth Buttons */}
             <div className="px-6 py-4 border-t border-neutral-200 space-y-3">
-              <Button
-                asChild
-                variant="outline"
-                className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-none"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Link href="/login">Authenticate</Link>
-              </Button>
-              <Button
-                asChild
-                className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Link href="/signup">Request Access</Link>
-              </Button>
+              {!authChecked ? (
+                // Show nothing while checking auth to prevent flash
+                null
+              ) : isAuthenticated ? (
+                <>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-none"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link href="/dashboard">Go to Dashboard</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link href="/profile/billing">Manage Billing</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-none"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link href="/login">Authenticate</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link href="/signup">Request Access</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>

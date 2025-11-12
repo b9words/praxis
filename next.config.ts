@@ -142,6 +142,10 @@ const configWithSentry = process.env.SENTRY_AUTH_TOKEN && !process.env.SENTRY_DI
       widenClientFileUpload: true,
       hideSourceMaps: true,
       disableLogger: true,
+      // Delete source maps after upload to avoid serving them to users
+      sourcemaps: {
+        deleteSourcemapsAfterUpload: true,
+      },
     })
   : withBundleAnalyzer(nextConfig);
 

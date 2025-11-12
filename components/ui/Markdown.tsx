@@ -6,14 +6,14 @@ import React, { useEffect, useRef, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
-import rehypeSanitize from 'rehype-sanitize'
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import remarkGfm from 'remark-gfm'
-import { defaultSchema } from 'hast-util-sanitize'
 import EmbeddedQuiz, { QuizQuestion } from '@/components/library/EmbeddedQuiz'
 import ReflectionPrompt from '@/components/library/ReflectionPrompt'
 import KeyTakeaway from '@/components/library/KeyTakeaway'
+import InlineCheck from '@/components/library/InlineCheck'
 
 interface MarkdownProps {
   content: string
@@ -251,12 +251,6 @@ function Mermaid({ chart }: { chart: string }) {
               allElements.forEach((el: Element) => {
                 const element = el as HTMLElement
                 
-                // Ensure white background on SVG element itself
-                if (element === svgElement) {
-                  element.style.background = 'white'
-                  element.style.backgroundColor = 'white'
-                }
-                
                 // Style all shapes with transparent fill and black borders
                 if (element.tagName === 'rect' || element.tagName === 'circle' || element.tagName === 'ellipse' || element.tagName === 'polygon') {
                   element.style.fill = 'transparent'
@@ -322,23 +316,25 @@ function Mermaid({ chart }: { chart: string }) {
 
 // Parse interactive blockquote blocks
 interface ParsedBlock {
-  type: 'QUESTION' | 'REFLECT' | 'KEY-TAKEAWAY'
+  type: 'QUESTION' | 'REFLECT' | 'KEY-TAKEAWAY' | 'CHECK'
   content: string
   startIndex: number
   endIndex: number
+  metadata?: Record<string, any>
 }
 
 function parseInteractiveBlocks(content: string): ParsedBlock[] {
   const blocks: ParsedBlock[] = []
   // Match: > [!TYPE] followed by content lines starting with >
-  const regex = /^>\s*\[!([A-Z-]+)\]\s*$\n((?:^>.*\n?)+?)(?=^>\s*\[!|$)/gm
+  const regex = /^>\s*\[!([A-Z-]+)\]\s*(.*?)$\n((?:^>.*\n?)+?)(?=^>\s*\[!|$)/gm
 
   let match
   while ((match = regex.exec(content)) !== null) {
     const type = match[1] as ParsedBlock['type']
-    if (type === 'QUESTION' || type === 'REFLECT' || type === 'KEY-TAKEAWAY') {
+    const metadataStr = match[2] || ''
+    if (type === 'QUESTION' || type === 'REFLECT' || type === 'KEY-TAKEAWAY' || type === 'CHECK') {
       const fullMatch = match[0]
-      const blockquoteContent = match[2] || ''
+      const blockquoteContent = match[3] || ''
 
       // Remove leading '> ' or '>' from each line and trim
       const cleanedContent = blockquoteContent
@@ -352,12 +348,24 @@ function parseInteractiveBlocks(content: string): ParsedBlock[] {
         .trim()
 
       if (cleanedContent) {
-        blocks.push({
+        const block: ParsedBlock = {
           type,
           content: cleanedContent,
           startIndex: match.index!,
           endIndex: match.index! + fullMatch.length,
-        })
+        }
+
+        // Parse metadata for CHECK blocks (e.g., correct: 0,2,3)
+        if (type === 'CHECK' && metadataStr) {
+          const metadata: Record<string, any> = {}
+          const correctMatch = metadataStr.match(/correct:\s*([0-9,]+)/i)
+          if (correctMatch) {
+            metadata.correctIndices = correctMatch[1].split(',').map(n => parseInt(n.trim(), 10))
+          }
+          block.metadata = metadata
+        }
+
+        blocks.push(block)
       }
     }
   }
@@ -473,6 +481,24 @@ export default function Markdown({
           component = (
             <KeyTakeaway key={`takeaway-${index}`} content={block.content} />
           )
+          break
+        }
+        case 'CHECK': {
+          // Parse items from content (each line is an item)
+          const items = block.content
+            .split('\n')
+            .map(line => line.replace(/^[-*]\s*/, '').trim())
+            .filter(line => line.length > 0)
+          
+          if (items.length >= 2 && items.length <= 5) {
+            component = (
+              <InlineCheck
+                key={`check-${index}`}
+                items={items}
+                correctIndices={block.metadata?.correctIndices}
+              />
+            )
+          }
           break
         }
       }

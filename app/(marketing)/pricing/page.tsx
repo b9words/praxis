@@ -1,12 +1,19 @@
 import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
+import MockCheckout from '@/components/pricing/MockCheckout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Check } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { getCurrentUser } from '@/lib/auth/get-user'
+import { prisma } from '@/lib/prisma/server'
+import { isMissingTable } from '@/lib/api/route-helpers'
+import { redirect } from 'next/navigation'
+
+const ENABLE_MOCK_CHECKOUT = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 'true'
 
 export const metadata: Metadata = {
   title: 'Pricing',
@@ -25,7 +32,28 @@ export const metadata: Metadata = {
   },
 }
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const user = await getCurrentUser()
+  
+  // If authenticated, check subscription status
+  if (user) {
+    let subscription: any = null
+    try {
+      subscription = await prisma.subscription.findUnique({
+        where: { userId: user.id },
+      })
+    } catch (error: any) {
+      if (!isMissingTable(error)) {
+        console.error('Error fetching subscription:', error)
+      }
+    }
+    
+    // If user has active subscription, redirect to billing page
+    if (subscription && subscription.status === 'active') {
+      redirect('/profile/billing')
+    }
+  }
+  
   const plans = [
     {
       name: 'Explorer',
@@ -85,6 +113,15 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white">
       <PublicHeader />
+      
+      {/* Auth notice for logged-in users */}
+      {user && (
+        <div className="bg-neutral-50 border-b border-neutral-200 px-6 py-3">
+          <div className="max-w-7xl mx-auto text-sm text-neutral-700">
+            You're signed in. <Link href="/profile/billing" className="underline font-medium hover:text-neutral-900">Manage your plan in Billing</Link>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <section className="border-b border-neutral-200 relative">
@@ -146,7 +183,18 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  {plan.planId ? (
+                  {ENABLE_MOCK_CHECKOUT ? (
+                    <MockCheckout
+                      planName={plan.name}
+                      className={`w-full h-12 text-sm font-medium rounded-none ${
+                        plan.popular 
+                          ? 'bg-neutral-900 hover:bg-neutral-800 text-white' 
+                          : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
+                      }`}
+                    >
+                      {plan.cta}
+                    </MockCheckout>
+                  ) : plan.planId ? (
                     <PaddleCheckout
                       planId={plan.planId}
                       planName={plan.name}
@@ -167,7 +215,7 @@ export default function PricingPage() {
                           : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
                       }`}
                     >
-                      <Link href="/signup">{plan.cta}</Link>
+                      <Link href={user ? '/profile/billing' : '/signup'}>{plan.cta}</Link>
                     </Button>
                   )}
                 </CardContent>

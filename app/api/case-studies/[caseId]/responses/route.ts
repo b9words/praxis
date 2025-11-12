@@ -7,21 +7,25 @@ import { notFound } from 'next/navigation'
 export const dynamic = 'force-dynamic'
 
 /**
- * GET /api/case-studies/[id]/responses
+ * GET /api/case-studies/[caseId]/responses
  * List public responses for a case study, sorted by likes
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { caseId } = await params
     const searchParams = request.nextUrl.searchParams
     const limit = parseInt(searchParams.get('limit') || '20', 10)
     const cursor = searchParams.get('cursor') || undefined
+    const sortBy = (searchParams.get('sortBy') || 'top') as 'top' | 'new' | 'following'
+
+    // Get current user for following sort
+    const user = await getCurrentUser()
 
     // Verify case exists
-    const caseItem = await getCaseById(id)
+    const caseItem = await getCaseById(caseId)
     if (!caseItem || !caseItem.published) {
       return NextResponse.json({ error: 'Case not found' }, { status: 404 })
     }
@@ -31,11 +35,13 @@ export async function GET(
       caseId: caseItem.id,
       limit,
       cursor,
+      sortBy,
+      userId: user?.id,
     })
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('[GET /api/case-studies/[id]/responses] Error:', error)
+    console.error('[GET /api/case-studies/[caseId]/responses] Error:', error)
     return NextResponse.json(
       { error: 'Failed to fetch responses' },
       { status: 500 }
@@ -44,12 +50,12 @@ export async function GET(
 }
 
 /**
- * POST /api/case-studies/[id]/responses
+ * POST /api/case-studies/[caseId]/responses
  * Create or update current user's response to a case study
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const user = await getCurrentUser()
@@ -57,7 +63,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
+    const { caseId } = await params
     const body = await request.json()
     const { content, isPublic, simulationId } = body
 
@@ -69,7 +75,7 @@ export async function POST(
     }
 
     // Verify case exists
-    const caseItem = await getCaseById(id)
+    const caseItem = await getCaseById(caseId)
     if (!caseItem || !caseItem.published) {
       return NextResponse.json({ error: 'Case not found' }, { status: 404 })
     }
@@ -85,7 +91,7 @@ export async function POST(
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('[POST /api/case-studies/[id]/responses] Error:', error)
+    console.error('[POST /api/case-studies/[caseId]/responses] Error:', error)
     return NextResponse.json(
       { error: 'Failed to save response' },
       { status: 500 }

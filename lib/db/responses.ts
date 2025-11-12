@@ -14,10 +14,14 @@ export interface CreateOrUpdateResponseData {
   isPublic: boolean
 }
 
+export type SortOption = 'top' | 'new' | 'following'
+
 export interface ListPublicResponsesOptions {
   caseId: string
   limit?: number
   cursor?: string
+  sortBy?: SortOption
+  userId?: string // For "following" sort
 }
 
 /**
@@ -91,15 +95,38 @@ export async function createOrUpdateResponse(data: CreateOrUpdateResponseData) {
 }
 
 /**
- * List public responses for a case, sorted by likes (desc) then createdAt (desc)
+ * List public responses for a case, sorted by specified option
  */
 export async function listPublicResponses(options: ListPublicResponsesOptions) {
-  const { caseId, limit = 20, cursor } = options
+  const { caseId, limit = 20, cursor, sortBy = 'top', userId } = options
 
   return dbCall(async (prisma) => {
     const where: Prisma.CaseResponseWhereInput = {
       caseId,
       isPublic: true,
+    }
+
+    // Determine orderBy based on sortBy
+    let orderBy: Prisma.CaseResponseOrderByWithRelationInput[] = []
+    if (sortBy === 'new') {
+      orderBy = [{ createdAt: 'desc' }]
+    } else if (sortBy === 'top') {
+      orderBy = [
+        { likesCount: 'desc' },
+        { createdAt: 'desc' },
+      ]
+    } else if (sortBy === 'following' && userId) {
+      // For following, we'd need a follow system - for now, fall back to top
+      orderBy = [
+        { likesCount: 'desc' },
+        { createdAt: 'desc' },
+      ]
+    } else {
+      // Default to top
+      orderBy = [
+        { likesCount: 'desc' },
+        { createdAt: 'desc' },
+      ]
     }
 
     if (cursor) {
@@ -110,15 +137,20 @@ export async function listPublicResponses(options: ListPublicResponsesOptions) {
       })
 
       if (cursorResponse) {
-        where.OR = [
-          {
-            likesCount: { lt: cursorResponse.likesCount },
-          },
-          {
-            likesCount: cursorResponse.likesCount,
-            createdAt: { lt: cursorResponse.createdAt },
-          },
-        ]
+        if (sortBy === 'new') {
+          where.createdAt = { lt: cursorResponse.createdAt }
+        } else {
+          // Top or following
+          where.OR = [
+            {
+              likesCount: { lt: cursorResponse.likesCount },
+            },
+            {
+              likesCount: cursorResponse.likesCount,
+              createdAt: { lt: cursorResponse.createdAt },
+            },
+          ]
+        }
       }
     }
 
@@ -139,10 +171,7 @@ export async function listPublicResponses(options: ListPublicResponsesOptions) {
           },
         },
       },
-      orderBy: [
-        { likesCount: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy,
       take: limit + 1, // Fetch one extra to determine if there's a next page
     })
 
@@ -163,6 +192,12 @@ export async function listPublicResponses(options: ListPublicResponsesOptions) {
  */
 export async function toggleLike(responseId: string, userId: string) {
   return withTransaction(async (tx) => {
+    // Get response to find owner
+    const response = await tx.caseResponse.findUnique({
+      where: { id: responseId },
+      select: { userId: true, case: { select: { id: true, title: true } } },
+    })
+
     // Check if like already exists
     const existingLike = await tx.caseResponseLike.findUnique({
       where: {
@@ -207,6 +242,23 @@ export async function toggleLike(responseId: string, userId: string) {
           likesCount: { increment: 1 },
         },
       })
+
+      // Notify response owner if different from liker (best-effort)
+      if (response && response.userId !== userId) {
+        try {
+          const { createNotification } = await import('@/lib/notifications')
+          await createNotification({
+            userId: response.userId,
+            type: 'like',
+            title: 'Someone liked your response',
+            message: `Your response to "${response.case.title}" received a like`,
+            link: `/library/case-studies/${response.case.id}`,
+            metadata: { responseId, likerId: userId },
+          })
+        } catch {
+          // Notification creation failed, continue anyway
+        }
+      }
 
       return { liked: true }
     }

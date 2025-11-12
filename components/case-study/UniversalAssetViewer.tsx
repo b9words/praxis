@@ -391,9 +391,9 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
     return assets
   }, [hasBriefing, briefingDoc, processedCaseFiles, processedDatasets])
 
-  // Prioritize and limit to 3
+  // Prioritize assets (no limit - show all)
   const prioritizedAssets = useMemo(() => {
-    return prioritizeAssets(allAssets).slice(0, 3)
+    return prioritizeAssets(allAssets)
   }, [allAssets])
 
   const totalAssets = allAssets.length
@@ -433,9 +433,6 @@ export default function UniversalAssetViewer({ briefingDoc, datasets, caseFiles 
       <div className="p-4 border-b border-gray-200 bg-gray-50">
         <h3 className="font-semibold text-gray-900">Case Materials</h3>
         <p className="text-sm text-gray-600">Reference materials and data for this scenario</p>
-        {totalAssets > 3 && (
-          <p className="text-xs text-gray-500 mt-1">Showing 3 of {totalAssets} materials</p>
-        )}
       </div>
 
       {limitedAssets.length === 0 ? (

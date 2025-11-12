@@ -97,6 +97,30 @@ export async function POST(request: NextRequest) {
       completed_at: status === 'completed' ? new Date().toISOString() : undefined,
     }).catch(() => null)
 
+    // Track analytics milestones (25%, 50%, 100%)
+    if (progressPercentage >= 25 && progressPercentage < 50) {
+      const { serverAnalyticsTracker } = await import('@/lib/analytics')
+      serverAnalyticsTracker.track('lesson_progress', {
+        lessonId: `${domainId}-${moduleId}-${lessonId}`,
+        progressPercentage: 25,
+        userId: authUser.id,
+      })
+    } else if (progressPercentage >= 50 && progressPercentage < 100) {
+      const { serverAnalyticsTracker } = await import('@/lib/analytics')
+      serverAnalyticsTracker.track('lesson_progress', {
+        lessonId: `${domainId}-${moduleId}-${lessonId}`,
+        progressPercentage: 50,
+        userId: authUser.id,
+      })
+    } else if (progressPercentage >= 100 || status === 'completed') {
+      const { serverAnalyticsTracker } = await import('@/lib/analytics')
+      serverAnalyticsTracker.track('lesson_progress', {
+        lessonId: `${domainId}-${moduleId}-${lessonId}`,
+        progressPercentage: 100,
+        userId: authUser.id,
+      })
+    }
+
     if (!progress) {
       // Silently return success for profile-related failures
       return NextResponse.json({ progress: null }, { status: 201 })

@@ -10,6 +10,7 @@ interface WeeklySummaryEmailProps {
   strongestCompetency?: string
   simulatorTimeMinutes?: number
   simulatorTimeChangePct?: number
+  recommendedContent?: Array<{ title: string; type: 'lesson' | 'case'; url: string; reason?: string }>
 }
 
 export function WeeklySummaryEmail({
@@ -21,6 +22,7 @@ export function WeeklySummaryEmail({
   strongestCompetency,
   simulatorTimeMinutes,
   simulatorTimeChangePct,
+  recommendedContent = [],
 }: WeeklySummaryEmailProps) {
   const totalActivities = articlesCompleted + simulationsCompleted + lessonsCompleted
   const hasInsights = strongestCompetency || simulatorTimeMinutes !== undefined
@@ -87,6 +89,23 @@ export function WeeklySummaryEmail({
           )}
         </Section>
 
+        {recommendedContent.length > 0 && (
+          <Section style={recommendationsContainer}>
+            <Text style={recommendationsHeading}>Recommended for Next Week</Text>
+            {recommendedContent.map((item, idx) => (
+              <Section key={idx} style={recommendationItem}>
+                <Text style={recommendationTitle}>{item.title}</Text>
+                {item.reason && (
+                  <Text style={recommendationReason}>{item.reason}</Text>
+                )}
+                <Button style={recommendationButton} href={`${baseUrl}${item.url}`}>
+                  {item.type === 'lesson' ? 'View Lesson' : 'Start Case Study'}
+                </Button>
+              </Section>
+            ))}
+          </Section>
+        )}
+
         <Text style={paragraph}>
           {totalActivities > 0 || hasInsights
             ? 'Continue building analytical acumen.' 
@@ -95,7 +114,7 @@ export function WeeklySummaryEmail({
 
         <Section style={buttonContainer}>
           <Button style={button} href={dashboardUrl}>
-            Open Dashboard
+            Resume Learning
           </Button>
         </Section>
       </Section>
@@ -150,5 +169,55 @@ const button = {
   textAlign: 'center' as const,
   display: 'block',
   padding: '12px 24px',
+}
+
+const recommendationsContainer = {
+  backgroundColor: '#f9fafb',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0',
+}
+
+const recommendationsHeading = {
+  color: '#111827',
+  fontSize: '18px',
+  fontWeight: '600',
+  lineHeight: '24px',
+  margin: '0 0 16px',
+}
+
+const recommendationItem = {
+  backgroundColor: '#ffffff',
+  borderLeft: '3px solid #2563eb',
+  borderRadius: '4px',
+  padding: '16px',
+  margin: '12px 0',
+}
+
+const recommendationTitle = {
+  color: '#111827',
+  fontSize: '16px',
+  fontWeight: '500',
+  lineHeight: '24px',
+  margin: '0 0 8px',
+}
+
+const recommendationReason = {
+  color: '#6b7280',
+  fontSize: '14px',
+  lineHeight: '20px',
+  margin: '0 0 12px',
+}
+
+const recommendationButton = {
+  backgroundColor: '#2563eb',
+  borderRadius: '4px',
+  color: '#ffffff',
+  fontSize: '14px',
+  fontWeight: '500',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  display: 'inline-block',
+  padding: '8px 16px',
 }
 

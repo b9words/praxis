@@ -160,51 +160,38 @@ export async function POST(request: NextRequest) {
       userId = newUser.user.id
     }
 
-    // Use existing supabaseAdmin to ensure profile exists with correct role (avoids Prisma schema issues)
+    // Use Prisma to create/update profile (bypasses RLS and handles schema correctly)
+    const { prisma } = await import('@/lib/prisma/server')
+    
     try {
       // Check if profile exists
-      const { data: existingProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('id, role')
-        .eq('id', userId)
-        .single()
+      const existingProfile = await prisma.profile.findUnique({
+        where: { id: userId },
+        select: { id: true, role: true },
+      })
 
       if (!existingProfile) {
-        // Create profile with Supabase (handles schema correctly)
-        const { error: profileError } = await (supabaseAdmin as any)
-          .from('profiles')
-          .upsert({
+        // Create profile with Prisma (bypasses RLS)
+        await prisma.profile.upsert({
+          where: { id: userId },
+          update: {}, // No update on conflict
+          create: {
             id: userId,
             username,
-            full_name: fullName || username.charAt(0).toUpperCase() + username.slice(1),
-            role: role || 'member',
-            is_public: false,
-          }, { onConflict: 'id' })
-        
-        if (profileError) {
-          console.error(`[auth-bypass] Failed to create profile: ${profileError.message}`)
-          return NextResponse.json(
-            { error: `Failed to create profile: ${profileError.message}` },
-            { status: 500 }
-          )
-        }
+            fullName: fullName || username.charAt(0).toUpperCase() + username.slice(1),
+            role: (role || 'member') as 'member' | 'editor' | 'admin',
+            isPublic: false,
+          },
+        })
         console.log(`[auth-bypass] Created profile for ${userId} with role: ${role || 'member'}`)
-      } else if (role && (existingProfile as any).role !== role) {
+      } else if (role && existingProfile.role !== role) {
         // Update role if specified and different
-        const { error: updateError } = await (supabaseAdmin as any)
-          .from('profiles')
-          .update({ role: role })
-          .eq('id', userId)
-        
-        if (updateError) {
-          console.error(`[auth-bypass] Failed to update role: ${updateError.message}`)
-          return NextResponse.json(
-            { error: `Failed to update role: ${updateError.message}` },
-            { status: 500 }
-          )
-        }
+        await prisma.profile.update({
+          where: { id: userId },
+          data: { role: role as 'member' | 'editor' | 'admin' },
+        })
         console.log(`[auth-bypass] Updated profile for ${userId} to role: ${role}`)
-      } else if (role && (existingProfile as any).role === role) {
+      } else if (role && existingProfile.role === role) {
         console.log(`[auth-bypass] Profile for ${userId} already has role: ${role}`)
       }
     } catch (profileError: any) {
@@ -214,30 +201,25 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-    
-    // Import Prisma for residency check after profile is created
-    const { prisma } = await import('@/lib/prisma/server')
 
-    // Wait longer for profile to be available and ensure consistency across all database connections
-    await new Promise(resolve => setTimeout(resolve, 800))
+    // Wait a bit for profile to be available across connections
+    await new Promise(resolve => setTimeout(resolve, 300))
     
-    // Verify the role was set correctly
+    // Verify the role was set correctly using Prisma
     if (role) {
-      const { data: verifiedProfile } = await supabaseAdmin
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single()
+      const verifiedProfile = await prisma.profile.findUnique({
+        where: { id: userId },
+        select: { role: true },
+      })
       
-      const verifiedProfileTyped = verifiedProfile as any
-      if (verifiedProfileTyped && verifiedProfileTyped.role !== role) {
-        console.warn(`[auth-bypass] Role verification failed: expected ${role}, got ${verifiedProfileTyped.role}`)
+      if (verifiedProfile && verifiedProfile.role !== role) {
+        console.warn(`[auth-bypass] Role verification failed: expected ${role}, got ${verifiedProfile.role}`)
         // Try one more update
-        await (supabaseAdmin as any)
-          .from('profiles')
-          .update({ role: role })
-          .eq('id', userId)
-        await new Promise(resolve => setTimeout(resolve, 300))
+        await prisma.profile.update({
+          where: { id: userId },
+          data: { role: role as 'member' | 'editor' | 'admin' },
+        })
+        await new Promise(resolve => setTimeout(resolve, 200))
       }
     }
     

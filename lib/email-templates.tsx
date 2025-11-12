@@ -36,6 +36,7 @@ interface EmailTemplateProps {
     strongestCompetency?: string
     simulatorTimeMinutes?: number
     simulatorTimeChangePct?: number
+    recommendedContent?: Array<{ title: string; type: 'lesson' | 'case'; url: string; reason?: string }>
   }
   general?: {
     title: string
@@ -92,6 +93,7 @@ export async function renderEmailTemplate(
           strongestCompetency: props.weekly_summary?.strongestCompetency,
           simulatorTimeMinutes: props.weekly_summary?.simulatorTimeMinutes,
           simulatorTimeChangePct: props.weekly_summary?.simulatorTimeChangePct,
+          recommendedContent: props.weekly_summary?.recommendedContent,
         })
       )
 

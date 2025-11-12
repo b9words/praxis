@@ -2,6 +2,7 @@
 
 import UniversalAssetViewer from '@/components/case-study/UniversalAssetViewer'
 import DecisionWorkspace from '@/components/case-study/DecisionWorkspace'
+import CaseStepper from '@/components/case-study/CaseStepper'
 import NeedARefresher from '@/components/case-study/NeedARefresher'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
@@ -14,7 +15,6 @@ import { DecisionPoint, SimulationState, UserDecision } from '@/types/simulation
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import Link from 'next/link'
 import { ChevronRight, Home } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
@@ -22,6 +22,10 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import { ProgressModal, ProgressStep } from '@/components/ui/modals/ProgressModal'
+import { ConfirmModal } from '@/components/ui/modals/ConfirmModal'
+import { InlineBanner } from '@/components/ui/inline-banner'
+import { toast } from 'sonner'
 
 interface CaseStudyWorkspaceProps {
   caseItem: any
@@ -76,11 +80,19 @@ export default function CaseStudyWorkspace({
   const [state, setState] = useState<SimulationState>({
     currentDecisionPoint: 0,
     decisions: [],
-    startedAt: simulation.started_at || new Date().toISOString(),
+    startedAt: simulation?.started_at || new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
   })
   const [showPublishModal, setShowPublishModal] = useState(false)
   const [isPublic, setIsPublic] = useState(true)
+  const [showProgressModal, setShowProgressModal] = useState(false)
+  const [progressSteps, setProgressSteps] = useState<ProgressStep[]>([])
+  const [progressStatus, setProgressStatus] = useState<'processing' | 'success' | 'error'>('processing')
+  const [progressError, setProgressError] = useState<string>()
+  const [saveStatus, setSaveStatus] = useState<{ status: 'saving' | 'saved' | null; timestamp?: Date }>({ status: null })
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false)
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false)
+  const [inlineSuccess, setInlineSuccess] = useState<string | null>(null)
 
   // Fetch case JSON from Storage if storage_path exists
   const { data: storageData, isLoading: isLoadingStorage } = useQuery({
@@ -127,7 +139,7 @@ export default function CaseStudyWorkspace({
 
   // Track simulation started when component mounts
   useEffect(() => {
-    if (caseItem && simulation && !isLoading) {
+    if (caseItem && simulation?.id && !isLoading) {
       trackEvents.simulationStarted(simulation.id, caseItem.id, userId)
     }
   }, [caseItem, simulation, userId, isLoading])
@@ -208,41 +220,75 @@ export default function CaseStudyWorkspace({
   // Get decision points from case data, or use improved fallback
   const decisionPoints: DecisionPoint[] = (caseData?.challenges as DecisionPoint[]) || 
     (caseData?.stages ? 
-      (caseData.stages as any[]).map((stage: any, idx: number) => ({
-        id: stage.stageId || `stage-${idx + 1}`,
-        order: stage.order || idx + 1,
-        title: stage.title || stage.stageTitle || `Decision Point ${idx + 1}`,
-        description: stage.description || '',
-        type: (stage.challengeType === 'MULTIPLE_CHOICE' ? 'multiple_choice' : 
-               stage.challengeType === 'ROLE_PLAY' ? 'role_play' : 'text') as 'text' | 'multiple_choice' | 'role_play',
-        options: stage.challengeData?.options?.map((opt: any) => ({
-          id: opt.id,
-          label: opt.title,
-          value: opt.description,
-        })),
-        requiresPersona: stage.requiresPersona,
-        rubricMapping: stage.rubricMapping || Object.keys(caseItem.rubric?.criteria || {}),
-      })) as DecisionPoint[]
+      (caseData.stages as any[]).map((stage: any, idx: number) => {
+        // Determine type: multiple_choice if options exist, role_play if requiresPersona, else text
+        const hasOptions = stage.challengeData?.options && Array.isArray(stage.challengeData.options) && stage.challengeData.options.length > 0
+        const type = hasOptions 
+          ? 'multiple_choice' as const
+          : stage.requiresPersona 
+            ? 'role_play' as const
+            : 'text' as const
+        
+        // Use prompt from challengeData if available, otherwise use description
+        const description = stage.challengeData?.prompt || stage.description || ''
+        
+        return {
+          id: stage.stageId || `stage-${idx + 1}`,
+          order: stage.order || idx + 1,
+          title: stage.title || stage.stageTitle || `Decision Point ${idx + 1}`,
+          description,
+          type,
+          options: hasOptions ? stage.challengeData.options.map((opt: any) => ({
+            id: opt.id,
+            label: opt.title,
+            value: opt.description,
+          })) : undefined,
+          requiresPersona: stage.requiresPersona,
+          rubricMapping: stage.rubricMapping || Object.keys(caseItem.rubric?.criteria || {}),
+        }
+      }) as DecisionPoint[]
       : generateFallbackDecisionPoints())
 
-  // Load existing state from simulation
+  // Load existing state from simulation (check both new and legacy paths)
   useEffect(() => {
-    if (simulation.user_inputs && typeof simulation.user_inputs === 'object') {
-      const inputs = simulation.user_inputs as any
-      if (inputs.decisions && Array.isArray(inputs.decisions)) {
+    if (!simulation) return
+    
+    // Try new path first: userInputs.stageStates.simulationState
+    const userInputs = (simulation.userInputs || simulation.user_inputs) as any
+    if (userInputs && typeof userInputs === 'object') {
+      const stageStates = userInputs.stageStates || {}
+      const simulationState = stageStates.simulationState
+      
+      if (simulationState && simulationState.decisions && Array.isArray(simulationState.decisions)) {
         setState(prev => ({
           ...prev,
-          decisions: inputs.decisions,
-          currentDecisionPoint: inputs.currentDecisionPoint || 0,
+          decisions: simulationState.decisions,
+          currentDecisionPoint: simulationState.currentDecisionPoint ?? prev.currentDecisionPoint,
+          startedAt: simulationState.startedAt || prev.startedAt,
+          lastUpdated: simulationState.lastUpdated || prev.lastUpdated,
+        }))
+        return
+      }
+      
+      // Fallback to legacy path: user_inputs.decisions
+      if (userInputs.decisions && Array.isArray(userInputs.decisions)) {
+        setState(prev => ({
+          ...prev,
+          decisions: userInputs.decisions,
+          currentDecisionPoint: userInputs.currentDecisionPoint || 0,
         }))
       }
     }
-  }, [simulation.user_inputs])
+  }, [simulation?.userInputs, simulation?.user_inputs])
 
   // Mutation for saving simulation state
   const saveStateMutation = useMutation({
-    mutationFn: (newState: SimulationState) =>
-      fetchJson(`/api/case-studies/${simulation.id}/state`, {
+    mutationFn: (newState: SimulationState) => {
+      if (!simulation?.id) {
+        // Simulation should always exist after unification, but guard for safety
+        return Promise.reject(new Error('Simulation not available. Please refresh the page.'))
+      }
+      return fetchJson(`/api/case-studies/${simulation.id}/state`, {
         method: 'PUT',
         body: {
           stageStates: { simulationState: newState }, // Store full state in stageStates
@@ -254,7 +300,8 @@ export default function CaseStudyWorkspace({
             index: idx,
           })),
         },
-      }),
+      })
+    },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to save your progress')
     },
@@ -276,6 +323,14 @@ export default function CaseStudyWorkspace({
   // Mutation for generating debrief
   const generateDebriefMutation = useMutation({
     mutationFn: async () => {
+      setShowProgressModal(true)
+      setProgressStatus('processing')
+      setProgressSteps([
+        { label: 'Queued', status: 'completed' },
+        { label: 'Processing', status: 'active' },
+        { label: 'Completed', status: 'pending' },
+      ])
+
       const response = await fetchJson<{ 
         debriefId?: string
         jobId?: string
@@ -284,19 +339,31 @@ export default function CaseStudyWorkspace({
         debrief?: any
       }>('/api/generate-debrief', {
         method: 'POST',
-        body: { simulationId: simulation.id },
+        body: { simulationId: simulation?.id },
       })
 
       // If debrief already exists (from cache), return immediately
       if (response.debriefId || response.fromCache) {
+        setProgressSteps([
+          { label: 'Queued', status: 'completed' },
+          { label: 'Processing', status: 'completed' },
+          { label: 'Completed', status: 'completed' },
+        ])
+        setProgressStatus('success')
         return { debriefId: response.debriefId || response.debrief?.id }
       }
 
-      // If job was created, poll for completion
+      // If job was created, poll for completion with progress updates
       if (response.jobId) {
         const jobId = response.jobId
         const maxAttempts = 60 // Poll for up to 60 seconds (1 minute)
         const pollInterval = 1000 // Poll every 1 second
+
+        setProgressSteps([
+          { label: 'Queued', status: 'completed' },
+          { label: 'Processing', status: 'active' },
+          { label: 'Completed', status: 'pending' },
+        ])
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           await new Promise(resolve => setTimeout(resolve, pollInterval))
@@ -313,38 +380,63 @@ export default function CaseStudyWorkspace({
             if (jobStatus.error) {
               throw new Error(jobStatus.error)
             }
+            setProgressSteps([
+              { label: 'Queued', status: 'completed' },
+              { label: 'Processing', status: 'completed' },
+              { label: 'Completed', status: 'completed' },
+            ])
+            setProgressStatus('success')
             // Extract debriefId from result
             const debriefId = jobStatus.result?.debriefId || jobStatus.result?.debrief?.id
             if (debriefId) {
               return { debriefId }
             }
             // Fallback: use simulationId to fetch debrief
-            return { debriefId: simulation.id }
+            return { debriefId: simulation?.id }
           } else if (jobStatus.status === 'failed') {
+            setProgressSteps([
+              { label: 'Queued', status: 'completed' },
+              { label: 'Processing', status: 'error' },
+              { label: 'Completed', status: 'pending' },
+            ])
+            setProgressStatus('error')
             throw new Error(jobStatus.error || 'Debrief generation failed')
           }
           // Continue polling if status is 'pending' or 'processing'
         }
 
-        // If we've exhausted all attempts, throw an error
+        // If we've exhausted all attempts, throw error
+        setProgressSteps([
+          { label: 'Queued', status: 'completed' },
+          { label: 'Processing', status: 'error' },
+          { label: 'Completed', status: 'pending' },
+        ])
+        setProgressStatus('error')
         throw new Error('Debrief generation timed out. Please check back later.')
       }
 
       // Fallback: if no jobId or debriefId, something went wrong
+      setProgressStatus('error')
       throw new Error('Unexpected response from debrief generation')
     },
     onSuccess: (data) => {
+      if (!simulation?.id) return
       // Track simulation completion
       trackEvents.simulationCompleted(simulation.id, caseItem.id, userId)
       
       // Invalidate debrief queries
       queryClient.invalidateQueries({ queryKey: queryKeys.debriefs.bySimulation(simulation.id) })
       
-      toast.success('Debrief generated!')
-      router.push(`/debrief/${simulation.id}`)
+      // Auto-close modal after brief delay, then redirect
+      setTimeout(() => {
+        setShowProgressModal(false)
+        const caseId = (caseItem.metadata as any)?.caseId || caseItem.id
+        router.push(`/library/case-studies/${caseId}/debrief`)
+      }, 1500)
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Failed to generate debrief')
+      setProgressError(error instanceof Error ? error.message : 'Failed to generate debrief')
+      // Modal stays open showing error
     },
     retry: 0, // Don't retry - we handle polling ourselves
   })
@@ -359,32 +451,47 @@ export default function CaseStudyWorkspace({
         body: {
           content: data.content,
           isPublic: data.isPublic,
-          simulationId: simulation.id,
+          simulationId: simulation?.id,
         },
       })
     },
     onSuccess: () => {
-      toast.success('Response published successfully!')
+      setInlineSuccess('Response published successfully!')
+      setTimeout(() => setInlineSuccess(null), 5000)
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Failed to publish response')
+      setInlineSuccess(null)
+      // Error will be shown via inline banner
     },
   })
 
   // Mutation for completing simulation
   const completeMutation = useMutation({
-      mutationFn: () => fetchJson<{ success: boolean }>(`/api/case-studies/${simulation.id}/complete`, {
-      method: 'POST',
-    }),
-    onSuccess: () => {
-      // Invalidate simulation queries
+    mutationFn: () => {
+      if (!simulation?.id) {
+        // Simulation should always exist after unification, but guard for safety
+        return Promise.reject(new Error('Simulation not available. Please refresh the page.'))
+      }
+      return fetchJson<{ success: boolean; alreadyCompleted?: boolean }>(`/api/case-studies/${simulation.id}/complete`, {
+        method: 'POST',
+      })
+    },
+    onSuccess: (data) => {
+      if (!simulation?.id) return
+      // Invalidate simulation queries to refresh UI
       queryClient.invalidateQueries({ queryKey: queryKeys.simulations.byId(simulation.id) })
+      
+      // If already completed, don't show publish modal - just refresh to show completed state
+      if (data.alreadyCompleted) {
+        return
+      }
       
       // Show publish modal before generating debrief
       setShowPublishModal(true)
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Failed to complete simulation')
+      setInlineSuccess(null)
+      // Error will be shown via inline banner
     },
   })
 
@@ -427,7 +534,6 @@ export default function CaseStudyWorkspace({
       setShowPublishModal(false)
       
       // Generate debrief after publishing
-      toast.loading('Generating your performance debrief...')
       generateDebriefMutation.mutate()
     } catch (error) {
       console.error('Failed to publish response:', error)
@@ -437,16 +543,19 @@ export default function CaseStudyWorkspace({
   const handleSkipPublish = () => {
     setShowPublishModal(false)
     // Generate debrief without publishing
-    toast.loading('Generating your performance debrief...')
     generateDebriefMutation.mutate()
   }
 
-  const handleComplete = async () => {
+  const handleComplete = () => {
+    // Show confirm modal first
+    setShowSubmitConfirm(true)
+  }
+
+  const handleConfirmComplete = async () => {
+    setShowSubmitConfirm(false)
     try {
       // Save final state first
       await saveStateMutation.mutateAsync(state)
-      
-      toast.loading('Completing simulation...')
       await completeMutation.mutateAsync()
     } catch (error) {
       // Error handling is done in mutation callbacks
@@ -492,6 +601,120 @@ export default function CaseStudyWorkspace({
   const currentProgress = state.currentDecisionPoint
   const progressPercentage = totalDecisionPoints > 0 ? (currentProgress / totalDecisionPoints) * 100 : 0
 
+  // Check if case is completed
+  const isCompleted = simulation?.status === 'completed'
+  const caseId = (caseItem.metadata as any)?.caseId || caseItem.id
+
+  // If completed, show completed state with response preview
+  if (isCompleted) {
+    return (
+      <div className="h-full flex flex-col">
+        {/* HEADER: Title, Breadcrumb */}
+        <div className="border-b border-gray-200 bg-white px-6 py-4">
+          <div className="flex items-center gap-2 text-xs text-gray-500 mb-3 uppercase tracking-wide">
+            <Link href="/dashboard" className="hover:text-gray-700 font-medium flex items-center gap-1">
+              <Home className="h-3 w-3" />
+              Dashboard
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <Link href="/library/case-studies" className="hover:text-gray-700 font-medium">
+              Case Studies
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="text-gray-700 font-medium">{caseData?.title || caseItem.title}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">{caseData?.title || caseItem.title}</h1>
+              <p className="text-sm text-gray-600 mt-1">Case Study Completed</p>
+            </div>
+            <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+              <Link href={`/library/case-studies/${caseId}/debrief`}>View Debrief</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* MAIN CONTENT: Resizable Panels */}
+        <div className="flex-1 overflow-hidden">
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            {/* LEFT PANEL: Case Files & Data */}
+            <ResizablePanel defaultSize={60} minSize={30} maxSize={70}>
+              <div className="h-full min-h-0 flex flex-col">
+                {showNeedARefresher && (
+                  <div className="p-4 border-b border-neutral-200 flex-shrink-0">
+                    <NeedARefresher 
+                      competencies={competencies}
+                      caseId={caseItem.id}
+                      recommendedLessons={recommendedLessons}
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                  <UniversalAssetViewer
+                    briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
+                    datasets={caseItem.datasets}
+                    caseFiles={caseItem.files}
+                  />
+                </div>
+              </div>
+            </ResizablePanel>
+
+            <ResizableHandle withHandle />
+
+            {/* RIGHT PANEL: Your Response Preview */}
+            <ResizablePanel defaultSize={40} minSize={30} maxSize={70}>
+              <div className="h-full min-h-0 flex flex-col bg-gray-50">
+                <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+                  <h2 className="text-lg font-medium text-gray-900">Your Response</h2>
+                  <p className="text-sm text-gray-600 mt-1">Review your completed analysis</p>
+                </div>
+                <div className="flex-1 min-h-0 overflow-y-auto p-6">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+                    {state.decisions.length === 0 ? (
+                      <p className="text-sm text-gray-600">No responses recorded.</p>
+                    ) : (
+                      state.decisions.map((decision, idx) => {
+                        const decisionPoint = decisionPoints.find(dp => dp.id === decision.decisionPointId)
+                        if (!decisionPoint) return null
+                        
+                        return (
+                          <div key={decision.decisionPointId} className="border-b border-gray-200 pb-6 last:border-0 last:pb-0">
+                            <h3 className="font-medium text-gray-900 mb-2">
+                              {decisionPoint.title}
+                            </h3>
+                            {decision.selectedOption && decisionPoint.options && (
+                              <div className="mb-3">
+                                <p className="text-sm font-medium text-gray-700 mb-1">Selected Option:</p>
+                                <p className="text-sm text-gray-600">
+                                  {decisionPoint.options.find(opt => opt.id === decision.selectedOption)?.label || decision.selectedOption}
+                                </p>
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-sm font-medium text-gray-700 mb-1">Your Analysis:</p>
+                              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-wrap">
+                                {decision.justification}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+                <div className="border-t border-gray-200 bg-white p-4">
+                  <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none">
+                    <Link href={`/library/case-studies/${caseId}/debrief`}>View Full Debrief & Feedback</Link>
+                  </Button>
+                </div>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* HEADER: Title, Breadcrumb, and Progress */}
@@ -533,43 +756,60 @@ export default function CaseStudyWorkspace({
       {/* MAIN CONTENT: Resizable Panels */}
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* LEFT PANEL: Case Files & Data (60% default for 3:2 ratio) */}
-          <ResizablePanel defaultSize={60} minSize={30} maxSize={70}>
-        <div className="h-full flex flex-col overflow-auto">
-          {/* Need a Refresher? component */}
-          {showNeedARefresher && (
-            <div className="p-4 border-b border-neutral-200">
-              <NeedARefresher 
-                competencies={competencies}
-                caseId={caseItem.id}
-                recommendedLessons={recommendedLessons}
+          {/* LEFT PANEL: Stepper (20% default) */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+            <div className="h-full min-h-0 overflow-y-auto">
+              <CaseStepper
+                decisionPoints={decisionPoints}
+                currentIndex={state.currentDecisionPoint}
+                decisions={state.decisions}
               />
             </div>
-          )}
-          {/* Case Files */}
-          <div className="flex-1 overflow-auto">
-      <UniversalAssetViewer
-        briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
-        datasets={caseItem.datasets}
-        caseFiles={caseItem.files}
-      />
-          </div>
-        </div>
-      </ResizablePanel>
+          </ResizablePanel>
 
           <ResizableHandle withHandle />
 
-          {/* RIGHT PANEL: Decision Workspace (40% default for 3:2 ratio) */}
-          <ResizablePanel defaultSize={40} minSize={30} maxSize={70}>
-            <DecisionWorkspace
-              decisionPoints={decisionPoints}
-              personas={caseStructure?.keyStakeholders || []}
-              currentIndex={state.currentDecisionPoint}
-              decisions={state.decisions}
-              onDecisionComplete={handleDecisionComplete}
-              onComplete={handleComplete}
-              softPaywallEnabled={softPaywallEnabled}
-            />
+          {/* MIDDLE PANEL: Case Files & Data (50% default) */}
+          <ResizablePanel defaultSize={50} minSize={30} maxSize={60}>
+            <div className="h-full min-h-0 flex flex-col">
+              {/* Need a Refresher? component */}
+              {showNeedARefresher && (
+                <div className="p-4 border-b border-neutral-200 flex-shrink-0">
+                  <NeedARefresher 
+                    competencies={competencies}
+                    caseId={caseItem.id}
+                    recommendedLessons={recommendedLessons}
+                  />
+                </div>
+              )}
+              {/* Case Files */}
+              <div className="flex-1 min-h-0 overflow-y-auto">
+                <UniversalAssetViewer
+                  briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
+                  datasets={caseItem.datasets}
+                  caseFiles={caseItem.files}
+                />
+              </div>
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          {/* RIGHT PANEL: Decision Workspace + Rubric (30% default) */}
+          <ResizablePanel defaultSize={30} minSize={25} maxSize={50}>
+            <div className="h-full min-h-0 flex flex-col">
+              <DecisionWorkspace
+                decisionPoints={decisionPoints}
+                personas={caseStructure?.keyStakeholders || []}
+                currentIndex={state.currentDecisionPoint}
+                decisions={state.decisions}
+                onDecisionComplete={handleDecisionComplete}
+                onComplete={handleComplete}
+                softPaywallEnabled={softPaywallEnabled}
+                rubric={caseItem.rubric}
+                currentDecisionPoint={decisionPoints[state.currentDecisionPoint]}
+              />
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
@@ -631,6 +871,60 @@ export default function CaseStudyWorkspace({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Progress Modal for Debrief Generation */}
+      <ProgressModal
+        open={showProgressModal}
+        onOpenChange={setShowProgressModal}
+        title="Generating Debrief"
+        description="Analyzing your decision and preparing personalized feedback..."
+        steps={progressSteps}
+        status={progressStatus}
+        errorMessage={progressError}
+        cancellable={progressStatus === 'processing'}
+        onCancel={() => {
+          setShowProgressModal(false)
+          setProgressStatus('processing')
+          setProgressError(undefined)
+        }}
+      />
+
+      {/* Confirm Modal for Submit */}
+      <ConfirmModal
+        open={showSubmitConfirm}
+        onOpenChange={setShowSubmitConfirm}
+        title="Submit Final Decision?"
+        description="This will finalize your case study submission. You'll be able to view your debrief and share your response with the community."
+        confirmLabel="Submit"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmComplete}
+        isLoading={completeMutation.isPending}
+      />
+
+      {/* Inline Success Banner */}
+      {inlineSuccess && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-md">
+          <InlineBanner
+            variant="success"
+            message={inlineSuccess}
+            dismissible
+            onDismiss={() => setInlineSuccess(null)}
+            autoDismiss={5000}
+          />
+        </div>
+      )}
+
+      {/* Inline Save Status */}
+      {saveStatus.status && (
+        <div className="fixed top-20 right-4 z-40">
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-2 text-xs text-gray-600">
+            {saveStatus.status === 'saving' && 'Saving...'}
+            {saveStatus.status === 'saved' && saveStatus.timestamp && (
+              `Saved ${Math.round((Date.now() - saveStatus.timestamp.getTime()) / 1000)}s ago`
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

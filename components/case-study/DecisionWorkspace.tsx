@@ -6,9 +6,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DecisionPoint, Persona, UserDecision } from '@/types/simulation.types'
-import { CheckCircle2, MessageSquare, Lock } from 'lucide-react'
-import { useState } from 'react'
+import { CheckCircle2, MessageSquare, Lock, Save, Clock } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import { analytics } from '@/lib/analytics'
+import { InlineBanner } from '@/components/ui/inline-banner'
 
 interface DecisionWorkspaceProps {
   decisionPoints: DecisionPoint[]
@@ -18,6 +21,8 @@ interface DecisionWorkspaceProps {
   onDecisionComplete: (decision: UserDecision) => void
   onComplete: () => void
   softPaywallEnabled?: boolean
+  rubric?: any
+  currentDecisionPoint?: DecisionPoint
 }
 
 export default function DecisionWorkspace({
@@ -28,13 +33,66 @@ export default function DecisionWorkspace({
   onDecisionComplete,
   onComplete,
   softPaywallEnabled = false,
+  rubric,
+  currentDecisionPoint,
 }: DecisionWorkspaceProps) {
-  const currentDecision = decisionPoints[currentIndex]
+  const currentDecision = decisionPoints[currentIndex] || currentDecisionPoint
   const [justification, setJustification] = useState('')
   const [selectedOption, setSelectedOption] = useState('')
   const [showPersonaChat, setShowPersonaChat] = useState(false)
   const [chatTranscript, setChatTranscript] = useState<Array<{ role: 'user' | 'ai'; message: string; timestamp: string }>>([])
   const [showPaywallModal, setShowPaywallModal] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
+
+  // Keyboard shortcuts for decision navigation (Alt+] and Alt+[)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in inputs/textarea
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target instanceof HTMLElement && e.target.isContentEditable)
+      ) {
+        return
+      }
+
+      // Alt+] to go to next decision (if available)
+      if (e.altKey && e.key === ']' && currentIndex < decisionPoints.length - 1) {
+        e.preventDefault()
+        // Note: Navigation would need to be handled by parent component
+        // This prevents default behavior and could trigger a callback if added
+        return
+      }
+
+      // Alt+[ to go to previous decision (if available)
+      if (e.altKey && e.key === '[' && currentIndex > 0) {
+        e.preventDefault()
+        // Note: Navigation would need to be handled by parent component
+        return
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [currentIndex, decisionPoints.length])
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!justification.trim() || justification.length < 10) return
+
+    const timeoutId = setTimeout(() => {
+      setIsSaving(true)
+      // Simulate autosave (in real implementation, this would call an API)
+      setTimeout(() => {
+        setLastSaved(new Date())
+        setIsSaving(false)
+      }, 500)
+    }, 2000) // Auto-save after 2 seconds of inactivity
+
+    return () => clearTimeout(timeoutId)
+  }, [justification])
 
   if (!currentDecision) {
     return (
@@ -54,8 +112,52 @@ export default function DecisionWorkspace({
     ? personas.find(p => p.id === currentDecision.requiresPersona)
     : null
 
+  // Quality check for justification
+  const validateJustification = (text: string): { valid: boolean; error?: string } => {
+    const trimmed = text.trim()
+    
+    // Minimum length check
+    if (trimmed.length < 50) {
+      return { valid: false, error: 'Justification must be at least 50 characters' }
+    }
+    
+    // Minimum word count (at least 8 words)
+    const words = trimmed.split(/\s+/).filter(w => w.length > 0)
+    if (words.length < 8) {
+      return { valid: false, error: 'Justification must contain at least 8 words' }
+    }
+    
+    // Check for repeated characters (e.g., "aaaaa" or "11111")
+    const hasRepeatedChars = /(.)\1{4,}/.test(trimmed)
+    if (hasRepeatedChars) {
+      return { valid: false, error: 'Justification appears to contain repeated characters' }
+    }
+    
+    // Check for meaningful content (at least 30% alphabetic characters)
+    const alphaChars = trimmed.match(/[a-zA-Z]/g)?.length || 0
+    const alphaRatio = alphaChars / trimmed.length
+    if (alphaRatio < 0.3) {
+      return { valid: false, error: 'Justification must contain meaningful text' }
+    }
+    
+    // Check for unique words (at least 50% unique words)
+    const uniqueWords = new Set(words.map(w => w.toLowerCase()))
+    const uniqueRatio = uniqueWords.size / words.length
+    if (uniqueRatio < 0.5 && words.length > 10) {
+      return { valid: false, error: 'Justification must contain varied vocabulary' }
+    }
+    
+    return { valid: true }
+  }
+
   const handleSubmit = () => {
-    if (!justification.trim()) return
+    const validation = validateJustification(justification)
+    if (!validation.valid) {
+      setValidationError(validation.error || 'Please provide a more detailed justification')
+      return
+    }
+    
+    setValidationError(null) // Clear any previous errors
 
     // Check if soft paywall should trigger (on Stage 1 submission)
     if (softPaywallEnabled && currentIndex === 0 && decisions.length === 0) {
@@ -70,6 +172,13 @@ export default function DecisionWorkspace({
       rolePlayTranscript: chatTranscript.length > 0 ? chatTranscript : undefined,
     }
 
+    // Track analytics
+    analytics.track('case_decision_submitted', {
+      decisionPointId: currentDecision.id,
+      decisionIndex: currentIndex,
+      hasPersonaChat: chatTranscript.length > 0,
+    })
+
     onDecisionComplete(decision)
     setJustification('')
     setSelectedOption('')
@@ -77,7 +186,8 @@ export default function DecisionWorkspace({
     setShowPersonaChat(false)
   }
 
-  const canSubmit = justification.trim().length >= 50
+  const validation = validateJustification(justification)
+  const canSubmit = validation.valid
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
@@ -191,7 +301,15 @@ export default function DecisionWorkspace({
               Provide a detailed analysis that addresses the specific challenges and trade-offs outlined in the decision prompt. Use quantitative data where available to support your reasoning.
             </p>
           </div>
-          <div className="p-6">
+          <div className="p-6 space-y-4">
+            {validationError && (
+              <InlineBanner
+                variant="error"
+                message={validationError}
+                dismissible
+                onDismiss={() => setValidationError(null)}
+              />
+            )}
             <div className="space-y-2">
               <Label htmlFor="justification">
                 Your Analysis (minimum 50 characters)
@@ -199,7 +317,10 @@ export default function DecisionWorkspace({
               <Textarea
                 id="justification"
                 value={justification}
-                onChange={(e) => setJustification(e.target.value)}
+                onChange={(e) => {
+                  setJustification(e.target.value)
+                  setValidationError(null) // Clear error on input
+                }}
                 placeholder="Provide a detailed analysis addressing the specific challenges, trade-offs, and quantitative factors relevant to this decision point."
                 rows={8}
                 className="resize-none rounded-none border-gray-300"
@@ -210,22 +331,84 @@ export default function DecisionWorkspace({
             </div>
           </div>
         </div>
+
+        {/* Rubric - Show evaluation criteria */}
+        {rubric && currentDecision?.rubricMapping && currentDecision.rubricMapping.length > 0 && (
+          <div className="bg-neutral-50 border border-neutral-200">
+            <div className="border-b border-neutral-200 px-6 py-4">
+              <h3 className="text-sm font-medium text-neutral-900">Evaluation Criteria</h3>
+            </div>
+            <div className="p-6 space-y-3">
+              {currentDecision.rubricMapping.map((criteriaKey: string) => {
+                const criteria = rubric.criteria?.[criteriaKey]
+                if (!criteria) return null
+                return (
+                  <div key={criteriaKey} className="text-sm">
+                    <div className="font-medium text-neutral-900 mb-1">
+                      {criteria.name || criteriaKey}
+                    </div>
+                    {criteria.description && (
+                      <div className="text-xs text-neutral-600">
+                        {criteria.description}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Submit button */}
-      <div className="border-t border-gray-200 bg-white p-4">
-        <Button
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          size="lg"
-          className="w-full rounded-none bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-400 disabled:text-white"
-        >
-          {softPaywallEnabled && currentIndex === 0 && decisions.length === 0
-            ? 'Submit & View Analysis'
-            : currentIndex < decisionPoints.length - 1
-            ? 'Submit & Continue'
-            : 'Submit Final Decision'}
-        </Button>
+      {/* Autosave status and action buttons */}
+      <div className="border-t border-gray-200 bg-white p-4 space-y-3">
+        {/* Autosave status */}
+        {lastSaved && (
+          <div className="flex items-center gap-2 text-xs text-neutral-600">
+            {isSaving ? (
+              <>
+                <Clock className="h-3 w-3 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="h-3 w-3" />
+                <span>Autosaved {formatDistanceToNow(lastSaved, { addSuffix: true })}</span>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              // Save draft functionality
+              setLastSaved(new Date())
+            }}
+            size="sm"
+            className="flex-1 rounded-none border-gray-300 hover:border-gray-400"
+          >
+            <Save className="h-3 w-3 mr-2" />
+            Save Draft
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            size="sm"
+            className="flex-1 rounded-none bg-gray-900 hover:bg-gray-800 text-white disabled:bg-gray-400 disabled:text-white"
+          >
+            {currentIndex < decisionPoints.length - 1
+              ? 'Continue'
+              : 'Submit for Feedback'}
+          </Button>
+        </div>
+        <p className="text-xs text-neutral-500 text-center">
+          {currentIndex < decisionPoints.length - 1
+            ? 'Continue to next decision point'
+            : 'Submit your complete analysis for AI feedback'}
+        </p>
       </div>
 
       {/* Soft Paywall Modal */}

@@ -40,32 +40,45 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const [items, total] = await Promise.all([
-      prisma.case.findMany({
-        where,
-        select: {
-          id: true,
-          title: true,
-          status: true,
-          published: true,
-          updatedAt: true,
-          storagePath: true,
-          metadata: true,
-          competencies: {
-            select: {
-              competency: {
-                select: { name: true },
+    let items: any[] = []
+    let total = 0
+
+    try {
+      const [itemsResult, totalResult] = await Promise.all([
+        prisma.case.findMany({
+          where,
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            published: true,
+            updatedAt: true,
+            storagePath: true,
+            metadata: true,
+            competencies: {
+              select: {
+                competency: {
+                  select: { name: true },
+                },
               },
+              take: 1,
             },
-            take: 1,
           },
-        },
-        orderBy: { updatedAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
-      }),
-      prisma.case.count({ where }),
-    ])
+          orderBy: { updatedAt: 'desc' },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+        prisma.case.count({ where }),
+      ])
+      items = itemsResult
+      total = totalResult
+    } catch (dbError: any) {
+      // Handle Prisma errors gracefully
+      console.error('[admin/content/cases] Database error:', dbError)
+      // Return empty result instead of crashing
+      items = []
+      total = 0
+    }
 
     const response = NextResponse.json({
       items: items.map((c) => ({

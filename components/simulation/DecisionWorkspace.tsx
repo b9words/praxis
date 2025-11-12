@@ -54,8 +54,52 @@ export default function DecisionWorkspace({
     ? personas.find(p => p.id === currentDecision.requiresPersona)
     : null
 
+  // Quality check for justification
+  const validateJustification = (text: string): { valid: boolean; error?: string } => {
+    const trimmed = text.trim()
+    
+    // Minimum length check
+    if (trimmed.length < 50) {
+      return { valid: false, error: 'Justification must be at least 50 characters' }
+    }
+    
+    // Minimum word count (at least 8 words)
+    const words = trimmed.split(/\s+/).filter(w => w.length > 0)
+    if (words.length < 8) {
+      return { valid: false, error: 'Justification must contain at least 8 words' }
+    }
+    
+    // Check for repeated characters (e.g., "aaaaa" or "11111")
+    const hasRepeatedChars = /(.)\1{4,}/.test(trimmed)
+    if (hasRepeatedChars) {
+      return { valid: false, error: 'Justification appears to contain repeated characters' }
+    }
+    
+    // Check for meaningful content (at least 30% alphabetic characters)
+    const alphaChars = trimmed.match(/[a-zA-Z]/g)?.length || 0
+    const alphaRatio = alphaChars / trimmed.length
+    if (alphaRatio < 0.3) {
+      return { valid: false, error: 'Justification must contain meaningful text' }
+    }
+    
+    // Check for unique words (at least 50% unique words)
+    const uniqueWords = new Set(words.map(w => w.toLowerCase()))
+    const uniqueRatio = uniqueWords.size / words.length
+    if (uniqueRatio < 0.5 && words.length > 10) {
+      return { valid: false, error: 'Justification must contain varied vocabulary' }
+    }
+    
+    return { valid: true }
+  }
+
   const handleSubmit = () => {
-    if (!justification.trim()) return
+    const validation = validateJustification(justification)
+    if (!validation.valid) {
+      // Use console.error for now since toast may not be available
+      console.error(validation.error || 'Please provide a more detailed justification')
+      alert(validation.error || 'Please provide a more detailed justification')
+      return
+    }
 
     // Check if soft paywall should trigger (on Stage 1 submission)
     if (softPaywallEnabled && currentIndex === 0 && decisions.length === 0) {
@@ -77,7 +121,8 @@ export default function DecisionWorkspace({
     setShowPersonaChat(false)
   }
 
-  const canSubmit = justification.trim().length >= 50
+  const validation = validateJustification(justification)
+  const canSubmit = validation.valid
 
   return (
     <div className="h-full flex flex-col bg-gray-50">

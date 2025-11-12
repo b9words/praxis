@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -13,19 +13,19 @@ export async function PUT(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
     const body = await request.json()
 
     const { stageStates, currentStageId, eventLog } = body
 
     // Verify case study ownership
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Update case study state in userInputs JSONB field
-    await updateSimulationState(id, {
+    await updateSimulationState(caseId, {
       stageStates,
       currentStageId,
       eventLog,
@@ -48,7 +48,7 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ caseId: string }> }
 ) {
   try {
     const { getCurrentUser } = await import('@/lib/auth/get-user')
@@ -56,22 +56,22 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: 'No user found' }, { status: 401 })
     }
-    const { id } = await params
+    const { caseId } = await params
 
     // Verify case study ownership
-    const isOwner = await verifySimulationOwnership(id, user.id)
+    const isOwner = await verifySimulationOwnership(caseId, user.id)
     if (!isOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Get case study state
-    const simulation = await getSimulationState(id)
+    const simulation = await getSimulationState(caseId)
     if (!simulation) {
       return NextResponse.json({ error: 'Case study not found' }, { status: 404 })
     }
 
     // Extract state from userInputs
-    const state = simulation.userInputs as any
+    const state = (simulation.userInputs || {}) as any
 
     return NextResponse.json({
       stageStates: state?.stageStates || {},

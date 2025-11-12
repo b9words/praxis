@@ -74,21 +74,21 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   if (toc.length === 0) return null
 
   return (
-    <div className="space-y-2">
-      <h3 className="font-semibold text-sm text-gray-900 mb-3">Table of Contents</h3>
+    <div className="space-y-2 border-l border-neutral-200 pl-4">
+      <h3 className="font-medium text-xs text-neutral-900 mb-3 uppercase tracking-wide">Contents</h3>
       <nav className="space-y-1">
         {toc.map((item) => (
           <button
             key={item.id}
             onClick={() => scrollToHeading(item.id)}
             className={`
-              block w-full text-left text-sm py-1 px-2 rounded transition-colors
-              ${item.level === 2 ? 'pl-4' : ''}
-              ${item.level === 3 ? 'pl-6' : ''}
+              block w-full text-left text-xs py-1.5 px-2 transition-colors
+              ${item.level === 2 ? 'pl-3' : ''}
+              ${item.level === 3 ? 'pl-5' : ''}
               ${
                 activeId === item.id
-                  ? 'text-blue-600 bg-blue-50 font-medium'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  ? 'text-neutral-900 font-medium border-l-2 border-neutral-900 -ml-4 pl-2'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }
             `}
           >

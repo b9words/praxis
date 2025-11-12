@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
+import MockCheckout from '@/components/pricing/MockCheckout'
 import { Badge } from '@/components/ui/badge'
 import { fetchJson } from '@/lib/api'
 import { useMutation } from '@tanstack/react-query'
@@ -12,6 +13,9 @@ import { ArrowRight, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
+import { analytics } from '@/lib/analytics'
+
+const ENABLE_MOCK_CHECKOUT = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 'true'
 
 interface PrescriptiveOnboardingProps {
   user: any
@@ -155,24 +159,40 @@ function getFoundationalLesson(domainId: string) {
 export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [strategicObjective, setStrategicObjective] = useState('')
+  const [currentRole, setCurrentRole] = useState('')
+  const [weeklyTimeCommitment, setWeeklyTimeCommitment] = useState<number>(5)
+  const [preferredLearningTimes, setPreferredLearningTimes] = useState<string[]>([])
   const [selectedCompetency, setSelectedCompetency] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const totalSteps = 4
+  const totalSteps = 6
   const progress = (currentStep / totalSteps) * 100
+
+  const TIME_OPTIONS = [
+    { value: 'morning', label: 'Morning (6am-12pm)' },
+    { value: 'afternoon', label: 'Afternoon (12pm-6pm)' },
+    { value: 'evening', label: 'Evening (6pm-10pm)' },
+    { value: 'weekend', label: 'Weekend' },
+  ]
 
   // Check if payment was successful (from query param)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('checkout') === 'success' && currentStep === 3) {
-      setCurrentStep(4)
+    if (params.get('checkout') === 'success' && currentStep === 5) {
+      setCurrentStep(6)
       // Clean up URL
       window.history.replaceState({}, '', '/onboarding')
     }
   }, [currentStep])
 
   const saveOnboardingDataMutation = useMutation({
-    mutationFn: async (data: { strategicObjective: string; competencyId: string }) => {
+    mutationFn: async (data: { 
+      strategicObjective: string
+      competencyId: string
+      currentRole?: string
+      weeklyTimeCommitment?: number
+      preferredLearningTimes?: string[]
+    }) => {
       setIsSaving(true)
       try {
         await fetchJson('/api/onboarding', {
@@ -180,6 +200,9 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
           body: {
             strategicObjective: data.strategicObjective,
             competencyId: data.competencyId,
+            currentRole: data.currentRole,
+            weeklyTimeCommitment: data.weeklyTimeCommitment,
+            preferredLearningTimes: data.preferredLearningTimes,
           },
         })
       } finally {
@@ -196,20 +219,43 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
       toast.error('Please describe your strategic objective')
       return
     }
+    analytics.track('onboarding_step_completed', { step: 1, userId: user?.id })
     setCurrentStep(2)
   }
 
   const handleStep2Submit = () => {
+    if (!currentRole.trim()) {
+      toast.error('Please enter your current role')
+      return
+    }
+    analytics.track('onboarding_step_completed', { step: 2, userId: user?.id })
+    setCurrentStep(3)
+  }
+
+  const handleStep3Submit = () => {
+    if (preferredLearningTimes.length === 0) {
+      toast.error('Please select at least one preferred learning time')
+      return
+    }
+    analytics.track('onboarding_step_completed', { step: 3, userId: user?.id })
+    setCurrentStep(4)
+  }
+
+  const handleStep4Submit = () => {
     if (!selectedCompetency) {
       toast.error('Please select a competency')
       return
     }
+    analytics.track('onboarding_step_completed', { step: 4, userId: user?.id })
     // Save onboarding data
     saveOnboardingDataMutation.mutate({
       strategicObjective,
       competencyId: selectedCompetency,
+      currentRole,
+      weeklyTimeCommitment,
+      preferredLearningTimes,
     })
-    setCurrentStep(3)
+    setCurrentStep(5)
   }
 
   const handlePaymentSuccess = () => {
@@ -272,8 +318,149 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
           </div>
         )}
 
-        {/* Step 2: The Diagnostic */}
+        {/* Step 2: Role and Context */}
         {currentStep === 2 && (
+          <div className="space-y-8">
+            <div className="bg-gray-50 border border-gray-300 p-4">
+              <div className="text-xs text-gray-500 font-mono mb-1">LOGGED OBJECTIVE</div>
+              <div className="text-sm text-gray-900">{strategicObjective}</div>
+            </div>
+
+            <div className="border-b border-gray-300 pb-2">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="text-xs text-gray-500 font-mono">SUBJECT: Context Assessment</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-gray-900">
+              <p className="text-base leading-relaxed">
+                To tailor your learning path, we need to understand your current position and context.
+              </p>
+              <div className="space-y-3">
+                <p className="text-base font-medium">
+                  <strong>What is your current role or professional background?</strong>
+                </p>
+                <Textarea
+                  value={currentRole}
+                  onChange={(e) => setCurrentRole(e.target.value)}
+                  placeholder="e.g., Software Engineer, Product Manager, Consultant, Entrepreneur..."
+                  className="min-h-[80px] rounded-none border-gray-400 focus:border-gray-900 resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={handleStep2Submit}
+                disabled={!currentRole.trim()}
+                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Time Preferences */}
+        {currentStep === 3 && (
+          <div className="space-y-8">
+            <div className="bg-gray-50 border border-gray-300 p-4">
+              <div className="text-xs text-gray-500 font-mono mb-1">LOGGED ROLE</div>
+              <div className="text-sm text-gray-900">{currentRole}</div>
+            </div>
+
+            <div className="border-b border-gray-300 pb-2">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="text-xs text-gray-500 font-mono">SUBJECT: Resource Allocation</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-gray-900">
+              <p className="text-base leading-relaxed">
+                Effective learning requires consistent time investment. Let's optimize your schedule.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-base font-medium mb-3">
+                    <strong>How many hours per week can you commit to learning?</strong>
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="2"
+                      max="20"
+                      step="1"
+                      value={weeklyTimeCommitment}
+                      onChange={(e) => setWeeklyTimeCommitment(parseInt(e.target.value))}
+                      className="flex-1"
+                    />
+                    <span className="text-lg font-medium text-gray-900 min-w-[60px] text-right">
+                      {weeklyTimeCommitment} hrs/week
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-base font-medium mb-3">
+                    <strong>When do you prefer to learn? (Select all that apply)</strong>
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {TIME_OPTIONS.map((option) => (
+                      <Card
+                        key={option.value}
+                        className={`cursor-pointer border-2 transition-all rounded-none ${
+                          preferredLearningTimes.includes(option.value)
+                            ? 'border-gray-900 bg-gray-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                        onClick={() => {
+                          setPreferredLearningTimes(prev =>
+                            prev.includes(option.value)
+                              ? prev.filter(t => t !== option.value)
+                              : [...prev, option.value]
+                          )
+                        }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-4 h-4 border-2 rounded flex-shrink-0 ${
+                              preferredLearningTimes.includes(option.value)
+                                ? 'border-gray-900 bg-gray-900'
+                                : 'border-gray-400'
+                            }`}>
+                              {preferredLearningTimes.includes(option.value) && (
+                                <Check className="w-3 h-3 text-white" />
+                              )}
+                            </div>
+                            <span className="text-sm text-gray-900">{option.label}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                onClick={handleStep3Submit}
+                disabled={preferredLearningTimes.length === 0}
+                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
+              >
+                Continue
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: The Diagnostic */}
+        {currentStep === 4 && (
           <div className="space-y-8">
             {/* Display logged objective */}
             <div className="bg-gray-50 border border-gray-300 p-4">
@@ -339,7 +526,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
 
             <div className="flex justify-end">
               <Button
-                onClick={handleStep2Submit}
+                onClick={handleStep4Submit}
                 disabled={!selectedCompetency || isSaving}
                 className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
               >
@@ -350,8 +537,8 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
           </div>
         )}
 
-        {/* Step 3: The Commitment */}
-        {currentStep === 3 && selectedCompetencyData && (
+        {/* Step 5: The Commitment */}
+        {currentStep === 5 && selectedCompetencyData && (
           <div className="space-y-8">
             <div className="bg-gray-50 border border-gray-300 p-4">
               <div className="text-xs text-gray-500 font-mono mb-1">ALLOCATION CONFIRMED</div>
@@ -414,7 +601,19 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
                         </li>
                       ))}
                     </ul>
-                    {plan.planId ? (
+                    {ENABLE_MOCK_CHECKOUT ? (
+                      <MockCheckout
+                        planName={plan.name}
+                        onSuccess={handlePaymentSuccess}
+                        className={`w-full h-12 text-sm font-medium rounded-none ${
+                          plan.popular
+                            ? 'bg-gray-900 hover:bg-gray-800 text-white'
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                        }`}
+                      >
+                        Authorize {plan.name} Plan
+                      </MockCheckout>
+                    ) : plan.planId ? (
                       <PaddleCheckout
                         planId={plan.planId}
                         planName={plan.name}
@@ -450,8 +649,8 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
           </div>
         )}
 
-        {/* Step 4: The First Clear Step */}
-        {currentStep === 4 && selectedCompetencyData && foundationalLesson && (
+        {/* Step 6: The First Session Plan */}
+        {currentStep === 6 && selectedCompetencyData && foundationalLesson && (
           <div className="space-y-8">
             <div className="bg-gray-900 text-white p-4 text-center">
               <div className="text-sm font-medium">Authorization Complete. Welcome, Operative.</div>
@@ -467,35 +666,48 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
 
             <div className="space-y-6 text-gray-900">
               <p className="text-base leading-relaxed">
-                <strong>ACTION: Acknowledged.</strong> Your initial focus will be on <strong>{selectedCompetencyData.title}</strong>. This is a high-leverage choice. Understanding structural advantage is the foundation of all durable strategy.
+                <strong>ACTION: Acknowledged.</strong> Your initial focus will be on <strong>{selectedCompetencyData.title}</strong>. This is a high-leverage choice.
               </p>
               <p className="text-base leading-relaxed">
-                Mastery requires starting with the fundamentals. Before you can apply advanced concepts, you must understand the core principles.
-              </p>
-              <p className="text-base font-medium">
-                <strong>Your first clear step is a foundational lesson:</strong>
+                Based on your commitment of <strong>{weeklyTimeCommitment} hours per week</strong> and preferred learning times, here's your personalized first session plan:
               </p>
             </div>
 
             <Card className="border-2 border-gray-300 rounded-none">
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 bg-gray-100 border border-gray-300 flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">📚</span>
+                <div className="space-y-6">
+                  <div>
+                    <div className="text-xs text-gray-500 font-mono mb-2">FIRST SESSION PLAN</div>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-16 h-16 bg-gray-100 border border-gray-300 flex items-center justify-center flex-shrink-0">
+                          <span className="text-2xl">📚</span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs text-gray-500 font-mono mb-1">DOMAIN</div>
+                          <div className="text-sm font-medium text-gray-900 mb-4">
+                            {foundationalLesson.domainTitle}
+                          </div>
+                          <div className="text-xs text-gray-500 font-mono mb-1">LESSON</div>
+                          <div className="text-base font-medium text-gray-900 mb-2">
+                            {foundationalLesson.lessonTitle}
+                          </div>
+                          <div className="text-sm text-gray-600 leading-relaxed">
+                            {foundationalLesson.description}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <div className="text-xs text-gray-500 font-mono mb-1">DOMAIN</div>
-                      <div className="text-sm font-medium text-gray-900 mb-4">
-                        {foundationalLesson.domainTitle}
-                      </div>
-                      <div className="text-xs text-gray-500 font-mono mb-1">LESSON</div>
-                      <div className="text-base font-medium text-gray-900 mb-2">
-                        {foundationalLesson.lessonTitle}
-                      </div>
-                      <div className="text-sm text-gray-600 leading-relaxed">
-                        {foundationalLesson.description}
-                      </div>
+                  </div>
+                  
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="text-xs text-gray-500 font-mono mb-2">RECOMMENDED SCHEDULE</div>
+                    <div className="space-y-2 text-sm text-gray-900">
+                      <p><strong>Weekly Commitment:</strong> {weeklyTimeCommitment} hours</p>
+                      <p><strong>Preferred Times:</strong> {preferredLearningTimes.map(t => TIME_OPTIONS.find(o => o.value === t)?.label).join(', ')}</p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        We'll send you reminders during your preferred learning times to help you stay on track.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -517,7 +729,7 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
         )}
 
         {/* Progress indicator */}
-        {currentStep < 4 && (
+        {currentStep < 6 && (
           <div className="mt-12 pt-8 border-t border-gray-200">
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>Step {currentStep} of {totalSteps}</span>
