@@ -2,7 +2,7 @@
 
 import 'highlight.js/styles/github.css'
 import mermaid from 'mermaid'
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
@@ -14,6 +14,7 @@ import EmbeddedQuiz, { QuizQuestion } from '@/components/library/EmbeddedQuiz'
 import ReflectionPrompt from '@/components/library/ReflectionPrompt'
 import KeyTakeaway from '@/components/library/KeyTakeaway'
 import InlineCheck from '@/components/library/InlineCheck'
+import ApplyThisNow from '@/components/library/ApplyThisNow'
 
 interface MarkdownProps {
   content: string
@@ -316,7 +317,7 @@ function Mermaid({ chart }: { chart: string }) {
 
 // Parse interactive blockquote blocks
 interface ParsedBlock {
-  type: 'QUESTION' | 'REFLECT' | 'KEY-TAKEAWAY' | 'CHECK'
+  type: 'QUESTION' | 'REFLECT' | 'KEY-TAKEAWAY' | 'CHECK' | 'APPLY'
   content: string
   startIndex: number
   endIndex: number
@@ -332,7 +333,7 @@ function parseInteractiveBlocks(content: string): ParsedBlock[] {
   while ((match = regex.exec(content)) !== null) {
     const type = match[1] as ParsedBlock['type']
     const metadataStr = match[2] || ''
-    if (type === 'QUESTION' || type === 'REFLECT' || type === 'KEY-TAKEAWAY' || type === 'CHECK') {
+    if (type === 'QUESTION' || type === 'REFLECT' || type === 'KEY-TAKEAWAY' || type === 'CHECK' || type === 'APPLY') {
       const fullMatch = match[0]
       const blockquoteContent = match[3] || ''
 
@@ -361,6 +362,20 @@ function parseInteractiveBlocks(content: string): ParsedBlock[] {
           const correctMatch = metadataStr.match(/correct:\s*([0-9,]+)/i)
           if (correctMatch) {
             metadata.correctIndices = correctMatch[1].split(',').map(n => parseInt(n.trim(), 10))
+          }
+          block.metadata = metadata
+        }
+        
+        // Parse metadata for APPLY blocks (e.g., caseId: abc123, caseTitle: "Case Name")
+        if (type === 'APPLY' && metadataStr) {
+          const metadata: Record<string, any> = {}
+          const caseIdMatch = metadataStr.match(/caseId:\s*([^\s,]+)/i)
+          const caseTitleMatch = metadataStr.match(/caseTitle:\s*"([^"]+)"/i)
+          if (caseIdMatch) {
+            metadata.caseId = caseIdMatch[1]
+          }
+          if (caseTitleMatch) {
+            metadata.caseTitle = caseTitleMatch[1]
           }
           block.metadata = metadata
         }
@@ -501,6 +516,22 @@ export default function Markdown({
           }
           break
         }
+        case 'APPLY': {
+          const caseId = block.metadata?.caseId
+          const caseTitle = block.metadata?.caseTitle || 'this case study'
+          if (caseId) {
+            const caseUrl = `/library/case-studies/${caseId}`
+            component = (
+              <ApplyThisNow
+                key={`apply-${index}`}
+                caseId={caseId}
+                caseTitle={caseTitle}
+                caseUrl={caseUrl}
+              />
+            )
+          }
+          break
+        }
       }
 
       if (component) {
@@ -526,8 +557,23 @@ export default function Markdown({
     return segs
   }, [content, interactiveBlocks, lessonId, domainId, moduleId, initialReflections])
 
+  // Detect density from parent data attribute
+  const [density, setDensity] = useState<'compact' | 'comfortable'>('compact')
+  
+  useEffect(() => {
+    const element = document.querySelector('[data-density]')
+    const densityValue = element?.getAttribute('data-density') as 'compact' | 'comfortable' | null
+    if (densityValue === 'comfortable' || densityValue === 'compact') {
+      setDensity(densityValue)
+    }
+  }, [])
+
+  const densityClasses = density === 'comfortable' 
+    ? 'prose-lg' 
+    : 'prose-sm'
+
   return (
-    <div className={`prose prose-neutral max-w-none ${className}`}>
+    <div className={`prose prose-neutral max-w-none ${densityClasses} ${className}`}>
       {segments.map((segment, idx) => {
         if (segment.type === 'component' && segment.component) {
           return React.createElement(

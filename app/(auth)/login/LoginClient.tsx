@@ -34,7 +34,22 @@ export default function LoginClient() {
     })
 
     if (error) {
-      setError(error.message)
+      let errorMessage = error.message
+      
+      // Human-readable error messages
+      if (error.message.toLowerCase().includes('invalid login credentials') || 
+          error.message.toLowerCase().includes('invalid') && error.message.toLowerCase().includes('password')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+      } else if (error.message.toLowerCase().includes('email not confirmed') || 
+                 error.message.toLowerCase().includes('email not verified')) {
+        errorMessage = 'Please verify your email address before logging in. Check your inbox for a verification link.'
+      } else if (error.message.toLowerCase().includes('rate limit')) {
+        errorMessage = 'Too many login attempts. Please wait a few minutes and try again.'
+      } else if (error.message.toLowerCase().includes('user not found')) {
+        errorMessage = 'No account found with this email address. Please sign up first.'
+      }
+      
+      setError(errorMessage)
       setLoading(false)
     } else {
       router.push(redirectTo)
@@ -49,16 +64,23 @@ export default function LoginClient() {
           <div className="flex justify-center">
             <Card className="w-full max-w-md border-neutral-200">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-light text-center text-neutral-900 tracking-tight">Access the Proving Ground</CardTitle>
+                <CardTitle className="text-2xl font-light text-center text-neutral-900 tracking-tight">Log in</CardTitle>
                 <CardDescription className="text-center text-neutral-600">
-                  Authenticate to access your analytical workspace
+                  Sign in to your account to continue your journey
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4">
                   {error && (
                     <div className="bg-neutral-50 border border-neutral-200 text-neutral-700 px-4 py-3 rounded-none">
-                      {error}
+                      <p className="font-medium mb-1 text-neutral-900">Unable to sign in</p>
+                      <p className="text-sm">{error}</p>
+                      <p className="text-xs text-neutral-600 mt-2">
+                        Need help? Contact{' '}
+                        <a href="mailto:support@execemy.com" className="underline hover:text-neutral-900">
+                          support@execemy.com
+                        </a>
+                      </p>
                     </div>
                   )}
                   <div className="space-y-2">
@@ -86,24 +108,24 @@ export default function LoginClient() {
                   </div>
                   <div className="text-right">
                     <Link href="/reset-password" className="text-sm text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                      Reset Access Protocol
+                      Forgot password?
                       <span className="absolute -bottom-0.5 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
                     </Link>
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Button type="submit" className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none" disabled={loading}>
-                    {loading ? 'Authenticating...' : 'Authenticate'}
+                    {loading ? 'Logging in...' : 'Log in'}
                   </Button>
                   <p className="text-sm text-center text-neutral-600">
                     Don't have an account?{' '}
                     <Link href="/signup" className="text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                      Request Access
+                      Sign up
                       <span className="absolute -bottom-0.5 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
                     </Link>
                   </p>
                   <p className="text-xs text-center text-neutral-500">
-                    Having trouble authenticating? Check your email for a verification link if you just signed up.
+                    Having trouble? Check your email for a verification link if you just signed up.
                   </p>
                 </CardFooter>
               </form>

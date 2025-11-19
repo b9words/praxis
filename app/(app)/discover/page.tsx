@@ -117,7 +117,7 @@ export default async function DiscoverPage() {
   const featuredPaths = pathsWithProgress.slice(0, 5)
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Discover</h1>
         <p className="text-lg text-gray-600">

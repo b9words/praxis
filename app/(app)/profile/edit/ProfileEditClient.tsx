@@ -109,29 +109,23 @@ export default function ProfileEditClient() {
   const profile = data?.profile
 
   if (loading) {
-    return (
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
-        <LoadingState type="profile" />
-      </div>
-    )
+    return <LoadingState type="profile" />
   }
 
   if (error) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
-        <ErrorState
-          title="Failed to load profile"
-          message="Unable to load your profile data. Please try again."
-          error={error}
-          onRetry={() => window.location.reload()}
-          showBackToDashboard={true}
-        />
-      </div>
+      <ErrorState
+        title="Failed to load profile"
+        message="Unable to load your profile data. Please try again."
+        error={error}
+        onRetry={() => window.location.reload()}
+        showBackToDashboard={true}
+      />
     )
   }
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+    <div>
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-900 mb-2">Edit Profile</h1>
         <p className="text-sm text-gray-600">Manage your profile settings</p>

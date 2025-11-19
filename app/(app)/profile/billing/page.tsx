@@ -4,16 +4,23 @@ import PaddleCheckout from '@/components/pricing/PaddleCheckout'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { InlineBanner } from '@/components/ui/inline-banner'
+import { CheckoutSuccessBanner } from '@/components/ui/checkout-success-banner'
 import { isMissingTable } from '@/lib/api/route-helpers'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { Check } from 'lucide-react'
 import ManageBillingButton from './ManageBillingButton'
+import { Suspense } from 'react'
 
 const ENABLE_MOCK_CHECKOUT = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 'true'
 
 // Force dynamic rendering to avoid static generation issues with useSearchParams
 export const dynamic = 'force-dynamic'
+
+interface BillingPageProps {
+  searchParams: Promise<{ upgrade?: string; returnUrl?: string; checkout?: string }>
+}
 
 const PLANS = [
   {
@@ -40,11 +47,9 @@ const PLANS = [
     features: [
       'Everything in Explorer, plus:',
       'Access to Years 1-3 curriculum (39 articles, 10 cases)',
-      'Priority AI coaching with detailed feedback',
+      'Priority AI feedback with detailed analysis',
       'Advanced simulations with AI role-play',
-      'Verified Execemy credential',
-      'Career coaching sessions (2/month)',
-      'Exclusive networking events'
+      'Verified Execemy credential'
     ],
     popular: true
   },
@@ -58,10 +63,8 @@ const PLANS = [
       'Everything in Professional, plus:',
       'Full 5-year curriculum (52 articles, 14 cases)',
       'Executive-level simulations',
-      '1-on-1 executive coaching (4/month)',
       'Custom learning paths',
       'Leadership assessment',
-      'Alumni network access',
       'Lifetime credential updates'
     ],
     popular: false
@@ -73,8 +76,10 @@ function getPlanName(planId: string): string {
   return plan?.name || planId
 }
 
-export default async function BillingPage() {
+export default async function BillingPage({ searchParams }: BillingPageProps) {
   const user = await getCurrentUser()
+  const params = await searchParams
+  const upgradeRedirect = params.upgrade === 'true'
 
   // Auth protection is handled by middleware
   if (!user) {
@@ -95,11 +100,51 @@ export default async function BillingPage() {
   const currentPlan = subscription ? PLANS.find(p => p.planId === subscription.paddlePlanId) : null
   const otherPlans = PLANS.filter(p => !subscription || p.planId !== subscription.paddlePlanId)
 
+  // Determine required plan for upgrade message
+  let requiredPlan = 'Professional'
+  if (params.returnUrl) {
+    // Try to infer from returnUrl if it's a lesson path
+    const lessonMatch = params.returnUrl.match(/\/library\/curriculum\/([^\/]+)/)
+    if (lessonMatch) {
+      const domainId = lessonMatch[1]
+      // Check which plan is needed (simplified - could be enhanced)
+      const year4Domains = ['capital-allocation', 'investor-market-narrative-control']
+      const year5Domains = ['crisis-leadership-public-composure', 'geopolitical-regulatory-navigation', 'technological-market-foresight']
+      if (year5Domains.includes(domainId)) {
+        requiredPlan = 'Executive'
+      } else if (year4Domains.includes(domainId)) {
+        requiredPlan = 'Executive'
+      }
+    }
+  }
+
+  const checkoutSuccess = params.checkout === 'success'
+  const hasActiveSubscription = subscription?.status === 'active'
+
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+    <div>
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-900 mb-2">Subscription & Billing</h1>
       </div>
+
+      {/* Checkout Success Banner */}
+      {checkoutSuccess && !hasActiveSubscription && (
+        <Suspense fallback={null}>
+          <CheckoutSuccessBanner userId={user.id} hasActiveSubscription={hasActiveSubscription} />
+        </Suspense>
+      )}
+
+      {/* Upgrade Banner */}
+      {upgradeRedirect && (
+        <div className="mb-6">
+          <InlineBanner
+            variant="info"
+            title="Upgrade Required"
+            message={`The content you're trying to access requires a ${requiredPlan} plan. ${currentPlan ? `You're currently on the ${currentPlan.name} plan.` : 'You need an active subscription to access this content.'} Upgrade below to continue.`}
+            dismissible={true}
+          />
+        </div>
+      )}
 
       {subscription ? (
         <div className="space-y-6">
@@ -129,7 +174,22 @@ export default async function BillingPage() {
               </div>
 
               <ManageBillingButton />
-              <p className="text-xs text-gray-500 mt-2">You will be redirected to our secure payment partner, Paddle, to manage your subscription.</p>
+              <p className="text-xs text-gray-500 mt-2">You will be redirected to our secure payment partner, Paddle, to manage your subscription, update payment methods, or cancel.</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Need help with billing? Contact{' '}
+                <a href="mailto:support@execemy.com" className="underline hover:text-gray-700">
+                  support@execemy.com
+                </a>
+              </p>
+              {subscription.status === 'canceled' && subscription.currentPeriodEnd && (
+                <div className="mt-4 p-4 bg-gray-50 border border-gray-200">
+                  <p className="text-sm font-medium text-gray-900 mb-1">Subscription Canceled</p>
+                  <p className="text-xs text-gray-600">
+                    Your access will continue until {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. 
+                    After that date, you'll lose access to paid content.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -273,7 +333,7 @@ export default async function BillingPage() {
                   <p className="text-sm text-gray-700">
                     <span className="font-medium text-gray-900">Save 20%</span> with annual billing
                     <span className="mx-2">•</span>
-                    All plans include 7-day free trial
+                    30-day evaluation period with full refund
                   </p>
                 </div>
               </div>

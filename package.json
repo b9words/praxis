@@ -37,7 +37,10 @@
     "audit:data-layer": "bash scripts/audit.sh",
     "db:reset": "prisma db push --force-reset",
     "db:seed:test": "psql $DATABASE_URL -f tests/seed-data.sql",
-    "check-env": "tsx scripts/check-env.ts"
+    "check-env": "tsx scripts/check-env.ts",
+    "cleanup:data": "tsx scripts/cleanup-old-data.ts",
+    "cleanup:data:dry-run": "tsx scripts/cleanup-old-data.ts --dry-run",
+    "validate:entitlements": "tsx scripts/validate-entitlements.ts"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.19.1",

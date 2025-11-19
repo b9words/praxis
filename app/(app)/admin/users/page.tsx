@@ -164,7 +164,7 @@ export default async function AdminUsersPage({
   const { users, total } = await getCachedUsers()
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+    <div>
       <UsersManagement
         initialUsers={users}
         totalUsers={total}

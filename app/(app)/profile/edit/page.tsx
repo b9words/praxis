@@ -7,11 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default function ProfileEditPage() {
   return (
-    <Suspense fallback={
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
-        <LoadingState type="profile" />
-      </div>
-    }>
+    <Suspense fallback={<LoadingState type="profile" />}>
       <ProfileEditClient />
     </Suspense>
   )

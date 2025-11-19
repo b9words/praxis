@@ -40,6 +40,14 @@ interface FocusedDashboardProps {
     currentHours: number
     progress: number
   }
+  latestKeyInsight: string | null
+  learningTrack: string | null
+}
+
+const TRACK_LABELS: Record<string, string> = {
+  'prepare-management': 'Prepare for Management',
+  'master-strategy': 'Master Corporate Strategy',
+  'think-investor': 'Think Like an Investor',
 }
 
 export default function FocusedDashboard({
@@ -48,96 +56,103 @@ export default function FocusedDashboard({
   jumpBackInItems,
   currentStreak,
   weeklyGoal,
+  latestKeyInsight,
+  learningTrack,
 }: FocusedDashboardProps) {
   const resumeItem = jumpBackInItems[0]
   const nextRecommendations = [
     recommendation.primary,
     ...recommendation.alternates.slice(0, 2),
   ].filter(Boolean)
+  
+  const trackLabel = learningTrack ? TRACK_LABELS[learningTrack] || learningTrack : 'Your Learning'
 
   return (
-    <div className="px-6 lg:px-8 py-12 max-w-7xl mx-auto space-y-12">
-      {/* Resume Module - Dominant */}
-      {resumeItem && (
+    <div className="space-y-12">
+      {/* Your Next Step - Unified */}
+      {(resumeItem || nextRecommendations.length > 0) && (
         <div className="border-t border-neutral-200 pt-8">
           <div className="flex items-center gap-2 mb-6">
             <ArrowRight className="h-4 w-4 text-neutral-600" />
-            <h2 className="text-xl font-light text-neutral-900 tracking-tight">Continue Learning</h2>
+            <h2 className="text-xl font-light text-neutral-900 tracking-tight">
+              Your Next Step{learningTrack ? ` on the '${trackLabel}' Track` : ''}
+            </h2>
           </div>
-          <div className="bg-neutral-50 border border-neutral-200 p-6">
-            <div className="flex items-start justify-between gap-8">
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2 text-xs text-neutral-500 uppercase tracking-wide">
-                  {resumeItem.type === 'lesson' ? (
-                    <>
-                      <BookOpen className="h-3 w-3" />
-                      <span>Article</span>
-                    </>
-                  ) : (
-                    <>
-                      <Target className="h-3 w-3" />
-                      <span>Case Study</span>
-                    </>
+          
+          {/* Primary Next Step */}
+          {resumeItem && (
+            <div className="bg-neutral-50 border border-neutral-200 p-6 mb-4">
+              <div className="flex items-start justify-between gap-8">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-neutral-500 uppercase tracking-wide">
+                    {resumeItem.type === 'lesson' ? (
+                      <>
+                        <BookOpen className="h-3 w-3" />
+                        <span>Article</span>
+                      </>
+                    ) : (
+                      <>
+                        <Target className="h-3 w-3" />
+                        <span>Case Study</span>
+                      </>
+                    )}
+                  </div>
+                  <h3 className="text-2xl font-light text-neutral-900 tracking-tight">
+                    {resumeItem.title}
+                  </h3>
+                  {resumeItem.progress !== undefined && resumeItem.progress > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-neutral-600">
+                      <span>{resumeItem.progress}% complete</span>
+                    </div>
                   )}
                 </div>
-                <h3 className="text-2xl font-light text-neutral-900 tracking-tight">
-                  {resumeItem.title}
-                </h3>
-                {resumeItem.progress !== undefined && resumeItem.progress > 0 && (
-                  <div className="flex items-center gap-2 text-sm text-neutral-600">
-                    <span>{resumeItem.progress}% complete</span>
-                  </div>
-                )}
+                <Button 
+                  asChild 
+                  className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none px-8 h-12 text-sm font-medium"
+                >
+                  <Link href={resumeItem.url}>
+                    {resumeItem.progress && resumeItem.progress > 0 ? 'Resume' : 'Start'}
+                  </Link>
+                </Button>
               </div>
-              <Button 
-                asChild 
-                className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none px-8 h-12 text-sm font-medium"
-              >
-                <Link href={resumeItem.url}>
-                  Resume
-                </Link>
-              </Button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Next 3 Recommendations */}
-      {nextRecommendations.length > 0 && (
-        <div className="border-t border-neutral-200 pt-8">
-          <h2 className="text-xl font-light text-neutral-900 tracking-tight mb-6">Recommended Next</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {nextRecommendations.map((rec, idx) => (
-              rec && (
-                <Link key={rec.id} href={rec.url}>
-                  <div className="bg-white border border-neutral-200 hover:border-neutral-300 transition-colors p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="text-xs text-neutral-400 font-mono">
-                        {String(idx + 1).padStart(2, '0')}
+          )}
+          
+          {/* Upcoming Items (1-2 next items) */}
+          {nextRecommendations.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-75">
+              {nextRecommendations.slice(0, 2).map((rec, idx) => (
+                rec && (
+                  <Link key={rec.id} href={rec.url}>
+                    <div className="bg-white border border-neutral-200 hover:border-neutral-300 transition-colors p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="text-xs text-neutral-400 font-mono">
+                          Next {idx + 1}
+                        </div>
+                        {rec.type === 'curriculum' ? (
+                          <BookOpen className="h-4 w-4 text-neutral-400" />
+                        ) : (
+                          <Target className="h-4 w-4 text-neutral-400" />
+                        )}
                       </div>
-                      {rec.type === 'curriculum' ? (
-                        <BookOpen className="h-4 w-4 text-neutral-400" />
-                      ) : (
-                        <Target className="h-4 w-4 text-neutral-400" />
-                      )}
+                      <h3 className="text-sm font-medium text-neutral-900 mb-1 leading-tight">
+                        {rec.title}
+                      </h3>
+                      <p className="text-xs text-neutral-600 leading-snug">
+                        {rec.reason}
+                      </p>
                     </div>
-                    <h3 className="text-base font-medium text-neutral-900 mb-2 leading-tight">
-                      {rec.title}
-                    </h3>
-                    <p className="text-xs text-neutral-600 leading-snug">
-                      {rec.reason}
-                    </p>
-                  </div>
-                </Link>
-              )
-            ))}
-          </div>
+                  </Link>
+                )
+              ))}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Weekly Goal & Streak */}
+      {/* Weekly Goal, Momentum & Key Insights */}
       <div className="border-t border-neutral-200 pt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Weekly Goal */}
           <div className="bg-neutral-50 border border-neutral-200 p-6">
             <div className="flex items-center justify-between mb-4">
@@ -158,24 +173,44 @@ export default function FocusedDashboard({
               <p className="text-xs text-neutral-600">
                 {weeklyGoal.progress >= 100
                   ? 'Goal achieved! Keep it up.'
+                  : weeklyGoal.targetHours === 2 && !weeklyGoal.currentHours
+                  ? 'Set your weekly goal in settings'
                   : `${Math.round(weeklyGoal.targetHours - weeklyGoal.currentHours)} hours remaining this week`}
               </p>
             </div>
           </div>
 
-          {/* Streak */}
+          {/* Momentum (formerly Streak) */}
           {currentStreak > 0 && (
             <div className="bg-neutral-50 border border-neutral-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-medium text-neutral-900">Learning Streak</h3>
+                <h3 className="text-base font-medium text-neutral-900">Momentum</h3>
                 <Target className="h-4 w-4 text-neutral-400" />
               </div>
               <div className="space-y-2">
-                <div className="text-2xl font-light text-neutral-900">{currentStreak} days</div>
+                <div className="text-2xl font-light text-neutral-900">{currentStreak}-day momentum</div>
                 <p className="text-xs text-neutral-600">
                   {currentStreak === 1
                     ? 'Great start! Come back tomorrow to keep it going.'
                     : `Keep your momentum going. Continue your learning journey today.`}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Key Insights */}
+          {latestKeyInsight && (
+            <div className="bg-neutral-50 border border-neutral-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-medium text-neutral-900">Key Insights</h3>
+                <Target className="h-4 w-4 text-neutral-400" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm text-neutral-700 leading-relaxed">
+                  {latestKeyInsight}
+                </p>
+                <p className="text-xs text-neutral-500 italic">
+                  From your latest case study debrief
                 </p>
               </div>
             </div>

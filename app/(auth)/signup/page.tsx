@@ -53,9 +53,13 @@ export default function SignupPage() {
       
       if (error.message.toLowerCase().includes('rate limit')) {
         errorMessage = 'Too many signup attempts. Please wait a few minutes and try again.'
-      }
-      else if (error.message.toLowerCase().includes('invalid') && error.message.toLowerCase().includes('email')) {
+      } else if (error.message.toLowerCase().includes('invalid') && error.message.toLowerCase().includes('email')) {
         errorMessage = 'Please enter a valid email address.'
+      } else if (error.message.toLowerCase().includes('already registered') || 
+                 error.message.toLowerCase().includes('user already exists')) {
+        errorMessage = 'An account with this email already exists. Please log in instead.'
+      } else if (error.message.toLowerCase().includes('password')) {
+        errorMessage = 'Password must be at least 6 characters long.'
       }
       
       setError(errorMessage)
@@ -88,10 +92,15 @@ export default function SignupPage() {
           <div className="flex justify-center">
             <Card className="w-full max-w-md border-neutral-200">
               <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-light text-center text-neutral-900 tracking-tight">Request Access</CardTitle>
+                <CardTitle className="text-2xl font-light text-center text-neutral-900 tracking-tight">Create Your Account</CardTitle>
                 <CardDescription className="text-center text-neutral-600">
-                  Create your account to access the proving ground
+                  Sign up to start your business acumen journey
                 </CardDescription>
+                <div className="mt-4 pt-4 border-t border-neutral-200">
+                  <p className="text-xs text-neutral-600 text-center">
+                    Plans start at $49/month • 30-day evaluation period with full refund • Cancel anytime
+                  </p>
+                </div>
               </CardHeader>
               <form onSubmit={handleSignup}>
                 <CardContent className="space-y-4">
@@ -106,7 +115,14 @@ export default function SignupPage() {
                     <>
                       {error && (
                         <div className="bg-neutral-50 border border-neutral-200 text-neutral-700 px-4 py-3 rounded-none">
-                          {error}
+                          <p className="font-medium mb-1 text-neutral-900">Unable to create account</p>
+                          <p className="text-sm">{error}</p>
+                          <p className="text-xs text-neutral-600 mt-2">
+                            Need help? Contact{' '}
+                            <a href="mailto:support@execemy.com" className="underline hover:text-neutral-900">
+                              support@execemy.com
+                            </a>
+                          </p>
                         </div>
                       )}
                       <div className="space-y-2">
@@ -185,12 +201,12 @@ export default function SignupPage() {
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-4">
                   <Button type="submit" className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none" disabled={loading}>
-                    {loading ? 'Submitting request...' : 'Submit Request'}
+                    {loading ? 'Creating account...' : 'Sign up'}
                   </Button>
                   <p className="text-sm text-center text-neutral-600">
                     Already have an account?{' '}
                     <Link href="/login" className="text-neutral-700 hover:text-neutral-900 transition-colors relative">
-                      Authenticate
+                      Log in
                       <span className="absolute -bottom-0.5 left-0 w-0 h-[0.5px] bg-neutral-900 transition-all duration-300 hover:w-full"></span>
                     </Link>
                   </p>

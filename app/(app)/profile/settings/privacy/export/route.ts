@@ -51,21 +51,45 @@ export async function GET() {
 
     const [profile, simulations, lessonProgress, articleProgress, residency, notifications, domainCompletions] =
       await Promise.all([
-        prisma.profile.findUnique({
-          where: { id: user.id },
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-            bio: true,
-            avatarUrl: true,
-            isPublic: true,
-            role: true,
-            emailNotificationsEnabled: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        }),
+        (async () => {
+          try {
+            return await prisma.profile.findUnique({
+              where: { id: user.id },
+              select: {
+                id: true,
+                username: true,
+                fullName: true,
+                bio: true,
+                avatarUrl: true,
+                isPublic: true,
+                role: true,
+                emailNotificationsEnabled: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            })
+          } catch (error: any) {
+            // If column doesn't exist, retry without it
+            const { isColumnNotFoundError } = await import('@/lib/db/utils')
+            if (isColumnNotFoundError(error)) {
+              return await prisma.profile.findUnique({
+                where: { id: user.id },
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                  bio: true,
+                  avatarUrl: true,
+                  isPublic: true,
+                  role: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              })
+            }
+            throw error
+          }
+        })(),
         prisma.simulation.findMany({
           where: { userId: user.id },
           include: {

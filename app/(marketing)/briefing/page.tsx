@@ -1,4 +1,3 @@
-import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -46,12 +45,10 @@ export default async function BriefingPage() {
   const stats = getCurriculumStats()
 
   return (
-    <>
-      <PublicHeader />
-      <div className="min-h-screen bg-white">
-        <SectionAccent variant="edge" />
-        
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 py-16">
+    <div className="min-h-screen bg-white">
+      <SectionAccent variant="edge" />
+      
+      <div className="max-w-4xl mx-auto py-16">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-medium text-gray-900 mb-4">
@@ -154,6 +151,5 @@ export default async function BriefingPage() {
           </div>
         </div>
       </div>
-    </>
   )
 }

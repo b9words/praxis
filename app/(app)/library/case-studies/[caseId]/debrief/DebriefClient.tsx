@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Star, TrendingUp, TrendingDown, ArrowRight, BarChart3, Award, Users } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Star, TrendingUp, TrendingDown, ArrowRight, BarChart3, Award, Users, Sparkles } from 'lucide-react'
 import RadarComparison from '@/components/debrief/RadarComparison'
 import PeerMetrics from '@/components/debrief/PeerMetrics'
 import CommunityResponses from '@/components/case-study/CommunityResponses'
@@ -52,6 +53,17 @@ export default function DebriefClient({
   const [hasViewedPeerBenchmark, setHasViewedPeerBenchmark] = useState(false)
   const [goldStandardLoaded, setGoldStandardLoaded] = useState(false)
   const [communityLoaded, setCommunityLoaded] = useState(false)
+  const [showSkillUnlocked, setShowSkillUnlocked] = useState(false)
+
+  // Show Skill Unlocked modal on first load
+  useEffect(() => {
+    // Check if we've shown this modal before (using sessionStorage)
+    const hasSeenModal = sessionStorage.getItem(`skill-unlocked-${caseId}`)
+    if (!hasSeenModal && keyInsight) {
+      setShowSkillUnlocked(true)
+      sessionStorage.setItem(`skill-unlocked-${caseId}`, 'true')
+    }
+  }, [caseId, keyInsight])
 
   // Sync tab with URL
   useEffect(() => {
@@ -103,8 +115,36 @@ export default function DebriefClient({
   }, [])
 
   return (
-    <div className="h-full flex flex-col lg:flex-row overflow-hidden">
-      {/* Left Sidebar - Summary & Navigation */}
+    <>
+      {/* Skill Unlocked Modal */}
+      <Dialog open={showSkillUnlocked} onOpenChange={setShowSkillUnlocked}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-purple-600" />
+              </div>
+              <DialogTitle className="text-xl font-semibold text-gray-900">
+                Skill Unlocked
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-base text-gray-700 leading-relaxed pt-2">
+              {keyInsight}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => setShowSkillUnlocked(false)}
+              className="bg-gray-900 hover:bg-gray-800 text-white rounded-none"
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="h-full flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Sidebar - Summary & Navigation */}
       <aside className="hidden lg:flex flex-col w-[300px] border-r border-gray-200 bg-white flex-shrink-0">
         <div className="p-6 border-b border-gray-200">
           <h1 className="text-xl font-semibold text-gray-900 mb-1">Executive Debrief</h1>
@@ -219,45 +259,55 @@ export default function DebriefClient({
                 </CardContent>
               </Card>
 
-              {/* Recommendations */}
+              {/* Choose Your Next Challenge */}
               {(weaknessRecommendation || strengthRecommendation) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {weaknessRecommendation && weakestCompetency && (
-                    <Card className="border-2 border-orange-200">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <TrendingDown className="h-4 w-4 text-orange-600" />
-                          Shore Up: {weakestCompetency}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <p className="text-xs text-gray-600 mb-3">{weaknessRecommendation.description}</p>
-                        <Link href={weaknessRecommendation.url}>
-                          <Button size="sm" className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none text-xs">
-                            Start Challenge
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  )}
-                  {strengthRecommendation && strongestCompetency && (
-                    <Card className="border-2 border-green-200">
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
-                          Build On: {strongestCompetency}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <p className="text-xs text-gray-600 mb-3">{strengthRecommendation.description}</p>
-                        <Link href={strengthRecommendation.url}>
-                          <Button size="sm" className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none text-xs">
-                            Start Challenge
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  )}
+                <div className="space-y-4">
+                  <div className="mb-4">
+                    <h3 className="text-base font-medium text-gray-900 mb-1">Choose Your Next Challenge</h3>
+                    <p className="text-xs text-gray-600">
+                      Continue building your skills with a curated next step
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {weaknessRecommendation && weakestCompetency && (
+                      <Card className="border-2 border-orange-200">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <TrendingDown className="h-4 w-4 text-orange-600" />
+                            Shore Up a Weakness
+                          </CardTitle>
+                          <p className="text-xs text-gray-600 mt-1">{weakestCompetency}</p>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-xs text-gray-600 mb-3">{weaknessRecommendation.description}</p>
+                          <Link href={weaknessRecommendation.url}>
+                            <Button size="sm" className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none text-xs">
+                              Start Challenge
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {strengthRecommendation && strongestCompetency && (
+                      <Card className="border-2 border-green-200">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-green-600" />
+                            Build on a Strength
+                          </CardTitle>
+                          <p className="text-xs text-gray-600 mt-1">{strongestCompetency}</p>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-xs text-gray-600 mb-3">{strengthRecommendation.description}</p>
+                          <Link href={strengthRecommendation.url}>
+                            <Button size="sm" className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-none text-xs">
+                              Start Challenge
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
                 </div>
               )}
             </TabsContent>
@@ -302,6 +352,25 @@ export default function DebriefClient({
 
             {/* Community Tab */}
             <TabsContent value="community" className="mt-0 space-y-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-base font-medium text-gray-900">Community Debriefs</h2>
+                  <p className="text-xs text-gray-600 mt-1">
+                    See how others approached this case study
+                  </p>
+                </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-none text-xs"
+                >
+                  <Link href={`/library/case-studies/${caseId}/community`}>
+                    View Community Hub
+                    <ArrowRight className="ml-2 h-3 w-3" />
+                  </Link>
+                </Button>
+              </div>
               <div onMouseEnter={() => setHasViewedPeerBenchmark(true)}>
                 <PeerMetrics caseId={caseId} />
               </div>
@@ -310,21 +379,14 @@ export default function DebriefClient({
                   caseId={caseId}
                   userId={userId}
                   isCompleted={true}
-                  headerSlot={
-                    <div>
-                      <h2 className="text-base font-medium text-gray-900">Community Responses</h2>
-                      <p className="text-xs text-gray-600 mt-1">
-                        See how others approached this case study
-                      </p>
-                    </div>
-                  }
                 />
               )}
             </TabsContent>
           </Tabs>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

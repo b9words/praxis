@@ -110,18 +110,36 @@ export async function GET(request: NextRequest) {
 
           try {
             // Get user profile for name and notification preferences
-            const profile = await prisma.profile.findUnique({
-              where: { id: authUser.id },
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-                emailNotificationsEnabled: true,
-              },
-            })
+            let profile: { id: string; username: string; fullName: string | null; emailNotificationsEnabled?: boolean } | null = null
+            try {
+              profile = await prisma.profile.findUnique({
+                where: { id: authUser.id },
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                  emailNotificationsEnabled: true,
+                },
+              })
+            } catch (error: any) {
+              // If column doesn't exist, try without it
+              const { isColumnNotFoundError } = await import('@/lib/db/utils')
+              if (isColumnNotFoundError(error)) {
+                profile = await prisma.profile.findUnique({
+                  where: { id: authUser.id },
+                  select: {
+                    id: true,
+                    username: true,
+                    fullName: true,
+                  },
+                })
+              } else {
+                throw error
+              }
+            }
 
-            // Skip if notifications disabled
-            if (profile && !profile.emailNotificationsEnabled) {
+            // Skip if notifications disabled (only if column exists and is false)
+            if (profile && 'emailNotificationsEnabled' in profile && !profile.emailNotificationsEnabled) {
               continue
             }
 
@@ -240,18 +258,36 @@ export async function GET(request: NextRequest) {
 
           try {
             // Get user profile for name and notification preferences
-            const profile = await prisma.profile.findUnique({
-              where: { id: user.id },
-              select: {
-                id: true,
-                username: true,
-                fullName: true,
-                emailNotificationsEnabled: true,
-              },
-            })
+            let profile: { id: string; username: string; fullName: string | null; emailNotificationsEnabled?: boolean } | null = null
+            try {
+              profile = await prisma.profile.findUnique({
+                where: { id: user.id },
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                  emailNotificationsEnabled: true,
+                },
+              })
+            } catch (error: any) {
+              // If column doesn't exist, try without it
+              const { isColumnNotFoundError } = await import('@/lib/db/utils')
+              if (isColumnNotFoundError(error)) {
+                profile = await prisma.profile.findUnique({
+                  where: { id: user.id },
+                  select: {
+                    id: true,
+                    username: true,
+                    fullName: true,
+                  },
+                })
+              } else {
+                throw error
+              }
+            }
 
-            // Skip if notifications disabled
-            if (profile && !profile.emailNotificationsEnabled) {
+            // Skip if notifications disabled (only if column exists and is false)
+            if (profile && 'emailNotificationsEnabled' in profile && !profile.emailNotificationsEnabled) {
               continue
             }
 

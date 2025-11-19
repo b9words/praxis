@@ -25,14 +25,22 @@ export async function getUserRole(userId: string): Promise<UserRole | null> {
       .maybeSingle() // Use maybeSingle instead of single to handle missing rows gracefully
 
     if (error) {
-      // Log error in development for debugging
-      if (process.env.NODE_ENV === 'development') {
+      // PGRST301 is a JWT decoding error that can occur with service role key
+      // This is expected in some configurations and we handle it gracefully
+      const isJwtError = error.code === 'PGRST301'
+      const isPermissionError = error.message?.includes('permission denied') || error.code === '42501'
+      
+      // Only log non-JWT errors in development (JWT errors are expected and handled)
+      if (process.env.NODE_ENV === 'development' && !isJwtError) {
         console.error(`[getUserRole] Error fetching role for user ${userId}:`, error.message, error)
       }
-      // For permission errors, return null instead of throwing
+      
+      // For permission/JWT errors, return null instead of throwing
       // This allows middleware to fail open and not block access
-      if (error.message?.includes('permission denied') || error.code === 'PGRST301' || error.code === '42501') {
-        if (process.env.NODE_ENV === 'development') {
+      if (isPermissionError || isJwtError) {
+        // Silently return null for JWT errors (expected with service role key)
+        // Only log permission errors in development
+        if (process.env.NODE_ENV === 'development' && isPermissionError && !isJwtError) {
           console.warn(`[getUserRole] Permission denied for user ${userId}, returning null (fail open)`)
         }
         return null

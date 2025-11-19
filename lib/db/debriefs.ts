@@ -3,8 +3,7 @@
  * All debrief database operations go through here
  */
 
-import { dbCall, assertFound, isColumnNotFoundError } from './utils'
-import type { Prisma } from '@prisma/client'
+import { dbCall, isColumnNotFoundError } from './utils'
 
 const defaultInclude = {
   simulation: {

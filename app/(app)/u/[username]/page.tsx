@@ -4,6 +4,7 @@ import { User, Calendar, BookOpen, Target, ThumbsUp } from 'lucide-react'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import MarkdownRenderer from '@/components/ui/Markdown'
+import PraxisRadarChart from '@/components/profile/PraxisRadarChart'
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>
@@ -17,11 +18,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     notFound()
   }
 
-  const { profile, stats, recentResponses } = profileData
+  const { profile, stats, recentResponses, radar, showcasedDebriefs } = profileData
+
+  // Check if radar has any non-zero values
+  const hasRadarData = Object.values(radar).some(v => v > 0)
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
+      <div className="max-w-4xl mx-auto">
         {/* Profile Header */}
         <div className="border-b border-neutral-200 pb-8 mb-8">
           <div className="flex items-start gap-6">
@@ -51,6 +55,50 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </div>
           </div>
         </div>
+
+        {/* Praxis Radar Chart - Hero Element */}
+        {hasRadarData && (
+          <div className="mb-12">
+            <h2 className="text-lg font-semibold text-neutral-900 mb-4">Praxis Radar Chart</h2>
+            <div className="bg-neutral-50 border border-neutral-200 p-6">
+              <PraxisRadarChart data={radar} />
+            </div>
+          </div>
+        )}
+
+        {/* Showcased Debriefs */}
+        {showcasedDebriefs.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-lg font-semibold text-neutral-900 mb-4">Showcased Debriefs</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {showcasedDebriefs.map((response) => (
+                <Link
+                  key={response.id}
+                  href={`/library/case-studies/${response.caseId}`}
+                  className="border border-neutral-200 bg-white hover:border-neutral-300 transition-colors"
+                >
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-sm font-medium text-neutral-900 line-clamp-2">
+                        {response.caseTitle}
+                      </h3>
+                      <div className="flex items-center gap-1 text-xs text-neutral-500 flex-shrink-0 ml-2">
+                        <ThumbsUp className="h-3 w-3" />
+                        <span>{response.likesCount}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-neutral-600 line-clamp-3 mt-2">
+                      {response.content}
+                    </p>
+                    <div className="text-xs text-neutral-500 mt-3">
+                      {formatDistanceToNow(response.createdAt, { addSuffix: true })}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

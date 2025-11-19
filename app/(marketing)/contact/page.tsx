@@ -1,6 +1,5 @@
 'use client'
 
-import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,12 +29,10 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
-
       {/* Hero */}
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl space-y-8">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
@@ -51,7 +48,7 @@ export default function ContactPage() {
       {/* Contact Form */}
       <section className="border-b border-neutral-200 bg-neutral-50 relative">
         <SectionAccent variant="edge" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-2xl mx-auto">
             <Card className="border-neutral-200 bg-white">
               <CardHeader>

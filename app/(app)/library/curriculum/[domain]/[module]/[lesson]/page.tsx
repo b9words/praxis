@@ -5,6 +5,7 @@ import LessonViewTracker from '@/components/library/LessonViewTracker'
 import LessonKeyboardShortcuts from '@/components/library/LessonKeyboardShortcuts'
 import TableOfContents from '@/components/library/TableOfContents'
 import RecommendationBlock from '@/components/library/RecommendationBlock'
+import KeyTakeaways from '@/components/library/KeyTakeaways'
 import { getSmartRecommendations } from '@/lib/recommendation-engine'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -186,6 +187,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
       const loginUrl = new URL('/login', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
       loginUrl.searchParams.set('redirectTo', `/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
       redirect(loginUrl.toString())
+    } else if (accessStatus.requiresUpgrade) {
+      // User has subscription but needs to upgrade plan - redirect to billing with upgrade context
+      const billingUrl = new URL('/profile/billing', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
+      billingUrl.searchParams.set('returnUrl', `/library/curriculum/${domainId}/${moduleId}/${lessonId}`)
+      billingUrl.searchParams.set('upgrade', 'true')
+      redirect(billingUrl.toString())
     } else {
       // Redirect to billing with return URL
       const billingUrl = new URL('/profile/billing', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
@@ -580,9 +587,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 </div>
               </div>
 
-              {/* Right Rail - Sticky TOC and Recommendations */}
+              {/* Right Rail - Sticky Key Takeaways, TOC and Recommendations */}
               <div className="hidden lg:block">
                 <div className="sticky top-24 max-h-[calc(100vh-var(--header-h)-8rem)] overflow-y-auto space-y-8">
+                  <KeyTakeaways content={lessonContent} />
                   <TableOfContents content={lessonContent} />
                   {recommendations.length > 0 && (
                     <RecommendationBlock recommendations={recommendations} maxItems={3} />

@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
 import MockCheckout from '@/components/pricing/MockCheckout'
@@ -9,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { fetchJson } from '@/lib/api'
 import { useMutation } from '@tanstack/react-query'
 import { getDomainById } from '@/lib/curriculum-data'
-import { ArrowRight, Check } from 'lucide-react'
+import { ArrowRight, Check, BookOpen, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
@@ -105,11 +104,9 @@ const PLANS = [
     features: [
       'Everything in Explorer, plus:',
       'Access to Years 1-3 curriculum (39 articles, 10 cases)',
-      'Priority AI coaching with detailed feedback',
+      'Priority AI feedback with detailed analysis',
       'Advanced simulations with AI role-play',
-      'Verified Execemy credential',
-      'Career coaching sessions (2/month)',
-      'Exclusive networking events'
+      'Verified Execemy credential'
     ],
     popular: true
   },
@@ -123,10 +120,8 @@ const PLANS = [
       'Everything in Professional, plus:',
       'Full 5-year curriculum (52 articles, 14 cases)',
       'Executive-level simulations',
-      '1-on-1 executive coaching (4/month)',
       'Custom learning paths',
       'Leadership assessment',
-      'Alumni network access',
       'Lifetime credential updates'
     ],
     popular: false
@@ -156,30 +151,37 @@ function getFoundationalLesson(domainId: string) {
   }
 }
 
+const LEARNING_TRACKS = [
+  { id: 'prepare-management', label: 'Prepare for Management', description: 'Build foundational leadership skills' },
+  { id: 'master-strategy', label: 'Master Corporate Strategy', description: 'Develop strategic thinking capabilities' },
+  { id: 'think-investor', label: 'Think Like an Investor', description: 'Learn capital allocation and value creation' },
+]
+
+const STRATEGIC_OBJECTIVES = [
+  { id: 'transition-to-leadership', label: 'Transition to Leadership', description: 'Move from individual contributor to leading teams and driving outcomes' },
+  { id: 'advance-to-executive', label: 'Advance to Executive Role', description: 'Prepare for C-suite or VP-level positions with strategic decision-making' },
+  { id: 'start-or-scale-business', label: 'Start or Scale a Business', description: 'Build entrepreneurial skills for founding or growing a company' },
+  { id: 'master-strategic-thinking', label: 'Master Strategic Thinking', description: 'Develop the ability to see the big picture and make high-impact decisions' },
+  { id: 'improve-business-acumen', label: 'Improve Business Acumen', description: 'Understand how businesses operate, make money, and create value' },
+  { id: 'career-pivot', label: 'Career Pivot', description: 'Transition to a new industry or role requiring different skills' },
+]
+
 export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingProps) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [strategicObjective, setStrategicObjective] = useState('')
-  const [currentRole, setCurrentRole] = useState('')
+  const [strategicObjective, setStrategicObjective] = useState<string | null>(null)
   const [weeklyTimeCommitment, setWeeklyTimeCommitment] = useState<number>(5)
-  const [preferredLearningTimes, setPreferredLearningTimes] = useState<string[]>([])
+  const [selectedTrack, setSelectedTrack] = useState<string | null>(null)
   const [selectedCompetency, setSelectedCompetency] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
 
-  const totalSteps = 6
+  const totalSteps = 5
   const progress = (currentStep / totalSteps) * 100
-
-  const TIME_OPTIONS = [
-    { value: 'morning', label: 'Morning (6am-12pm)' },
-    { value: 'afternoon', label: 'Afternoon (12pm-6pm)' },
-    { value: 'evening', label: 'Evening (6pm-10pm)' },
-    { value: 'weekend', label: 'Weekend' },
-  ]
 
   // Check if payment was successful (from query param)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    if (params.get('checkout') === 'success' && currentStep === 5) {
-      setCurrentStep(6)
+    if (params.get('checkout') === 'success' && currentStep === 4) {
+      setCurrentStep(5)
       // Clean up URL
       window.history.replaceState({}, '', '/onboarding')
     }
@@ -187,22 +189,23 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
 
   const saveOnboardingDataMutation = useMutation({
     mutationFn: async (data: { 
-      strategicObjective: string
+      strategicObjective: string | null
       competencyId: string
-      currentRole?: string
       weeklyTimeCommitment?: number
-      preferredLearningTimes?: string[]
+      selectedTrack?: string
     }) => {
       setIsSaving(true)
       try {
+        const objectiveLabel = data.strategicObjective 
+          ? STRATEGIC_OBJECTIVES.find(o => o.id === data.strategicObjective)?.label || data.strategicObjective
+          : ''
         await fetchJson('/api/onboarding', {
           method: 'POST',
           body: {
-            strategicObjective: data.strategicObjective,
+            strategicObjective: objectiveLabel,
             competencyId: data.competencyId,
-            currentRole: data.currentRole,
             weeklyTimeCommitment: data.weeklyTimeCommitment,
-            preferredLearningTimes: data.preferredLearningTimes,
+            selectedTrack: data.selectedTrack,
           },
         })
       } finally {
@@ -214,30 +217,50 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
     },
   })
 
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
   const handleStep1Submit = () => {
-    if (!strategicObjective.trim()) {
-      toast.error('Please describe your strategic objective')
+    if (!strategicObjective) {
+      toast.error('Please select your strategic objective')
       return
     }
-    analytics.track('onboarding_step_completed', { step: 1, userId: user?.id })
+    analytics.track('onboarding_step_completed', { 
+      stepNumber: 1, 
+      stepName: 'Strategic Objective',
+      userId: user?.id 
+    })
     setCurrentStep(2)
   }
 
   const handleStep2Submit = () => {
-    if (!currentRole.trim()) {
-      toast.error('Please enter your current role')
+    if (weeklyTimeCommitment < 1 || weeklyTimeCommitment > 10) {
+      toast.error('Please select a weekly commitment between 1 and 10 hours')
       return
     }
-    analytics.track('onboarding_step_completed', { step: 2, userId: user?.id })
+    analytics.track('onboarding_step_completed', { 
+      stepNumber: 2, 
+      stepName: 'Weekly Commitment',
+      selectedGoalHours: weeklyTimeCommitment,
+      userId: user?.id 
+    })
     setCurrentStep(3)
   }
 
   const handleStep3Submit = () => {
-    if (preferredLearningTimes.length === 0) {
-      toast.error('Please select at least one preferred learning time')
+    if (!selectedTrack) {
+      toast.error('Please select a learning track')
       return
     }
-    analytics.track('onboarding_step_completed', { step: 3, userId: user?.id })
+    analytics.track('onboarding_step_completed', { 
+      stepNumber: 3, 
+      stepName: 'Learning Track Selection',
+      selectedTrack: selectedTrack,
+      userId: user?.id 
+    })
     setCurrentStep(4)
   }
 
@@ -246,245 +269,248 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
       toast.error('Please select a competency')
       return
     }
-    analytics.track('onboarding_step_completed', { step: 4, userId: user?.id })
+    analytics.track('onboarding_step_completed', { 
+      stepNumber: 4, 
+      stepName: 'Competency Selection',
+      selectedGoalHours: weeklyTimeCommitment,
+      selectedTrack: selectedTrack || undefined,
+      userId: user?.id 
+    })
     // Save onboarding data
     saveOnboardingDataMutation.mutate({
       strategicObjective,
       competencyId: selectedCompetency,
-      currentRole,
       weeklyTimeCommitment,
-      preferredLearningTimes,
+      selectedTrack: selectedTrack || undefined,
     })
     setCurrentStep(5)
   }
 
   const handlePaymentSuccess = () => {
     // Payment handled via Paddle - will redirect with ?checkout=success
-    // The useEffect will handle moving to step 4
+    // The useEffect will handle moving to step 5
   }
 
   const selectedCompetencyData = selectedCompetency ? COMPETENCY_MAP[selectedCompetency] : null
   const foundationalLesson = selectedCompetency ? getFoundationalLesson(selectedCompetency) : null
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
-        {/* Step 1: The Situation Briefing */}
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="max-w-4xl mx-auto px-6 lg:px-8 py-12 flex-1 flex flex-col">
+        {/* Step 1: Strategic Objective */}
         {currentStep === 1 && (
-          <div className="space-y-8">
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Initial Assessment</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">STATUS: Pending Operative Input</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
+          <div className="flex-1 flex flex-col space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-3xl font-light text-neutral-900 tracking-tight">
+                Define Your Strategic Objective
+              </h1>
+              <p className="text-base text-neutral-700 leading-relaxed">
+                What market are you trying to win in the next five years? We'll personalize your learning path based on your goals.
+              </p>
             </div>
 
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                We begin by defining the strategic challenge. Every leader's journey starts with a clear-eyed assessment of their current position and their desired end-state.
-              </p>
-              <p className="text-base leading-relaxed">
-                Consider your career as a company. You have assets, liabilities, and a competitive landscape.
-              </p>
-              <div className="space-y-3">
-                <p className="text-base font-medium">
-                  <strong>Describe the strategic objective of your "company." What market are you trying to win in the next five years?</strong>
-                </p>
-                <Textarea
-                  value={strategicObjective}
-                  onChange={(e) => setStrategicObjective(e.target.value)}
-                  placeholder="Example: To transition from a senior engineering role to leading a new product division... or... To secure a Series A for my B2B SaaS startup..."
-                  className="min-h-[120px] rounded-none border-gray-400 focus:border-gray-900 resize-none"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {STRATEGIC_OBJECTIVES.map((objective) => (
+                <Card
+                  key={objective.id}
+                  className={`cursor-pointer border transition-colors rounded-none ${
+                    strategicObjective === objective.id
+                      ? 'border-neutral-900 bg-neutral-50'
+                      : 'border-neutral-200 hover:border-neutral-300'
+                  }`}
+                  onClick={() => setStrategicObjective(objective.id)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-4 h-4 border-2 rounded flex-shrink-0 transition-colors ${
+                        strategicObjective === objective.id
+                          ? 'border-neutral-900 bg-neutral-900'
+                          : 'border-neutral-400'
+                      }`}>
+                        {strategicObjective === objective.id && (
+                          <Check className="w-3 h-3 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-neutral-900 mb-1">
+                          {objective.label}
+                        </div>
+                        <div className="text-xs text-neutral-600 leading-relaxed">
+                          {objective.description}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
-            <div className="flex justify-end">
-              <Button
-                onClick={handleStep1Submit}
-                disabled={!strategicObjective.trim()}
-                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
-              >
-                Log Assessment
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            <div className="mt-auto pt-8 border-t border-neutral-200">
+              <div className="flex justify-between">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  disabled
+                  className="rounded-none border-neutral-200 text-neutral-400 px-8 h-12 text-sm font-medium cursor-not-allowed opacity-50"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={handleStep1Submit}
+                  disabled={!strategicObjective}
+                  className="rounded-none bg-neutral-900 hover:bg-neutral-800 text-white px-8 h-12 text-sm font-medium"
+                >
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 2: Role and Context */}
+        {/* Step 2: Weekly Commitment */}
         {currentStep === 2 && (
-          <div className="space-y-8">
-            <div className="bg-gray-50 border border-gray-300 p-4">
-              <div className="text-xs text-gray-500 font-mono mb-1">LOGGED OBJECTIVE</div>
-              <div className="text-sm text-gray-900">{strategicObjective}</div>
-            </div>
-
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Context Assessment</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 flex flex-col space-y-8">
+            {strategicObjective && (
+              <div className="bg-neutral-50 border border-neutral-200 p-4">
+                <div className="text-xs text-neutral-500 uppercase tracking-wide mb-1">Your Objective</div>
+                <div className="text-sm text-neutral-900">
+                  {STRATEGIC_OBJECTIVES.find(o => o.id === strategicObjective)?.label || strategicObjective}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                To tailor your learning path, we need to understand your current position and context.
-              </p>
-              <div className="space-y-3">
-                <p className="text-base font-medium">
-                  <strong>What is your current role or professional background?</strong>
-                </p>
-                <Textarea
-                  value={currentRole}
-                  onChange={(e) => setCurrentRole(e.target.value)}
-                  placeholder="e.g., Software Engineer, Product Manager, Consultant, Entrepreneur..."
-                  className="min-h-[80px] rounded-none border-gray-400 focus:border-gray-900 resize-none"
+            <div className="space-y-4">
+              <h1 className="text-3xl font-light text-neutral-900 tracking-tight">
+                Set Your Weekly Commitment
+              </h1>
+              <label className="text-sm font-medium text-neutral-900">
+                How many hours per week can you commit?
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  value={weeklyTimeCommitment}
+                  onChange={(e) => setWeeklyTimeCommitment(parseInt(e.target.value))}
+                  className="flex-1 h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-900"
                 />
+                <span className="text-lg font-light text-neutral-900 min-w-[80px] text-right">
+                  {weeklyTimeCommitment} {weeklyTimeCommitment === 1 ? 'hour' : 'hours'}/week
+                </span>
               </div>
             </div>
 
-            <div className="flex justify-end">
-              <Button
-                onClick={handleStep2Submit}
-                disabled={!currentRole.trim()}
-                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            <div className="mt-auto pt-8 border-t border-neutral-200">
+              <div className="flex justify-between">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  className="rounded-none border-neutral-200 hover:border-neutral-300 text-neutral-700 px-8 h-12 text-sm font-medium"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={handleStep2Submit}
+                  disabled={weeklyTimeCommitment < 1 || weeklyTimeCommitment > 10}
+                  className="rounded-none bg-neutral-900 hover:bg-neutral-800 text-white px-8 h-12 text-sm font-medium"
+                >
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 3: Time Preferences */}
+        {/* Step 3: Learning Track Selection */}
         {currentStep === 3 && (
-          <div className="space-y-8">
-            <div className="bg-gray-50 border border-gray-300 p-4">
-              <div className="text-xs text-gray-500 font-mono mb-1">LOGGED ROLE</div>
-              <div className="text-sm text-gray-900">{currentRole}</div>
-            </div>
-
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Resource Allocation</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 flex flex-col space-y-8">
+            {weeklyTimeCommitment > 0 && (
+              <div className="bg-neutral-50 border border-neutral-200 p-4">
+                <div className="text-xs text-neutral-500 uppercase tracking-wide mb-1">Weekly Commitment</div>
+                <div className="text-sm text-neutral-900">{weeklyTimeCommitment} hours/week</div>
               </div>
+            )}
+
+            <div className="space-y-4">
+              <h1 className="text-3xl font-light text-neutral-900 tracking-tight">
+                Choose Your Learning Track
+              </h1>
             </div>
 
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                Effective learning requires consistent time investment. Let's optimize your schedule.
-              </p>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-base font-medium mb-3">
-                    <strong>How many hours per week can you commit to learning?</strong>
-                  </p>
-                  <div className="flex items-center gap-4">
-                    <input
-                      type="range"
-                      min="2"
-                      max="20"
-                      step="1"
-                      value={weeklyTimeCommitment}
-                      onChange={(e) => setWeeklyTimeCommitment(parseInt(e.target.value))}
-                      className="flex-1"
-                    />
-                    <span className="text-lg font-medium text-gray-900 min-w-[60px] text-right">
-                      {weeklyTimeCommitment} hrs/week
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-base font-medium mb-3">
-                    <strong>When do you prefer to learn? (Select all that apply)</strong>
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {TIME_OPTIONS.map((option) => (
-                      <Card
-                        key={option.value}
-                        className={`cursor-pointer border-2 transition-all rounded-none ${
-                          preferredLearningTimes.includes(option.value)
-                            ? 'border-gray-900 bg-gray-50'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                        onClick={() => {
-                          setPreferredLearningTimes(prev =>
-                            prev.includes(option.value)
-                              ? prev.filter(t => t !== option.value)
-                              : [...prev, option.value]
-                          )
-                        }}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-4 h-4 border-2 rounded flex-shrink-0 ${
-                              preferredLearningTimes.includes(option.value)
-                                ? 'border-gray-900 bg-gray-900'
-                                : 'border-gray-400'
-                            }`}>
-                              {preferredLearningTimes.includes(option.value) && (
-                                <Check className="w-3 h-3 text-white" />
-                              )}
-                            </div>
-                            <span className="text-sm text-gray-900">{option.label}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {LEARNING_TRACKS.map((track) => (
+                <Card
+                  key={track.id}
+                  className={`cursor-pointer border transition-colors rounded-none ${
+                    selectedTrack === track.id
+                      ? 'border-neutral-900 bg-neutral-50'
+                      : 'border-neutral-200 hover:border-neutral-300'
+                  }`}
+                  onClick={() => setSelectedTrack(track.id)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-4 h-4 border-2 rounded flex-shrink-0 transition-colors ${
+                        selectedTrack === track.id
+                          ? 'border-neutral-900 bg-neutral-900'
+                          : 'border-neutral-400'
+                      }`}>
+                        {selectedTrack === track.id && (
+                          <Check className="w-3 h-3 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-neutral-900 mb-1">
+                          {track.label}
+                        </div>
+                        <div className="text-xs text-neutral-600 leading-relaxed">
+                          {track.description}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="mt-auto pt-8 border-t border-neutral-200">
+              <div className="flex justify-between">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  className="rounded-none border-neutral-200 hover:border-neutral-300 text-neutral-700 px-8 h-12 text-sm font-medium"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={handleStep3Submit}
+                  disabled={!selectedTrack}
+                  className="rounded-none bg-neutral-900 hover:bg-neutral-800 text-white px-8 h-12 text-sm font-medium"
+                >
+                  Continue
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button
-                onClick={handleStep3Submit}
-                disabled={preferredLearningTimes.length === 0}
-                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
-              >
-                Continue
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
           </div>
         )}
 
-        {/* Step 4: The Diagnostic */}
+        {/* Step 4: Competency Selection */}
         {currentStep === 4 && (
-          <div className="space-y-8">
-            {/* Display logged objective */}
-            <div className="bg-gray-50 border border-gray-300 p-4">
-              <div className="text-xs text-gray-500 font-mono mb-1">LOGGED OBJECTIVE</div>
-              <div className="text-sm text-gray-900">{strategicObjective}</div>
-            </div>
-
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Resource Allocation</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                <strong>ANALYSIS: Acknowledged.</strong> Achieving this objective requires closing a critical competency gap. A leader's primary function is to allocate their most limited resource—time—against the highest-leverage opportunity.
-              </p>
-              <p className="text-base leading-relaxed">
-                We will now allocate your initial training resources.
-              </p>
-              <p className="text-base font-medium">
-                <strong>Based on your objective, which of these 10 core competencies represents your most significant current gap?</strong>
+          <div className="flex-1 flex flex-col space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-3xl font-light text-neutral-900 tracking-tight">
+                Identify Your Focus Area
+              </h1>
+              <p className="text-base text-neutral-700 leading-relaxed">
+                Which of these 10 core competencies represents your most significant current gap?
               </p>
             </div>
 
@@ -492,29 +518,29 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
               {COMPETENCIES.map((competency) => (
                 <Card
                   key={competency.id}
-                  className={`cursor-pointer border-2 transition-all rounded-none ${
+                  className={`cursor-pointer border transition-colors rounded-none ${
                     selectedCompetency === competency.id
-                      ? 'border-gray-900 bg-gray-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-neutral-900 bg-neutral-50'
+                      : 'border-neutral-200 hover:border-neutral-300'
                   }`}
                   onClick={() => setSelectedCompetency(competency.id)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <div className={`mt-1 w-4 h-4 border-2 rounded flex-shrink-0 ${
+                      <div className={`mt-1 w-4 h-4 border-2 rounded flex-shrink-0 transition-colors ${
                         selectedCompetency === competency.id
-                          ? 'border-gray-900 bg-gray-900'
-                          : 'border-gray-400'
+                          ? 'border-neutral-900 bg-neutral-900'
+                          : 'border-neutral-400'
                       }`}>
                         {selectedCompetency === competency.id && (
                           <Check className="w-3 h-3 text-white" />
                         )}
                       </div>
                       <div className="flex-1">
-                        <div className="font-medium text-sm text-gray-900 mb-1">
+                        <div className="font-medium text-sm text-neutral-900 mb-1">
                           {competency.title}
                         </div>
-                        <div className="text-xs text-gray-600 leading-relaxed">
+                        <div className="text-xs text-neutral-600 leading-relaxed">
                           {competency.description}
                         </div>
                       </div>
@@ -524,79 +550,86 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
               ))}
             </div>
 
-            <div className="flex justify-end">
-              <Button
-                onClick={handleStep4Submit}
-                disabled={!selectedCompetency || isSaving}
-                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-6"
-              >
-                {isSaving ? 'Saving...' : 'Confirm Allocation'}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+            <div className="mt-auto pt-8 border-t border-neutral-200">
+              <div className="flex justify-between">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  className="rounded-none border-neutral-200 hover:border-neutral-300 text-neutral-700 px-8 h-12 text-sm font-medium"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={handleStep4Submit}
+                  disabled={!selectedCompetency || isSaving}
+                  className="rounded-none bg-neutral-900 hover:bg-neutral-800 text-white px-8 h-12 text-sm font-medium"
+                >
+                  {isSaving ? 'Saving...' : 'Continue'}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 5: The Commitment */}
+        {/* Step 5: Payment & First Session */}
         {currentStep === 5 && selectedCompetencyData && (
-          <div className="space-y-8">
-            <div className="bg-gray-50 border border-gray-300 p-4">
-              <div className="text-xs text-gray-500 font-mono mb-1">ALLOCATION CONFIRMED</div>
-              <div className="text-sm text-gray-900 font-medium">{selectedCompetencyData.title}</div>
-            </div>
-
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Finalizing Resource Commitment</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 flex flex-col space-y-8">
+            {selectedCompetencyData && (
+              <div className="bg-neutral-50 border border-neutral-200 p-4">
+                <div className="text-xs text-neutral-500 uppercase tracking-wide mb-1">Focus Area</div>
+                <div className="text-sm text-neutral-900 font-medium">{selectedCompetencyData.title}</div>
               </div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">STATUS: Awaiting Authorization</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-            </div>
+            )}
 
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                <strong>ANALYSIS:</strong> Your training resources are allocated. Your first deployment is calculated. One final action is required to activate the program.
-              </p>
-              <p className="text-base leading-relaxed">
-                Success in any high-stakes endeavor requires a commitment of resources. This is the point of no return. Choose your engagement level to proceed.
+            <div className="space-y-4">
+              <h1 className="text-3xl font-light text-neutral-900 tracking-tight">
+                Choose Your Plan
+              </h1>
+              <p className="text-base text-neutral-700 leading-relaxed">
+                Select a plan to start your journey. You'll have immediate access to all content in your plan.
               </p>
             </div>
+
+            {foundationalLesson && (
+              <div className="bg-neutral-50 border border-neutral-200 p-4 mb-6">
+                <div className="text-xs text-neutral-500 uppercase tracking-wide mb-2">Your First Lesson</div>
+                <div className="text-sm font-medium text-neutral-900 mb-1">{foundationalLesson.lessonTitle}</div>
+                <div className="text-xs text-neutral-600">{foundationalLesson.domainTitle}</div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {PLANS.map((plan) => (
                 <Card
                   key={plan.name}
-                  className={`relative border-2 rounded-none ${
+                  className={`relative border transition-colors rounded-none ${
                     plan.popular
-                      ? 'border-gray-900'
-                      : 'border-gray-300'
+                      ? 'border-neutral-900'
+                      : 'border-neutral-200'
                   }`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-gray-900 text-white text-xs font-medium rounded-none">
+                      <Badge className="bg-neutral-900 text-white text-xs font-medium rounded-none">
                         Most Popular
                       </Badge>
                     </div>
                   )}
                   <CardContent className="p-6 space-y-6">
                     <div>
-                      <div className="text-xl font-medium text-gray-900 mb-2">{plan.name}</div>
-                      <div className="text-sm text-gray-600 mb-4">{plan.description}</div>
+                      <div className="text-xl font-light text-neutral-900 mb-2 tracking-tight">{plan.name}</div>
+                      <div className="text-sm text-neutral-600 mb-4">{plan.description}</div>
                       <div className="mb-4">
-                        <span className="text-4xl font-light text-gray-900 tracking-tight">{plan.price}</span>
-                        <span className="text-sm text-gray-600">{plan.period}</span>
+                        <span className="text-4xl font-light text-neutral-900 tracking-tight">{plan.price}</span>
+                        <span className="text-sm text-neutral-600">{plan.period}</span>
                       </div>
                     </div>
                     <ul className="space-y-3">
                       {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                          <Check className="w-4 h-4 text-gray-900 flex-shrink-0 mt-0.5" />
+                        <li key={idx} className="flex items-start gap-2 text-sm text-neutral-700">
+                          <Check className="w-4 h-4 text-neutral-900 flex-shrink-0 mt-0.5" />
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -607,11 +640,11 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
                         onSuccess={handlePaymentSuccess}
                         className={`w-full h-12 text-sm font-medium rounded-none ${
                           plan.popular
-                            ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                            ? 'bg-neutral-900 hover:bg-neutral-800 text-white'
+                            : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
                         }`}
                       >
-                        Authorize {plan.name} Plan
+                        Select {plan.name} Plan
                       </MockCheckout>
                     ) : plan.planId ? (
                       <PaddleCheckout
@@ -620,19 +653,19 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
                         onSuccess={handlePaymentSuccess}
                         className={`w-full h-12 text-sm font-medium rounded-none ${
                           plan.popular
-                            ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                            ? 'bg-neutral-900 hover:bg-neutral-800 text-white'
+                            : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
                         }`}
                       >
-                        Authorize {plan.name} Plan
+                        Select {plan.name} Plan
                       </PaddleCheckout>
                     ) : (
                       <Button
                         disabled
                         className={`w-full h-12 text-sm font-medium rounded-none ${
                           plan.popular
-                            ? 'bg-gray-900 hover:bg-gray-800 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                            ? 'bg-neutral-900 hover:bg-neutral-800 text-white'
+                            : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
                         }`}
                       >
                         Plan Unavailable
@@ -643,99 +676,36 @@ export default function PrescriptiveOnboarding({ user }: PrescriptiveOnboardingP
               ))}
             </div>
 
-            <div className="text-center text-sm text-gray-600">
-              All plans include a 30-day evaluation period. Full refund if the program does not meet your analytical standards.
-            </div>
-          </div>
-        )}
-
-        {/* Step 6: The First Session Plan */}
-        {currentStep === 6 && selectedCompetencyData && foundationalLesson && (
-          <div className="space-y-8">
-            <div className="bg-gray-900 text-white p-4 text-center">
-              <div className="text-sm font-medium">Authorization Complete. Welcome, Operative.</div>
+            <div className="text-center text-sm text-neutral-600">
+              We offer a 30-day evaluation and refund period from the date of your initial subscription. If you are not satisfied with the Service during this period, you may request a full refund by contacting us at support@execemy.com.
             </div>
 
-            <div className="border-b border-gray-300 pb-2">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="flex-1 h-px bg-gray-200"></div>
-                <span className="text-xs text-gray-500 font-mono">SUBJECT: Initial Deployment</span>
-                <div className="flex-1 h-px bg-gray-200"></div>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-gray-900">
-              <p className="text-base leading-relaxed">
-                <strong>ACTION: Acknowledged.</strong> Your initial focus will be on <strong>{selectedCompetencyData.title}</strong>. This is a high-leverage choice.
-              </p>
-              <p className="text-base leading-relaxed">
-                Based on your commitment of <strong>{weeklyTimeCommitment} hours per week</strong> and preferred learning times, here's your personalized first session plan:
-              </p>
-            </div>
-
-            <Card className="border-2 border-gray-300 rounded-none">
-              <CardContent className="p-6">
-                <div className="space-y-6">
-                  <div>
-                    <div className="text-xs text-gray-500 font-mono mb-2">FIRST SESSION PLAN</div>
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-gray-100 border border-gray-300 flex items-center justify-center flex-shrink-0">
-                          <span className="text-2xl">📚</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-xs text-gray-500 font-mono mb-1">DOMAIN</div>
-                          <div className="text-sm font-medium text-gray-900 mb-4">
-                            {foundationalLesson.domainTitle}
-                          </div>
-                          <div className="text-xs text-gray-500 font-mono mb-1">LESSON</div>
-                          <div className="text-base font-medium text-gray-900 mb-2">
-                            {foundationalLesson.lessonTitle}
-                          </div>
-                          <div className="text-sm text-gray-600 leading-relaxed">
-                            {foundationalLesson.description}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="border-t border-gray-200 pt-4">
-                    <div className="text-xs text-gray-500 font-mono mb-2">RECOMMENDED SCHEDULE</div>
-                    <div className="space-y-2 text-sm text-gray-900">
-                      <p><strong>Weekly Commitment:</strong> {weeklyTimeCommitment} hours</p>
-                      <p><strong>Preferred Times:</strong> {preferredLearningTimes.map(t => TIME_OPTIONS.find(o => o.value === t)?.label).join(', ')}</p>
-                      <p className="text-xs text-gray-600 mt-2">
-                        We'll send you reminders during your preferred learning times to help you stay on track.
-                      </p>
-                    </div>
-                  </div>
+            {foundationalLesson && (
+              <div className="mt-8 pt-8 border-t border-neutral-200">
+                <div className="flex justify-center">
+                  <Button
+                    asChild
+                    className="rounded-none bg-neutral-900 hover:bg-neutral-800 text-white px-8 h-12 text-sm font-medium"
+                  >
+                    <Link href={foundationalLesson.url}>
+                      Begin Your First Lesson
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-center">
-              <Button
-                asChild
-                className="rounded-none bg-gray-900 hover:bg-gray-800 text-white px-8"
-              >
-                <Link href={foundationalLesson.url}>
-                  Begin Analysis
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Progress indicator */}
-        {currentStep < 6 && (
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="flex items-center justify-between text-xs text-gray-500">
+        {currentStep < 5 && (
+          <div className="mt-12 pt-8 border-t border-neutral-200">
+            <div className="flex items-center justify-between text-xs text-neutral-500">
               <span>Step {currentStep} of {totalSteps}</span>
-              <div className="flex-1 mx-4 bg-gray-200 h-1">
+              <div className="flex-1 mx-4 bg-neutral-200 h-1">
                 <div
-                  className="bg-gray-900 h-1 transition-all"
+                  className="bg-neutral-900 h-1 transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>

@@ -1,46 +1,49 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { BookOpen, Target, Bookmark, TrendingUp, ArrowRight } from 'lucide-react'
+import { BookOpen, Target, Bookmark, ArrowRight, Users } from 'lucide-react'
+import { useState } from 'react'
 
 interface LibraryTabsProps {
-  continueContent: React.ReactNode
+  myTrackContent: React.ReactNode
   articlesContent: React.ReactNode
   caseStudiesContent: React.ReactNode
+  debriefsContent: React.ReactNode
   savedContent: React.ReactNode
-  trendingContent: React.ReactNode
 }
 
 export default function LibraryTabs({
-  continueContent,
+  myTrackContent,
   articlesContent,
   caseStudiesContent,
+  debriefsContent,
   savedContent,
-  trendingContent,
 }: LibraryTabsProps) {
+  const [browseSubTab, setBrowseSubTab] = useState<'articles' | 'case-studies'>('articles')
+
   return (
-    <Tabs defaultValue="continue" className="w-full">
-      <TabsList className="grid w-full grid-cols-5 bg-transparent border-b border-neutral-200 rounded-none h-auto">
+    <Tabs defaultValue="my-track" className="w-full">
+      <TabsList className="grid w-full grid-cols-4 bg-transparent border-b border-neutral-200 rounded-none h-auto">
         <TabsTrigger
-          value="continue"
+          value="my-track"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium text-neutral-600 data-[state=active]:text-neutral-900 uppercase tracking-wide py-3 rounded-none"
         >
           <ArrowRight className="h-3 w-3 mr-2" />
-          Continue
+          My Track
         </TabsTrigger>
         <TabsTrigger
-          value="articles"
+          value="browse"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium text-neutral-600 data-[state=active]:text-neutral-900 uppercase tracking-wide py-3 rounded-none"
         >
           <BookOpen className="h-3 w-3 mr-2" />
-          Articles
+          Browse
         </TabsTrigger>
         <TabsTrigger
-          value="case-studies"
+          value="debriefs"
           className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium text-neutral-600 data-[state=active]:text-neutral-900 uppercase tracking-wide py-3 rounded-none"
         >
-          <Target className="h-3 w-3 mr-2" />
-          Case Studies
+          <Users className="h-3 w-3 mr-2" />
+          Debriefs
         </TabsTrigger>
         <TabsTrigger
           value="saved"
@@ -49,29 +52,49 @@ export default function LibraryTabs({
           <Bookmark className="h-3 w-3 mr-2" />
           Saved
         </TabsTrigger>
-        <TabsTrigger
-          value="trending"
-          className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-neutral-900 text-xs font-medium text-neutral-600 data-[state=active]:text-neutral-900 uppercase tracking-wide py-3 rounded-none"
-        >
-          <TrendingUp className="h-3 w-3 mr-2" />
-          Trending
-        </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="continue" className="mt-0">
-        {continueContent}
+      <TabsContent value="my-track" className="mt-0">
+        {myTrackContent}
       </TabsContent>
-      <TabsContent value="articles" className="mt-0">
-        {articlesContent}
+      <TabsContent value="browse" className="mt-0">
+        <div className="space-y-6">
+          {/* Browse Sub-tabs */}
+          <div className="border-b border-neutral-200">
+            <div className="flex gap-4">
+              <button
+                onClick={() => setBrowseSubTab('articles')}
+                className={`pb-3 text-xs font-medium uppercase tracking-wide transition-colors ${
+                  browseSubTab === 'articles'
+                    ? 'text-neutral-900 border-b-2 border-neutral-900'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <BookOpen className="h-3 w-3 inline mr-2" />
+                Articles
+              </button>
+              <button
+                onClick={() => setBrowseSubTab('case-studies')}
+                className={`pb-3 text-xs font-medium uppercase tracking-wide transition-colors ${
+                  browseSubTab === 'case-studies'
+                    ? 'text-neutral-900 border-b-2 border-neutral-900'
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                <Target className="h-3 w-3 inline mr-2" />
+                Case Studies
+              </button>
+            </div>
+          </div>
+          {browseSubTab === 'articles' && articlesContent}
+          {browseSubTab === 'case-studies' && caseStudiesContent}
+        </div>
       </TabsContent>
-      <TabsContent value="case-studies" className="mt-0">
-        {caseStudiesContent}
+      <TabsContent value="debriefs" className="mt-0">
+        {debriefsContent}
       </TabsContent>
       <TabsContent value="saved" className="mt-0">
         {savedContent}
-      </TabsContent>
-      <TabsContent value="trending" className="mt-0">
-        {trendingContent}
       </TabsContent>
     </Tabs>
   )

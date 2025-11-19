@@ -4,10 +4,22 @@ import { isMissingTable } from '@/lib/api/route-helpers'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  // Only allow in development
-  if (process.env.NODE_ENV !== 'development') {
+  // Only allow in development or when explicitly enabled for testing
+  const isDevelopment = process.env.NODE_ENV === 'development'
+  const mockCheckoutEnabled = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 'true'
+  
+  // Block in production unless explicitly enabled (for staging/testing)
+  if (!isDevelopment && !mockCheckoutEnabled) {
     return NextResponse.json(
-      { error: 'This endpoint is only available in development' },
+      { error: 'This endpoint is not available in production' },
+      { status: 403 }
+    )
+  }
+  
+  // Additional safety: require explicit enable flag even in development for production-like testing
+  if (!mockCheckoutEnabled) {
+    return NextResponse.json(
+      { error: 'Mock checkout is disabled. Set NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT=true to enable.' },
       { status: 403 }
     )
   }
@@ -79,4 +91,5 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
 

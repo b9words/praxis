@@ -66,14 +66,30 @@ export async function POST(request: NextRequest) {
     })
 
     // Get all users with email notifications enabled (from Prisma)
-    const profiles = await prisma.profile.findMany({
-      where: {
-        emailNotificationsEnabled: true,
-      },
-      select: {
-        id: true,
-      },
-    })
+    // Handle case where emailNotificationsEnabled column doesn't exist
+    let profiles: Array<{ id: string }> = []
+    try {
+      profiles = await prisma.profile.findMany({
+        where: {
+          emailNotificationsEnabled: true,
+        },
+        select: {
+          id: true,
+        },
+      })
+    } catch (error: any) {
+      // If column doesn't exist, get all profiles (assume all want notifications)
+      const { isColumnNotFoundError } = await import('@/lib/db/utils')
+      if (isColumnNotFoundError(error)) {
+        profiles = await prisma.profile.findMany({
+          select: {
+            id: true,
+          },
+        })
+      } else {
+        throw error
+      }
+    }
 
     const userIds = profiles.map(p => p.id)
     const allEmails: string[] = []

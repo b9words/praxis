@@ -192,7 +192,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
 
   if (debriefLoading) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div>
         <div className="mb-8">
           <LoadingState type="dashboard" />
         </div>
@@ -202,7 +202,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
 
   if (debriefError) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div>
         <ErrorState
           title="Failed to load debrief"
           message="Unable to load the simulation debrief. Please try again."
@@ -216,7 +216,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
 
   if (!simulation || !debrief) {
     return (
-      <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+      <div>
         <ErrorState
           title="Debrief not found"
           message="This simulation may not be completed yet or the debrief data is unavailable."
@@ -235,7 +235,7 @@ export default function DebriefPage({ params }: { params: Promise<{ simulationId
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-12">
+        <div>
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-medium text-gray-900 mb-2">

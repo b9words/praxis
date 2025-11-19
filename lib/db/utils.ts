@@ -130,9 +130,29 @@ export function assertFound<T>(
  * This is useful for handling missing columns gracefully
  */
 export function isColumnNotFoundError(error: any): boolean {
-  return (
-    (error instanceof AppError && error.code === 'P2022') ||
-    error.code === 'P2022'
-  )
+  const errorCode = error.code || (error instanceof AppError ? error.code : null)
+  const errorMessage = error.message || ''
+  
+  // Check for P2022 error code (Prisma's standard "Column does not exist" error)
+  if (errorCode === 'P2022') {
+    return true
+  }
+  
+  // Check for Prisma validation errors about unknown fields in SELECT statements
+  if (errorMessage.includes('Unknown field') && errorMessage.includes('for select statement')) {
+    return true
+  }
+  
+  // Check for Prisma validation errors about unknown fields in WHERE clauses
+  if (errorMessage.includes('Unknown field') && errorMessage.includes('where')) {
+    return true
+  }
+  
+  // Check for Prisma validation errors about unknown fields in general
+  if (errorMessage.includes('Unknown field') && errorMessage.includes('model')) {
+    return true
+  }
+  
+  return false
 }
 

@@ -1,4 +1,5 @@
 import Navbar from '@/components/layout/Navbar'
+import ConditionalContainer from '@/components/layout/ConditionalContainer'
 import SentryUserProvider from '@/components/providers/SentryUserProvider'
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { getUserSubscriptionStatus } from '@/lib/auth/subscription'
@@ -41,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-white overflow-hidden" data-density="compact">
       {/* Set Sentry user context for error tracking */}
       {user && (
         <SentryUserProvider
@@ -57,7 +58,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <a href="/profile/billing" className="underline font-medium">Manage billing</a>
         </div>
       )}
-      <main className="flex-1 min-h-0 overflow-y-auto lg:pb-0 pb-16">{children}</main>
+      <main className="flex-1 min-h-0 overflow-y-auto lg:pb-0 pb-16">
+        <ConditionalContainer variant="app">{children}</ConditionalContainer>
+      </main>
     </div>
   )
 }

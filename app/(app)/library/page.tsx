@@ -7,10 +7,12 @@ import { listCases } from '@/lib/db/cases'
 import { getPopularLessons } from '@/lib/db/progress'
 import { getPopularSimulations } from '@/lib/db/simulations'
 import { getAllInteractiveSimulations } from '@/lib/case-study-loader'
+import { dbCall } from '@/lib/db/utils'
 import LibraryTabs from '@/components/library/LibraryTabs'
 import EmptyState from '@/components/ui/empty-state'
-import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp, ArrowRight, Bookmark } from 'lucide-react'
+import { BookOpen, CheckCircle, Clock, GraduationCap, Target, TrendingUp, ArrowRight, Bookmark, Users, ThumbsUp } from 'lucide-react'
 import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
 
 // Force dynamic rendering to avoid static generation issues with useSearchParams
 export const dynamic = 'force-dynamic'
@@ -281,8 +283,87 @@ export default async function LibraryPage() {
   )
   const recommendedLessons = await getCachedRecommendedLessons()
 
+  // Get debriefs (community responses sorted by likes across all cases)
+  let debriefsContent: React.ReactNode = null
+  try {
+    const topResponses = await dbCall(async (prisma) => {
+      return prisma.caseResponse.findMany({
+        where: {
+          isPublic: true,
+        },
+        include: {
+          case: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+        orderBy: [
+          { likesCount: 'desc' },
+          { createdAt: 'desc' },
+        ],
+        take: 12,
+      })
+    }).catch(() => [])
+    
+    debriefsContent = (
+      <div className="p-4 space-y-6">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-neutral-900 mb-1">Community Debriefs</h2>
+          <p className="text-sm text-neutral-500">Most insightful responses from the community</p>
+        </div>
+        {topResponses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topResponses.map((response: any) => (
+              <Link key={response.id} href={`/library/case-studies/${response.caseId}`}>
+                <div className="bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <Target className="h-4 w-4 text-neutral-400" />
+                      <div className="flex items-center gap-1 text-xs text-neutral-500">
+                        <ThumbsUp className="h-3 w-3" />
+                        <span>{response.likesCount || 0}</span>
+                      </div>
+                    </div>
+                    <h3 className="text-sm font-medium text-neutral-900 mb-2 line-clamp-2">
+                      {response.case?.title || 'Case Study'}
+                    </h3>
+                    <p className="text-xs text-neutral-600 line-clamp-3 mb-3">
+                      {response.content.substring(0, 150)}...
+                    </p>
+                    <div className="text-xs text-neutral-500">
+                      {formatDistanceToNow(new Date(response.createdAt), { addSuffix: true })}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="No community debriefs yet"
+            description="Community responses will appear here once users start sharing their case study analyses."
+          />
+        )}
+      </div>
+    )
+  } catch (error) {
+    console.error('Error loading debriefs:', error)
+    debriefsContent = (
+      <div className="p-4">
+        <EmptyState
+          icon={Users}
+          title="Unable to load debriefs"
+          description="There was an error loading community responses. Please try again later."
+        />
+      </div>
+    )
+  }
+
   // Content components for tabs
-  const continueContent = (
+  const myTrackContent = (
     <div className="p-4 space-y-6">
       {/* Continue Learning Section */}
       {user && inProgressLessons.length > 0 ? (
@@ -629,11 +710,11 @@ export default async function LibraryPage() {
 
           {/* Library Tabs */}
           <LibraryTabs
-            continueContent={continueContent}
+            myTrackContent={myTrackContent}
             articlesContent={articlesContent}
             caseStudiesContent={caseStudiesContent}
+            debriefsContent={debriefsContent}
             savedContent={savedContent}
-            trendingContent={trendingContent}
           />
         </div>
       </div>

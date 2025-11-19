@@ -1,4 +1,3 @@
-import PublicHeader from '@/components/layout/PublicHeader'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
@@ -29,8 +28,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24">
+      <div className="py-24">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-light text-neutral-900 mb-8 tracking-tight">Privacy Policy</h1>
           

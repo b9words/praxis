@@ -21,6 +21,7 @@ type AnalyticsEvent =
   | 'onboarding_completed'
   | 'case_decision_submitted'
   | 'response_liked'
+  | 'apply_this_now_clicked'
 
 interface AnalyticsProperties {
   [key: string]: string | number | boolean | undefined

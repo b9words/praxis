@@ -1,4 +1,3 @@
-import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import LedgerHero from '@/components/marketing/ledger-hero'
 import LedgerArchive from '@/components/marketing/ledger-archive'
@@ -24,12 +23,10 @@ export const metadata: Metadata = {
 export default function LedgerPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
-
       {/* Hero Section */}
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <LedgerHero />
         </div>
       </section>
@@ -37,7 +34,7 @@ export default function LedgerPage() {
       {/* Archive Section */}
       <section className="border-b border-neutral-200 bg-neutral-50 relative">
         <SectionAccent variant="edge" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <LedgerArchive />
         </div>
       </section>

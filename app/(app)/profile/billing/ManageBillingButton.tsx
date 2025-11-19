@@ -15,10 +15,10 @@ export default function ManageBillingButton() {
       if (result?.portalUrl) {
         window.location.href = result.portalUrl
       } else {
-        toast.error('Unable to access billing portal')
+        toast.error('Unable to access billing portal. Please try again in a few minutes or contact support@execemy.com for assistance.')
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to open billing portal')
+      toast.error('Unable to access billing portal. Please try again in a few minutes or contact support@execemy.com for assistance.')
     } finally {
       setIsLoading(false)
     }

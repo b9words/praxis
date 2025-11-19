@@ -1,4 +1,3 @@
-import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import { Button } from '@/components/ui/button'
 import type { Metadata } from 'next'
@@ -24,12 +23,10 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
-
       {/* Hero */}
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl space-y-8">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
@@ -45,7 +42,7 @@ export default function AboutPage() {
       {/* Mission */}
       <section className="border-b border-neutral-200 bg-neutral-50 relative">
         <SectionAccent variant="edge" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl space-y-6">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
@@ -64,7 +61,7 @@ export default function AboutPage() {
       {/* Approach */}
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl space-y-6">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
@@ -107,7 +104,7 @@ export default function AboutPage() {
           </svg>
         </div>
         
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl mx-auto text-center relative">
             <SectionAccent variant="center" />
             <h2 className="text-3xl font-light mb-6 tracking-tight">Start Your Journey</h2>
@@ -116,7 +113,7 @@ export default function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
-                <Link href="/signup">Request Access</Link>
+                <Link href="/signup">Sign up</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-neutral-600 text-white hover:bg-neutral-800 rounded-none px-8 h-12 text-sm font-medium">
                 <Link href="/pricing">View Pricing</Link>

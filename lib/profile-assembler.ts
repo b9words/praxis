@@ -6,6 +6,7 @@
 import { getProfileByUsername } from './db/profiles'
 import { getUserReadingStats } from './db/progress'
 import { dbCall } from './db/utils'
+import { getUserAggregateScores } from './db/debriefs'
 
 export interface PublicProfileData {
   profile: {
@@ -22,6 +23,21 @@ export interface PublicProfileData {
     caseResponses: number
     totalLikes: number
   }
+  radar: {
+    financialAcumen: number
+    strategicThinking: number
+    marketAwareness: number
+    riskManagement: number
+    leadershipJudgment: number
+  }
+  showcasedDebriefs: Array<{
+    id: string
+    caseId: string
+    caseTitle: string
+    content: string
+    likesCount: number
+    createdAt: Date
+  }>
   recentResponses: Array<{
     id: string
     caseId: string
@@ -70,6 +86,28 @@ export async function assemblePublicProfile(username: string): Promise<PublicPro
   // Calculate total likes across all responses
   const totalLikes = responses.reduce((sum, r) => sum + r.likesCount, 0)
 
+  // Get showcased debriefs (top 3 by likes)
+  const showcasedDebriefs = [...responses]
+    .sort((a, b) => b.likesCount - a.likesCount)
+    .slice(0, 3)
+    .map((r) => ({
+      id: r.id,
+      caseId: r.case.id,
+      caseTitle: r.case.title,
+      content: r.content.substring(0, 200) + (r.content.length > 200 ? '...' : ''),
+      likesCount: r.likesCount,
+      createdAt: r.createdAt,
+    }))
+
+  // Get aggregate scores for radar chart
+  const aggregateScores = await getUserAggregateScores(profile.id).catch(() => ({
+    financialAcumen: 0,
+    strategicThinking: 0,
+    marketAwareness: 0,
+    riskManagement: 0,
+    leadershipJudgment: 0,
+  }))
+
   return {
     profile: {
       id: profile.id,
@@ -85,6 +123,8 @@ export async function assemblePublicProfile(username: string): Promise<PublicPro
       caseResponses: responses.length,
       totalLikes,
     },
+    radar: aggregateScores,
+    showcasedDebriefs,
     recentResponses: responses.map((r) => ({
       id: r.id,
       caseId: r.case.id,

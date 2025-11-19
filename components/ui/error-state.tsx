@@ -35,25 +35,33 @@ export default function ErrorState({
               <p className="text-xs text-neutral-700 font-mono break-all">{errorMessage}</p>
             </div>
           )}
-          <div className="flex gap-3 justify-center">
-            {onRetry && (
-              <Button
-                onClick={onRetry}
-                className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none flex items-center gap-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                {retryLabel}
-              </Button>
-            )}
-            {showBackToDashboard && (
-              <Button
-                variant="outline"
-                asChild
-                className="border-neutral-300 hover:border-neutral-400 rounded-none"
-              >
-                <Link href="/dashboard">Return to Dashboard</Link>
-              </Button>
-            )}
+          <div className="space-y-3">
+            <div className="flex gap-3 justify-center">
+              {onRetry && (
+                <Button
+                  onClick={onRetry}
+                  className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  {retryLabel}
+                </Button>
+              )}
+              {showBackToDashboard && (
+                <Button
+                  variant="outline"
+                  asChild
+                  className="border-neutral-300 hover:border-neutral-400 rounded-none"
+                >
+                  <Link href="/dashboard">Return to Dashboard</Link>
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-neutral-500 text-center">
+              Still having issues? Contact{' '}
+              <a href="mailto:support@execemy.com" className="underline hover:text-neutral-700">
+                support@execemy.com
+              </a>
+            </p>
           </div>
         </div>
       </div>

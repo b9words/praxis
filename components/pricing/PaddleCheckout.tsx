@@ -101,6 +101,21 @@ export default function PaddleCheckout({
       const userEmail = userData?.email
       const customerId = userData?.id
 
+      // Determine success URL based on current page
+      const currentPath = window.location.pathname
+      let successUrl = `${window.location.origin}?checkout=success`
+      
+      // If on onboarding, redirect back to onboarding to complete step 5
+      if (currentPath.includes('/onboarding')) {
+        successUrl = `${window.location.origin}/onboarding?checkout=success`
+      } else if (currentPath.includes('/pricing')) {
+        // If on pricing page, redirect to dashboard after successful checkout
+        successUrl = `${window.location.origin}/dashboard?checkout=success`
+      } else if (currentPath.includes('/profile/billing')) {
+        // If on billing page, redirect back to billing to see updated subscription
+        successUrl = `${window.location.origin}/profile/billing?checkout=success`
+      }
+
       window.Paddle.Checkout.open({
         items: [{ priceId: planId, quantity: 1 }],
         email: userEmail,
@@ -109,7 +124,7 @@ export default function PaddleCheckout({
           planName,
           userId: customerId,
         }),
-        successUrl: `${window.location.origin}?checkout=success`,
+        successUrl,
         settings: {
           displayMode: 'overlay',
           theme: 'light',

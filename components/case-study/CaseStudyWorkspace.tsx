@@ -7,6 +7,7 @@ import NeedARefresher from '@/components/case-study/NeedARefresher'
 import ErrorState from '@/components/ui/error-state'
 import { LoadingState } from '@/components/ui/loading-skeleton'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { trackEvents } from '@/lib/analytics'
 import { fetchJson } from '@/lib/api'
 import { parseCaseBriefing } from '@/lib/parse-case-template'
@@ -16,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight, Home } from 'lucide-react'
+import { ChevronRight, Home, ListChecks, FileText, ClipboardList } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -26,6 +27,7 @@ import { ProgressModal, ProgressStep } from '@/components/ui/modals/ProgressModa
 import { ConfirmModal } from '@/components/ui/modals/ConfirmModal'
 import { InlineBanner } from '@/components/ui/inline-banner'
 import { toast } from 'sonner'
+import MarkdownRenderer from '@/components/ui/Markdown'
 
 interface CaseStudyWorkspaceProps {
   caseItem: any
@@ -93,6 +95,7 @@ export default function CaseStudyWorkspace({
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false)
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
   const [inlineSuccess, setInlineSuccess] = useState<string | null>(null)
+  const [leftPanelTab, setLeftPanelTab] = useState<'tasks' | 'files' | 'rubric'>('tasks')
 
   // Fetch case JSON from Storage if storage_path exists
   const { data: storageData, isLoading: isLoadingStorage } = useQuery({
@@ -753,62 +756,128 @@ export default function CaseStudyWorkspace({
         </div>
       </div>
 
-      {/* MAIN CONTENT: Resizable Panels */}
+      {/* MAIN CONTENT: Two-Panel Layout */}
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* LEFT PANEL: Stepper (20% default) */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
-            <div className="h-full min-h-0 overflow-y-auto">
-              <CaseStepper
-                decisionPoints={decisionPoints}
-                currentIndex={state.currentDecisionPoint}
-                decisions={state.decisions}
-              />
+          {/* LEFT PANEL: Context Panel with Tabs (30% default) */}
+          <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+            <div className="h-full min-h-0 flex flex-col bg-white border-r border-neutral-200">
+              <Tabs value={leftPanelTab} onValueChange={(v) => setLeftPanelTab(v as 'tasks' | 'files' | 'rubric')} className="h-full flex flex-col">
+                <TabsList className="grid w-full grid-cols-3 rounded-none border-b border-neutral-200 bg-white h-auto">
+                  <TabsTrigger value="tasks" className="rounded-none data-[state=active]:bg-neutral-50 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900">
+                    <ListChecks className="h-3 w-3 mr-2" />
+                    <span className="text-xs">Tasks</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="files" className="rounded-none data-[state=active]:bg-neutral-50 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900">
+                    <FileText className="h-3 w-3 mr-2" />
+                    <span className="text-xs">Case Files</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="rubric" className="rounded-none data-[state=active]:bg-neutral-50 data-[state=active]:border-b-2 data-[state=active]:border-neutral-900">
+                    <ClipboardList className="h-3 w-3 mr-2" />
+                    <span className="text-xs">Rubric</span>
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="tasks" className="flex-1 min-h-0 overflow-y-auto m-0 p-4">
+                  <CaseStepper
+                    decisionPoints={decisionPoints}
+                    currentIndex={state.currentDecisionPoint}
+                    decisions={state.decisions}
+                    onStepClick={(index) => {
+                      if (index <= state.currentDecisionPoint) {
+                        setState(prev => ({ ...prev, currentDecisionPoint: index }))
+                      }
+                    }}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="files" className="flex-1 min-h-0 overflow-y-auto m-0 p-0">
+                  {showNeedARefresher && (
+                    <div className="p-4 border-b border-neutral-200 flex-shrink-0">
+                      <NeedARefresher 
+                        competencies={competencies}
+                        caseId={caseItem.id}
+                        recommendedLessons={recommendedLessons}
+                      />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <UniversalAssetViewer
+                      briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
+                      datasets={caseItem.datasets}
+                      caseFiles={caseItem.files}
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="rubric" className="flex-1 min-h-0 overflow-y-auto m-0 p-4">
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium text-neutral-900 mb-2">
+                        Scoring Guide: {decisionPoints[state.currentDecisionPoint]?.title || 'Current Task'}
+                      </h3>
+                      {caseItem.rubric && (
+                        <div className="prose prose-sm max-w-none">
+                          {typeof caseItem.rubric === 'string' ? (
+                            <MarkdownRenderer content={caseItem.rubric} />
+                          ) : caseItem.rubric.criteria ? (
+                            <div className="space-y-4">
+                              {Object.entries(caseItem.rubric.criteria).map(([key, value]: [string, any]) => (
+                                <div key={key} className="border border-neutral-200 p-3">
+                                  <h4 className="text-xs font-medium text-neutral-900 mb-2">{key}</h4>
+                                  {typeof value === 'string' ? (
+                                    <MarkdownRenderer content={value} />
+                                  ) : value.description ? (
+                                    <p className="text-xs text-neutral-700">{value.description}</p>
+                                  ) : (
+                                    <pre className="text-xs text-neutral-600">{JSON.stringify(value, null, 2)}</pre>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <pre className="text-xs text-neutral-600">{JSON.stringify(caseItem.rubric, null, 2)}</pre>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </ResizablePanel>
 
           <ResizableHandle withHandle />
 
-          {/* MIDDLE PANEL: Case Files & Data (50% default) */}
-          <ResizablePanel defaultSize={50} minSize={30} maxSize={60}>
-            <div className="h-full min-h-0 flex flex-col">
-              {/* Need a Refresher? component */}
-              {showNeedARefresher && (
-                <div className="p-4 border-b border-neutral-200 flex-shrink-0">
-                  <NeedARefresher 
-                    competencies={competencies}
-                    caseId={caseItem.id}
-                    recommendedLessons={recommendedLessons}
-                  />
+          {/* RIGHT PANEL: Workspace Panel (70% default) */}
+          <ResizablePanel defaultSize={70} minSize={60} maxSize={80}>
+            <div className="h-full min-h-0 flex flex-col bg-white">
+              {/* Task Prompt Header */}
+              {decisionPoints[state.currentDecisionPoint] && (
+                <div className="border-b border-neutral-200 p-4 bg-neutral-50 flex-shrink-0">
+                  <h2 className="text-base font-medium text-neutral-900 mb-2">
+                    {decisionPoints[state.currentDecisionPoint].title}
+                  </h2>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    {decisionPoints[state.currentDecisionPoint].description}
+                  </p>
                 </div>
               )}
-              {/* Case Files */}
+              
+              {/* Decision Workspace */}
               <div className="flex-1 min-h-0 overflow-y-auto">
-                <UniversalAssetViewer
-                  briefingDoc={caseItem.briefingDoc || caseItem.briefing_doc || null}
-                  datasets={caseItem.datasets}
-                  caseFiles={caseItem.files}
+                <DecisionWorkspace
+                  decisionPoints={decisionPoints}
+                  personas={caseStructure?.keyStakeholders || []}
+                  currentIndex={state.currentDecisionPoint}
+                  decisions={state.decisions}
+                  onDecisionComplete={handleDecisionComplete}
+                  onComplete={handleComplete}
+                  softPaywallEnabled={softPaywallEnabled}
+                  rubric={caseItem.rubric}
+                  currentDecisionPoint={decisionPoints[state.currentDecisionPoint]}
                 />
               </div>
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
-
-          {/* RIGHT PANEL: Decision Workspace + Rubric (30% default) */}
-          <ResizablePanel defaultSize={30} minSize={25} maxSize={50}>
-            <div className="h-full min-h-0 flex flex-col">
-              <DecisionWorkspace
-                decisionPoints={decisionPoints}
-                personas={caseStructure?.keyStakeholders || []}
-                currentIndex={state.currentDecisionPoint}
-                decisions={state.decisions}
-                onDecisionComplete={handleDecisionComplete}
-                onComplete={handleComplete}
-                softPaywallEnabled={softPaywallEnabled}
-                rubric={caseItem.rubric}
-                currentDecisionPoint={decisionPoints[state.currentDecisionPoint]}
-              />
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

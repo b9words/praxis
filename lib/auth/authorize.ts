@@ -295,6 +295,8 @@ export interface PublicAccessStatus {
   access: boolean
   isPublic?: boolean
   requiresLogin?: boolean
+  requiresUpgrade?: boolean
+  domainId?: string
 }
 
 /**
@@ -368,10 +370,32 @@ export async function getPublicAccessStatus(
     }
   }
   
-  // Check if user has active subscription
+  // Check if user has active subscription and plan-based entitlements
   if (userId) {
     const subscriptionStatus = await checkSubscription()
     if (subscriptionStatus.isActive) {
+      // For lessons, check plan-based entitlements
+      if (target.type === 'lesson') {
+        try {
+          const { canAccessDomain } = await import('@/lib/entitlements')
+          const hasAccess = await canAccessDomain(userId, target.domainId)
+          if (!hasAccess) {
+            // User has subscription but not the right plan - show upgrade message
+            return { 
+              access: false, 
+              requiresUpgrade: true,
+              domainId: target.domainId 
+            }
+          }
+        } catch (error) {
+          // If entitlements check fails, fail open (allow access)
+          // This prevents blocking users if entitlements system has issues
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`[getPublicAccessStatus] Error checking entitlements for domain ${target.domainId}:`, error)
+          }
+        }
+      }
+      
       return { access: true }
     }
   }

@@ -93,18 +93,19 @@ export default async function Home() {
                 The Proving Ground for Business Leaders
               </h1>
               <p className="text-lg text-neutral-700 leading-relaxed max-w-2xl">
-                Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment.
+                Build demonstrable business acumen through systematic analysis, interactive simulations, and rigorous assessment. 
+                Designed for analytical professionals transitioning to leadership roles—from product managers to executives.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none px-8 h-12 text-sm font-medium">
                 <Link href="/signup">
-                  Start Free
+                  Sign up
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 rounded-none px-8 h-12 text-sm font-medium">
-                <Link href="#demo">
-                  Try 5-Min Demo
+                <Link href="/pricing">
+                  View Pricing
                 </Link>
               </Button>
             </div>
@@ -439,7 +440,7 @@ export default async function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
                 <Link href="/signup">
-                  Request Access
+                  Sign up
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-neutral-600 text-white hover:bg-neutral-800 rounded-none px-8 h-12 text-sm font-medium">
@@ -449,7 +450,7 @@ export default async function Home() {
               </Button>
             </div>
             <p className="mt-8 text-xs text-neutral-400 uppercase tracking-wider">
-              Assessment-based access • 30-day evaluation period
+              Self-serve signup • 30-day evaluation period
             </p>
           </div>
         </div>

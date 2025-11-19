@@ -46,21 +46,39 @@ function mapPaddleStatus(status: string): 'active' | 'canceled' | 'past_due' | '
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  let eventId: string | null = null
+  let paddleEventType = ''
+  
   try {
     const body = await request.text()
     const signature = request.headers.get('p-signature') || ''
-    const paddleEventType = request.headers.get('p-event-type') || ''
+    paddleEventType = request.headers.get('p-event-type') || ''
+
+    // Log webhook receipt
+    console.log('[Paddle Webhook] Received event:', {
+      eventType: paddleEventType,
+      timestamp: new Date().toISOString(),
+      hasSignature: !!signature,
+    })
 
     // Verify webhook signature
     if (!verifyPaddleSignature(body, signature)) {
-      console.error('Invalid Paddle webhook signature')
+      console.error('[Paddle Webhook] Invalid signature', {
+        eventType: paddleEventType,
+        timestamp: new Date().toISOString(),
+      })
+      Sentry.captureMessage('Invalid Paddle webhook signature', {
+        level: 'error',
+        extra: { eventType: paddleEventType },
+      })
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
     const data = JSON.parse(body)
+    eventId = data?.event_id || data?.event?.id || null
 
     // Check for idempotency using event_id from Paddle
-    const eventId = data?.event_id || data?.event?.id || null
     if (eventId) {
       // Use Supabase Admin client to check webhook_events table
       const supabaseAdmin = createClient(
@@ -82,6 +100,10 @@ export async function POST(request: NextRequest) {
 
       if (existingEvent) {
         // Event already processed
+        console.log('[Paddle Webhook] Duplicate event detected', {
+          eventId: eventId.toString(),
+          eventType: paddleEventType,
+        })
         return NextResponse.json({ received: true, duplicate: true })
       }
 
@@ -220,7 +242,20 @@ export async function POST(request: NextRequest) {
 
       // If still no profile found and it's a creation event, log error
       if (!profile && paddleEventType === 'subscription.created') {
-        console.error('User not found for Paddle customer:', customerId, 'Email:', customerEmail)
+        const errorDetails = {
+          eventId,
+          eventType: paddleEventType,
+          paddleSubscriptionId,
+          customerId,
+          customerEmail,
+          hadUserId: !!userId,
+          timestamp: new Date().toISOString(),
+        }
+        console.error('[Paddle Webhook] User not found for subscription creation', errorDetails)
+        Sentry.captureMessage('Paddle webhook: User not found for subscription creation', {
+          level: 'error',
+          extra: errorDetails,
+        })
         return NextResponse.json({ 
           error: 'User not found',
           details: 'No matching user found for Paddle customer. User must be authenticated during checkout.'
@@ -261,12 +296,33 @@ export async function POST(request: NextRequest) {
 
       // If we still don't have a profile, we can't proceed
       if (!profile) {
-        console.error('Unable to resolve user for Paddle subscription:', paddleSubscriptionId)
+        const errorDetails = {
+          eventId,
+          eventType: paddleEventType,
+          paddleSubscriptionId,
+          customerId,
+          customerEmail,
+          timestamp: new Date().toISOString(),
+        }
+        console.error('[Paddle Webhook] Unable to resolve user for subscription', errorDetails)
+        Sentry.captureMessage('Paddle webhook: Unable to resolve user', {
+          level: 'error',
+          extra: errorDetails,
+        })
         return NextResponse.json({ 
           error: 'User not found',
           details: 'Unable to resolve user for subscription event'
         }, { status: 404 })
       }
+
+      // Log successful user resolution
+      console.log('[Paddle Webhook] User resolved', {
+        eventId,
+        eventType: paddleEventType,
+        userId: profile.id,
+        paddleSubscriptionId,
+        timestamp: new Date().toISOString(),
+      })
 
       const status = mapPaddleStatus(subscription.status)
       const currentPeriodStart = subscription.current_billing_period?.starts_at
@@ -278,6 +334,15 @@ export async function POST(request: NextRequest) {
 
       switch (paddleEventType) {
         case 'subscription.created':
+          console.log('[Paddle Webhook] Processing subscription.created', {
+            eventId,
+            userId: profile!.id,
+            paddleSubscriptionId,
+            planId: subscription.plan_id?.toString(),
+            status,
+            timestamp: new Date().toISOString(),
+          })
+          
           let createdSubscription: any = null
           try {
             createdSubscription = await prisma.subscription.upsert({
@@ -299,9 +364,30 @@ export async function POST(request: NextRequest) {
             })
           } catch (error: any) {
             if (!isMissingTable(error)) {
-              console.error('Failed to upsert subscription:', error)
+              const errorDetails = {
+                eventId,
+                userId: profile!.id,
+                paddleSubscriptionId,
+                error: error.message,
+                timestamp: new Date().toISOString(),
+              }
+              console.error('[Paddle Webhook] Failed to upsert subscription', errorDetails)
+              Sentry.captureException(error, {
+                level: 'error',
+                extra: errorDetails,
+              })
             }
             // Continue processing even if subscription save fails (non-critical)
+          }
+          
+          if (createdSubscription) {
+            console.log('[Paddle Webhook] Subscription created successfully', {
+              eventId,
+              subscriptionId: createdSubscription.id,
+              userId: profile!.id,
+              paddleSubscriptionId,
+              timestamp: new Date().toISOString(),
+            })
           }
           
           // Send subscription confirmation email
@@ -347,6 +433,14 @@ export async function POST(request: NextRequest) {
           break
 
         case 'subscription.updated':
+          console.log('[Paddle Webhook] Processing subscription.updated', {
+            eventId,
+            userId: profile!.id,
+            paddleSubscriptionId,
+            newStatus: status,
+            newPlanId: subscription.plan_id?.toString(),
+            timestamp: new Date().toISOString(),
+          })
           {
             try {
           await prisma.subscription.updateMany({
@@ -359,15 +453,38 @@ export async function POST(request: NextRequest) {
               updatedAt: new Date(),
             },
           })
+          console.log('[Paddle Webhook] Subscription updated successfully', {
+            eventId,
+            paddleSubscriptionId,
+            status,
+            timestamp: new Date().toISOString(),
+          })
             } catch (error: any) {
               if (!isMissingTable(error)) {
-                console.error('Failed to update subscription:', error)
+                const errorDetails = {
+                  eventId,
+                  userId: profile!.id,
+                  paddleSubscriptionId,
+                  error: error.message,
+                  timestamp: new Date().toISOString(),
+                }
+                console.error('[Paddle Webhook] Failed to update subscription', errorDetails)
+                Sentry.captureException(error, {
+                  level: 'error',
+                  extra: errorDetails,
+                })
               }
             }
           }
           break
 
         case 'subscription.canceled':
+          console.log('[Paddle Webhook] Processing subscription.canceled', {
+            eventId,
+            userId: profile!.id,
+            paddleSubscriptionId,
+            timestamp: new Date().toISOString(),
+          })
           {
             try {
           await prisma.subscription.updateMany({
@@ -377,9 +494,25 @@ export async function POST(request: NextRequest) {
               updatedAt: new Date(),
             },
           })
+          console.log('[Paddle Webhook] Subscription canceled successfully', {
+            eventId,
+            paddleSubscriptionId,
+            timestamp: new Date().toISOString(),
+          })
             } catch (error: any) {
               if (!isMissingTable(error)) {
-                console.error('Failed to cancel subscription:', error)
+                const errorDetails = {
+                  eventId,
+                  userId: profile!.id,
+                  paddleSubscriptionId,
+                  error: error.message,
+                  timestamp: new Date().toISOString(),
+                }
+                console.error('[Paddle Webhook] Failed to cancel subscription', errorDetails)
+                Sentry.captureException(error, {
+                  level: 'error',
+                  extra: errorDetails,
+                })
               }
             }
           }
@@ -505,17 +638,29 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const processingTime = Date.now() - startTime
+    console.log('[Paddle Webhook] Event processed successfully', {
+      eventId,
+      eventType: paddleEventType,
+      processingTimeMs: processingTime,
+      timestamp: new Date().toISOString(),
+    })
+    
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Error processing Paddle webhook:', error)
-    Sentry.addBreadcrumb({
-      category: 'webhook',
+    const errorDetails = {
+      eventId,
+      eventType: paddleEventType,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    }
+    console.error('[Paddle Webhook] Error processing webhook', errorDetails)
+    Sentry.captureException(error instanceof Error ? error : new Error(String(error)), {
       level: 'error',
-      message: 'Paddle webhook processing failed',
-      data: { error: error instanceof Error ? error.message : String(error) },
+      extra: errorDetails,
     })
-    Sentry.captureException(error)
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 

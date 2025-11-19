@@ -153,4 +153,13 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Density variants for consistent spacing */
+  [data-density="compact"] {
+    --density-spacing: 0.75;
+  }
+
+  [data-density="comfortable"] {
+    --density-spacing: 1.25;
+  }
 }

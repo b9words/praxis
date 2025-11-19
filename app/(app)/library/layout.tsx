@@ -3,10 +3,27 @@
 import LibrarySidebar from '@/components/library/LibrarySidebar'
 import LibraryShortcuts from '@/components/library/LibraryShortcuts'
 import { Button } from '@/components/ui/button'
-import { useLibraryUiStore } from '@/lib/ui/library-ui-store'
+import { useLibraryUiStore, rehydrateLibraryUiStore } from '@/lib/ui/library-ui-store'
 import { Menu } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+
+// Read from localStorage synchronously - this runs during component initialization
+function getSidebarMode(): 'expanded' | 'rail' {
+  if (typeof window === 'undefined') return 'expanded'
+  try {
+    const stored = localStorage.getItem('library-ui')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed.state?.sidebarMode === 'rail' || parsed.state?.sidebarMode === 'expanded') {
+        return parsed.state.sidebarMode
+      }
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+  return 'expanded'
+}
 
 export default function LibraryLayout({
   children,
@@ -14,9 +31,28 @@ export default function LibraryLayout({
   children: React.ReactNode
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const sidebarMode = useLibraryUiStore((state) => state.sidebarMode)
+  // Read from localStorage in initializer - this is synchronous on client
+  // On server, this returns 'expanded', which is fine for SSR
+  const [sidebarMode, setSidebarMode] = useState<'expanded' | 'rail'>(() => {
+    // This runs during component initialization, before first render
+    return getSidebarMode()
+  })
+  const storeSidebarMode = useLibraryUiStore((state) => state.sidebarMode)
+  const setStoreSidebarMode = useLibraryUiStore((state) => state.setSidebarMode)
   const pathname = usePathname()
   const mobileOverlayRef = useRef<HTMLDivElement>(null)
+
+  // Sync store on mount
+  useEffect(() => {
+    setStoreSidebarMode(sidebarMode)
+  }, []) // Only run once on mount
+
+  // Update when store changes (user toggles)
+  useEffect(() => {
+    if (storeSidebarMode !== sidebarMode) {
+      setSidebarMode(storeSidebarMode)
+    }
+  }, [storeSidebarMode, sidebarMode])
 
   // Auto-close mobile menu on navigation
   useEffect(() => {
@@ -40,8 +76,6 @@ export default function LibraryLayout({
     const menuButton = document.querySelector('[aria-label="Open menu"]') as HTMLElement
     menuButton?.focus()
   }
-
-  const sidebarWidth = sidebarMode === 'expanded' ? 'w-[320px]' : 'w-[64px]'
 
   return (
     <>
@@ -67,8 +101,12 @@ export default function LibraryLayout({
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Desktop Sidebar */}
-        <div className={`hidden md:block ${sidebarWidth} border-r border-neutral-200 bg-white flex-shrink-0 transition-all duration-200`}>
+        {/* Desktop Sidebar - width from localStorage read synchronously in useState */}
+        <div 
+          className="hidden md:block border-r border-neutral-200 bg-white flex-shrink-0 transition-all duration-200"
+          style={{ width: sidebarMode === 'expanded' ? '320px' : '64px' }}
+          suppressHydrationWarning
+        >
           <LibrarySidebar />
         </div>
         

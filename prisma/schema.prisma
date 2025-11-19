@@ -19,6 +19,8 @@ model Profile {
   isPublic                  Boolean  @default(false) @map("is_public")
   role                      String   @default("member")
   emailNotificationsEnabled Boolean  @default(true) @map("email_notifications_enabled")
+  weeklyTargetHours         Int?     @map("weekly_target_hours")
+  learningTrack             String?  @map("learning_track")
   createdAt                 DateTime @default(now()) @map("created_at")
   updatedAt                 DateTime @updatedAt @map("updated_at")
 

@@ -1,11 +1,14 @@
 import { getCurrentUser } from '@/lib/auth/get-user'
 import { prisma } from '@/lib/prisma/server'
 import { isMissingTable } from '@/lib/api/route-helpers'
+import * as Sentry from '@sentry/nextjs'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
+  let user: Awaited<ReturnType<typeof getCurrentUser>> = null
+  
   try {
-    const user = await getCurrentUser()
+    user = await getCurrentUser()
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -49,21 +52,45 @@ export async function POST(request: NextRequest) {
 
     const [profile, simulations, lessonProgress, articleProgress, userResidency, notifications, domainCompletions] =
       await Promise.all([
-        prisma.profile.findUnique({
-          where: { id: user.id },
-          select: {
-            id: true,
-            username: true,
-            fullName: true,
-            avatarUrl: true,
-            bio: true,
-            isPublic: true,
-            role: true,
-            emailNotificationsEnabled: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        }),
+        (async () => {
+          try {
+            return await prisma.profile.findUnique({
+              where: { id: user.id },
+              select: {
+                id: true,
+                username: true,
+                fullName: true,
+                avatarUrl: true,
+                bio: true,
+                isPublic: true,
+                role: true,
+                emailNotificationsEnabled: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            })
+          } catch (error: any) {
+            // If column doesn't exist, retry without it
+            const { isColumnNotFoundError } = await import('@/lib/db/utils')
+            if (isColumnNotFoundError(error)) {
+              return await prisma.profile.findUnique({
+                where: { id: user.id },
+                select: {
+                  id: true,
+                  username: true,
+                  fullName: true,
+                  avatarUrl: true,
+                  bio: true,
+                  isPublic: true,
+                  role: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              })
+            }
+            throw error
+          }
+        })(),
         prisma.simulation.findMany({
           where: { userId: user.id },
           include: {
@@ -168,6 +195,17 @@ export async function POST(request: NextRequest) {
       filename: `execemy-data-export-${new Date().toISOString().split('T')[0]}.json`
     })
   } catch (error) {
+    // Log to Sentry with context (but don't expose sensitive data)
+    Sentry.captureException(error, {
+      tags: {
+        route: '/api/profile/settings/privacy/export',
+        operation: 'export_user_data',
+      },
+      extra: {
+        userId: user?.id,
+      },
+    })
+    
     const { normalizeError } = await import('@/lib/api/route-helpers')
     const normalized = normalizeError(error)
     console.error('Error exporting user data:', error)

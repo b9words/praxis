@@ -12,7 +12,7 @@ interface LibraryUiState {
 export const useLibraryUiStore = create<LibraryUiState>()(
   persist(
     (set) => ({
-      sidebarMode: 'expanded',
+      sidebarMode: 'expanded', // Default, will be set from component on mount
       setSidebarMode: (mode: SidebarMode) => set({ sidebarMode: mode }),
       toggleSidebarMode: () =>
         set((state) => ({
@@ -24,4 +24,20 @@ export const useLibraryUiStore = create<LibraryUiState>()(
     }
   )
 )
+
+// Manually rehydrate after component sets initial value
+export const rehydrateLibraryUiStore = () => {
+  if (typeof window === 'undefined') return
+  try {
+    const stored = localStorage.getItem('library-ui')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed.state?.sidebarMode) {
+        useLibraryUiStore.getState().setSidebarMode(parsed.state.sidebarMode)
+      }
+    }
+  } catch (e) {
+    // Ignore errors
+  }
+}
 

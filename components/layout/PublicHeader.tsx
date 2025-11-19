@@ -106,10 +106,10 @@ export default function PublicHeader() {
                 ) : (
                   <>
                     <Button asChild variant="ghost" size="sm" className="text-neutral-700 rounded-none">
-                      <Link href="/login">Authenticate</Link>
+                      <Link href="/login">Log in</Link>
                     </Button>
                     <Button asChild size="sm" className="bg-neutral-900 hover:bg-neutral-800 text-white rounded-none">
-                      <Link href="/signup">Request Access</Link>
+                      <Link href="/signup">Sign up</Link>
                     </Button>
                   </>
                 )}
@@ -198,14 +198,14 @@ export default function PublicHeader() {
                     className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50 rounded-none"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Link href="/login">Authenticate</Link>
+                    <Link href="/login">Log in</Link>
                   </Button>
                   <Button
                     asChild
                     className="w-full bg-neutral-900 hover:bg-neutral-800 text-white rounded-none"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <Link href="/signup">Request Access</Link>
+                    <Link href="/signup">Sign up</Link>
                   </Button>
                 </>
               )}

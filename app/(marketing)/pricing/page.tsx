@@ -1,4 +1,3 @@
-import PublicHeader from '@/components/layout/PublicHeader'
 import { SectionAccent } from '@/components/layout/SectionAccent'
 import PaddleCheckout from '@/components/pricing/PaddleCheckout'
 import MockCheckout from '@/components/pricing/MockCheckout'
@@ -17,7 +16,7 @@ const ENABLE_MOCK_CHECKOUT = process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === 't
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions. All plans include AI-powered coaching and interactive simulations.',
+  description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions. All plans include AI-powered feedback and interactive simulations.',
   openGraph: {
     title: 'Pricing | Execemy',
     description: 'Choose the perfect plan for your business acumen journey. From Explorer to Executive, find the right level for your ambitions.',
@@ -80,11 +79,9 @@ export default async function PricingPage() {
       features: [
         'Everything in Explorer, plus:',
         'Access to Years 1-3 curriculum (39 articles, 10 cases)',
-        'Priority AI coaching with detailed feedback',
+        'Priority AI feedback with detailed analysis',
         'Advanced simulations with AI role-play',
-        'Verified Execemy credential',
-        'Career coaching sessions (2/month)',
-        'Exclusive networking events'
+        'Verified Execemy credential'
       ],
       cta: 'Start Professional',
       popular: true
@@ -99,10 +96,8 @@ export default async function PricingPage() {
         'Everything in Professional, plus:',
         'Full 5-year curriculum (52 articles, 14 cases)',
         'Executive-level simulations',
-        '1-on-1 executive coaching (4/month)',
         'Custom learning paths',
         'Leadership assessment',
-        'Alumni network access',
         'Lifetime credential updates'
       ],
       cta: 'Start Executive',
@@ -112,12 +107,10 @@ export default async function PricingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
-      
       {/* Auth notice for logged-in users */}
       {user && (
-        <div className="bg-neutral-50 border-b border-neutral-200 px-6 py-3">
-          <div className="max-w-7xl mx-auto text-sm text-neutral-700">
+        <div className="bg-neutral-50 border-b border-neutral-200">
+          <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-3 text-sm text-neutral-700">
             You're signed in. <Link href="/profile/billing" className="underline font-medium hover:text-neutral-900">Manage your plan in Billing</Link>
           </div>
         </div>
@@ -127,22 +120,23 @@ export default async function PricingPage() {
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
         <SectionAccent variant="corner" className="top-24 opacity-20" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h1 className="text-5xl md:text-6xl font-light text-neutral-900 leading-tight tracking-tight">
               Invest in Your Business Acumen
             </h1>
             <p className="text-lg text-neutral-700 leading-relaxed">
-              Choose the plan that fits your ambition. All plans include AI-powered coaching and interactive simulations.
+              Choose the plan that fits your ambition. All plans include AI-powered feedback and interactive simulations. 
+              Designed for analytical professionals—from product managers to executives—building demonstrable business leadership skills.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6 text-sm text-neutral-600">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-neutral-700" />
-                <span>30-day money-back guarantee</span>
+                <span>30-day evaluation period with full refund</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-neutral-700" />
-                <span>Cancel anytime</span>
+                <span>Cancel anytime—access continues until period end</span>
               </div>
             </div>
           </div>
@@ -152,7 +146,7 @@ export default async function PricingPage() {
       {/* Pricing Cards */}
       <section className="border-b border-neutral-200 bg-neutral-50 relative">
         <SectionAccent variant="edge" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {plans.map((plan, idx) => (
               <Card key={idx} className={`relative bg-white hover:border-neutral-300 transition-colors ${
@@ -194,7 +188,7 @@ export default async function PricingPage() {
                     >
                       {plan.cta}
                     </MockCheckout>
-                  ) : plan.planId ? (
+                  ) : plan.planId && user ? (
                     <PaddleCheckout
                       planId={plan.planId}
                       planName={plan.name}
@@ -215,7 +209,7 @@ export default async function PricingPage() {
                           : 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900'
                       }`}
                     >
-                      <Link href={user ? '/profile/billing' : '/signup'}>{plan.cta}</Link>
+                      <Link href={user ? '/profile/billing' : '/signup'}>Start {plan.name}</Link>
                     </Button>
                   )}
                 </CardContent>
@@ -229,7 +223,7 @@ export default async function PricingPage() {
               <p className="text-sm text-neutral-700">
                 <span className="font-medium text-neutral-900">Save 20%</span> with annual billing
                 <span className="mx-2">•</span>
-                All plans include 7-day free trial
+                30-day evaluation period with full refund
               </p>
             </div>
           </div>
@@ -239,7 +233,7 @@ export default async function PricingPage() {
       {/* FAQ */}
       <section className="border-b border-neutral-200 relative">
         <SectionAccent variant="vertical" className="opacity-30" />
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl mx-auto">
             <div className="mb-20 relative">
               <div className="absolute -left-8 top-0 w-px h-20 bg-neutral-900 opacity-20 hidden lg:block"></div>
@@ -270,7 +264,11 @@ export default async function PricingPage() {
                 },
                 {
                   q: 'What if I\'m not satisfied?',
-                  a: '30-day money-back guarantee, no questions asked. We\'re confident you\'ll see immediate value.'
+                  a: 'We offer a 30-day evaluation and refund period from the date of your initial subscription. If you are not satisfied with the Service during this period, you may request a full refund by contacting us at support@execemy.com. After the 30-day period, all subscription fees are non-refundable.'
+                },
+                {
+                  q: 'How do I get support?',
+                  a: 'Email support@execemy.com and we\'ll respond within 2 business days. For billing questions, you can also manage your subscription directly through Paddle.'
                 }
               ].map((faq, idx) => (
                 <Card key={idx} className="bg-white border border-neutral-200 hover:border-neutral-300 transition-colors relative">
@@ -302,7 +300,7 @@ export default async function PricingPage() {
           </svg>
         </div>
         
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-24 relative">
+        <div className="py-24 relative">
           <div className="max-w-4xl mx-auto text-center relative">
             <SectionAccent variant="center" />
             <h2 className="text-3xl font-light mb-6 tracking-tight">Ready to Start</h2>
@@ -311,7 +309,7 @@ export default async function PricingPage() {
             </p>
             <Button asChild size="lg" className="bg-white text-neutral-900 hover:bg-neutral-100 rounded-none px-8 h-12 text-sm font-medium">
               <Link href="/signup">
-                Request Access
+                Sign up
               </Link>
             </Button>
           </div>

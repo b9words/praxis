@@ -81,7 +81,7 @@ const DEFAULT_BENEFITS = {
     'Access all lessons in this module',
     'Complete the full learning path',
     'Practice with associated case studies',
-    'Get AI-powered feedback and coaching',
+    'Get AI-powered feedback and analysis',
   ],
   curriculum: [
     'Full access to 5-year curriculum (52 articles, 14 cases)',
@@ -119,7 +119,7 @@ const DEFAULT_DESCRIPTIONS = {
   lesson: 'Subscribe to access this lesson and unlock the complete curriculum.',
   'case-study': 'Subscribe to complete this case study and view your detailed performance analysis.',
   module: 'Subscribe to access all lessons in this module and the complete curriculum.',
-  curriculum: 'Get full access to the 5-year curriculum with AI coaching and simulations.',
+  curriculum: 'Get full access to the 5-year curriculum with AI feedback and simulations.',
   debrief: 'Your performance analysis and competency scores are ready. Subscribe to view them.',
   simulation: 'Subscribe to complete all stages and receive your comprehensive performance debrief.'
 }
@@ -208,7 +208,7 @@ export default function Upgrade({
           )}
           
           <p className="text-xs text-neutral-500 text-center mt-3">
-            30-day money-back guarantee • Cancel anytime
+            30-day evaluation period • Cancel anytime
           </p>
         </div>
       </CardContent>

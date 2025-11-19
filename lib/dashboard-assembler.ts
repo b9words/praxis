@@ -50,6 +50,8 @@ export interface DashboardData {
     currentHours: number
     progress: number
   }
+  latestKeyInsight: string | null
+  learningTrack: string | null
   recentActivities: Array<{
     id: string
     type: 'article' | 'simulation'
@@ -780,17 +782,38 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     console.error('Error building roadmap:', error)
   }
 
-  // Get profile to extract weekly goal from bio
+  // Get profile to extract weekly goal and learning track
   const profile = await dbCall(async (prisma) => {
-    return prisma.profile.findUnique({
-      where: { id: userId },
-      select: { bio: true },
-    })
+    // Try with optional fields first
+    try {
+      return await prisma.profile.findUnique({
+        where: { id: userId },
+        select: { 
+          bio: true,
+          weeklyTargetHours: true,
+          learningTrack: true,
+        } as any,
+      })
+    } catch (error: any) {
+      // If columns don't exist, retry with basic fields only
+      const { isColumnNotFoundError } = await import('@/lib/db/utils')
+      if (isColumnNotFoundError(error)) {
+        return await prisma.profile.findUnique({
+          where: { id: userId },
+          select: { 
+            bio: true,
+          },
+        })
+      }
+      throw error
+    }
   }).catch(() => null)
 
-  // Extract weekly goal from bio (format: "Weekly commitment: X hours")
+  // Use weeklyTargetHours from profile, fallback to parsing bio, then default to 2
   let weeklyGoalHours = 2 // Default
-  if (profile?.bio) {
+  if (profile && 'weeklyTargetHours' in profile && profile.weeklyTargetHours) {
+    weeklyGoalHours = profile.weeklyTargetHours
+  } else if (profile?.bio) {
     const match = profile.bio.match(/Weekly commitment:\s*(\d+)\s*hours?/i)
     if (match) {
       weeklyGoalHours = parseInt(match[1], 10) || 2
@@ -821,6 +844,22 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     targetHours: weeklyGoalHours,
     currentHours: Math.round(weeklyTimeSpent / 3600 * 10) / 10, // Round to 1 decimal
     progress: Math.min(100, Math.round((weeklyTimeSpent / 3600 / weeklyGoalHours) * 100)),
+  }
+
+  // Get latest key insight from most recent completed debrief
+  let latestKeyInsight: string | null = null
+  try {
+    const { listDebriefsByUser } = await import('@/lib/db/debriefs')
+    const debriefs = await listDebriefsByUser(userId)
+    if (debriefs.length > 0) {
+      const latestDebrief = debriefs[0] // Already sorted by createdAt desc
+      const summaryText = latestDebrief.summaryText || ''
+      // Extract first sentence as key insight
+      latestKeyInsight = summaryText.split('.')[0] + '.' || null
+    }
+  } catch (error) {
+    // Best-effort; if this fails, latestKeyInsight remains null
+    console.error('Error fetching latest key insight:', error)
   }
 
   // Calculate learning streak (current and longest)
@@ -872,6 +911,8 @@ export async function assembleDashboardData(userId: string): Promise<DashboardDa
     currentStreak,
     longestStreak,
     weeklyGoal,
+    latestKeyInsight,
+    learningTrack: (profile && 'learningTrack' in profile ? profile.learningTrack : null) || null,
     recentActivities,
     aggregateScores: aggregateScoresResult as unknown as Record<string, number> | null,
     jumpBackInItems,

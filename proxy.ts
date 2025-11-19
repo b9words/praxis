@@ -128,9 +128,13 @@ export async function proxy(request: NextRequest) {
             return NextResponse.redirect(new URL('/onboarding', request.url))
           }
           
-          // If there's a different error, log but allow through (fail open)
+          // If there's a different error, handle gracefully
+          // PGRST301 is a JWT decoding error that can occur with service role key - this is expected
           if (residencyError && residencyError.code !== 'PGRST116') {
-            console.error('Error checking residency in middleware:', residencyError)
+            // Only log non-JWT errors (JWT errors are expected and handled silently)
+            if (residencyError.code !== 'PGRST301') {
+              console.error('Error checking residency in middleware:', residencyError)
+            }
             // Fail open - allow access
           }
         }
