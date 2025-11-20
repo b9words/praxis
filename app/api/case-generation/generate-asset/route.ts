@@ -234,20 +234,12 @@ function buildRepairPrompt(
   
   return `${originalPrompt}
 
-VALIDATION FAILED:
-The generated content did not meet HBR-quality requirements. Errors:
+VALIDATION FAILED - Errors:
 ${validationErrors.map(e => `- ${e}`).join('\n')}
 
-REPAIR INSTRUCTIONS:
-${needsExpansion ? 'CRITICAL: EXPAND the content to meet length/data thresholds. Add more detail, more data points, more sections, more depth.' : ''}
-- Fix all validation errors listed above
-- Ensure the output format exactly matches the requirements
-- Do not include any explanations or code fences
-- Output ONLY the corrected raw content
-- If content is too short, EXPAND it significantly with more detail and substance
-- If data is insufficient, ADD more rows/entries to meet minimum requirements
+REPAIR: Fix all errors above. ${needsExpansion ? 'EXPAND content to meet thresholds (more detail/data/sections).' : ''} Match output format exactly. No code fences/explanations. Output ONLY corrected raw content.
 
-Regenerate the ${fileType} asset "${assetName}" with all errors fixed and expanded to HBR-quality standards.`
+Regenerate ${fileType} "${assetName}" with errors fixed.`
 }
 
 /**

@@ -7,14 +7,14 @@
     {
       "type": "lesson",
       "domain": "second-order-decision-making",
-      "module": "unit-economics-mastery",
-      "lesson": "cac-ltv-fundamentals"
+      "module": "foundations-consequential-thinking",
+      "lesson": "first-order-vs-second-order"
     },
     {
       "type": "lesson",
       "domain": "second-order-decision-making",
-      "module": "unit-economics-mastery",
-      "lesson": "unit-economics-optimization"
+      "module": "temporal-dimension-time-variable",
+      "lesson": "compounding-small-decisions"
     },
     {
       "type": "case",

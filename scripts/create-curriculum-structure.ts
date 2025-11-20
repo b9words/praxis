@@ -226,8 +226,10 @@ flowchart TD
   // Create index files for each domain
   console.log('\n📋 Creating domain index files...')
   
-  for (const domain of completeCurriculumData) {
-    const indexPath = join(baseDir, `content/curriculum/${domain.id}/README.md`)
+  for (const [domainIndex, domain] of completeCurriculumData.entries()) {
+    const domainNumber = String(domainIndex + 1).padStart(2, '0')
+    const numberedDomainPath = `${domainNumber}-${domain.id}`
+    const indexPath = join(baseDir, `content/curriculum/${numberedDomainPath}/README.md`)
     
     const indexContent = `# ${domain.title}
 
@@ -235,14 +237,22 @@ ${domain.philosophy}
 
 ## Modules Overview
 
-${domain.modules.map(module => `
+${domain.modules.map(module => {
+      const moduleNumber = String(module.number).padStart(2, '0')
+      const numberedModulePath = `${moduleNumber}-${module.id}`
+      return `
 ### Module ${module.number}: ${module.title}
 
 ${module.description}
 
 **Lessons:**
-${module.lessons.map(lesson => `- [${module.number}.${lesson.number}: ${lesson.title}](./${module.id}/${lesson.id}.md)`).join('\n')}
-`).join('\n')}
+${module.lessons.map(lesson => {
+        const lessonNumber = String(lesson.number).padStart(2, '0')
+        const numberedLessonFile = `${lessonNumber}-${lesson.id}.md`
+        return `- [${module.number}.${lesson.number}: ${lesson.title}](./${numberedModulePath}/${numberedLessonFile})`
+      }).join('\n')}
+`
+    }).join('\n')}
 
 ---
 
@@ -255,7 +265,7 @@ ${module.lessons.map(lesson => `- [${module.number}.${lesson.number}: ${lesson.t
 
     try {
       await writeFile(indexPath, indexContent, 'utf-8')
-      console.log(`   ✅ Created domain index: content/curriculum/${domain.id}/README.md`)
+      console.log(`   ✅ Created domain index: content/curriculum/${numberedDomainPath}/README.md`)
     } catch (error) {
       console.error(`   ❌ Error creating domain index for ${domain.id}:`, error)
     }
@@ -269,15 +279,19 @@ A comprehensive curriculum for developing world-class CEOs and senior executives
 
 ## Curriculum Overview
 
-${completeCurriculumData.map(domain => `
+${completeCurriculumData.map((domain, domainIndex) => {
+    const domainNumber = String(domainIndex + 1).padStart(2, '0')
+    const numberedDomainPath = `${domainNumber}-${domain.id}`
+    return `
 ### ${domain.title}
 
 ${domain.philosophy}
 
 **Modules:** ${domain.modules.length} | **Lessons:** ${domain.modules.reduce((sum, m) => sum + m.lessons.length, 0)}
 
-[📖 View Domain →](./${domain.id}/README.md)
-`).join('\n')}
+[📖 View Domain →](./${numberedDomainPath}/README.md)
+`
+  }).join('\n')}
 
 ## Curriculum Statistics
 
@@ -290,22 +304,20 @@ ${domain.philosophy}
 
 \`\`\`
 content/curriculum/
-├── capital-allocation/
-│   ├── README.md
-│   ├── ceo-as-investor/
-│   │   ├── five-choices.md
-│   │   ├── per-share-value.md
-│   │   └── opportunity-cost.md
-│   └── [other modules...]
-├── competitive-moat-architecture/
-├── global-systems-thinking/
-├── organizational-design-talent-density/
-├── high-stakes-dealmaking-integration/
-├── investor-market-narrative-control/
-├── geopolitical-regulatory-navigation/
-├── crisis-leadership-public-composure/
-├── second-order-decision-making/
-└── technological-market-foresight/
+${completeCurriculumData.map((domain, domainIndex) => {
+    const domainNumber = String(domainIndex + 1).padStart(2, '0')
+    const numberedDomain = `${domainNumber}-${domain.id}`
+    const firstModule = domain.modules[0]
+    if (!firstModule) return `├── ${numberedDomain}/`
+    const moduleNumber = String(firstModule.number).padStart(2, '0')
+    const numberedModule = `${moduleNumber}-${firstModule.id}`
+    const firstLesson = firstModule.lessons[0]
+    if (!firstLesson) return `├── ${numberedDomain}/\n│   └── ${numberedModule}/`
+    const lessonNumber = String(firstLesson.number).padStart(2, '0')
+    const numberedLesson = `${lessonNumber}-${firstLesson.id}.md`
+    return `├── ${numberedDomain}/\n│   ├── README.md\n│   ├── ${numberedModule}/\n│   │   ├── ${numberedLesson}\n│   │   └── [other lessons...]\n│   └── [other modules...]`
+  }).join('\n')}
+└── [other domains...]
 \`\`\`
 
 ---

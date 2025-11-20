@@ -347,20 +347,12 @@ function buildRepairPrompt(
   
   return `${originalPrompt}
 
-VALIDATION FAILED:
-The generated content did not meet HBR-quality requirements. Errors:
+VALIDATION FAILED - Errors:
 ${validationErrors.map(e => `- ${e}`).join('\n')}
 
-REPAIR INSTRUCTIONS:
-${needsExpansion ? 'CRITICAL: EXPAND the content to meet length/data thresholds. Add more detail, more data points, more sections, more depth.' : ''}
-- Fix all validation errors listed above
-- Ensure the output format exactly matches the requirements
-- Do not include any explanations or code fences
-- Output ONLY the corrected raw content
-- If content is too short, EXPAND it significantly with more detail and substance
-- If data is insufficient, ADD more rows/entries to meet minimum requirements
+REPAIR: Fix all errors above. ${needsExpansion ? 'EXPAND content to meet thresholds (more detail/data/sections).' : ''} Match output format exactly. No code fences/explanations. Output ONLY corrected raw content.
 
-Regenerate the ${fileType} asset "${assetName}" with all errors fixed and expanded to HBR-quality standards.`
+Regenerate ${fileType} "${assetName}" with errors fixed.`
 }
 
 /**
@@ -812,31 +804,27 @@ export async function POST(request: NextRequest) {
       console.info(`[generate-case] Attempting to repair/expand case JSON...`)
       
       try {
-        const repairPrompt = `You generated a case study JSON, but it failed validation. Fix and EXPAND it to meet HBR-quality standards.
+        const repairPrompt = `Case JSON failed validation. Fix errors and expand to meet requirements.
 
-VALIDATION ERRORS:
+ERRORS:
 ${caseValidationErrors.map(e => `- ${e}`).join('\n')}
 
-CURRENT CASE JSON:
+CURRENT JSON:
 ${JSON.stringify(caseData, null, 2)}
 
-REPAIR INSTRUCTIONS:
-- EXPAND the description to 800-1200+ words with clear sections: executive summary, context, dilemma, alternatives, constraints, risks
-- EXPAND to 6-8 detailed stages (currently ${caseData.stages?.length || 0})
-- EXPAND rubric to 8-10 criteria with 4 performance levels each (Unsatisfactory, Developing, Proficient, Exemplary)
-- ENSURE exactly 3 datasets are included (currently ${caseData.datasets?.length || 0}) - if more than 3, trim to top 3
-- ENSURE exactly 3 caseFiles are included (currently ${caseData.caseFiles?.length || 0}) - if more than 3, prioritize and trim to top 3
-- Priority for caseFiles: PRESENTATION_DECK > REPORT/MEMO > FINANCIAL_DATA/MARKET_DATASET
-- Each stage description must be 150-250 words
-- Each option description must be 100-150 words
+FIX:
+- Description: 800-1200 words (exec summary, context, dilemma, alternatives, constraints, risks)
+- Stages: 6-8 (currently ${caseData.stages?.length || 0}). Each description: 150-250 words. Each option: 100-150 words.
+- Rubric: 8-10 criteria, 4 levels each (Unsatisfactory, Developing, Proficient, Exemplary)
+- Datasets: EXACTLY 3 (currently ${caseData.datasets?.length || 0})
+- caseFiles: EXACTLY 3 (currently ${caseData.caseFiles?.length || 0}). Priority: PRESENTATION_DECK > REPORT/MEMO > FINANCIAL_DATA/MARKET_DATASET
 - NO placeholders, NO empty sections
-- Output ONLY valid JSON, no markdown, no code fences
 
-Return the complete, expanded, HBR-quality case JSON with exactly 3 caseFiles and exactly 3 datasets.`
+OUTPUT: ONLY valid JSON, no markdown/code fences.`
         
         const repairResult = await generateWithAI(
           repairPrompt,
-          'You are an expert business educator. Fix and expand the case study to HBR-quality standards.',
+          'You are an expert business educator. Fix validation errors and expand content to meet requirements.',
           {
             trackUsage: true,
           }

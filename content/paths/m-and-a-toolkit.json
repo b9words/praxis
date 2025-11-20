@@ -7,20 +7,20 @@
     {
       "type": "lesson",
       "domain": "high-stakes-dealmaking-integration",
-      "module": "target-identification-thesis",
-      "lesson": "strategic-rationale"
+      "module": "strategic-rationale",
+      "lesson": "dealmaking-tool-strategy"
     },
     {
       "type": "lesson",
       "domain": "high-stakes-dealmaking-integration",
       "module": "valuation-price-value",
-      "lesson": "valuation-methods"
+      "lesson": "intrinsic-vs-strategic-value"
     },
     {
       "type": "lesson",
       "domain": "high-stakes-dealmaking-integration",
       "module": "negotiation-playbook",
-      "lesson": "negotiation-fundamentals"
+      "lesson": "leading-deal-team"
     },
     {
       "type": "case",

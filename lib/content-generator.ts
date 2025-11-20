@@ -111,77 +111,28 @@ export class ContentGenerator {
 
   private buildPrompt(lesson: LessonStructure, options: GenerationOptions): string {
     const basePrompt = `
-You are an expert business educator creating comprehensive curriculum content for executive education. 
+You are an expert business educator creating curriculum content for executive education.
 
-Generate a detailed lesson on "${lesson.lessonName}" for Module ${lesson.moduleNumber}: "${lesson.moduleName}".
+Generate a lesson on "${lesson.lessonName}" (Module ${lesson.moduleNumber}: "${lesson.moduleName}").
 
-LESSON DESCRIPTION: ${lesson.description}
+DESCRIPTION: ${lesson.description}
 
-REQUIREMENTS:
-- Target length: ${options.targetWordCount} words (approximately 2-3 A4 pages)
-- Tone: ${options.tone}
-- Include real company examples and case studies
-- Include specific data, metrics, and calculations where relevant
-- Structure using clear headings and subheadings
-- Include actionable frameworks and tools
+REQUIREMENTS: ${options.targetWordCount} words, ${options.tone} tone. Include real company examples, specific data/metrics, actionable frameworks. Use clear headings.
 
-${options.includeVisualizations ? `
-VISUALIZATION GUIDELINES (evaluate if needed):
-- Consider including tables ONLY if the lesson deals with quantitative data, comparisons, metrics, or frameworks that genuinely benefit from tabular presentation
-- If tables would enhance understanding of data relationships, comparisons, or structured information, include 1-3 well-designed tables
-- Evaluate whether each table genuinely enhances understanding - if not needed, omit it
-- Add calculation examples with step-by-step breakdowns where they add value
-` : ''}
+${options.includeVisualizations ? `TABLES: Include 1-3 tables only if quantitative data/comparisons/frameworks benefit. Add calculation examples with breakdowns.` : ''}
 
-${options.includeMermaidDiagrams ? `
-MERMAID DIAGRAM GUIDELINES (evaluate if needed):
-- Consider including Mermaid diagrams ONLY if the lesson involves processes, workflows, decision trees, relationships, or systems that genuinely benefit from visual representation
-- Use flowcharts for multi-step decision processes or workflows
-- Use graphs/charts for showing relationships between concepts or entities
-- Use timelines for chronological processes
-- Wrap Mermaid code in \`\`\`mermaid blocks
-- Evaluate whether each diagram genuinely enhances understanding - if not needed, omit it
-- If the lesson is primarily conceptual or narrative without complex processes, diagrams may not be necessary
-` : ''}
+${options.includeMermaidDiagrams ? `MERMAID: Include diagrams only if processes/workflows/relationships benefit. Use flowcharts (processes), graphs (relationships), timelines (chronological). Wrap in \`\`\`mermaid blocks.` : ''}
 
-CONTENT STRUCTURE:
-1. **Executive Summary** (150-200 words)
-   - Key concept overview
-   - Why this matters for CEOs
-   - Main takeaways
+STRUCTURE:
+1. **Executive Summary** (150-200): Concept overview, why it matters for CEOs, takeaways
+2. **Core Principle** (400-600): Concept explanation, theory, industry context
+3. **The Framework** (600-800): Step-by-step methodology, decision criteria, implementation
+4. **Real-World Examples** (500-700): 2-3 company cases with numbers/outcomes, lessons learned
+5. **Common Pitfalls** (300-400): Mistakes, warning signs, how to avoid
+6. **Application Exercise** (200-300): Practical scenario, reflection questions, next steps
+7. **Key Takeaways** (100-150): 5-7 bullets with actionable insights
 
-2. **Core Principle** (400-600 words)
-   - Fundamental concept explanation
-   - Theoretical foundation
-   - Industry context
-
-3. **The Framework** (600-800 words)
-   - Step-by-step methodology
-   - Decision criteria
-   - Implementation process
-   - Include tables and calculations only if they enhance understanding
-
-4. **Real-World Examples** (500-700 words)
-   - 2-3 detailed company case studies
-   - Specific numbers and outcomes
-   - Lessons learned
-
-5. **Common Pitfalls** (300-400 words)
-   - Typical mistakes
-   - Warning signs
-   - How to avoid them
-
-6. **Application Exercise** (200-300 words)
-   - Practical scenario
-   - Questions for reflection
-   - Next steps
-
-7. **Key Takeaways** (100-150 words)
-   - 5-7 bullet points
-   - Actionable insights
-   - Remember points
-
-Use markdown formatting with proper headers, tables, lists, and emphasis. Make the content engaging, practical, and immediately applicable for senior executives.
+Use markdown with headers, tables, lists, emphasis. Engaging, practical, immediately applicable.
 `
 
     return basePrompt.trim()

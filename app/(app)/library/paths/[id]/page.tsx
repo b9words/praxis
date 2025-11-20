@@ -8,6 +8,7 @@ import { getAllLessonsFlat } from '@/lib/curriculum-data'
 import { getLearningPathById } from '@/lib/learning-paths'
 import { getAllUserProgress } from '@/lib/progress-tracking'
 import { getCompletedSimulationByUserAndCase } from '@/lib/db/simulations'
+import { loadLessonByPathAsync } from '@/lib/content-loader'
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Clock, Target } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
@@ -83,15 +84,45 @@ export default async function LearningPathDetailPage({ params }: LearningPathDet
                    p.lesson_id === item.lesson
             )
             
+            // Try to find lesson in curriculum-data
             const lesson = allLessons.find(
               l => l.domain === item.domain &&
                    l.moduleId === item.module &&
                    l.lessonId === item.lesson
             )
 
+            // Get title from curriculum-data first
+            let lessonTitle = lesson?.lessonTitle || lesson?.title
+            
+            // ALWAYS try filesystem to ensure we get the most up-to-date title
+            // This is the source of truth for lesson content
+            if (item.domain && item.module && item.lesson) {
+              try {
+                const fsLesson = await loadLessonByPathAsync(item.domain, item.module, item.lesson)
+                if (fsLesson) {
+                  // Prefer filesystem title as it's the source of truth
+                  if (fsLesson.title) {
+                    lessonTitle = fsLesson.title
+                  } else if (!lessonTitle) {
+                    // If filesystem lesson exists but no title, format lessonId as fallback
+                    lessonTitle = item.lesson.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                  }
+                }
+              } catch (error) {
+                // Log error for debugging but don't fail - use curriculum-data title if available
+                console.error(`Could not load lesson ${item.domain}/${item.module}/${item.lesson} from filesystem:`, error)
+              }
+            }
+
+            // Final fallback: format lessonId if we still don't have a title
+            // This should rarely happen if curriculum-data and filesystem are in sync
+            if (!lessonTitle && item.lesson) {
+              lessonTitle = item.lesson.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+            }
+
             return {
               ...item,
-              title: lesson?.lessonTitle || 'Unknown Lesson',
+              title: lessonTitle || 'Unknown Lesson',
               url: `/library/curriculum/${item.domain}/${item.module}/${item.lesson}`,
               completed: progress?.status === 'completed' || false,
               progress: progress?.progress_percentage || 0,

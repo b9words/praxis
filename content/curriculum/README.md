@@ -11,7 +11,7 @@ Capital allocation is the process of deciding how to deploy the firm's financial
 
 **Modules:** 12 | **Lessons:** 30
 
-[📖 View Domain →](./capital-allocation/README.md)
+[📖 View Domain →](./01-capital-allocation/README.md)
 
 
 ### Competitive Moat Architecture
@@ -20,7 +20,7 @@ A competitive moat is a structural advantage that protects a company from compet
 
 **Modules:** 9 | **Lessons:** 24
 
-[📖 View Domain →](./competitive-moat-architecture/README.md)
+[📖 View Domain →](./02-competitive-moat-architecture/README.md)
 
 
 ### Global Systems Thinking
@@ -29,7 +29,7 @@ A multinational corporation is not a machine; it is a complex adaptive system. I
 
 **Modules:** 7 | **Lessons:** 19
 
-[📖 View Domain →](./global-systems-thinking/README.md)
+[📖 View Domain →](./03-global-systems-thinking/README.md)
 
 
 ### Organizational Design & Talent Density
@@ -38,7 +38,7 @@ The goal of organizational design is not to create a tidy org chart, but to buil
 
 **Modules:** 8 | **Lessons:** 21
 
-[📖 View Domain →](./organizational-design-talent-density/README.md)
+[📖 View Domain →](./04-organizational-design-talent-density/README.md)
 
 
 ### High-Stakes Dealmaking & Integration
@@ -47,7 +47,7 @@ A major transaction is not a financial event; it is the most potent and dangerou
 
 **Modules:** 9 | **Lessons:** 27
 
-[📖 View Domain →](./high-stakes-dealmaking-integration/README.md)
+[📖 View Domain →](./05-high-stakes-dealmaking-integration/README.md)
 
 
 ### Investor & Market Narrative Control
@@ -56,7 +56,7 @@ The CEO of a public company has two jobs: 1) Run the business to create long-ter
 
 **Modules:** 8 | **Lessons:** 21
 
-[📖 View Domain →](./investor-market-narrative-control/README.md)
+[📖 View Domain →](./06-investor-market-narrative-control/README.md)
 
 
 ### Geopolitical & Regulatory Navigation
@@ -65,7 +65,7 @@ A multinational corporation is a non-state actor operating within a system desig
 
 **Modules:** 7 | **Lessons:** 19
 
-[📖 View Domain →](./geopolitical-regulatory-navigation/README.md)
+[📖 View Domain →](./07-geopolitical-regulatory-navigation/README.md)
 
 
 ### Crisis Leadership & Public Composure
@@ -74,7 +74,7 @@ A crisis is a high-consequence, high-uncertainty event that threatens the compan
 
 **Modules:** 7 | **Lessons:** 20
 
-[📖 View Domain →](./crisis-leadership-public-composure/README.md)
+[📖 View Domain →](./08-crisis-leadership-public-composure/README.md)
 
 
 ### Second-Order Decision Making
@@ -83,7 +83,7 @@ First-order thinking is simplistic and superficial; it seeks a single answer to 
 
 **Modules:** 7 | **Lessons:** 19
 
-[📖 View Domain →](./second-order-decision-making/README.md)
+[📖 View Domain →](./09-second-order-decision-making/README.md)
 
 
 ### Technological & Market Foresight
@@ -92,7 +92,7 @@ The future is not a destiny to be predicted, but a probability distribution to b
 
 **Modules:** 7 | **Lessons:** 19
 
-[📖 View Domain →](./technological-market-foresight/README.md)
+[📖 View Domain →](./10-technological-market-foresight/README.md)
 
 
 ## Curriculum Statistics
@@ -106,24 +106,69 @@ The future is not a destiny to be predicted, but a probability distribution to b
 
 ```
 content/curriculum/
-├── capital-allocation/
+├── 01-capital-allocation/
 │   ├── README.md
-│   ├── ceo-as-investor/
-│   │   ├── five-choices.md
-│   │   ├── per-share-value.md
-│   │   └── opportunity-cost.md
+│   ├── 01-ceo-as-investor/
+│   │   ├── 01-five-choices.md
+│   │   └── [other lessons...]
 │   └── [other modules...]
-├── competitive-moat-architecture/
-├── global-systems-thinking/
-├── organizational-design-talent-density/
-├── high-stakes-dealmaking-integration/
-├── investor-market-narrative-control/
-├── geopolitical-regulatory-navigation/
-├── crisis-leadership-public-composure/
-├── second-order-decision-making/
-└── technological-market-foresight/
+├── 02-competitive-moat-architecture/
+│   ├── README.md
+│   ├── 01-foundational-theory/
+│   │   ├── 01-defining-moat.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 03-global-systems-thinking/
+│   ├── README.md
+│   ├── 01-foundations-systems-thinking/
+│   │   ├── 01-stocks-flows-feedback.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 04-organizational-design-talent-density/
+│   ├── README.md
+│   ├── 01-foundational-theories-structure/
+│   │   ├── 01-speed-vs-control.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 05-high-stakes-dealmaking-integration/
+│   ├── README.md
+│   ├── 01-strategic-rationale/
+│   │   ├── 01-dealmaking-tool-strategy.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 06-investor-market-narrative-control/
+│   ├── README.md
+│   ├── 01-public-market-storytelling/
+│   │   ├── 01-efficient-market-vs-mr-market.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 07-geopolitical-regulatory-navigation/
+│   ├── README.md
+│   ├── 01-global-chessboard/
+│   │   ├── 01-westphalian-system-corporate-sovereignty.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 08-crisis-leadership-public-composure/
+│   ├── README.md
+│   ├── 01-before-crisis-resilient-organization/
+│   │   ├── 01-inoculation-mindset.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 09-second-order-decision-making/
+│   ├── README.md
+│   ├── 01-foundations-consequential-thinking/
+│   │   ├── 01-first-order-vs-second-order.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+├── 10-technological-market-foresight/
+│   ├── README.md
+│   ├── 01-signal-detection-information-flow/
+│   │   ├── 01-building-information-diet.md
+│   │   └── [other lessons...]
+│   └── [other modules...]
+└── [other domains...]
 ```
 
 ---
 
-*Generated on 2025-10-29T08:06:53.885Z*
+*Generated on 2025-11-19T10:06:34.758Z*

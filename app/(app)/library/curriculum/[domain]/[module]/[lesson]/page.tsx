@@ -74,38 +74,9 @@ function getPreviousLessonInSequence(domainId: string, moduleId: string, lessonI
 export default async function LessonPage({ params }: LessonPageProps) {
   const { domain: domainId, module: moduleId, lesson: lessonId } = await params
   
-  // Cache article lookup (1 hour revalidate)
-  // Try multiple storage path patterns
-  const getCachedArticle = cache(
-    async () => {
-      try {
-        // Try exact pattern first: domain/module/lesson.md
-        let article = await findArticleByStoragePath(`${domainId}/${moduleId}/${lessonId}.md`)
-        
-        // If not found, try with content/curriculum prefix
-        if (!article) {
-          article = await findArticleByStoragePath(`content/curriculum/${domainId}/${moduleId}/${lessonId}.md`)
-        }
-        
-        // If still not found, try just the lesson filename
-        if (!article) {
-          article = await findArticleByStoragePath(`${lessonId}.md`)
-        }
-        
-        return article
-      } catch (error: any) {
-        console.error('Error fetching article from database:', error)
-        return null
-      }
-    },
-    ['lesson', 'article', domainId, moduleId, lessonId],
-    {
-      tags: [CacheTags.ARTICLES, `lesson-${domainId}-${moduleId}-${lessonId}`],
-      revalidate: 3600, // 1 hour
-    }
-  )
-
-  const articleFromDb = await getCachedArticle()
+  // FIRST: Try local file system (content/curriculum/{domain}/{module}/{lesson}.md)
+  // This is now the primary source for lesson content
+  const fsLesson = await loadLessonByPathAsync(domainId, moduleId, lessonId)
 
   let lessonContent: string | null = null
   let lessonDuration = 12
@@ -113,34 +84,66 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let lessonTitle = ''
   let lessonDescription = ''
 
-  // If found in database, fetch content from storage
-  if (articleFromDb && articleFromDb.storagePath) {
-    lessonTitle = articleFromDb.title
-    lessonDescription = articleFromDb.description || ''
-    
-    const metadata = (articleFromDb.metadata || {}) as Record<string, any>
-    lessonDuration = metadata.duration || 12
-    lessonDifficulty = metadata.difficulty || 'intermediate'
-    
-    // Fetch full markdown content from Supabase Storage
-    const { success, content, error } = await fetchFromStorageServer(articleFromDb.storagePath)
-    
-    if (success && content) {
-      lessonContent = content
-    } else {
-      console.error('Failed to fetch from storage:', error)
-      // No fallback - content must exist in storage
-    }
+  // If found in local filesystem, use it
+  if (fsLesson && fsLesson.content) {
+    lessonContent = fsLesson.content
+    lessonDuration = fsLesson.duration ?? 12
+    lessonDifficulty = fsLesson.difficulty ?? 'intermediate'
+    lessonTitle = fsLesson.title
+    lessonDescription = fsLesson.description
   } else {
-    // Try local file system as last resort (for development/legacy content)
-    const lessonContentData = await loadLessonByPathAsync(domainId, moduleId, lessonId)
-    
-    if (lessonContentData && lessonContentData.content) {
-      lessonContent = lessonContentData.content
-      lessonDuration = lessonContentData.duration || 12
-      lessonDifficulty = lessonContentData.difficulty || 'intermediate'
-      lessonTitle = lessonContentData.title
-      lessonDescription = lessonContentData.description
+    // FALLBACK: Only if local file doesn't exist, try database/Supabase storage
+    // Cache article lookup (1 hour revalidate)
+    // Try multiple storage path patterns
+    const getCachedArticle = cache(
+      async () => {
+        try {
+          // Try exact pattern first: domain/module/lesson.md
+          let article = await findArticleByStoragePath(`${domainId}/${moduleId}/${lessonId}.md`)
+          
+          // If not found, try with content/curriculum prefix
+          if (!article) {
+            article = await findArticleByStoragePath(`content/curriculum/${domainId}/${moduleId}/${lessonId}.md`)
+          }
+          
+          // If still not found, try just the lesson filename
+          if (!article) {
+            article = await findArticleByStoragePath(`${lessonId}.md`)
+          }
+          
+          return article
+        } catch (error: any) {
+          console.error('Error fetching article from database:', error)
+          return null
+        }
+      },
+      ['lesson', 'article', domainId, moduleId, lessonId],
+      {
+        tags: [CacheTags.ARTICLES, `lesson-${domainId}-${moduleId}-${lessonId}`],
+        revalidate: 3600, // 1 hour
+      }
+    )
+
+    const articleFromDb = await getCachedArticle()
+
+    // If found in database, fetch content from storage
+    if (articleFromDb && articleFromDb.storagePath) {
+      lessonTitle = articleFromDb.title
+      lessonDescription = articleFromDb.description || ''
+      
+      const metadata = (articleFromDb.metadata || {}) as Record<string, any>
+      lessonDuration = metadata.duration || 12
+      lessonDifficulty = metadata.difficulty || 'intermediate'
+      
+      // Fetch full markdown content from Supabase Storage
+      const { success, content, error } = await fetchFromStorageServer(articleFromDb.storagePath)
+      
+      if (success && content) {
+        lessonContent = content
+      } else {
+        console.error('Failed to fetch from storage:', error)
+        // No fallback - content must exist in storage
+      }
     }
   }
 
@@ -154,16 +157,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const module = getModuleById(domainId, moduleId)
   const lesson = getLessonById(domainId, moduleId, lessonId)
   
-  // If not in hardcoded data and no article in DB, return 404
-  if (!domain || !module || !lesson) {
-    if (!articleFromDb) {
-      notFound()
-    }
-    // If article exists but not in hardcoded data, use metadata for display
-    if (!lessonTitle && articleFromDb) {
-      lessonTitle = articleFromDb.title
-    }
-  }
+  // Note: We can render lessons even if they're not in curriculum-data hardcoded structure
+  // The FS frontmatter or DB metadata will provide the necessary display information
 
   const nextLesson = getNextLessonInSequence(domainId, moduleId, lessonId)
   const previousLesson = getPreviousLessonInSequence(domainId, moduleId, lessonId)
@@ -395,11 +390,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
     }
   }
 
-  // Use article title or fall back to lesson title
+  // Prefer FS-derived title, then curriculum-data, then fallback
   const displayTitle = lessonTitle || (lesson ? lesson.title : 'Untitled Lesson')
-  const displayModuleNumber = lesson ? lesson.number : 1
-  const displayModuleTitle = module ? module.title : 'Module'
-  const displayDomainTitle = domain ? domain.title : 'Domain'
+  const displayModuleNumber = lesson ? lesson.number : (fsLesson?.lesson_number || 1)
+  const displayModuleTitle = module ? module.title : (fsLesson?.module || 'Module')
+  const displayDomainTitle = domain ? domain.title : (fsLesson?.domain || 'Domain')
 
   const stats = getCurriculumStats()
 

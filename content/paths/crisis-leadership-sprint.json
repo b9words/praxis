@@ -8,13 +8,13 @@
       "type": "lesson",
       "domain": "crisis-leadership-public-composure",
       "module": "golden-hour-first-60-minutes",
-      "lesson": "first-response-framework"
+      "lesson": "ceo-first-three-calls"
     },
     {
       "type": "lesson",
       "domain": "crisis-leadership-public-composure",
       "module": "first-communication-narrative-control",
-      "lesson": "narrative-framing"
+      "lesson": "holding-statement"
     },
     {
       "type": "case",
@@ -31,14 +31,14 @@
     {
       "type": "lesson",
       "domain": "crisis-leadership-public-composure",
-      "module": "public-composure-under-pressure",
-      "lesson": "maintaining-calm"
+      "module": "ceo-public-composure-psychology",
+      "lesson": "leader-calming-agent"
     },
     {
       "type": "lesson",
       "domain": "crisis-leadership-public-composure",
-      "module": "recovery-and-learning",
-      "lesson": "post-crisis-analysis"
+      "module": "long-road-recovery",
+      "lesson": "root-cause-analysis-five-whys"
     }
   ]
 }

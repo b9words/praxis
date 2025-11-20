@@ -25,20 +25,20 @@
     {
       "type": "lesson",
       "domain": "competitive-moat-architecture",
-      "module": "moat-fundamentals",
-      "lesson": "sources-of-moat"
+      "module": "foundational-theory",
+      "lesson": "source-all-moats"
     },
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "talent-density-principles",
-      "lesson": "defining-talent-density"
+      "module": "principle-talent-density",
+      "lesson": "netflix-philosophy"
     },
     {
       "type": "lesson",
       "domain": "second-order-decision-making",
-      "module": "principles-of-second-order",
-      "lesson": "second-order-maps"
+      "module": "foundations-consequential-thinking",
+      "lesson": "first-order-vs-second-order"
     },
     {
       "type": "case",
@@ -48,7 +48,7 @@
       "type": "lesson",
       "domain": "crisis-leadership-public-composure",
       "module": "golden-hour-first-60-minutes",
-      "lesson": "first-response-framework"
+      "lesson": "ceo-first-three-calls"
     }
   ]
 }

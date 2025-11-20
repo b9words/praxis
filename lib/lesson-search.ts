@@ -1,4 +1,4 @@
-import { loadLessonByPath } from './content-loader'
+import { loadLessonByPathAsync } from './content-loader'
 import { completeCurriculumData } from './curriculum-data'
 import { isYear1Lesson } from './year1-allowlist'
 
@@ -57,7 +57,7 @@ export async function searchLessons(query: string): Promise<LessonSearchResult[]
         } else {
           // Only load content if title/description didn't match
           // This saves I/O for obvious matches
-          const lessonContent = loadLessonByPath(domain.id, module.id, lesson.id)
+          const lessonContent = await loadLessonByPathAsync(domain.id, module.id, lesson.id)
           
           if (lessonContent && lessonContent.content) {
             const contentLower = lessonContent.content.toLowerCase()
@@ -68,14 +68,17 @@ export async function searchLessons(query: string): Promise<LessonSearchResult[]
               const end = Math.min(lessonContent.content.length, contentIndex + searchTerm.length + 200)
               const snippet = lessonContent.content.substring(start, end)
               
+              // Use title from filesystem if available (more up-to-date)
+              const title = lessonContent.title || lesson.title
+              
               results.push({
                 domainId: domain.id,
                 domainTitle: domain.title,
                 moduleId: module.id,
                 moduleTitle: module.title,
                 lessonId: lesson.id,
-                lessonTitle: lesson.title,
-                lessonDescription: lesson.description,
+                lessonTitle: title,
+                lessonDescription: lessonContent.description || lesson.description,
                 matchInTitle: false,
                 matchInDescription: false,
                 matchInContent: true,

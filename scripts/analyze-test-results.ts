@@ -96,67 +96,21 @@ class GeminiTestAnalyzer {
    * Build comprehensive analysis prompt for Gemini
    */
   private buildAnalysisPrompt(testResults: TestResults): string {
-    return `
-You are an expert QA engineer and product analyst. Analyze the following Playwright E2E test results for a business education platform called "Execemy Platform" and provide a comprehensive analysis.
+    return `You are an expert QA engineer. Analyze Playwright E2E test results for "Execemy Platform" (business education: auth, curriculum, case simulations, debriefs, community, profiles, admin).
 
-## Application Context
-Execemy Platform is a business education platform with these key features:
-- User authentication and onboarding
-- Curriculum library with articles and lessons
-- Case study simulations with AI interactions
-- Debrief system with performance analysis
-- Community forum for discussions
-- User profiles with competency radar charts
-- Admin panel for content management
-
-## Test Results
+TEST RESULTS:
 ${JSON.stringify(testResults, null, 2)}
 
-## Analysis Requirements
-Please provide a JSON response with the following structure:
-
+OUTPUT (JSON):
 {
-  "overallAssessment": {
-    "testCoverage": "percentage and description",
-    "criticalIssues": ["list of blocking issues"],
-    "performanceIssues": ["list of performance problems"],
-    "userExperienceIssues": ["list of UX problems"]
-  },
-  "gapAnalysis": {
-    "missingTestScenarios": ["scenarios not covered"],
-    "incompleteUserFlows": ["flows that need completion"],
-    "edgeCasesNotCovered": ["edge cases missing"],
-    "accessibilityGaps": ["a11y issues found"]
-  },
-  "technicalIssues": {
-    "apiErrors": ["API-related problems"],
-    "databaseIssues": ["DB-related problems"],
-    "componentErrors": ["React component issues"],
-    "integrationIssues": ["integration problems"]
-  },
-  "recommendations": {
-    "immediateFixes": ["high priority fixes needed"],
-    "testEnhancements": ["ways to improve tests"],
-    "featureCompletions": ["features to complete"],
-    "performanceOptimizations": ["performance improvements"]
-  },
-  "productionReadiness": {
-    "readyForProduction": "boolean",
-    "blockingIssues": ["issues preventing production"],
-    "riskAssessment": "low/medium/high",
-    "confidenceLevel": "percentage"
-  }
+  "overallAssessment": {"testCoverage": "percentage and description", "criticalIssues": [], "performanceIssues": [], "userExperienceIssues": []},
+  "gapAnalysis": {"missingTestScenarios": [], "incompleteUserFlows": [], "edgeCasesNotCovered": [], "accessibilityGaps": []},
+  "technicalIssues": {"apiErrors": [], "databaseIssues": [], "componentErrors": [], "integrationIssues": []},
+  "recommendations": {"immediateFixes": [], "testEnhancements": [], "featureCompletions": [], "performanceOptimizations": []},
+  "productionReadiness": {"readyForProduction": boolean, "blockingIssues": [], "riskAssessment": "low/medium/high", "confidenceLevel": "percentage"}
 }
 
-Focus on:
-1. Identifying gaps between current implementation and production requirements
-2. Finding missing test scenarios that real users would encounter
-3. Detecting performance issues that could impact user experience
-4. Identifying accessibility and usability problems
-5. Recommending specific fixes and improvements
-
-Be thorough and specific in your analysis.
-`
+FOCUS: Gaps vs production requirements, missing test scenarios, performance issues, accessibility/usability problems, specific fixes. Be thorough and specific.`
   }
 
   /**

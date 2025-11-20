@@ -7,20 +7,20 @@
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "talent-density-principles",
-      "lesson": "defining-talent-density"
+      "module": "principle-talent-density",
+      "lesson": "netflix-philosophy"
     },
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "talent-density-principles",
-      "lesson": "the-multiplier-effect"
+      "module": "principle-talent-density",
+      "lesson": "mathematics-top-performers"
     },
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "hiring-excellence",
-      "lesson": "hiring-for-talent-density"
+      "module": "ceo-toolkit-talent-density",
+      "lesson": "hiring-process-core-business"
     },
     {
       "type": "case",
@@ -29,8 +29,8 @@
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "organizational-structure",
-      "lesson": "structure-follows-strategy"
+      "module": "foundational-theories-structure",
+      "lesson": "strategy-structure-relationship"
     },
     {
       "type": "case",
@@ -39,14 +39,14 @@
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "decision-making-velocity",
-      "lesson": "decentralizing-decisions"
+      "module": "information-flow-decision-making",
+      "lesson": "high-velocity-decisions"
     },
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "compensation-and-retention",
-      "lesson": "paying-for-performance"
+      "module": "incentives-alignment",
+      "lesson": "designing-bonus-structures"
     },
     {
       "type": "case",
@@ -55,8 +55,8 @@
     {
       "type": "lesson",
       "domain": "organizational-design-talent-density",
-      "module": "culture-as-system",
-      "lesson": "building-performance-culture"
+      "module": "evolving-organization",
+      "lesson": "managing-growth-transitions"
     }
   ]
 }

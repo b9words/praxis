@@ -6,33 +6,33 @@
   "items": [
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "ceo-as-investor-foundational-mindset",
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
       "lesson": "five-choices"
     },
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "ceo-as-investor-foundational-mindset",
-      "lesson": "primacy-per-share-value"
+      "domain": "capital-allocation",
+      "module": "ceo-as-investor",
+      "lesson": "per-share-value"
     },
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "intrinsic-value-calculation",
-      "lesson": "owners-earnings-framework"
+      "domain": "capital-allocation",
+      "module": "calculating-intrinsic-value",
+      "lesson": "owners-earnings"
     },
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "reinvestment-decision-framework",
-      "lesson": "organic-growth-capital-allocation"
+      "domain": "capital-allocation",
+      "module": "organic-reinvestment",
+      "lesson": "roic-framework"
     },
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "acquisition-strategy",
-      "lesson": "m-a-strategic-rationale"
+      "domain": "capital-allocation",
+      "module": "acquisitions",
+      "lesson": "build-vs-buy"
     },
     {
       "type": "case",

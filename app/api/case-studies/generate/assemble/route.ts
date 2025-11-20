@@ -116,71 +116,31 @@ ${data.truncated ? '\n⚠️  NOTE: Content was truncated due to length limits.'
 ---`
   }).join('\n')
   
-  return `You are a master storyteller and instructional designer specializing in executive education. Using the provided Case File Manifest and the raw content of each sourced file, your task is to write the complete, final ${manifest.caseId}.json file for the Execemy simulation platform.
+  return `You are a master storyteller and instructional designer. Write the complete ${manifest.caseId}.json file using the Case File Manifest and evidence files.
 
-CASE TOPIC: ${manifest.topic}
-CASE ID: ${manifest.caseId}
+TOPIC: ${manifest.topic} | CASE ID: ${manifest.caseId}
 
 EVIDENCE FILES:
 ${fileSections}
 
-YOUR TASK:
-1. Write a compelling, realistic \`briefing\` (500-800 words) that sets the stage:
-   - Draw facts, figures, and context directly from the provided evidence files
-   - Create a sense of urgency and stakes
-   - Introduce key stakeholders and their perspectives
-   - Present the core challenge that requires executive decision-making
-   - Make it feel like a real-world business scenario
+TASKS:
+1. briefing (500-800 words): Draw facts/figures from evidence. Create urgency/stakes. Introduce stakeholders/perspectives. Present core challenge. Real-world feel.
+2. caseFiles array: Reference each by fileId/fileName. Use REFERENCE source type, paths: "content/sources/${manifest.caseId}/{fileName}". Include all manifest files. Set fileType: FINANCIAL_DATA, MEMO, REPORT, PRESENTATION_DECK, LEGAL_DOCUMENT.
+3. stages (3-4): Progressive decision points building complexity, revealing info over time. Force trade-offs from evidence. Test competencies (strategic thinking, financial acumen, risk, stakeholder mgmt). Realistic time constraints. Distinct, building on previous.
+4. For each stage: prompt (150-300 words), 3-5 realistic options, impact data (quantitative from files), aiPersonas (2-4 stakeholders with distinct perspectives/biases), initialMessage per persona reflecting evidence-based position.
+5. rubric: 4-6 competencies, scoring guides (1-5 scale), realistic executive performance indicators, aligned with evidence/complexity.
+6. Use synthesisInstruction to weave evidence into narrative/decisions/evaluation.
 
-2. Structure the \`caseFiles\` array:
-   - Reference each file by its \`fileId\` and \`fileName\` from the manifest
-   - Use the REFERENCE source type with paths: "content/sources/${manifest.caseId}/{fileName}"
-   - Ensure all files from the manifest are included
-   - Set appropriate \`fileType\` values (FINANCIAL_DATA, MEMO, REPORT, PRESENTATION_DECK, LEGAL_DOCUMENT)
-
-3. Design 3-4 progressive \`stages\` (decision points) that:
-   - Build complexity and reveal new information over time
-   - Force the user to grapple with trade-offs revealed in the evidence
-   - Test different executive competencies (strategic thinking, financial acumen, risk assessment, stakeholder management)
-   - Include realistic time constraints and pressures
-   - Each stage should feel distinct and build on previous decisions
-
-4. For each stage:
-   - Write a clear, challenging \`prompt\` (150-300 words) that presents the decision point
-   - Define 3-5 realistic \`options\` that executives might consider
-   - Include detailed \`impact\` data for each option (quantitative when possible from the files)
-   - Add \`aiPersonas\` (2-4 stakeholders) with distinct perspectives and biases
-   - Write \`initialMessage\` for each persona that reflects their position based on the evidence
-
-5. Create a comprehensive \`rubric\`:
-   - Identify 4-6 key competencies being tested
-   - Provide detailed scoring guides (1-5 scale) for each competency
-   - Base scoring criteria on realistic executive performance indicators
-   - Ensure the rubric aligns with the evidence and decision complexity
-
-6. Use the \`synthesisInstruction\` from the manifest to guide how you weave each piece of evidence into the case narrative, decision points, and evaluation.
-
-OUTPUT FORMAT:
-Generate a valid JSON object with this exact structure:
+OUTPUT (valid JSON only):
 {
   "caseId": "${manifest.caseId}",
   "version": "1.0",
   "title": "[Descriptive Case Title]",
   "description": "[2-3 sentence overview]",
-  "competencies": ["[Competency 1]", "[Competency 2]", ...],
+  "competencies": ["[Competency 1]", ...],
   "estimatedDuration": 120,
   "difficulty": "beginner" | "intermediate" | "advanced",
-  "caseFiles": [
-    {
-      "fileId": "[fileId from manifest]",
-      "fileName": "[fileName from manifest]",
-      "fileType": "[FINANCIAL_DATA | MEMO | REPORT | PRESENTATION_DECK]",
-      "source": {
-        "type": "REFERENCE",
-        "path": "content/sources/${manifest.caseId}/[fileName]"
-      }
-    }
-  ],
+  "caseFiles": [{"fileId": "[id]", "fileName": "[name]", "fileType": "[type]", "source": {"type": "REFERENCE", "path": "content/sources/${manifest.caseId}/[fileName]"}}],
   "stages": [...],
   "rubric": {...},
   "status": "draft"
@@ -188,7 +148,7 @@ Generate a valid JSON object with this exact structure:
 
 ${coreValues}
 
-CRITICAL: Output ONLY valid JSON, no markdown formatting, no explanations. The JSON must be parseable.`
+OUTPUT: ONLY valid JSON, no markdown/explanations.`
 }
 
 function validateCaseJSON(data: any): { valid: boolean; errors: string[] } {

@@ -462,14 +462,22 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
       
       if (lessonPath) {
         const [domain, module, lessonId] = lessonPath.split('/')
-        storagePath = `content/curriculum/${domain}/${module}/${lessonId}.md`
         
-        // Find the lesson data for metadata
+        // Find the lesson data for metadata and numbering
         const lessonData = allLessons.find(l => 
           l.domain === domain && l.moduleId === module && l.lessonId === lessonId
         )
         
         if (lessonData) {
+          // Get domain index for numbering
+          const domainIndex = completeCurriculumData.findIndex(d => d.id === domain)
+          const domainNumber = String(domainIndex + 1).padStart(2, '0')
+          const moduleNumber = String(lessonData.moduleNumber).padStart(2, '0')
+          const lessonNumber = String(lessonData.lessonNumber).padStart(2, '0')
+          
+          // Use numbered path: content/curriculum/{domainNumber}-{domain}/{moduleNumber}-{module}/{lessonNumber}-{lesson}.md
+          storagePath = `content/curriculum/${domainNumber}-${domain}/${moduleNumber}-${module}/${lessonNumber}-${lessonId}.md`
+          
           // Merge path-based metadata with existing metadata (preserves thumbnail)
           metadata = {
             ...metadata, // Preserve thumbnailUrl, thumbnailType, keyTakeaways, etc.
@@ -480,6 +488,9 @@ export default function CurriculumGenerator({ competencies }: CurriculumGenerato
             domain_title: lessonData.domainTitle,
             module_title: lessonData.moduleTitle,
           }
+        } else {
+          // Fallback to unnumbered path if lesson data not found
+          storagePath = `content/curriculum/${domain}/${module}/${lessonId}.md`
         }
       }
 

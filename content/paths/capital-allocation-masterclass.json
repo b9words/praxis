@@ -55,8 +55,8 @@
     {
       "type": "lesson",
       "domain": "capital-allocation",
-      "module": "stock-buybacks",
-      "lesson": "when-buybacks-create-value"
+      "module": "share-buybacks",
+      "lesson": "price-value-discipline"
     },
     {
       "type": "case",

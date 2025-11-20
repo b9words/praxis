@@ -193,53 +193,36 @@ export async function generateDebrief(simulation: SimulationData): Promise<Debri
     ['Strategic Thinking', 'Financial Acumen', 'Risk Management', 'Market Awareness', 'Leadership Judgment']
 
   // Build prompt for comprehensive debrief
-  const debriefPrompt = `You are an expert executive coach providing a comprehensive debrief for a case study simulation.
+  const debriefPrompt = `You are an expert executive coach debriefing a case study simulation.
 
-CASE STUDY: ${simulation.case.title}
-
-USER'S DECISIONS AND ANALYSIS:
-${decisionsText || 'No decisions provided.'}
-
-RUBRIC CRITERIA:
-${criteria.map(c => `- ${c.name}: ${c.description}`).join('\n')}
-
-COMPETENCIES ASSESSED: ${competencyNames.join(', ')}
-
-YOUR TASK:
-Generate a comprehensive debrief following the "Quote, Critique, Coach" framework for each competency tested.
+CASE: ${simulation.case.title}
+DECISIONS: ${decisionsText || 'No decisions provided.'}
+CRITERIA: ${criteria.map(c => `- ${c.name}: ${c.description}`).join('\n')}
+COMPETENCIES: ${competencyNames.join(', ')}
 
 For EACH competency, provide:
-1. **Score** (1-5 scale): Based on how well the user's decisions and analysis demonstrate this competency
-2. **Strength**: A specific, positive observation that quotes the user's own words from their justification
-3. **Weakness**: A specific, constructive criticism that quotes the user or points to an omission
-4. **Actionable Advice**: A concrete next step that references a lesson or framework they should review
+1. Score (1-5): Based on decisions/analysis
+2. Strength: Quote user's words, specific positive observation
+3. Weakness: Quote or point to omission, constructive criticism
+4. Actionable Advice: Concrete next step, reference lesson/framework
 
-Additionally, provide:
-- **Key Insight**: A single, powerful sentence that gets to the heart of their performance (the "aha!" moment)
-- **Summary Text**: A 2-3 paragraph executive summary of their overall performance
+Also provide:
+- Key Insight: One powerful sentence (the "aha!" moment)
+- Summary Text: 2-3 paragraph executive summary
 
-OUTPUT FORMAT (JSON):
+OUTPUT (JSON):
 {
-  "scores": [
-    {
-      "competencyName": "Strategic Thinking",
-      "score": 4,
-      "justification": "Overall strong strategic analysis with minor gaps",
-      "strength": "You correctly identified the core challenge, writing: '[quote from user]'. This demonstrates strong problem-framing.",
-      "weakness": "However, your plan did not address [specific gap]. You offered no [missing element]. This is a critical oversight.",
-      "actionableAdvice": "To improve this, review the lesson: '[Lesson Title]'. It provides a framework for [specific skill]."
-    }
-  ],
-  "keyInsight": "Your quantitative analysis was flawless, but your plan failed to adequately account for the second-order cultural consequences.",
-  "summaryText": "[2-3 paragraph executive summary]"
+  "scores": [{"competencyName": "Strategic Thinking", "score": 4, "justification": "...", "strength": "You wrote: '[quote]'. This shows...", "weakness": "However, you didn't address [gap].", "actionableAdvice": "Review lesson '[Title]' for [skill]."}],
+  "keyInsight": "[One powerful sentence]",
+  "summaryText": "[2-3 paragraphs]"
 }
 
-IMPORTANT:
-- Quote actual phrases from the user's justification text
-- Be specific and constructive, not generic
-- Scores should reflect the rubric criteria
-- Ensure all tested competencies are included
-- The key insight should be memorable and actionable`
+REQUIREMENTS:
+- Quote actual user phrases
+- Be specific, not generic
+- Scores reflect rubric criteria
+- Include all tested competencies
+- Key insight: memorable and actionable`
 
   try {
     // Generate debrief using Gemini

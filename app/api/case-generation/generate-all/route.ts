@@ -99,17 +99,12 @@ function buildRepairPrompt(
 ): string {
   return `${originalPrompt}
 
-VALIDATION FAILED:
-The generated content did not meet requirements. Errors:
+VALIDATION FAILED - Errors:
 ${validationErrors.map(e => `- ${e}`).join('\n')}
 
-REPAIR INSTRUCTIONS:
-- Fix all validation errors listed above
-- Ensure the output format exactly matches the requirements
-- Do not include any explanations or code fences
-- Output ONLY the corrected raw content
+REPAIR: Fix all errors. Match output format exactly. No code fences/explanations. Output ONLY corrected raw content.
 
-Regenerate the ${fileType} asset "${assetName}" with all errors fixed.`
+Regenerate ${fileType} "${assetName}" with errors fixed.`
 }
 
 /**

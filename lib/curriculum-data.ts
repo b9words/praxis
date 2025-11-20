@@ -80,7 +80,7 @@ export const getAllLessonsFlat = () => {
   return lessons
 }
 
-// Generate file paths for content organization
+// Generate file paths for content organization with numbering
 export const generateContentPaths = () => {
   const paths: Array<{
     domain: string
@@ -90,10 +90,14 @@ export const generateContentPaths = () => {
     title: string
   }> = []
 
-  completeCurriculumData.forEach(domain => {
+  completeCurriculumData.forEach((domain, domainIndex) => {
+    const domainNumber = String(domainIndex + 1).padStart(2, '0')
     domain.modules.forEach(module => {
+      const moduleNumber = String(module.number).padStart(2, '0')
       module.lessons.forEach(lesson => {
-        const filePath = `content/curriculum/${domain.id}/${module.id}/${lesson.id}.md`
+        const lessonNumber = String(lesson.number).padStart(2, '0')
+        // Use numbered paths: {domainNumber}-{domainId}/{moduleNumber}-{moduleId}/{lessonNumber}-{lessonId}.md
+        const filePath = `content/curriculum/${domainNumber}-${domain.id}/${moduleNumber}-${module.id}/${lessonNumber}-${lesson.id}.md`
         paths.push({
           domain: domain.id,
           module: module.id,

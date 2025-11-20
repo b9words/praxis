@@ -70,35 +70,22 @@ export async function enhanceCaseStudyWithAI(caseData: any): Promise<any> {
     ? `\nQUALITY STANDARDS:\n${qualityStandards}\n`
     : '\nNote: Quality standards file not available. Focus on making the case study a genuine dilemma with messy, realistic details.\n'
   
-  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study to meet the highest quality standards.${qualityStandardsSection}
+  const prompt = `You are an expert instructional designer. Evaluate and rewrite this case study to meet quality standards.${qualityStandardsSection}
 
 CURRENT CASE STUDY (JSON):
 ${JSON.stringify(caseData, null, 2)}
 
-YOUR TASK:
-1. Evaluate the case study against the 3 criteria:
-   - Is it a Genuine Dilemma? (Central Tension)
-   - Is it Messy? (High-Fidelity Realism)
-   - Does it Demand a Specific Artifact? (Decision Forcing)
+EVALUATE against 3 criteria: 1) Genuine Dilemma (central tension), 2) Messy (realistic, incomplete info, conflicts), 3) Demands Specific Artifact (not just multiple choice).
 
-2. Rewrite the case study to meet ALL three criteria. Specifically:
-   - Ensure the central decision is a true dilemma with competing valid options
-   - Add incomplete information, conflicting data, and political context to make it messy
-   - Ensure the final challenge requires producing a specific, high-value executive artifact (not just multiple choice)
-   - Enhance caseFiles to include conflicting perspectives from different stakeholders
-   - Strengthen stages to force difficult trade-offs
-   - Improve rubric to evaluate executive judgment, not just knowledge
+REWRITE to meet all criteria:
+- Central decision: true dilemma with competing valid options
+- Add incomplete info, conflicting data, political context
+- Final challenge: requires specific executive artifact (memo/model/deck/analysis)
+- caseFiles: include conflicting stakeholder perspectives (e.g., Sales email vs Finance recommendation, Legal skepticism)
+- stages: force difficult trade-offs, each prompt requires artifact creation
+- rubric: evaluate executive judgment, not just knowledge
 
-3. For caseFiles: Add at least one file that conflicts with the primary recommendation (e.g., a panicked email from Sales arguing against what Finance recommends, or a skeptical memo from Legal)
-
-4. For stages: Ensure each stage's challengeData.prompt forces the user to create a specific artifact (memo, model, deck, analysis) - not just choose an option
-
-5. Maintain the JSON structure exactly - only improve the content within each field
-
-OUTPUT FORMAT:
-Return ONLY the improved JSON object. Do NOT include any explanations, advice, or commentary. Output valid JSON that can be parsed directly.
-
-CRITICAL: The output must be parseable JSON only. No markdown formatting, no code blocks, no explanations.`
+Maintain JSON structure exactly. Output ONLY improved JSON, no markdown/code blocks/explanations.`
 
   const systemPrompt = 'You are an expert instructional designer specializing in executive case study design. You evaluate and rewrite case studies to meet the highest quality standards.'
 
@@ -223,42 +210,28 @@ export async function enhanceCaseStudyAssetWithAI(
     ? `\nQUALITY STANDARDS (from quality_casestudy.md):\n${qualityStandards}\n`
     : '\nNote: Quality standards file not available. Focus on making the asset messy and realistic with conflicting perspectives.\n'
   
-  const prompt = `You are an expert instructional designer specializing in executive case study design. Your task is to evaluate and rewrite a case study asset file to meet the highest quality standards.${qualityStandardsSection}
+  const prompt = `You are an expert instructional designer. Evaluate and rewrite this case study asset to meet quality standards.${qualityStandardsSection}
 
-CASE STUDY CONTEXT:
-- Title: ${caseContext.title}
-- Description: ${caseContext.description}
-- Competencies: ${caseContext.competencies.join(', ')}
+CONTEXT: Title: ${caseContext.title} | Competencies: ${caseContext.competencies.join(', ')}
 
-ASSET FILE:
-- File Name: ${fileName}
-- File Type: ${fileType}
-- Type Context: ${assetTypeContext}
+ASSET: ${fileName} (${fileType})
 
-CURRENT ASSET CONTENT:
+CURRENT CONTENT:
 ${assetContent}
 
-YOUR TASK:
-1. Evaluate the asset against the case study quality criteria, especially:
-   - Is it Messy? (High-Fidelity Realism) - Does it include incomplete information, conflicting data, or political context?
-   - Does it contribute to a Genuine Dilemma? - Does it present competing perspectives or conflicting advice?
+EVALUATE: Is it Messy (incomplete info, conflicts, political context)? Does it contribute to a Genuine Dilemma (competing perspectives)?
 
-2. Rewrite the asset to meet quality standards. Specifically:
-   - Add realistic "noise" and incomplete information that reflects messy business reality
-   - Include conflicting perspectives or data that create tension (e.g., Sales says one thing, Finance says another)
-   - Make it feel like a real business document with real stakes and political context
-   - Ensure it contributes to the case study's central dilemma, not just provides clean data
+REWRITE:
+- Add realistic "noise" and incomplete info reflecting messy business reality
+- Include conflicting perspectives/data creating tension (e.g., Sales vs Finance)
+- Real business document feel with stakes and political context
+- Contributes to central dilemma, not just clean data
 
-3. For ${fileType} files specifically:
-${assetTypeContext}
+For ${fileType}: ${assetTypeContext}
 
-4. Maintain the original format (markdown, CSV, etc.) - only improve the content
-${fileType === 'FINANCIAL_DATA' && fileName.endsWith('.csv') ? '\nCRITICAL FOR CSV: Output valid CSV format with comma-separated values. Preserve headers and ensure all rows have the same number of columns. Do NOT use markdown tables or pipe separators.' : ''}
+Maintain original format (markdown/CSV/JSON). ${fileType === 'FINANCIAL_DATA' && fileName.endsWith('.csv') ? 'CSV: comma-separated, preserve headers, same columns per row. NO markdown tables/pipes.' : ''}
 
-OUTPUT FORMAT:
-Return ONLY the improved asset content in the same format as the original. Do NOT include any explanations, advice, or commentary. Output the complete rewritten asset content.
-
-CRITICAL: Output the complete asset content only. No markdown code blocks (unless the asset itself is markdown), no explanations, no meta-commentary.`
+OUTPUT: ONLY improved content in same format. No code blocks (unless asset is markdown), no explanations.`
 
   const systemPrompt = 'You are an expert instructional designer specializing in executive case study design. You evaluate and rewrite case study assets to meet the highest quality standards.'
 

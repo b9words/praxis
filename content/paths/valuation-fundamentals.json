@@ -6,21 +6,21 @@
   "items": [
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "intrinsic-value-calculation",
-      "lesson": "owners-earnings-framework"
+      "domain": "capital-allocation",
+      "module": "calculating-intrinsic-value",
+      "lesson": "owners-earnings"
     },
     {
       "type": "lesson",
-      "domain": "second-order-decision-making",
-      "module": "intrinsic-value-calculation",
+      "domain": "capital-allocation",
+      "module": "calculating-intrinsic-value",
       "lesson": "dcf-for-ceo"
     },
     {
       "type": "lesson",
       "domain": "high-stakes-dealmaking-integration",
       "module": "valuation-price-value",
-      "lesson": "valuation-methods"
+      "lesson": "intrinsic-vs-strategic-value"
     }
   ]
 }
